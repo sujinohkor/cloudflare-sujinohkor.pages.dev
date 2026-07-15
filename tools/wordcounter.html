@@ -86,11 +86,24 @@
                 alert("저장할 내용이 없습니다.");
                 return;
             }
+
+            // 현재 날짜 및 시간 가져오기
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            // 파일명 조합 (예: mytext-2026-07-15 18-48-50.txt)
+            const fileName = `mytext-${year}-${month}-${day}${hours}-${minutes}-${seconds}.txt`;
+
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'mytext.txt'; // 기본 파일명
+            a.download = fileName; // 동적으로 생성된 파일명 적용
             a.click();
             URL.revokeObjectURL(url);
         });
