@@ -133,6 +133,7 @@
 
         const userLang = navigator.language || navigator.userLanguage;
         if (!userLang.startsWith('ko')) {
+            document.getElementById('pageTitle').textContent = "Word Counter";
             document.getElementById('titleText').textContent = "Word Counter";
             document.getElementById('homeBtn').textContent = "Go Home";
             textarea.placeholder = "Enter text here";
