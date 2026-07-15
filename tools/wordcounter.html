@@ -11,6 +11,7 @@
             line-height: 1.6;
             display: flex;
             justify-content: center;
+            background-color: #FDF5E6; /* 배경색 적용 */
         }
         .main-container {
             width: 100%;
@@ -26,11 +27,19 @@
         textarea { 
             width: 100%; 
             height: 300px; 
-            padding: 15px; 
+            padding: 20px; 
             box-sizing: border-box; 
             font-family: 'Consolas', 'Malgun Gothic', monospace;
             font-size: 14px;
             resize: vertical; 
+            border-radius: 20px; 
+            border: 2px solid #ddd; 
+            outline: none; 
+            transition: border-color 0.3s; 
+        }
+        textarea:focus {
+            border-color: #ff9e40; 
+            box-shadow: 0 0 8px rgba(255, 158, 64, 0.2); 
         }
         .controls { 
             margin-top: 15px; 
@@ -40,34 +49,30 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        /* 결과 표시 영역 CSS 수정 */
         .result {
             font-weight: bold;
-            display: flex; /* 데스크톱에서는 가로 정렬 */
+            display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
-        /* 구분선 제거 및 각 항목을 블록으로 처리 */
-        .result span.sep {
-            display: none; /* 데스크톱에서도 구분선 대신 gap 사용 */
+        /* 수정된 숫자 색상 적용 */
+        #withSpace, #withoutSpace, #wordCount, #paragraphCount {
+           color: #F38020;
         }
         .topbuttons { display: flex; gap: 10px; }
         .buttons { display: flex; gap: 10px; }
-        button { padding: 8px 16px; cursor: pointer; }
+        button { padding: 8px 16px; cursor: pointer; border-radius: 10px; border: none; background: #ddd; }
+        button:hover { background: #ccc; }
 
         @media (max-width: 600px) {
             .controls {
                 flex-direction: column;
-                align-items: stretch; /* 요소를 가로로 꽉 차게 */
+                align-items: stretch;
             }
-    
-            /* .result를 블록 요소로 명시적으로 변경 */
             .result {
                 display: block; 
                 width: 100%;
             }
-    
-            /* 각 항목을 아래로 한 줄씩 배치 */
             .result div {
                display: block;
                margin-bottom: 5px;
@@ -118,23 +123,14 @@
 
         function updateCounts() {
             const val = textarea.value.trim();
-            
-            // 글자 수
             withSpace.textContent = textarea.value.length;
-            
-            // 공백 제외 글자 수
             withoutSpace.textContent = textarea.value.replace(/(\s*)/g, "").length;
-            
-            // 단어 수 (공백 기준으로 나눈 뒤 빈 문자열 필터링)
             const words = val ? val.split(/\s+/).filter(w => w.length > 0) : [];
             wordCount.textContent = words.length;
-            
-            // 문단 수
             const paragraphs = textarea.value.split('\n').filter(p => p.trim() !== '');
             paragraphCount.textContent = paragraphs.length;
         }
 
-        // 언어 설정 로직 (생략된 코드 수정 포함)
         const userLang = navigator.language || navigator.userLanguage;
         if (!userLang.startsWith('ko')) {
             document.getElementById('titleText').textContent = "Word Counter";
@@ -152,7 +148,7 @@
         copyBtn.addEventListener('click', () => {
             textarea.select();
             document.execCommand('copy');
-            alert("텍스트가 복사되었습니다.");
+            alert(userLang.startsWith('ko') ? "텍스트가 복사되었습니다." : "Text copied.");
         });
 
         resetBtn.addEventListener('click', () => {
@@ -162,7 +158,7 @@
 
         saveBtn.addEventListener('click', () => {
             const text = textarea.value;
-            if (!text) { alert("저장할 내용이 없습니다."); return; }
+            if (!text) { alert(userLang.startsWith('ko') ? "저장할 내용이 없습니다." : "No text to save."); return; }
             const now = new Date();
             const fileName = `mytext-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}.txt`;
             const blob = new Blob([text], { type: 'text/plain' });
