@@ -6,22 +6,32 @@
     <title id="pageTitle">QR 생성 및 해석기</title>
     <style>
         body { font-family: 'Malgun Gothic', 'Consolas', monospace; background-color: #FDF5E6; padding: 20px; text-align: center; margin: 0; }
-        .header-container { display: flex; justify-content: space-between; align-items: center; max-width: 440px; margin: 0 auto 20px auto; }
+        
+        /* 기본 반응형 컨테이너: 모바일에서는 꽉 차게, PC에서는 최대 1000px까지 확장 */
+        .header-container, .box-container { 
+            width: 90%; 
+            max-width: 1000px; 
+            margin: 0 auto 20px auto; 
+        }
+
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
         .header-container h2 { margin: 0; font-size: 1.5rem; }
         .home-btn { text-decoration: none; background: #ddd; color: black; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-        .box-container { margin: 20px auto; padding: 20px; border-radius: 20px; border: 3px solid #ff9e40; background: white; max-width: 400px; }
+        
+        .box-container { padding: 20px; border-radius: 20px; border: 3px solid #ff9e40; background: white; }
         
         textarea { 
-            width: 90%; 
-            height: 100px; 
-            padding: 10px; 
+            width: 100%; /* 컨테이너 폭에 맞게 자동 조절 */
+            height: 150px; 
+            padding: 15px; 
             border-radius: 15px; 
             border: 2px solid #ff9e40; 
             margin-bottom: 10px; 
             box-sizing: border-box; 
-            resize: none; 
+            resize: vertical; /* 세로 크기 조절 허용 */
+            font-size: 1rem;
         }
-        /* textarea 포커스 시 기본 검은색 아웃라인 제거 */
+        
         textarea:focus {
             outline: none;
             border: 2px solid #ff9e40;
@@ -32,7 +42,7 @@
         .file-label:hover { background-color: #ccc; }
         button { background: #ff9e40; color: white; }
         button:hover { background-color: #e68a35; }
-        .btn-group { display: flex; gap: 5px; justify-content: center; align-items: center; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 10px; }
         
         #byteCount { color: #ff9e40; font-weight: bold; font-size: 0.9rem; margin-right: 10px; }
         #qrImg { max-width: 200px; margin-top: 10px; display: none; }
@@ -51,7 +61,6 @@
             <button id="genBtn" onclick="generateQR()">QR 코드 생성</button>
             <button id="saveBtn" onclick="saveQR()">저장하기</button>
         </div>
-        <br>
         <img id="qrImg" src="" alt="QR Code">
     </div>
     <div class="box-container">
