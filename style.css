@@ -1,0 +1,249 @@
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue",  Arial, sans-serif;
+  margin: auto;
+}
+
+.bg-image {
+  position: absolute;
+  bottom: -88%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 165px 0 124px;
+  width: 100%;
+  margin: auto;
+  border: #fbab40;
+  height: 100vh;
+  background-color: #242628;
+  background-image: url(./assets/world.svg);
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: 70px;
+  background-origin: padding-box;
+}
+
+.header h3 {
+  text-align: center;
+  color: #ff9e40;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  margin: 0;
+  line-height: 36px;
+}
+
+.header {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  font-style: normal;
+}
+
+.header > h1 {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 150%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+.header > p {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 150%;
+  text-align: center;
+  color: #ffffff;
+  flex-grow: 0;
+  margin: 16px 0px;
+}
+
+.options {
+  display: flex;
+  flex-direction: row;
+}
+
+.options > a {
+  color: #ffffff;
+  text-decoration: underline;
+  margin: 0px 8px;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 150%;
+}
+
+.options > a:first-of-type {
+  margin-right: 30px;
+}
+
+.logo {
+  margin-top: 75px;
+}
+
+.logo > img {
+  width: 160px;
+  height: 64px;
+}
+
+.learn-more > a > button {
+  background: #f6821f;
+  border-radius: 4px;
+  border: none;
+  width: 180px;
+  margin-top: 78px;
+  height: 55px;
+  color: #ffffff;
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 19px;
+  background: rgba(246, 130, 31, 1);
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) {
+    .container {
+        background-size: contain;
+        background-position-y: center;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+.container{
+    background-size: contain;
+    background-position-y: center;
+    }
+  pre {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    width: 100%;
+  }
+
+  body {
+    width: 100vw;
+  }
+
+  .header img {
+    margin-left: 0;
+  }
+
+  .installation-steps {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  ol {
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+}
+
+
+.custom-list {
+  list-style: none;
+  padding: 0;
+}
+
+.custom-list li {
+  display: flex;
+  align-items: center; /* 핵심: 수직 중앙 정렬 */
+}
+
+/* 가상 요소로 점 생성 */
+.custom-list li::before {
+  content: "•";
+  color: white;
+  font-size: 1.5em;    /* 폰트 크기에 따라 조절 */
+  margin-right: 10px;  /* 점과 제목 사이 간격 */
+}
+
+.custom-list h3 {
+  margin: 0;           /* h3 기본 마진 제거 */
+}
+
+
+
+
+
+
+/* 기본 스타일 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #242628;
+  font-family: -apple-system, system-ui, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  width: 100%;
+  max-width: 1000px; /* 큰 화면에서 너무 넓어지지 않게 제한 */
+}
+
+.header h1 {
+  color: #ffffff;
+  font-size: 3rem; /* 기본 폰트 크기 */
+  margin: 16px 0;
+}
+
+.header h3 {
+  color: #ff9e40;
+  margin: 0;
+}
+
+.custom-list {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.custom-list li a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+/* 반응형 미디어 쿼리 */
+@media screen and (max-width: 600px) {
+  .header h1 {
+    font-size: 1.8rem; /* 모바일 환경에서 제목 크기 축소 */
+  }
+  
+  .custom-list li a {
+    font-size: 1rem; /* 모바일 환경에서 링크 크기 축소 */
+  }
+}
