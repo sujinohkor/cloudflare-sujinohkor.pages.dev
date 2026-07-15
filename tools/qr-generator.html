@@ -10,13 +10,16 @@
         .header-container h2 { margin: 0; font-size: 1.5rem; }
         .home-btn { text-decoration: none; background: #ddd; color: black; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
         .box-container { margin: 20px auto; padding: 20px; border-radius: 20px; border: 3px solid #ff9e40; background: white; max-width: 400px; }
-        input[type="text"] { width: 90%; padding: 10px; border-radius: 20px; border: 2px solid #ff9e40; margin-bottom: 10px; box-sizing: border-box; }
+        /* textarea 스타일 변경 */
+        textarea { width: 90%; height: 100px; padding: 10px; border-radius: 15px; border: 2px solid #ff9e40; margin-bottom: 10px; box-sizing: border-box; resize: none; }
         .file-label, button { padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; border: none; transition: background 0.3s; }
         .file-label { display: inline-block; background-color: #ddd; color: black; margin-bottom: 10px; }
         .file-label:hover { background-color: #ccc; }
         button { background: #ff9e40; color: white; }
         button:hover { background-color: #e68a35; }
-        .btn-group { display: flex; gap: 5px; justify-content: center; }
+        .btn-group { display: flex; gap: 5px; justify-content: center; align-items: center; }
+        /* 바이트 표시 스타일 */
+        #byteCount { color: #ff9e40; font-weight: bold; font-size: 0.9rem; margin-right: 10px; }
         #qrImg { max-width: 200px; margin-top: 10px; display: none; }
         #fileName { display: block; margin-top: 5px; font-size: 0.9rem; color: #555; }
     </style>
@@ -27,8 +30,10 @@
         <a href="../index" class="home-btn" id="homeBtn">집으로</a>
     </div>
     <div class="box-container">
-        <input type="text" id="textInput" placeholder="생성할 텍스트/URL 입력">
+        <!-- textarea로 변경 -->
+        <textarea id="textInput" placeholder="생성할 텍스트/URL 입력" oninput="updateByteCount()"></textarea>
         <div class="btn-group">
+            <span id="byteCount">0B</span> <!-- 바이트 수 표시 -->
             <button id="genBtn" onclick="generateQR()">QR 코드 생성</button>
             <button id="saveBtn" onclick="saveQR()">저장하기</button>
         </div>
@@ -64,6 +69,13 @@
         document.getElementById('fileName').textContent = t.file;
         document.getElementById('decodeBtn').textContent = t.decode;
 
+        // 바이트 수 업데이트 함수
+        function updateByteCount() {
+            const text = document.getElementById('textInput').value;
+            const bytes = new TextEncoder().encode(text).length;
+            document.getElementById('byteCount').textContent = bytes + 'B';
+        }
+
         document.getElementById('fileInput').addEventListener('change', function() {
             document.getElementById('fileName').textContent = this.files.length > 0 ? this.files[0].name : t.file;
         });
@@ -73,7 +85,6 @@
             const qrImg = document.getElementById('qrImg');
             if (!text) return alert(t.alertVal);
 
-            // 데이터 길이 검증 (UTF-8 기준 1,000바이트 제한)
             const byteLength = new TextEncoder().encode(text).length;
             if (byteLength > 1000) return alert(t.alertTooLong);
 
