@@ -7,7 +7,6 @@
     <style>
         body { font-family: 'Malgun Gothic', 'Consolas', monospace; background-color: #FDF5E6; padding: 20px; text-align: center; margin: 0; }
         
-        /* 기본 반응형 컨테이너: 모바일에서는 꽉 차게, PC에서는 최대 1000px까지 확장 */
         .header-container, .box-container { 
             width: 90%; 
             max-width: 1000px; 
@@ -21,15 +20,17 @@
         .box-container { padding: 20px; border-radius: 20px; border: 3px solid #ff9e40; background: white; }
         
         textarea { 
-            width: 100%; /* 컨테이너 폭에 맞게 자동 조절 */
+            width: 100%; 
             height: 150px; 
             padding: 15px; 
             border-radius: 15px; 
             border: 2px solid #ff9e40; 
             margin-bottom: 10px; 
             box-sizing: border-box; 
-            resize: vertical; /* 세로 크기 조절 허용 */
+            resize: vertical; 
             font-size: 1rem;
+            /* 영문 Consolas, 한글 맑은 고딕 적용 */
+            font-family: 'Consolas', 'Malgun Gothic', sans-serif;
         }
         
         textarea:focus {
