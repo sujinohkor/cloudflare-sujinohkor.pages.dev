@@ -16,6 +16,14 @@
             width: 100%;
             max-width: 1000px;
         }
+        /* 제목과 버튼을 정렬하는 스타일 */
+        .title-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* 추가: 양 끝 배치 */
+            width: 100%;
+            gap: 15px;
+        }
         textarea { 
             width: 100%; 
             height: 300px; 
@@ -23,7 +31,7 @@
             box-sizing: border-box; 
             font-family: 'Consolas', 'Malgun Gothic', monospace;
             font-size: 14px;
-            resize: vertical; /* 이 속성을 추가합니다 */
+            resize: vertical; 
         }
         .controls { 
             margin-top: 15px; 
@@ -34,6 +42,7 @@
             gap: 10px;
         }
         .result { font-weight: bold; }
+        .topbuttons { display: flex; gap: 10px; }
         .buttons { display: flex; gap: 10px; }
         button { padding: 8px 16px; cursor: pointer; }
 
@@ -48,7 +57,16 @@
 <body>
 
     <div class="main-container">
-        <h2>글자 수 및 문단 수 세기</h2>
+        <!-- 제목과 버튼 영역 -->
+        <div class="title-area">
+            <div class="subtitle">
+              <h2>글자 수 및 문단 수 세기</h2>
+            </div>
+            <div class="topbuttons">
+              <button id="homeBtn" onclick="location.href='index.html'">집으로 가기</button>
+            </div>
+        </div>
+        
         <textarea id="textInput" placeholder="내용을 입력하세요."></textarea>
         
         <div class="controls">
@@ -58,6 +76,7 @@
                 문단 수: <span id="paragraphCount">0</span>개
             </div>
             <div class="buttons">
+                <button id="copyBtn">복사하기</button>
                 <button id="saveBtn">저장(.txt)</button>
                 <button id="resetBtn">초기화</button>
             </div>
@@ -71,24 +90,26 @@
         const paragraphCount = document.getElementById('paragraphCount');
         const saveBtn = document.getElementById('saveBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const copyBtn = document.getElementById('copyBtn'); // 추가된 버튼
 
         textarea.addEventListener('input', updateCounts);
 
-        // 초기화 버튼
+        // 복사하기 기능
+        copyBtn.addEventListener('click', () => {
+            textarea.select();
+            document.execCommand('copy');
+            alert("텍스트가 복사되었습니다.");
+        });
+
         resetBtn.addEventListener('click', () => {
             textarea.value = '';
             updateCounts();
         });
 
-        // 저장 버튼: Blob 객체를 사용해 파일 생성 및 다운로드
         saveBtn.addEventListener('click', () => {
             const text = textarea.value;
-            if (!text) {
-                alert("저장할 내용이 없습니다.");
-                return;
-            }
+            if (!text) { alert("저장할 내용이 없습니다."); return; }
 
-            // 현재 날짜 및 시간 가져오기
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -97,14 +118,12 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
 
-            // 파일명 조합 (예: mytext-2026-07-15 18-48-50.txt)
             const fileName = `mytext-${year}-${month}-${day}-${hours}-${minutes}-${seconds}.txt`;
-
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = fileName; // 동적으로 생성된 파일명 적용
+            a.download = fileName;
             a.click();
             URL.revokeObjectURL(url);
         });
