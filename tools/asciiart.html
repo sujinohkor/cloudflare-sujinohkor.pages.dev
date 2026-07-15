@@ -6,7 +6,7 @@
     <title id="pageTitle">ASCII Art Converter</title>
     <style>
         body { 
-            font-family: 'Consolas', monospace; 
+            font-family: 'Malgun Gothic', 'Consolas', monospace; 
             background-color: #FDF5E6; 
             padding: 40px 20px; 
             text-align: center; 
@@ -22,7 +22,7 @@
             display: block; 
             border-radius: 20px;
             width: calc(100% - 40px); 
-            max-width: 800px; /* 데스크톱에서 너무 커지는 것 방지[cite: 3] */
+            max-width: 800px; 
             margin-left: auto; 
             margin-right: auto;
             overflow-x: hidden; 
@@ -32,30 +32,18 @@
         }
         canvas { display: none !important; width: 0; height: 0; }
         
-        .file-upload-btn { 
-            display: inline-block; 
-            padding: 20px 40px; 
-            background-color: #ff9e40; 
-            color: white; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-size: 1.5rem; 
-            font-weight: bold; 
-            transition: background-color 0.3s; 
-        }
-        .file-upload-btn:hover { background-color: #e68a35; }
-        
-        .buttons { 
-            margin-top: 40px; 
+        /* 버튼 영역 공통 스타일 */
+        .btn-container { 
             display: flex; 
             justify-content: center; 
             gap: 10px; 
             flex-wrap: nowrap; 
-            max-width: 600px; /* 버튼 영역 최대 너비 제한[cite: 3] */
-            margin-left: auto; 
-            margin-right: auto;
+            max-width: 600px; 
+            margin: 20px auto; 
         }
-        button { 
+        
+        /* 모든 버튼 통일된 스타일 */
+        .btn-style { 
             padding: 15px 10px; 
             cursor: pointer; 
             border-radius: 15px; 
@@ -64,36 +52,53 @@
             font-size: 1rem; 
             flex: 1; 
             min-width: 0; 
-            max-width: 150px; /* 버튼 개별 최대 너비 제한[cite: 3] */
+            max-width: 150px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: black;
+            font-family: inherit;
         }
+        
+        /* 이미지 선택 전용 추가 스타일 */
+        .file-upload-btn { background-color: #ff9e40; color: white; font-weight: bold; }
+        .file-upload-btn:hover { background-color: #e68a35; }
+        .btn-style:hover { background-color: #ccc; }
     </style>
 </head>
 <body>
     <h2 id="mainHeading">이미지 → 아스키 아트 변환기</h2>
     
-    <label for="imageInput" class="file-upload-btn" id="fileLabel">이미지 선택하기</label>
+    <!-- 이미지 선택과 집으로 버튼 영역 -->
+    <div class="btn-container">
+        <label for="imageInput" class="btn-style file-upload-btn" id="fileLabel">이미지 선택하기</label>
+        <a href="/" class="btn-style" id="homeBtn">집으로</a>
+    </div>
     <input type="file" id="imageInput" accept="image/*" style="display:none;">
     
-    <br>
     <div id="asciiOutput"></div>
 
-    <div class="buttons">
-        <button id="copyBtn">복사하기</button>
-        <button id="saveBtn">저장</button>
-        <button id="resetBtn">초기화</button>
+    <!-- 하단 제어 버튼 -->
+    <div class="btn-container">
+        <button class="btn-style" id="copyBtn">복사하기</button>
+        <button class="btn-style" id="saveBtn">저장</button>
+        <button class="btn-style" id="resetBtn">초기화</button>
     </div>
     
     <canvas id="canvas"></canvas>
 
     <script>
         const lang = {
-            ko: { heading: "이미지 → 아스키 아트 변환기", label: "이미지 선택하기", copy: "복사하기", save: "저장", reset: "초기화", alertCopy: "복사되었습니다." },
-            en: { heading: "Image to ASCII Art Converter", label: "Select Image", copy: "Copy", save: "Save", reset: "Reset", alertCopy: "Copied!" }
+            ko: { heading: "이미지 → 아스키 아트 변환기", label: "이미지 선택하기", home: "집으로", copy: "복사하기", save: "저장", reset: "초기화", alertCopy: "복사되었습니다." },
+            en: { heading: "Image to ASCII Art Converter", label: "Select Image", home: "Home", copy: "Copy", save: "Save", reset: "Reset", alertCopy: "Copied!" }
         };
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
         const t = lang[userLang];
+        
         document.getElementById('mainHeading').textContent = t.heading;
         document.getElementById('fileLabel').textContent = t.label;
+        document.getElementById('homeBtn').textContent = t.home;
         document.getElementById('copyBtn').textContent = t.copy;
         document.getElementById('saveBtn').textContent = t.save;
         document.getElementById('resetBtn').textContent = t.reset;
@@ -111,7 +116,6 @@
                     const fontSize = Math.min(8, 350 / baseWidth); 
                     asciiOutput.style.fontSize = fontSize + "px";
                     asciiOutput.style.lineHeight = fontSize + "px";
-
                     canvas.width = baseWidth;
                     canvas.height = Math.floor((img.height / img.width) * baseWidth * 0.5);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
