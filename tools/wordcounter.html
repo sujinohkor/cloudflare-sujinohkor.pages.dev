@@ -10,11 +10,11 @@
             padding: 20px; 
             line-height: 1.6;
             display: flex;
-            justify-content: center; /* 전체 화면에서 중앙 정렬 */
+            justify-content: center;
         }
         .main-container {
             width: 100%;
-            max-width: 1000px; /* 최대 너비 1000px */
+            max-width: 1000px;
         }
         textarea { 
             width: 100%; 
@@ -29,20 +29,17 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            flex-wrap: wrap; /* 600px 이하에서 줄바꿈 발생 */
+            flex-wrap: wrap;
             gap: 10px;
         }
         .result { font-weight: bold; }
+        .buttons { display: flex; gap: 10px; }
         button { padding: 8px 16px; cursor: pointer; }
 
-        /* 600px 이하 반응형 설정 */
         @media (max-width: 600px) {
             .controls {
                 flex-direction: column;
                 align-items: flex-start;
-            }
-            .result {
-                font-size: 0.9rem;
             }
         }
     </style>
@@ -59,7 +56,10 @@
                 공백 제외: <span id="withoutSpace">0</span>자 | 
                 문단 수: <span id="paragraphCount">0</span>개
             </div>
-            <button id="resetBtn">초기화</button>
+            <div class="buttons">
+                <button id="saveBtn">저장(.txt)</button>
+                <button id="resetBtn">초기화</button>
+            </div>
         </div>
     </div>
     
@@ -68,21 +68,37 @@
         const withSpace = document.getElementById('withSpace');
         const withoutSpace = document.getElementById('withoutSpace');
         const paragraphCount = document.getElementById('paragraphCount');
+        const saveBtn = document.getElementById('saveBtn');
         const resetBtn = document.getElementById('resetBtn');
 
         textarea.addEventListener('input', updateCounts);
 
+        // 초기화 버튼
         resetBtn.addEventListener('click', () => {
             textarea.value = '';
             updateCounts();
         });
 
+        // 저장 버튼: Blob 객체를 사용해 파일 생성 및 다운로드
+        saveBtn.addEventListener('click', () => {
+            const text = textarea.value;
+            if (!text) {
+                alert("저장할 내용이 없습니다.");
+                return;
+            }
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mytext.txt'; // 기본 파일명
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
         function updateCounts() {
             const val = textarea.value;
-            
             withSpace.textContent = val.length;
             withoutSpace.textContent = val.replace(/(\s*)/g, "").length;
-
             const paragraphs = val.split('\n').filter(p => p.trim() !== '');
             paragraphCount.textContent = paragraphs.length;
         }
