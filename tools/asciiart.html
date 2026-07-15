@@ -2,16 +2,60 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title id="pageTitle">이미지 → 아스키 아트 변환기</title>
+    <!-- 모바일 화면 대응 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="pageTitle">ASCII Art Converter</title>
     <style>
-        body { font-family: 'Consolas', monospace; background-color: #FDF5E6; padding: 20px; text-align: center; }
-        #asciiOutput { white-space: pre; font-size: 8px; line-height: 8px; margin-top: 20px; background: white; padding: 20px; display: inline-block; border-radius: 20px; }
+        body { 
+            font-family: 'Consolas', monospace; 
+            background-color: #FDF5E6; 
+            padding: 40px 20px; /* 위아래 여백 추가 */
+            text-align: center; 
+        }
+        
+        /* 헤더 크기 확대 */
+        h2 { font-size: 2.2rem; margin-bottom: 30px; }
+        
+        /* 아스키 출력 영역 설정 */
+        #asciiOutput { 
+            white-space: pre; 
+            font-size: 6px; 
+            line-height: 7px; 
+            margin-top: 40px; 
+            background: white; 
+            padding: 30px; 
+            display: inline-block; 
+            border-radius: 20px;
+            width: 90%;
+            overflow-x: auto;
+        }
+        
         canvas { display: none !important; width: 0; height: 0; }
-        .file-upload-btn { display: inline-block; padding: 10px 20px; background-color: #ff9e40; color: white; border-radius: 15px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
-        .file-upload-btn:hover { background-color: #e68a35; }
-        .buttons { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
-        button { padding: 8px 16px; cursor: pointer; border-radius: 10px; border: none; background: #ddd; }
-        button:hover { background: #ccc; }
+        
+        /* 파일 선택 버튼 대형화 */
+        .file-upload-btn { 
+            display: inline-block; 
+            padding: 20px 40px; 
+            background-color: #ff9e40; 
+            color: white; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 1.5rem; /* 버튼 글자 크기 확대 */
+            font-weight: bold; 
+            transition: background-color 0.3s; 
+        }
+        
+        /* 하단 제어 버튼 대형화 */
+        .buttons { margin-top: 40px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        button { 
+            padding: 20px 30px; 
+            cursor: pointer; 
+            border-radius: 15px; 
+            border: none; 
+            background: #ddd; 
+            font-size: 1.3rem; /* 버튼 글자 크기 확대 */
+            min-width: 140px;  /* 버튼 최소 너비 설정 */
+        }
     </style>
 </head>
 <body>
@@ -32,7 +76,6 @@
     <canvas id="canvas"></canvas>
 
     <script>
-        // 다국어 텍스트 정의[cite: 5]
         const lang = {
             ko: { heading: "이미지 → 아스키 아트 변환기", label: "이미지 선택하기", copy: "복사하기", save: "저장", reset: "초기화", alertCopy: "복사되었습니다." },
             en: { heading: "Image to ASCII Art Converter", label: "Select Image", copy: "Copy", save: "Save", reset: "Reset", alertCopy: "Copied!" }
@@ -41,13 +84,13 @@
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
         const t = lang[userLang];
 
-        // 텍스트 적용[cite: 5]
         document.getElementById('mainHeading').textContent = t.heading;
         document.getElementById('fileLabel').textContent = t.label;
         document.getElementById('copyBtn').textContent = t.copy;
         document.getElementById('saveBtn').textContent = t.save;
         document.getElementById('resetBtn').textContent = t.reset;
 
+        // 변환 로직 (이전과 동일)
         const imageInput = document.getElementById('imageInput');
         const asciiOutput = document.getElementById('asciiOutput');
         const canvas = document.getElementById('canvas');
@@ -57,7 +100,6 @@
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
