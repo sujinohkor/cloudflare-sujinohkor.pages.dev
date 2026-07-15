@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title id="pageTitle">텍스트 → 아스키 아트</title>
+    <!-- CDN 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/figlet@1.8.0/lib/figlet.min.js"></script>
+    <style>
+        body { background-color: #FDF5E6; padding: 20px; text-align: center; font-family: 'Malgun Gothic', 'Consolas', monospace; }
+        
+        /* 헤더 컨테이너 */
+        .header-area { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
+        
+        textarea { 
+            width: 300px; 
+            height: 100px; 
+            border-radius: 20px; 
+            padding: 10px; 
+            border: 2px solid #ff9e40; 
+            outline: none;
+        }
+
+        button { 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            border: none; 
+            background: #ff9e40; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #e68a35; }
+        
+        /* 집으로 버튼 */
+        .home-btn { background: #ddd; color: black; text-decoration: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
+        .home-btn:hover { background: #ccc; }
+
+        #asciiOutput { 
+            white-space: pre; 
+            font-family: monospace; 
+            margin-top: 20px; 
+            background: white; 
+            padding: 20px; 
+            border: 3px solid #ff9e40; 
+            border-radius: 20px; 
+            display: inline-block; 
+            font-size: 12px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-area">
+        <h2 id="mainTitle">텍스트 → 아스키 아트</h2>
+        <a href="../index.html" class="home-btn" id="homeBtn">집으로</a>
+    </div>
+
+    <textarea id="textInput" placeholder="영문 글자를 입력하세요(유니코드 미지원)"></textarea>
+    <br>
+    <button id="convertBtn" onclick="convertText()">변환하기</button>
+    <br>
+    <div id="asciiOutput"></div>
+    <br>
+    <button id="saveBtn" style="display:none;" onclick="saveASCII()">저장하기</button>
+
+    <script>
+        // 다국어 데이터 설정[cite: 3]
+        const lang = {
+            ko: { title: "텍스트 → 아스키 아트", home: "집으로", placeholder: "영문 글자를 입력하세요(유니코드 미지원)", convert: "변환하기", alertInput: "글자를 입력해 주세요.", errUnicode: "변환 불가: 유니코드가 포함되어 있습니다.", errFail: "변환 오류", save: "저장하기" },
+            en: { title: "Text → ASCII Art", home: "Go Home", placeholder: "Enter English text (No Unicode)", convert: "Convert", alertInput: "Please enter text.", errUnicode: "Conversion failed: Unicode characters are not supported.", errFail: "Conversion error", save: "Save" }
+        };
+
+        const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
+        const t = lang[userLang];
+
+        // 텍스트 적용[cite: 3]
+        document.getElementById('pageTitle').textContent = t.title;
+        document.getElementById('mainTitle').textContent = t.title;
+        document.getElementById('homeBtn').textContent = t.home;
+        document.getElementById('textInput').placeholder = t.placeholder;
+        document.getElementById('convertBtn').textContent = t.convert;
+        document.getElementById('saveBtn').textContent = t.save;
+
+        figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
+
+        function convertText() {
+            const text = document.getElementById('textInput').value;
+            
+            if (!text.trim()) {
+                alert(t.alertInput);
+                return;
+            }
+
+            if (/[^\x00-\x7F]/.test(text)) {
+                document.getElementById('asciiOutput').textContent = t.errUnicode;
+                document.getElementById('saveBtn').style.display = 'none';
+                return;
+            }
+
+            figlet.text(text, { font: 'Standard' }, function(err, data) {
+                if (err) {
+                    document.getElementById('asciiOutput').textContent = t.errFail;
+                    return;
+                }
+                document.getElementById('asciiOutput').textContent = data;
+                document.getElementById('saveBtn').style.display = 'inline-block';
+            });
+        }
+
+        function saveASCII() {
+            const asciiData = document.getElementById('asciiOutput').textContent;
+            const blob = new Blob([asciiData], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'ascii_art.txt';
+            a.click();
+        }
+    </script>
+</body>
+</html>
