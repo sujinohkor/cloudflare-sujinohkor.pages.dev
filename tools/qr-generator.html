@@ -5,61 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="pageTitle">QR 생성 및 해석기</title>
     <style>
-        body { 
-            font-family: 'Malgun Gothic', 'Consolas', monospace; 
-            background-color: #FDF5E6; 
-            padding: 20px; 
-            text-align: center; 
-            margin: 0;
-        }
-        /* 헤더 영역 스타일 추가[cite: 3] */
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 440px;
-            margin: 0 auto 20px auto;
-        }
+        body { font-family: 'Malgun Gothic', 'Consolas', monospace; background-color: #FDF5E6; padding: 20px; text-align: center; margin: 0; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; max-width: 440px; margin: 0 auto 20px auto; }
         .header-container h2 { margin: 0; font-size: 1.5rem; }
-        .home-btn {
-            text-decoration: none;
-            background: #ddd;
-            color: black;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .box-container { 
-            margin: 20px auto; 
-            padding: 20px; 
-            border-radius: 20px; 
-            border: 3px solid #ff9e40; 
-            background: white; 
-            max-width: 400px;
-        }
-        input[type="text"] { 
-            width: 90%; 
-            padding: 10px; 
-            border-radius: 20px; 
-            border: 2px solid #ff9e40; 
-            margin-bottom: 10px; 
-            box-sizing: border-box;
-        }
-        .file-label, button {
-            padding: 10px 20px;
-            border-radius: 20px; 
-            cursor: pointer;
-            font-weight: bold;
-            border: none;
-            transition: background 0.3s;
-        }
-        .file-label {
-            display: inline-block;
-            background-color: #ddd;
-            color: black;
-            margin-bottom: 10px;
-        }
+        .home-btn { text-decoration: none; background: #ddd; color: black; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+        .box-container { margin: 20px auto; padding: 20px; border-radius: 20px; border: 3px solid #ff9e40; background: white; max-width: 400px; }
+        input[type="text"] { width: 90%; padding: 10px; border-radius: 20px; border: 2px solid #ff9e40; margin-bottom: 10px; box-sizing: border-box; }
+        .file-label, button { padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; border: none; transition: background 0.3s; }
+        .file-label { display: inline-block; background-color: #ddd; color: black; margin-bottom: 10px; }
         .file-label:hover { background-color: #ccc; }
         button { background: #ff9e40; color: white; }
         button:hover { background-color: #e68a35; }
@@ -69,13 +22,10 @@
     </style>
 </head>
 <body>
-
-    <!-- 최상단 헤더 영역[cite: 3] -->
     <div class="header-container">
         <h2 id="headerTitle">QR 코드 생성기</h2>
         <a href="../index" class="home-btn" id="homeBtn">집으로</a>
     </div>
-
     <div class="box-container">
         <input type="text" id="textInput" placeholder="생성할 텍스트/URL 입력">
         <div class="btn-group">
@@ -85,7 +35,6 @@
         <br>
         <img id="qrImg" src="" alt="QR Code">
     </div>
-
     <div class="box-container">
         <label for="fileInput" id="fileLabel" class="file-label">파일 선택</label>
         <span id="fileName">선택된 파일 없음</span>
@@ -97,13 +46,14 @@
 
     <script>
         const lang = {
-            ko: { title: "QR 생성 및 해석기", header: "QR 코드 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "저장에 실패했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
-            en: { title: "QR Generator & Decoder", header: "QR Code Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "Save failed.", alertFile: "Please select an image.", fail: "Decoding failed" }
+            ko: { title: "QR 생성 및 해석기", header: "QR 코드 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "저장에 실패했습니다.", alertFile: "이미지를 선택하세요.", alertTooLong: "데이터가 너무 깁니다. (최대 1,000바이트)", fail: "해석 실패" },
+            en: { title: "QR Generator & Decoder", header: "QR Code Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "Save failed.", alertFile: "Please select an image.", alertTooLong: "Data is too long (Max 1,000 bytes)", fail: "Decoding failed" }
         };
 
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
         const t = lang[userLang];
 
+        // UI 텍스트 초기화
         document.getElementById('pageTitle').textContent = t.title;
         document.getElementById('headerTitle').textContent = t.header;
         document.getElementById('homeBtn').textContent = t.home;
@@ -118,12 +68,28 @@
             document.getElementById('fileName').textContent = this.files.length > 0 ? this.files[0].name : t.file;
         });
 
-        function generateQR() {
+        async function generateQR() {
             const text = document.getElementById('textInput').value;
             const qrImg = document.getElementById('qrImg');
             if (!text) return alert(t.alertVal);
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
-            qrImg.style.display = "inline-block";
+
+            // 데이터 길이 검증 (UTF-8 기준 1,000바이트 제한)
+            const byteLength = new TextEncoder().encode(text).length;
+            if (byteLength > 1000) return alert(t.alertTooLong);
+
+            const url = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
+            
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    qrImg.src = url;
+                    qrImg.style.display = "inline-block";
+                } else {
+                    alert(t.alertErr);
+                }
+            } catch (e) {
+                alert(t.alertErr);
+            }
         }
 
         async function saveQR() {
@@ -150,16 +116,17 @@
             if (!file) return alert(t.alertFile);
             const formData = new FormData();
             formData.append('file', file);
-            
+                        
             fetch('https://api.qrserver.com/v1/read-qr-code/', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                const res = data[0].symbol[0].data;
+                const res = data[0]?.symbol[0]?.data;
                 document.getElementById('resultText').textContent = res || t.fail;
-            });
+            })
+            .catch(() => alert(t.fail));
         }
     </script>
 </body>
