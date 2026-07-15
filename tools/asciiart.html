@@ -99,7 +99,8 @@
         };
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
         const t = lang[userLang];
-        
+
+        document.getElementById('pageTitle').textContent = t.title;
         document.getElementById('mainHeading').textContent = t.heading;
         document.getElementById('fileLabel').textContent = t.label;
         document.getElementById('homeBtn').textContent = t.home;
