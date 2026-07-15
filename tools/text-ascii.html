@@ -2,17 +2,18 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- 모바일 대응 viewport 설정[cite: 3] -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">텍스트 → 아스키 아트</title>
-    <!-- CDN 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/figlet@1.8.0/lib/figlet.min.js"></script>
     <style>
         body { background-color: #FDF5E6; padding: 20px; text-align: center; font-family: 'Malgun Gothic', 'Consolas', monospace; }
         
-        /* 헤더 컨테이너 */
         .header-area { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
         
         textarea { 
-            width: 300px; 
+            width: 90%; /* 모바일 대응을 위해 %로 변경 */
+            max-width: 300px;
             height: 100px; 
             border-radius: 20px; 
             padding: 10px; 
@@ -32,7 +33,6 @@
         }
         button:hover { background: #e68a35; }
         
-        /* 집으로 버튼 */
         .home-btn { background: #ddd; color: black; text-decoration: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
         .home-btn:hover { background: #ccc; }
 
@@ -45,8 +45,15 @@
             border: 3px solid #ff9e40; 
             border-radius: 20px; 
             display: inline-block; 
-            font-size: 12px;
+            font-size: 12px; /* 기본 글자 크기 */
             text-align: left;
+            overflow-x: auto; /* 너무 길면 옆으로 스크롤 */
+            max-width: 90vw;
+        }
+
+        /* 모바일 최적화 미디어 쿼리[cite: 3] */
+        @media (max-width: 600px) {
+            #asciiOutput { font-size: 8px; } /* 모바일에서는 글자를 작게 줄여서 한 줄에 다 보이게 함 */
         }
     </style>
 </head>
@@ -65,7 +72,6 @@
     <button id="saveBtn" style="display:none;" onclick="saveASCII()">저장하기</button>
 
     <script>
-        // 다국어 데이터 설정[cite: 3]
         const lang = {
             ko: { title: "텍스트 → 아스키 아트", home: "집으로", placeholder: "영문 글자를 입력하세요(유니코드 미지원)", convert: "변환하기", alertInput: "글자를 입력해 주세요.", errUnicode: "변환 불가: 유니코드가 포함되어 있습니다.", errFail: "변환 오류", save: "저장하기" },
             en: { title: "Text → ASCII Art", home: "Go Home", placeholder: "Enter English text (No Unicode)", convert: "Convert", alertInput: "Please enter text.", errUnicode: "Conversion failed: Unicode characters are not supported.", errFail: "Conversion error", save: "Save" }
@@ -74,7 +80,6 @@
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
         const t = lang[userLang];
 
-        // 텍스트 적용[cite: 3]
         document.getElementById('pageTitle').textContent = t.title;
         document.getElementById('mainTitle').textContent = t.title;
         document.getElementById('homeBtn').textContent = t.home;
@@ -86,23 +91,14 @@
 
         function convertText() {
             const text = document.getElementById('textInput').value;
-            
-            if (!text.trim()) {
-                alert(t.alertInput);
-                return;
-            }
-
+            if (!text.trim()) { alert(t.alertInput); return; }
             if (/[^\x00-\x7F]/.test(text)) {
                 document.getElementById('asciiOutput').textContent = t.errUnicode;
                 document.getElementById('saveBtn').style.display = 'none';
                 return;
             }
-
             figlet.text(text, { font: 'Standard' }, function(err, data) {
-                if (err) {
-                    document.getElementById('asciiOutput').textContent = t.errFail;
-                    return;
-                }
+                if (err) { document.getElementById('asciiOutput').textContent = t.errFail; return; }
                 document.getElementById('asciiOutput').textContent = data;
                 document.getElementById('saveBtn').style.display = 'inline-block';
             });
