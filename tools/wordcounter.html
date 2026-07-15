@@ -97,7 +97,7 @@
             const seconds = String(now.getSeconds()).padStart(2, '0');
 
             // 파일명 조합 (예: mytext-2026-07-15 18-48-50.txt)
-            const fileName = `mytext-${year}-${month}-${day}${hours}-${minutes}-${seconds}.txt`;
+            const fileName = `mytext-${year}-${month}-${day}-${hours}-${minutes}-${seconds}.txt`;
 
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
