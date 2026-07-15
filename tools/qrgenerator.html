@@ -12,6 +12,24 @@
             text-align: center; 
             margin: 0;
         }
+        /* 헤더 영역 스타일 추가[cite: 3] */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 440px;
+            margin: 0 auto 20px auto;
+        }
+        .header-container h2 { margin: 0; font-size: 1.5rem; }
+        .home-btn {
+            text-decoration: none;
+            background: #ddd;
+            color: black;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
         .box-container { 
             margin: 20px auto; 
             padding: 20px; 
@@ -52,6 +70,12 @@
 </head>
 <body>
 
+    <!-- 최상단 헤더 영역[cite: 3] -->
+    <div class="header-container">
+        <h2 id="headerTitle">QR 코드 생성기</h2>
+        <a href="../index" class="home-btn" id="homeBtn">집으로</a>
+    </div>
+
     <div class="box-container">
         <input type="text" id="textInput" placeholder="생성할 텍스트/URL 입력">
         <div class="btn-group">
@@ -72,17 +96,17 @@
     </div>
 
     <script>
-        // 다국어 설정 데이터
         const lang = {
-            ko: { title: "QR 생성 및 해석기", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "저장에 실패했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
-            en: { title: "QR Generator & Decoder", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "Save failed.", alertFile: "Please select an image.", fail: "Decoding failed" }
+            ko: { title: "QR 생성 및 해석기", header: "QR 코드 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "저장에 실패했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
+            en: { title: "QR Generator & Decoder", header: "QR Code Generator", home: "Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "Save failed.", alertFile: "Please select an image.", fail: "Decoding failed" }
         };
 
-        // 사용자 언어 감지 및 적용
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
         const t = lang[userLang];
 
         document.getElementById('pageTitle').textContent = t.title;
+        document.getElementById('headerTitle').textContent = t.header;
+        document.getElementById('homeBtn').textContent = t.home;
         document.getElementById('textInput').placeholder = t.placeholder;
         document.getElementById('genBtn').textContent = t.gen;
         document.getElementById('saveBtn').textContent = t.save;
