@@ -5,39 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="pageTitle">ASCII Art Converter</title>
     <style>
-        body { font-family: 'Consolas', monospace; background-color: #FDF5E6; padding: 40px 20px; text-align: center; }
+        body { 
+            font-family: 'Consolas', monospace; 
+            background-color: #FDF5E6; 
+            padding: 40px 20px; 
+            text-align: center; 
+            margin: 0;
+        }
         h2 { font-size: 2.2rem; margin-bottom: 30px; }
         
         #asciiOutput { 
             white-space: pre; 
             margin-top: 40px; 
             background: white; 
-            padding: 30px; 
-            display: block; /* 중앙 정렬을 위해 block으로 변경 */
+            padding: 15px; 
+            display: block; 
             border-radius: 20px;
-            width: 90%; 
-            margin-left: auto; /* 좌우 여백 자동화 */
-            margin-right: auto; /* 좌우 여백 자동화 */
-            overflow-x: auto;
+            /* 좌우 여백을 정확히 맞추고 가로 스크롤 방지 */
+            width: calc(100% - 40px); 
+            margin-left: auto; 
+            margin-right: auto;
+            overflow-x: hidden; 
+            word-break: break-all;
+            box-sizing: border-box; /* 패딩을 너비에 포함 */
             text-align: center;
         }
         canvas { display: none !important; width: 0; height: 0; }
-        .file-upload-btn { display: inline-block; padding: 20px 40px; background-color: #ff9e40; color: white; border-radius: 20px; cursor: pointer; font-size: 1.5rem; font-weight: bold; transition: background-color 0.3s; }
-        .buttons { margin-top: 40px; display: flex; justify-content: center; gap: 10px; flex-wrap: nowrap; }
-        button { padding: 15px 10px; cursor: pointer; border-radius: 15px; border: none; background: #ddd; font-size: 1rem; flex: 1; min-width: 0; }
+        
+        .file-upload-btn { 
+            display: inline-block; 
+            padding: 20px 40px; 
+            background-color: #ff9e40; 
+            color: white; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            transition: background-color 0.3s; 
+        }
+        .file-upload-btn:hover { background-color: #e68a35; }
+        
+        .buttons { 
+            margin-top: 40px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: nowrap; /* 버튼 한 줄 정렬 */
+        }
+        button { 
+            padding: 15px 10px; 
+            cursor: pointer; 
+            border-radius: 15px; 
+            border: none; 
+            background: #ddd; 
+            font-size: 1rem; 
+            flex: 1; /* 동일한 너비 점유 */
+            min-width: 0; /* 내부 텍스트에 구애받지 않음 */
+        }
     </style>
 </head>
 <body>
     <h2 id="mainHeading">이미지 → 아스키 아트 변환기</h2>
+    
     <label for="imageInput" class="file-upload-btn" id="fileLabel">이미지 선택하기</label>
     <input type="file" id="imageInput" accept="image/*" style="display:none;">
+    
     <br>
     <div id="asciiOutput"></div>
+
     <div class="buttons">
         <button id="copyBtn">복사하기</button>
         <button id="saveBtn">저장</button>
         <button id="resetBtn">초기화</button>
     </div>
+    
     <canvas id="canvas"></canvas>
 
     <script>
@@ -62,9 +103,10 @@
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    // 이미지 크기에 따른 글자 크기 동적 조절
-                    const baseWidth = 100;
-                    const fontSize = Math.max(2, 800 / img.width); 
+                    const baseWidth = 60; // 모바일 화면 최적화를 위한 가로 폭
+                    
+                    // 이미지 너비에 따라 글자 크기 동적 조절
+                    const fontSize = Math.min(8, 350 / baseWidth); 
                     asciiOutput.style.fontSize = fontSize + "px";
                     asciiOutput.style.lineHeight = fontSize + "px";
 
@@ -87,7 +129,27 @@
             };
             reader.readAsDataURL(file);
         });
-        // (버튼 이벤트 리스너는 이전과 동일)
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            if (!asciiOutput.textContent) return;
+            navigator.clipboard.writeText(asciiOutput.textContent);
+            alert(t.alertCopy);
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            if (!asciiOutput.textContent) return;
+            const blob = new Blob([asciiOutput.textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ascii-art.txt';
+            a.click();
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            asciiOutput.textContent = '';
+            imageInput.value = '';
+        });
     </script>
 </body>
 </html>
