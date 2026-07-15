@@ -16,11 +16,10 @@
             width: 100%;
             max-width: 1000px;
         }
-        /* 제목과 버튼을 정렬하는 스타일 */
         .title-area {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* 추가: 양 끝 배치 */
+            justify-content: space-between;
             width: 100%;
             gap: 15px;
         }
@@ -57,10 +56,9 @@
 <body>
 
     <div class="main-container">
-        <!-- 제목과 버튼 영역 -->
         <div class="title-area">
             <div class="subtitle">
-              <h2>글자 수 및 문단 수 세기</h2>
+              <h2 id="titleText">글자 수 세기</h2>
             </div>
             <div class="topbuttons">
               <button id="homeBtn" onclick="location.href='../index.html'">집으로 가기</button>
@@ -73,6 +71,7 @@
             <div class="result">
                 공백 포함: <span id="withSpace">0</span>자 | 
                 공백 제외: <span id="withoutSpace">0</span>자 | 
+                단어 수: <span id="wordCount">0</span>개 | 
                 문단 수: <span id="paragraphCount">0</span>개
             </div>
             <div class="buttons">
@@ -87,14 +86,47 @@
         const textarea = document.getElementById('textInput');
         const withSpace = document.getElementById('withSpace');
         const withoutSpace = document.getElementById('withoutSpace');
+        const wordCount = document.getElementById('wordCount');
         const paragraphCount = document.getElementById('paragraphCount');
         const saveBtn = document.getElementById('saveBtn');
         const resetBtn = document.getElementById('resetBtn');
-        const copyBtn = document.getElementById('copyBtn'); // 추가된 버튼
+        const copyBtn = document.getElementById('copyBtn');
 
         textarea.addEventListener('input', updateCounts);
 
-        // 복사하기 기능
+        function updateCounts() {
+            const val = textarea.value.trim();
+            
+            // 글자 수
+            withSpace.textContent = textarea.value.length;
+            
+            // 공백 제외 글자 수
+            withoutSpace.textContent = textarea.value.replace(/(\s*)/g, "").length;
+            
+            // 단어 수 (공백 기준으로 나눈 뒤 빈 문자열 필터링)
+            const words = val ? val.split(/\s+/).filter(w => w.length > 0) : [];
+            wordCount.textContent = words.length;
+            
+            // 문단 수
+            const paragraphs = textarea.value.split('\n').filter(p => p.trim() !== '');
+            paragraphCount.textContent = paragraphs.length;
+        }
+
+        // 언어 설정 로직 (생략된 코드 수정 포함)
+        const userLang = navigator.language || navigator.userLanguage;
+        if (!userLang.startsWith('ko')) {
+            document.getElementById('titleText').textContent = "Word Counter";
+            document.getElementById('homeBtn').textContent = "Go Home";
+            textarea.placeholder = "Enter text here";
+            document.getElementById('labelWithSpace').textContent = "Chars (inc. spaces)";
+            document.getElementById('labelWithoutSpace').textContent = "Chars (excl. spaces)";
+            document.getElementById('labelWord').textContent = "Words";
+            document.getElementById('labelParagraph').textContent = "Paragraphs";
+            document.getElementById('copyBtn').textContent = "Copy";
+            document.getElementById('saveBtn').textContent = "Save (.txt)";
+            document.getElementById('resetBtn').textContent = "Reset";
+        }
+
         copyBtn.addEventListener('click', () => {
             textarea.select();
             document.execCommand('copy');
@@ -109,16 +141,8 @@
         saveBtn.addEventListener('click', () => {
             const text = textarea.value;
             if (!text) { alert("저장할 내용이 없습니다."); return; }
-
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const fileName = `mytext-${year}-${month}-${day}-${hours}-${minutes}-${seconds}.txt`;
+            const fileName = `mytext-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}.txt`;
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -127,14 +151,6 @@
             a.click();
             URL.revokeObjectURL(url);
         });
-
-        function updateCounts() {
-            const val = textarea.value;
-            withSpace.textContent = val.length;
-            withoutSpace.textContent = val.replace(/(\s*)/g, "").length;
-            const paragraphs = val.split('\n').filter(p => p.trim() !== '');
-            paragraphCount.textContent = paragraphs.length;
-        }
     </script>
 </body>
 </html>
