@@ -2,21 +2,16 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- 모바일 화면 대응 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="pageTitle">ASCII Art Converter</title>
     <style>
         body { 
             font-family: 'Consolas', monospace; 
             background-color: #FDF5E6; 
-            padding: 40px 20px; /* 위아래 여백 추가 */
+            padding: 40px 20px; 
             text-align: center; 
         }
-        
-        /* 헤더 크기 확대 */
         h2 { font-size: 2.2rem; margin-bottom: 30px; }
-        
-        /* 아스키 출력 영역 설정 */
         #asciiOutput { 
             white-space: pre; 
             font-size: 6px; 
@@ -29,10 +24,7 @@
             width: 90%;
             overflow-x: auto;
         }
-        
         canvas { display: none !important; width: 0; height: 0; }
-        
-        /* 파일 선택 버튼 대형화 */
         .file-upload-btn { 
             display: inline-block; 
             padding: 20px 40px; 
@@ -40,21 +32,29 @@
             color: white; 
             border-radius: 20px; 
             cursor: pointer; 
-            font-size: 1.5rem; /* 버튼 글자 크기 확대 */
+            font-size: 1.5rem; 
             font-weight: bold; 
             transition: background-color 0.3s; 
         }
+        .file-upload-btn:hover { background-color: #e68a35; }
         
-        /* 하단 제어 버튼 대형화 */
-        .buttons { margin-top: 40px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        /* 버튼 한 줄 정렬을 위한 스타일 */
+        .buttons { 
+            margin-top: 40px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: nowrap; /* 강제 한 줄 정렬[cite: 6] */
+        }
         button { 
-            padding: 20px 30px; 
+            padding: 15px 10px; 
             cursor: pointer; 
             border-radius: 15px; 
             border: none; 
             background: #ddd; 
-            font-size: 1.3rem; /* 버튼 글자 크기 확대 */
-            min-width: 140px;  /* 버튼 최소 너비 설정 */
+            font-size: 1rem; 
+            flex: 1; /* 동일한 너비 점유[cite: 6] */
+            min-width: 0; /* 내부 텍스트에 구애받지 않음[cite: 6] */
         }
     </style>
 </head>
@@ -90,7 +90,6 @@
         document.getElementById('saveBtn').textContent = t.save;
         document.getElementById('resetBtn').textContent = t.reset;
 
-        // 변환 로직 (이전과 동일)
         const imageInput = document.getElementById('imageInput');
         const asciiOutput = document.getElementById('asciiOutput');
         const canvas = document.getElementById('canvas');
