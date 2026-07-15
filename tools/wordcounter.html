@@ -40,14 +40,25 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .result { font-weight: bold; }
+        /* 결과 표시 영역 CSS 수정 */
+        .result {
+            font-weight: bold;
+            display: flex; /* 데스크톱에서는 가로 정렬 */
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        /* 구분선 제거 및 각 항목을 블록으로 처리 */
+        .result span.sep {
+            display: none; /* 데스크톱에서도 구분선 대신 gap 사용 */
+        }
         .topbuttons { display: flex; gap: 10px; }
         .buttons { display: flex; gap: 10px; }
         button { padding: 8px 16px; cursor: pointer; }
 
         @media (max-width: 600px) {
             .controls {
-                flex-direction: column;
+                flex-direction: column; /* 모바일에서는 세로 정렬(엔터 효과) */
+                gap: 5px;
                 align-items: flex-start;
             }
         }
@@ -69,10 +80,10 @@
         
         <div class="controls">
             <div class="result">
-                <span id="labelWithSpace">공백 포함</span>: <span id="withSpace">0</span> | 
-                <span id="labelWithoutSpace">공백 제외</span>: <span id="withoutSpace">0</span> | 
-                <span id="labelWord">단어 수</span>: <span id="wordCount">0</span> | 
-                <span id="labelParagraph">문단 수</span>: <span id="paragraphCount">0</span>
+                <div><span id="labelWithSpace">공백 포함</span>: <span id="withSpace">0</span></div>
+                <div><span id="labelWithoutSpace">공백 제외</span>: <span id="withoutSpace">0</span></div>
+                <div><span id="labelWord">단어 수</span>: <span id="wordCount">0</span></div>
+                <div><span id="labelParagraph">문단 수</span>: <span id="paragraphCount">0</span></div>
             </div>
             <div class="buttons">
                 <button id="copyBtn">복사하기</button>
