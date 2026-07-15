@@ -21,13 +21,13 @@
             padding: 15px; 
             display: block; 
             border-radius: 20px;
-            /* 좌우 여백을 정확히 맞추고 가로 스크롤 방지 */
             width: calc(100% - 40px); 
+            max-width: 800px; /* 데스크톱에서 너무 커지는 것 방지[cite: 3] */
             margin-left: auto; 
             margin-right: auto;
             overflow-x: hidden; 
             word-break: break-all;
-            box-sizing: border-box; /* 패딩을 너비에 포함 */
+            box-sizing: border-box; 
             text-align: center;
         }
         canvas { display: none !important; width: 0; height: 0; }
@@ -50,7 +50,10 @@
             display: flex; 
             justify-content: center; 
             gap: 10px; 
-            flex-wrap: nowrap; /* 버튼 한 줄 정렬 */
+            flex-wrap: nowrap; 
+            max-width: 600px; /* 버튼 영역 최대 너비 제한[cite: 3] */
+            margin-left: auto; 
+            margin-right: auto;
         }
         button { 
             padding: 15px 10px; 
@@ -59,8 +62,9 @@
             border: none; 
             background: #ddd; 
             font-size: 1rem; 
-            flex: 1; /* 동일한 너비 점유 */
-            min-width: 0; /* 내부 텍스트에 구애받지 않음 */
+            flex: 1; 
+            min-width: 0; 
+            max-width: 150px; /* 버튼 개별 최대 너비 제한[cite: 3] */
         }
     </style>
 </head>
@@ -103,9 +107,7 @@
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    const baseWidth = 60; // 모바일 화면 최적화를 위한 가로 폭
-                    
-                    // 이미지 너비에 따라 글자 크기 동적 조절
+                    const baseWidth = 60; 
                     const fontSize = Math.min(8, 350 / baseWidth); 
                     asciiOutput.style.fontSize = fontSize + "px";
                     asciiOutput.style.lineHeight = fontSize + "px";
