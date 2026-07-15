@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title id="pageTitle">이미지 → 아스키 아트 변환기</title>
+    <style>
+        body { font-family: 'Consolas', monospace; background-color: #FDF5E6; padding: 20px; text-align: center; }
+        #asciiOutput { white-space: pre; font-size: 8px; line-height: 8px; margin-top: 20px; background: white; padding: 20px; display: inline-block; border-radius: 20px; }
+        canvas { display: none !important; width: 0; height: 0; }
+        .file-upload-btn { display: inline-block; padding: 10px 20px; background-color: #ff9e40; color: white; border-radius: 15px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        .file-upload-btn:hover { background-color: #e68a35; }
+        .buttons { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
+        button { padding: 8px 16px; cursor: pointer; border-radius: 10px; border: none; background: #ddd; }
+        button:hover { background: #ccc; }
+    </style>
+</head>
+<body>
+    <h2 id="mainHeading">이미지 → 아스키 아트 변환기</h2>
+    
+    <label for="imageInput" class="file-upload-btn" id="fileLabel">이미지 선택하기</label>
+    <input type="file" id="imageInput" accept="image/*" style="display:none;">
+    
+    <br>
+    <div id="asciiOutput"></div>
+
+    <div class="buttons">
+        <button id="copyBtn">복사하기</button>
+        <button id="saveBtn">저장</button>
+        <button id="resetBtn">초기화</button>
+    </div>
+    
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // 다국어 텍스트 정의[cite: 5]
+        const lang = {
+            ko: { heading: "이미지 → 아스키 아트 변환기", label: "이미지 선택하기", copy: "복사하기", save: "저장", reset: "초기화", alertCopy: "복사되었습니다." },
+            en: { heading: "Image to ASCII Art Converter", label: "Select Image", copy: "Copy", save: "Save", reset: "Reset", alertCopy: "Copied!" }
+        };
+
+        const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
+        const t = lang[userLang];
+
+        // 텍스트 적용[cite: 5]
+        document.getElementById('mainHeading').textContent = t.heading;
+        document.getElementById('fileLabel').textContent = t.label;
+        document.getElementById('copyBtn').textContent = t.copy;
+        document.getElementById('saveBtn').textContent = t.save;
+        document.getElementById('resetBtn').textContent = t.reset;
+
+        const imageInput = document.getElementById('imageInput');
+        const asciiOutput = document.getElementById('asciiOutput');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const chars = " .:-=+*#%@";
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const width = 100;
+                    const height = Math.floor((img.height / img.width) * width * 0.5); 
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const imageData = ctx.getImageData(0, 0, width, height);
+                    let asciiStr = "";
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            const offset = (y * width + x) * 4;
+                            const avg = (imageData.data[offset] + imageData.data[offset+1] + imageData.data[offset+2]) / 3;
+                            asciiStr += chars[Math.min(Math.floor((avg / 255) * (chars.length - 1)), chars.length - 1)];
+                        }
+                        asciiStr += "\n";
+                    }
+                    asciiOutput.textContent = asciiStr;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            if (!asciiOutput.textContent) return;
+            navigator.clipboard.writeText(asciiOutput.textContent);
+            alert(t.alertCopy);
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            if (!asciiOutput.textContent) return;
+            const blob = new Blob([asciiOutput.textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ascii-art.txt';
+            a.click();
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            asciiOutput.textContent = '';
+            imageInput.value = '';
+        });
+    </script>
+</body>
+</html>
