@@ -11,7 +11,7 @@
             line-height: 1.6;
             display: flex;
             justify-content: center;
-            background-color: #FDF5E6; /* 배경색 적용 */
+            background-color: #FDF5E6;
         }
         .main-container {
             width: 100%;
@@ -55,9 +55,8 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        /* 수정된 숫자 색상 적용 */
         #withSpace, #withoutSpace, #wordCount, #paragraphCount {
-           color: #F38020;
+            color: #F38020;
         }
         .topbuttons { display: flex; gap: 10px; }
         .buttons { display: flex; gap: 10px; }
@@ -69,14 +68,8 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            .result {
-                display: block; 
-                width: 100%;
-            }
-            .result div {
-               display: block;
-               margin-bottom: 5px;
-            }
+            .result { display: block; width: 100%; }
+            .result div { display: block; margin-bottom: 5px; }
         }
     </style>
 </head>
@@ -85,10 +78,10 @@
     <div class="main-container">
         <div class="title-area">
             <div class="subtitle">
-              <h2 id="titleText">글자 수 세기</h2>
+                <h2 id="titleText">글자 수 세기</h2>
             </div>
             <div class="topbuttons">
-              <button id="homeBtn" onclick="location.href='../index.html'">집으로 가기</button>
+                <button id="homeBtn" onclick="location.href='../index.html'">집으로 가기</button>
             </div>
         </div>
         
@@ -131,19 +124,21 @@
             paragraphCount.textContent = paragraphs.length;
         }
 
+        // 다국어 처리 로직[cite: 1]
         const userLang = navigator.language || navigator.userLanguage;
         if (!userLang.startsWith('ko')) {
-            document.getElementById('pageTitle').textContent = "Word Counter";
-            document.getElementById('titleText').textContent = "Word Counter";
+            const titleText = "Word Counter";
+            document.getElementById('pageTitle').textContent = titleText; // 탭 제목 업데이트[cite: 1]
+            document.getElementById('titleText').textContent = titleText;
             document.getElementById('homeBtn').textContent = "Go Home";
             textarea.placeholder = "Enter text here";
             document.getElementById('labelWithSpace').textContent = "Chars (inc. spaces)";
             document.getElementById('labelWithoutSpace').textContent = "Chars (excl. spaces)";
             document.getElementById('labelWord').textContent = "Words";
             document.getElementById('labelParagraph').textContent = "Paragraphs";
-            document.getElementById('copyBtn').textContent = "Copy";
-            document.getElementById('saveBtn').textContent = "Save (.txt)";
-            document.getElementById('resetBtn').textContent = "Reset";
+            copyBtn.textContent = "Copy";
+            saveBtn.textContent = "Save (.txt)";
+            resetBtn.textContent = "Reset";
         }
 
         copyBtn.addEventListener('click', () => {
