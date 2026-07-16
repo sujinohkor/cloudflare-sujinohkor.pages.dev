@@ -2,74 +2,87 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>색 편집</title>
+    <title>색 편집기</title>
     <style>
         body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
-        .container { display: flex; gap: 20px; align-items: flex-start; }
-        canvas { border-radius: 5px; }
-        #colorPicker { cursor: crosshair; }
-        #hueSlider { cursor: pointer; }
+        .container { display: flex; gap: 15px; align-items: flex-start; }
+        
+        /* 1. 채도/명도 박스 */
+        #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
+        /* 2. 색상 미리보기 */
+        #previewBox { width: 50px; height: 300px; border-radius: 5px; border: 1px solid #555; }
+        /* 3. 색조 슬라이더 */
+        #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
+        
         .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
         input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
-        .input-group { display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <canvas id="colorPicker" width="300" height="300"></canvas>
+    <canvas id="sbBox" width="300" height="300"></canvas>
+    <div id="previewBox"></div>
     <canvas id="hueSlider" width="30" height="300"></canvas>
     
     <div class="controls">
         <input type="text" id="hexInput" value="#FF0000">
-        <div class="input-group"><input type="number" id="rInput" value="255"> <span>빨강</span></div>
-        <div class="input-group"><input type="number" id="gInput" value="0"> <span>녹색</span></div>
-        <div class="input-group"><input type="number" id="bInput" value="0"> <span>파랑</span></div>
+        <input type="number" id="rInput" value="255">
+        <input type="number" id="gInput" value="0">
+        <input type="number" id="bInput" value="0">
     </div>
 </div>
 
 <script>
-    const cp = document.getElementById('colorPicker').getContext('2d', {willReadFrequently: true});
-    const hs = document.getElementById('hueSlider').getContext('2d');
-    const hexInput = document.getElementById('hexInput');
-    const rInput = document.getElementById('rInput'), gInput = document.getElementById('gInput'), bInput = document.getElementById('bInput');
+    const sb = document.getElementById('sbBox').getContext('2d', {willReadFrequently: true});
+    const hue = document.getElementById('hueSlider').getContext('2d');
+    const preview = document.getElementById('previewBox');
+    
+    let currentHue = 'red';
 
-    // 1. 초기 그리기
+    // 색조 슬라이더 초기화
     function drawHue() {
-        let grad = hs.createLinearGradient(0, 0, 0, 300);
+        let grad = hue.createLinearGradient(0, 0, 0, 300);
         grad.addColorStop(0, 'red'); grad.addColorStop(0.2, 'yellow');
         grad.addColorStop(0.4, 'lime'); grad.addColorStop(0.6, 'cyan');
         grad.addColorStop(0.8, 'blue'); grad.addColorStop(1, 'magenta');
-        hs.fillStyle = grad; hs.fillRect(0, 0, 30, 300);
+        hue.fillStyle = grad; hue.fillRect(0, 0, 30, 300);
     }
-    
-    function drawPicker(color) {
-        cp.fillStyle = color; cp.fillRect(0, 0, 300, 300);
-        let gradW = cp.createLinearGradient(0, 0, 300, 0);
+
+    // 채도/명도 박스 그리기
+    function drawSB(color) {
+        sb.fillStyle = color; sb.fillRect(0, 0, 300, 300);
+        let gradW = sb.createLinearGradient(0, 0, 300, 0);
         gradW.addColorStop(0, 'white'); gradW.addColorStop(1, 'transparent');
-        cp.fillStyle = gradW; cp.fillRect(0, 0, 300, 300);
-        let gradB = cp.createLinearGradient(0, 0, 0, 300);
+        sb.fillStyle = gradW; sb.fillRect(0, 0, 300, 300);
+        let gradB = sb.createLinearGradient(0, 0, 0, 300);
         gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, 'black');
-        cp.fillStyle = gradB; cp.fillRect(0, 0, 300, 300);
+        sb.fillStyle = gradB; sb.fillRect(0, 0, 300, 300);
     }
 
-    drawHue(); drawPicker('red');
+    drawHue(); drawSB('red');
 
-    // 2. Picking 로직 (클릭 시 값 추출)
-    document.getElementById('colorPicker').addEventListener('click', (e) => {
-        const data = cp.getImageData(e.offsetX, e.offsetY, 1, 1).data;
-        updateInputs(data[0], data[1], data[2]);
+    // Picking: 박스 클릭 시 값 추출
+    document.getElementById('sbBox').addEventListener('click', (e) => {
+        const data = sb.getImageData(e.offsetX, e.offsetY, 1, 1).data;
+        updateUI(data[0], data[1], data[2]);
     });
 
-    // 3. 값 입력 시 색상 반영 로직
-    function updateInputs(r, g, b) {
-        rInput.value = r; gInput.value = g; bInput.value = b;
-        hexInput.value = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+    // 입력값 변경 시 Picking: 입력하면 색상 반영
+    function updateUI(r, g, b) {
+        document.getElementById('rInput').value = r;
+        document.getElementById('gInput').value = g;
+        document.getElementById('bInput').value = b;
+        const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+        document.getElementById('hexInput').value = hex;
+        preview.style.backgroundColor = hex;
     }
 
-    [rInput, gInput, bInput].forEach(el => el.addEventListener('input', () => {
-        // 입력된 RGB를 기반으로 색상을 다시 설정하는 로직 추가 필요 (간소화됨)
-    }));
+    [document.getElementById('rInput'), document.getElementById('gInput'), document.getElementById('bInput')].forEach(input => {
+        input.addEventListener('input', () => {
+            updateUI(document.getElementById('rInput').value, document.getElementById('gInput').value, document.getElementById('bInput').value);
+        });
+    });
 </script>
 
 </body>
