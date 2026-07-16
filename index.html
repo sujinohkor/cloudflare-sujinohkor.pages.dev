@@ -33,6 +33,14 @@
             .horizontal-list li {
                 white-space: normal;
             }
+            /* 모바일에서만 br 태그 숨김 처리하여 한 줄로 표시 */
+            .horizontal-list a br {
+                display: none;
+            }
+            /* br 숨김 시 레이블과 주소 사이 공백 추가 */
+            .horizontal-list a::after {
+                content: " ";
+            }
         }
         
         a { color: white; text-decoration: none; }
