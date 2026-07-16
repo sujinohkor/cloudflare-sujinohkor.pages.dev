@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Text to SVG Grid</title>
+    <!-- title 태그에 id 추가 -->
+    <title id="pageTitle">Text to SVG Grid</title>
     <style>
         body { display: flex; flex-direction: column; align-items: center; background: #000; color: white; padding-top: 50px; margin: 0; }
         
@@ -22,7 +23,6 @@
             background: #000;
         }
         
-        /* 텍스트박스 동글동글하게 */
         input { 
             padding: 10px 20px; 
             width: 300px; 
@@ -33,7 +33,6 @@
             color: white; 
         }
         
-        /* 버튼 동글동글하게 */
         button { 
             padding: 10px 20px; 
             cursor: pointer; 
@@ -51,20 +50,31 @@
 
     <div class="header-container">
         <div class="spacer"></div>
-        <input type="text" id="textInput" placeholder="글자를 입력하세요" maxlength="1">
-        <button onclick="location.href='../index.html'">집으로</button>
+        <input type="text" id="textInput" maxlength="1">
+        <button onclick="location.href='../index.html'" id="homeBtn">집으로</button>
     </div>
 
     <svg id="canvas-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
 
     <script>
-        const svg = document.getElementById('canvas-svg');
-        const input = document.getElementById('textInput');
-        
-        const rows = 20;
-        const cols = 40;
-        const size = 15;
+        // 언어 설정 로직
+        const isKorean = navigator.language.startsWith('ko');
+        const pageTitle = document.getElementById('pageTitle');
+        const textInput = document.getElementById('textInput');
+        const homeBtn = document.getElementById('homeBtn');
 
+        if (isKorean) {
+            pageTitle.innerText = "텍스트 SVG 그리드";
+            textInput.placeholder = "글자를 입력하세요";
+            homeBtn.innerText = "집으로";
+        } else {
+            pageTitle.innerText = "Text to SVG Grid";
+            textInput.placeholder = "Enter a character";
+            homeBtn.innerText = "Go Home";
+        }
+
+        const svg = document.getElementById('canvas-svg');
+        const rows = 20, cols = 40, size = 15;
         const circles = [];
         const startX = (800 - (cols - 1) * size) / 2;
         const startY = (400 - (rows - 1) * size) / 2;
@@ -82,7 +92,7 @@
             }
         }
 
-        input.addEventListener('input', (e) => {
+        textInput.addEventListener('input', (e) => {
             const text = e.target.value;
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
