@@ -98,16 +98,18 @@
         function resetAnimation() {
             isRunning = false;
             setButtonsDisabled(false);
-            input.value = '';
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
         }
 
+        resetBtn.addEventListener('click', () => {
+            resetAnimation();
+            input.value = '';
+        });
+
         // 1. 한글자씩 보여주기
         document.getElementById('showOneCharBtn').addEventListener('click', async () => {
-            isRunning = true;
-            setButtonsDisabled(true);
-            const text = input.value;
-            for (let char of text) {
+            isRunning = true; setButtonsDisabled(true);
+            for (let char of input.value) {
                 if (!isRunning) break;
                 circles.forEach(c => c.setAttribute("fill", "#21252a"));
                 const data = getCharData(char);
@@ -117,10 +119,9 @@
             if (isRunning) resetAnimation();
         });
 
-        // 2. 위에서 아래로 보여주기 (Stroke Animation)
+        // 2. 위에서 아래로 보여주기 (Stroke)
         document.getElementById('showTopDownBtn').addEventListener('click', async () => {
-            isRunning = true;
-            setButtonsDisabled(true);
+            isRunning = true; setButtonsDisabled(true);
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
             for (let char of input.value) {
                 if (!isRunning) break;
@@ -140,23 +141,27 @@
 
         // 3. 전광판처럼 보여주기 (Ticker Tape)
         document.getElementById('showTickerTapeBtn').addEventListener('click', async () => {
-            isRunning = true;
-            setButtonsDisabled(true);
-            const text = "     " + input.value + "     "; // 여백 추가
-            for (let start = 0; start <= text.length - 1; start++) {
+            isRunning = true; setButtonsDisabled(true);
+            const text = input.value;
+            const scrollCanvas = document.createElement('canvas');
+            const scrollCtx = scrollCanvas.getContext('2d');
+            scrollCanvas.width = text.length * cols + cols;
+            scrollCanvas.height = rows;
+            scrollCtx.fillStyle = 'white';
+            scrollCtx.font = 'bold 20px Arial';
+            scrollCtx.textBaseline = 'middle';
+            scrollCtx.fillText(text, cols, rows / 2);
+
+            for (let offset = 0; offset <= text.length * cols; offset++) {
                 if (!isRunning) break;
-                circles.forEach(c => c.setAttribute("fill", "#21252a"));
-                // 실제 구현은 글자 인덱스를 슬라이딩하며 렌더링
-                // 예시를 위해 여기서는 간단한 텍스트 렌더링으로 대체
-                const char = text[start];
-                const data = getCharData(char);
-                circles.forEach((c, i) => { if(data[i*4+3] > 128) c.setAttribute("fill", "#ffffff"); });
-                await new Promise(r => setTimeout(r, 300));
+                const frameData = scrollCtx.getImageData(offset, 0, cols, rows).data;
+                circles.forEach((c, i) => {
+                    c.setAttribute("fill", frameData[i*4+3] > 128 ? "#ffffff" : "#21252a");
+                });
+                await new Promise(r => setTimeout(r, 80));
             }
             if (isRunning) resetAnimation();
         });
-
-        resetBtn.addEventListener('click', resetAnimation);
     </script>
 </body>
 </html>
