@@ -2241,10 +2241,17 @@
         ctx.font = "bold 30pt 'Times New Roman'";
         ctx.fillText(hex.toUpperCase(), 20, 570);
         
-        // 각 단어의 첫 글자를 대문자로 변환
-        const capitalizedName = name.split(' ').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ');
+        // 제외할 단어 목록
+        const minorWords = ['of', 'in', 'the', 'a', 'and', 'at', 'on', 'or', 'for'];
+        
+        const capitalizedName = name.split(' ').map((word, index) => {
+            // 첫 단어이거나 minorWords에 포함되지 않은 경우 대문자 변환
+            if (index === 0 || !minorWords.includes(word.toLowerCase())) {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            }
+            // minorWords에 포함된 경우 소문자로 유지
+            return word.toLowerCase();
+        }).join(' ');
         ctx.fillText(capitalizedName, 20, 630);
 
         // 4. 우측 하단 웹사이트 주소 (Times New Roman, bold 10pt)
