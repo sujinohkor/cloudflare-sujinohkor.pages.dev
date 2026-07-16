@@ -22,8 +22,6 @@
         
         .controls { display: flex; flex-direction: column; gap: 5px; width: 80px; }
         .input-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; }
-        
-        /* 텍스트박스 둥글게 처리 */
         input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 4px; width: 45px; border-radius: 8px; text-align: center; }
     </style>
 </head>
@@ -31,7 +29,8 @@
 
 <div class="header">
     <h2 style="margin: 0;">색 편집기</h2>
-    <button onclick="alert('집으로 이동')">집으로</button>
+    <!-- 수정된 부분: onclick 이벤트 변경 -->
+    <button onclick="window.location.href='../index'">집으로</button>
 </div>
 
 <div class="container">
@@ -51,7 +50,6 @@
 </div>
 
 <script>
-    // 기능 로직은 이전과 동일하게 유지됩니다.
     const field = document.getElementById('colorField');
     const ctx = field.getContext('2d');
     const slider = document.getElementById('hueSlider');
@@ -112,6 +110,8 @@
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
         sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
         sCtx.beginPath(); sCtx.arc(15, hueY, 8, 0, Math.PI * 2); sCtx.stroke();
+        sCtx.strokeStyle = '#000'; sCtx.lineWidth = 1;
+        sCtx.beginPath(); sCtx.arc(15, hueY, 9, 0, Math.PI * 2); sCtx.stroke();
     }
 
     function drawField(h, s, v) {
@@ -124,6 +124,8 @@
         let px = (s / 100) * 299, py = (1 - (v / 100)) * 299;
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.stroke();
     }
 
     ['r', 'g', 'b'].forEach(id => document.getElementById(id).addEventListener('input', () => {
