@@ -3,76 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { background: #202020; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 20px; }
-        .window { background: #2d2d2d; padding: 20px; border-radius: 8px; width: 500px; }
+        body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .editor-container { display: flex; gap: 20px; align-items: flex-start; }
         
-        /* 메인 영역 */
-        .main-area { display: flex; gap: 15px; margin-bottom: 20px; }
-        #sbBox { width: 250px; height: 250px; cursor: crosshair; }
-        #preview { width: 50px; height: 250px; border-radius: 4px; }
-        #hueSlider { width: 30px; height: 250px; cursor: pointer; }
+        /* 1. 컬러 필드(좌) 및 미리보기(중) */
+        #colorField { width: 300px; height: 300px; cursor: crosshair; border: 1px solid #444; }
+        #previewBox { width: 50px; height: 300px; border: 1px solid #444; }
         
-        /* 우측 입력창 */
-        .inputs { display: flex; flex-direction: column; gap: 10px; width: 120px; }
-        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 8px; }
+        /* 2. Hue 슬라이더(우) */
+        #hueSlider { width: 30px; height: 300px; cursor: pointer; border: 1px solid #444; }
         
-        /* 팔레트 영역 */
-        .palette-area { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .swatch-grid { display: grid; grid-template-columns: repeat(8, 25px); gap: 5px; }
-        .swatch { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; }
-        
-        /* 하단 버튼 */
-        .footer { display: flex; gap: 10px; }
-        button { flex: 1; padding: 10px; cursor: pointer; border: none; }
-        .confirm { background: #ff8c69; }
+        /* 3. 입력 폼 */
+        .controls { display: flex; flex-direction: column; gap: 10px; width: 140px; }
+        .input-row { display: flex; align-items: center; justify-content: space-between; }
+        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 6px; width: 80px; }
     </style>
 </head>
 <body>
 
-<div class="window">
-    <h3>색 편집</h3>
-    <div class="main-area">
-        <canvas id="sbBox" width="250" height="250"></canvas>
-        <div id="preview"></div>
-        <canvas id="hueSlider" width="30" height="250"></canvas>
-        <div class="inputs">
-            <input type="text" id="hex" value="#05360E">
-            <input type="number" id="r" value="5">
-            <input type="number" id="g" value="54">
-            <input type="number" id="b" value="14">
-        </div>
-    </div>
-
-    <div class="palette-area">
-        <div>
-            <div>기본 색</div>
-            <div class="swatch-grid" id="basicPalette"></div>
-        </div>
-        <div>
-            <div>사용자 지정 색</div>
-            <div class="swatch-grid" id="customPalette"></div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <button class="confirm">확인</button>
-        <button>취소</button>
+<div class="editor-container">
+    <canvas id="colorField" width="300" height="300"></canvas>
+    <div id="previewBox"></div>
+    <canvas id="hueSlider" width="30" height="300"></canvas>
+    
+    <div class="controls">
+        <input type="text" id="hex" value="#05360E" style="width:120px">
+        <div class="input-row">R <input type="number" id="r" value="5"></div>
+        <div class="input-row">G <input type="number" id="g" value="54"></div>
+        <div class="input-row">B <input type="number" id="b" value="14"></div>
     </div>
 </div>
 
 <script>
-    // 1. 팔레트 생성
-    const basic = document.getElementById('basicPalette');
-    const colors = ['#f88', '#f00', '#844', '#800', '#400', '#8ff', '#0ff', '#88f', '#00f', '#008'];
-    colors.forEach(c => {
-        const s = document.createElement('div');
-        s.className = 'swatch'; s.style.backgroundColor = c;
-        basic.appendChild(s);
+    const field = document.getElementById('colorField');
+    const ctx = field.getContext('2d', {willReadFrequently: true});
+    const slider = document.getElementById('hueSlider');
+    const sCtx = slider.getContext('2d');
+    const preview = document.getElementById('previewBox');
+
+    // Hue 슬라이더 그리기
+    function drawHue() {
+        let grad = sCtx.createLinearGradient(0, 0, 0, 300);
+        for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
+        sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
+    }
+
+    // 컬러 필드 그리기 (선택된 Hue 반영)
+    function drawField(hue) {
+        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.fillRect(0, 0, 300, 300);
+        let gradW = ctx.createLinearGradient(0, 0, 300, 0);
+        gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradW; ctx.fillRect(0, 0, 300, 300);
+        let gradB = ctx.createLinearGradient(0, 0, 0, 300);
+        gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
+        ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
+    }
+
+    function updateColor(x, y) {
+        const data = ctx.getImageData(x, y, 1, 1).data;
+        document.getElementById('r').value = data[0];
+        document.getElementById('g').value = data[1];
+        document.getElementById('b').value = data[2];
+        const hex = '#' + ((1<<24)+(data[0]<<16)+(data[1]<<8)+data[2]).toString(16).slice(1).toUpperCase();
+        document.getElementById('hex').value = hex;
+        preview.style.backgroundColor = hex;
+    }
+
+    drawHue(); drawField(0);
+
+    // 이벤트
+    slider.addEventListener('click', (e) => {
+        const h = (e.offsetY / 300) * 360;
+        drawField(h);
     });
 
-    // 2. 캔버스 로직 (생략: 이전과 동일한 로직을 적용하면 됩니다)
-    // 윈도우 스타일의 '색 편집'은 내부적으로 마우스 좌표를 추적해 실시간 업데이트하는 방식입니다.
-    console.log("윈도우 그림판 UI 구조 구현 완료");
+    field.addEventListener('click', (e) => updateColor(e.offsetX, e.offsetY));
 </script>
 </body>
 </html>
