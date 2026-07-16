@@ -50,6 +50,7 @@
             transition: all 0.3s;
         }
 
+        /* 다크 모드 기본 hover: 크림색 */
         .theme-btn:hover { 
             background-color: #FDF5E6; 
             color: #F38020; 
@@ -79,7 +80,7 @@
         }
 
         .bottom-btns {
-            margin-top: 10px; /* 여기서 하단 버튼과의 간격을 조절하세요 */
+            margin-top: 10px;
         }
 
         .top-section { margin-bottom: 30px; }
@@ -103,14 +104,13 @@
             overflow: hidden;
         }
 
+        /* textarea에만 적용되는 폰트 설정 */
         .content-card textarea {
             width: 100%;
             flex: 1; 
             border: none;
             outline: none;
             resize: none;
-            font-family: inherit;
-            /* textarea에만 적용되는 폰트 설정 */
             font-family: 'Consolas', 'Malgun Gothic', sans-serif;
             font-size: 1rem;
             padding: 40px;
@@ -121,12 +121,20 @@
 
         .content-card textarea::placeholder { color: #888888; opacity: 1; }
 
+        /* 라이트 모드 */
         body.light-mode { background-color: #ffffff; }
         body.light-mode .sidebar { background-color: #FDF5E6; }
         body.light-mode .menu-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
         body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #ff9e40; }
+        
+        /* 라이트 모드 hover: #202020 */
+        body.light-mode .theme-btn:hover { 
+            background-color: #202020; 
+            color: #ff9e40; 
+            border-color: #202020; 
+        }
+
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .content-card { background: #ffffff; }
         body.light-mode .content-card textarea { color: #000000; }
