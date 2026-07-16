@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Sequential Stroke Animation</title>
+    <title id="pageTitle">Sequential Stroke Animation</title>
     <style>
         body { 
             display: flex; flex-direction: column; align-items: center; 
@@ -40,21 +40,37 @@
     <div class="main-container">
         <div class="header-container">
             <div></div>
-            <input type="text" id="textInput" placeholder="텍스트를 입력하세요" maxlength="333">
+            <input type="text" id="textInput" maxlength="333">
             <button id="homeBtn" onclick="location.href='../index.html'">집으로</button>
         </div>
 
         <div class="control-container">
-            <button class="animBtn" id="showOneCharBtn">한글자씩 보여주기</button>
-            <button class="animBtn" id="showTopDownBtn">위에서 아래로 보여주기</button>
-            <button class="animBtn" id="showTickerTapeBtn">전광판처럼 보여주기</button>
-            <button id="resetBtn">초기화</button>
+            <button class="animBtn" id="showOneCharBtn"></button>
+            <button class="animBtn" id="showTopDownBtn"></button>
+            <button class="animBtn" id="showTickerTapeBtn"></button>
+            <button id="resetBtn"></button>
         </div>
 
         <svg id="canvas-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
     </div>
 
     <script>
+        // 언어 설정 로직
+        const isKorean = navigator.language.startsWith('ko');
+        const lang = {
+            ko: { title: "점등 애니메이션", input: "텍스트를 입력하세요", home: "집으로", one: "한글자씩 보여주기", top: "위에서 아래로 보여주기", tick: "전광판처럼 보여주기", reset: "초기화" },
+            en: { title: "Stroke Animation", input: "Enter text here", home: "Go Home", one: "Show Char by Char", top: "Show Top-Down", tick: "Show as Ticker", reset: "Reset" }
+        };
+        const cur = isKorean ? lang.ko : lang.en;
+
+        document.getElementById('pageTitle').innerText = cur.title;
+        document.getElementById('textInput').placeholder = cur.input;
+        document.getElementById('homeBtn').innerText = cur.home;
+        document.getElementById('showOneCharBtn').innerText = cur.one;
+        document.getElementById('showTopDownBtn').innerText = cur.top;
+        document.getElementById('showTickerTapeBtn').innerText = cur.tick;
+        document.getElementById('resetBtn').innerText = cur.reset;
+
         const svg = document.getElementById('canvas-svg');
         const input = document.getElementById('textInput');
         const animBtns = document.querySelectorAll('.animBtn');
@@ -106,7 +122,6 @@
             input.value = '';
         });
 
-        // 1. 한글자씩 보여주기
         document.getElementById('showOneCharBtn').addEventListener('click', async () => {
             isRunning = true; setButtonsDisabled(true);
             for (let char of input.value) {
@@ -120,7 +135,6 @@
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
         });
 
-        // 2. 위에서 아래로 보여주기 (Stroke)
         document.getElementById('showTopDownBtn').addEventListener('click', async () => {
             isRunning = true; setButtonsDisabled(true);
             for (let char of input.value) {
@@ -139,7 +153,6 @@
             isRunning = false; setButtonsDisabled(false);
         });
 
-        // 3. 전광판처럼 보여주기 (Ticker Tape)
         document.getElementById('showTickerTapeBtn').addEventListener('click', async () => {
             isRunning = true; setButtonsDisabled(true);
             const text = input.value;
