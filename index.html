@@ -40,6 +40,21 @@
         
         a { text-decoration: none; color: inherit; }
         .highlight-text { color: #ff9e40; text-align: center; margin: 30px 0; }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr; } /* 모바일에서는 1열로 배치 */
+            .card { 
+                width: 100%; 
+                height: auto; /* 높이를 내용에 맞게 자동 조절 */
+                padding: 15px; 
+                display: flex; /* 가로 배치를 위해 flex 사용 */
+                align-items: center; 
+                gap: 15px; /* 아이콘과 제목 사이 간격 */
+            }
+            .icon { font-size: 1.5rem; margin-bottom: 0; } /* 아이콘 크기 축소 */
+            .card h3 { font-size: 1.1rem; }
+            .card p, .arrow { display: none; } /* 설명글과 화살표 숨김 */
+        }
     </style>
 </head>
 <body>
