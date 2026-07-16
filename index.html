@@ -9,7 +9,22 @@
         .container { width: 100%; max-width: 800px; }
         .header { margin-bottom: 30px; }
         .custom-list { list-style: none; padding: 0; }
-        .horizontal-list { display: flex; list-style: none; padding: 0; gap: 20px; flex-wrap: wrap; }
+        
+        /* 가로 정렬 수정 */
+        .horizontal-list { 
+            display: flex;        /* 가로 배치 */
+            list-style: none;     
+            padding: 0; 
+            gap: 20px;            
+            flex-wrap: wrap;      
+        }
+        
+        /* li 내의 h3가 줄바꿈되지 않도록 설정 */
+        .horizontal-list li h3 {
+            margin: 0;            /* 불필요한 여백 제거 */
+            font-size: 1.17em;    /* 기존 h3 사이즈 유지 */
+        }
+    
         a { color: white; text-decoration: none; }
         a:hover { text-decoration: underline; }
     </style>
