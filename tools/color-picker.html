@@ -2,65 +2,68 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>색 편집기</title>
+    <title>윈도우 12 스타일 색 편집기</title>
     <style>
-        body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
-        .editor-container { display: flex; gap: 20px; align-items: flex-start; }
-        #colorField { width: 300px; height: 300px; cursor: crosshair; border: 1px solid #444; }
-        #previewBox { width: 50px; height: 300px; border: 1px solid #444; }
-        #hueSlider { width: 30px; height: 300px; cursor: pointer; border: 1px solid #444; }
-        .controls { display: flex; flex-direction: column; gap: 10px; width: 140px; }
-        .input-row { display: flex; align-items: center; justify-content: space-between; }
-        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 6px; width: 80px; }
+        body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 8px; }
+        
+        /* 캔버스 스타일 */
+        canvas { border: 1px solid #444; }
+        #colorField { width: 300px; height: 300px; cursor: crosshair; }
+        #hueSlider { width: 30px; height: 300px; cursor: pointer; }
+        #previewBox { width: 50px; height: 300px; border: 1px solid #444; background: #ff0000; }
+
+        .controls { display: flex; flex-direction: column; gap: 10px; width: 120px; }
+        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 6px; }
     </style>
 </head>
 <body>
 
-<div class="editor-container">
+<div class="container">
     <canvas id="colorField" width="300" height="300"></canvas>
     <div id="previewBox"></div>
     <canvas id="hueSlider" width="30" height="300"></canvas>
     
     <div class="controls">
-        <input type="text" id="hex" value="#FF0000" style="width:120px">
-        <div class="input-row">R <input type="number" id="r" value="255"></div>
-        <div class="input-row">G <input type="number" id="g" value="0"></div>
-        <div class="input-row">B <input type="number" id="b" value="0"></div>
+        <input type="text" id="hex" value="#FF0000">
+        <label>R <input type="number" id="r" value="255"></label>
+        <label>G <input type="number" id="g" value="0"></label>
+        <label>B <input type="number" id="b" value="0"></label>
     </div>
 </div>
 
 <script>
     const field = document.getElementById('colorField');
-    const ctx = field.getContext('2d', {willReadFrequently: true});
+    const ctx = field.getContext('2d', { willReadFrequently: true });
     const slider = document.getElementById('hueSlider');
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
 
     let isDragging = false;
 
-    // 초기 색상 설정
+    // 1. 색조 슬라이더 그리기
     function drawHue() {
         let grad = sCtx.createLinearGradient(0, 0, 0, 300);
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
     }
 
+    // 2. 컬러 필드 그리기
     function drawField(hue) {
         ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
         ctx.fillRect(0, 0, 300, 300);
+        
         let gradW = ctx.createLinearGradient(0, 0, 300, 0);
         gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
         ctx.fillStyle = gradW; ctx.fillRect(0, 0, 300, 300);
+        
         let gradB = ctx.createLinearGradient(0, 0, 0, 300);
         gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
     }
 
+    // 3. 색상 값 업데이트
     function updateColor(x, y) {
-        // 캔버스 범위를 벗어나지 않게 제어
-        x = Math.max(0, Math.min(x, 299));
-        y = Math.max(0, Math.min(y, 299));
-        
         const data = ctx.getImageData(x, y, 1, 1).data;
         document.getElementById('r').value = data[0];
         document.getElementById('g').value = data[1];
@@ -70,15 +73,12 @@
         preview.style.backgroundColor = hex;
     }
 
+    // 초기화
     drawHue(); drawField(0);
 
-    // 드래그 로직
+    // 이벤트: 마우스 드래그 및 클릭
     field.addEventListener('mousedown', (e) => { isDragging = true; updateColor(e.offsetX, e.offsetY); });
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const rect = field.getBoundingClientRect();
-        updateColor(e.clientX - rect.left, e.clientY - rect.top);
-    });
+    field.addEventListener('mousemove', (e) => { if (isDragging) updateColor(e.offsetX, e.offsetY); });
     window.addEventListener('mouseup', () => isDragging = false);
 
     slider.addEventListener('click', (e) => {
