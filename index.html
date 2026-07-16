@@ -10,19 +10,20 @@
         .header { margin-bottom: 30px; }
         .custom-list { list-style: none; padding: 0; }
         
+        /* 제목 색상 적용 */
+        .highlight-text { color: #ff9e40; }
+        
         /* Websites 전용 가로 정렬 스타일 */
         .horizontal-list { 
             display: flex; 
             list-style: none; 
             padding: 0; 
-            gap: 30px; /* 간격 확대 */
-            flex-wrap: nowrap; /* 강제 한 줄 유지 */
+            gap: 30px; 
+            flex-wrap: nowrap; 
         }
-        .horizontal-list li {
-            white-space: nowrap; /* 주소가 길어도 줄바꿈하지 않음 */
-        }
-        
+        .horizontal-list li { white-space: nowrap; }
         .horizontal-list li h4 { margin: 0; font-size: 1.1em; }
+        
         a { color: white; text-decoration: none; }
         a:hover { text-decoration: underline; }
     </style>
@@ -32,7 +33,8 @@
 <div class="container">
     <div class="header">
         <h3 data-i18n="hello">Hello World!</h3>
-        <h1 data-i18n="title">SUJIN's TOOL ARCHIVE</h1>
+        <!-- 제목에 클래스 적용 -->
+        <h1 data-i18n="title" class="highlight-text">SUJIN's TOOL ARCHIVE</h1>
         
         <ul class="custom-list">
             <li><h3><a href="https://sujinohkor.pages.dev/tools/word-counter">Word Counter</a></h3></li>
@@ -45,15 +47,16 @@
         </ul>
 
         <br>
-        <h3 data-i18n="sample_archive">SUJIN's SAMPLE ARCHIVE</h3>
+        <!-- 제목에 클래스 적용 -->
+        <h3 data-i18n="sample_archive" class="highlight-text">SUJIN's SAMPLE ARCHIVE</h3>
         <ul class="custom-list">
             <li><h3><a href="https://helloworld123123.pages.dev/">● helloworld123123: Cloudflare demo</a></h3></li>
             <li><h3><a href="https://helloworld.sujinohkor.workers.dev/">● helloworld: hello world</a></h3></li>
         </ul>
 
         <br>
-        <h3 data-i18n="websites">SUJIN's Websites</h3>
-        <!-- Web. https... 부분을 아래와 같이 수정 -->
+        <!-- 제목에 클래스 적용 -->
+        <h3 data-i18n="websites" class="highlight-text">SUJIN's Websites</h3>
         <ul class="horizontal-list">
             <li><h4><a href="https://www.sujinohkor.kr">Web.<br>https://www.sujinohkor.kr</a></h4></li>
             <li><h4><a href="https://sujinohkor.pages.dev">Dev.<br>https://sujinohkor.pages.dev</a></h4></li>
