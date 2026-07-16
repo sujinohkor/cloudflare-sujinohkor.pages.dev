@@ -11,16 +11,22 @@
         .header-wrapper {
             display: flex;
             align-items: center;
-            justify-content: center; /* 제목이 정중앙에 위치하도록 */
-            position: relative;
+            justify-content: space-between; /* 양 끝으로 정렬 */
             width: 100%;
+            max-width: 1200px; /* 컨테이너와 동일한 너비 제한 */
+            margin: 0 auto;    /* 중앙 정렬 */
+            padding: 0 20px;   /* 카드와 여백 맞춤 */
+            box-sizing: border-box;
         }
         
-        .header-wrapper h1 { margin: 30px auto; } /* 제목을 가운대로 밀어냄 */
+        .header-wrapper h1 { 
+            margin: 30px auto; /* 제목은 여전히 가운데 */
+            padding-left: 80px; /* 버튼 너비만큼 왼쪽 여백을 주어 중앙 유지 */
+        }
         
         #theme-toggle {
-            position: absolute;
-            right: 0;
+            position: relative; /* absolute 제거 */
+            right: auto;
             padding: 8px 16px;
             cursor: pointer;
             background: #202020;
