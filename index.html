@@ -42,10 +42,18 @@
         .highlight-text { color: #ff9e40; text-align: center; margin: 30px 0; }
 
         /* 하단 Websites 섹션 스타일 */
-        .websites-section { margin-top: 60px; text-align: center; }
-        .websites-list { list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .websites-list li { margin: 0 10px; }
-        .websites-list h4 { color: #ccc; font-weight: normal; }
+        .websites-section { margin-top: 40px; text-align: center; }
+        .websites-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; /* margin 추가하여 간격 줄이기 */
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+        }
+        .websites-list li { margin: 5px 0; } /* li 마진 축소 */
+        .websites-list h4 { color: #ccc; font-weight: normal; margin: 5px 0; } /* h4 마진 축소 */
 
         /* 모바일 대응 미디어 쿼리 */
         @media (max-width: 600px) {
@@ -80,8 +88,9 @@
             }
             .card p, .arrow { display: none; } /* 설명글과 화살표 숨김 */
             
-            /* 모바일에서 링크들 세로 정렬 */
-            .websites-list { flex-direction: column; gap: 10px; }
+            /* 모바일에서 웹사이트 링크 간격 대폭 축소 */
+            .websites-list { flex-direction: column; gap: 5px; }
+            .websites-list h4 { font-size: 0.9rem; margin: 2px 0; }
         }
     </style>
 </head>
