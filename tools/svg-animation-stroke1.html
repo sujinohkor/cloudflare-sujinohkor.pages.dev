@@ -23,13 +23,16 @@
         const cols = 40;
         const size = 15; // 원의 간격
 
-        // 1. 격자 초기화 (모든 점 생성)
+        // 1. 격자 초기화 (중앙 정렬 좌표 계산)
         const circles = [];
+        const startX = (800 - (cols - 1) * size) / 2; // 전체 너비 기준 중앙 배치[cite: 1]
+        const startY = (400 - (rows - 1) * size) / 2; // 전체 높이 기준 중앙 배치[cite: 1]
+
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", 50 + j * size);
-                circle.setAttribute("cy", 50 + i * size);
+                circle.setAttribute("cx", startX + j * size); // 중앙 정렬된 X좌표[cite: 1]
+                circle.setAttribute("cy", startY + i * size); // 중앙 정렬된 Y좌표[cite: 1]
                 circle.setAttribute("r", "3");
                 circle.setAttribute("fill", "#21252a");
                 circle.classList.add('dot');
