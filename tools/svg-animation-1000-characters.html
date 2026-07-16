@@ -59,7 +59,9 @@
 
         <!-- 중단: 버튼들 -->
         <div class="control-container">
-            <button id="showBtn">보여주기</button>
+            <button id="showOneCharBtn">한글자씩 보여주기</button>
+            <button id="showTopDownBtn">위에서 아래로 보여주기</button>
+            <button id="showTickerTapeBtn">전광판처럼 보여주기</button>
             <button id="resetBtn">초기화</button>
         </div>
 
@@ -69,7 +71,9 @@
     <script>
         const svg = document.getElementById('canvas-svg');
         const input = document.getElementById('textInput');
-        const showBtn = document.getElementById('showBtn');
+        const showOneCharBtn = document.getElementById('showOneCharBtn');
+        const showTopDownBtn = document.getElementById('showTopDownBtn');
+        const showTickerTapeBtn = document.getElementById('showTickerTapeBtn');
         const resetBtn = document.getElementById('resetBtn');
         
         const rows = 20, cols = 40, size = 15;
@@ -107,14 +111,14 @@
         // 초기화 함수
         function resetAnimation() {
             isRunning = false;
-            showBtn.disabled = false;
+            showTopDownBtn.disabled = false;
             input.value = ''; // 텍스트 박스 내용까지 초기화
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
         }
 
-        showBtn.addEventListener('click', async () => {
+        showTopDownBtn.addEventListener('click', async () => {
             isRunning = true;
-            showBtn.disabled = true;
+            showTopDownBtn.disabled = true;
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
             
             const text = input.value;
@@ -137,7 +141,7 @@
                 await new Promise(r => setTimeout(r, 500));
                 circles.forEach(c => c.setAttribute("fill", "#21252a"));
             }
-            showBtn.disabled = false;
+            showTopDownBtn.disabled = false;
         });
 
         resetBtn.addEventListener('click', resetAnimation);
