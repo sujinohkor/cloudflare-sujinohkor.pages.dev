@@ -2180,7 +2180,40 @@
         let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
     }
 
-    function saveColor() { alert(document.getElementById('colorName').value + " 저장됨!"); }
+    function saveColor() {
+        const hex = document.getElementById('hex').value;
+        const name = document.getElementById('colorName').value;
+        const filename = `${name}(${hex}).png`;
+    
+        // 1. 임시 캔버스 생성 (500x700)
+        const canvas = document.createElement('canvas');
+        canvas.width = 500;
+        canvas.height = 700;
+        const ctx = canvas.getContext('2d');
+    
+        // 2. 상단 색상 영역 채우기 (500x500)
+        ctx.fillStyle = hex;
+        ctx.fillRect(0, 0, 500, 500);
+    
+        // 3. 하단 배경 (흰색)
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 500, 500, 200);
+    
+        // 4. 텍스트 그리기 (Times New Roman, 30pt, bold)
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 30pt 'Times New Roman'";
+        ctx.fillText(hex.toUpperCase(), 20, 570);
+        
+        // 이름은 첫 글자를 대문자로 변환하여 표시
+        const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+        ctx.fillText(capitalizedName, 20, 630);
+    
+        // 5. 다운로드 실행
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }
 
     syncAll(110, 40, 40, 0, 64, 43);
 </script>
