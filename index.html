@@ -131,11 +131,25 @@
             visibility: visible;
             top: -35px; /* 호버 시 약간 위에서 아래로 살짝 올라오는 효과 */
         }
+
+        .typing-container {
+            display: block;
+            width: 90%;          /* 모바일에서 화면 너비의 90%를 차지 */
+            max-width: 600px;    /* 최대 600px까지만 커짐 (PC 배려) */
+            margin: 20px auto;   /* 중앙 정렬 */
+        }
+        
+        .typing-container img {
+            width: 100%;         /* 부모 컨테이너(typing-container)에 맞춰 크기 조절 */
+            height: auto;        /* 비율 유지 */
+        }
     </style>
 </head>
 <body>
 
-<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=25&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice.;I+hope+you+enjoy+it+as+much+as+I+do." alt="Typing SVG" /></a>
+<a href="https://git.io/typing-svg" class="typing-container">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=25&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice.;I+hope+you+enjoy+it+as+much+as+I+do." alt="Typing SVG" />
+</a>
 
 <div class="container">
     <h1 class="highlight-text">SUJIN's TOOL ARCHIVE</h1>
