@@ -53,15 +53,15 @@
         
         /* 반응형: 모바일 */
         @media (max-width: 600px) {
-            .header { align-items: flex-start; } /* 모바일에서 전체 왼쪽 정렬 */
-            .highlight-text { 
-                text-align: left; 
-                padding: 15px 0 5px 0; /* 모바일 맞춤 간격 축소 */
-            }
+            .header { align-items: flex-start; }
+            .highlight-text { text-align: left; padding: 15px 0 5px 0; }
+            
+            /* gap을 0으로 설정하여 간격을 제거합니다 */
             .horizontal-list { 
                 flex-direction: column; 
-                gap: 12px; 
+                gap: 0; 
             }
+            
             .horizontal-list li { white-space: normal; }
             .horizontal-list a br { display: none; }
         }
