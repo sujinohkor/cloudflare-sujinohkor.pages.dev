@@ -5,7 +5,15 @@
     <title>Text to SVG Grid</title>
     <style>
         body { display: flex; flex-direction: column; align-items: center; background: #000; color: white; padding-top: 50px; }
-        #canvas-svg { border: 1px solid #333; margin-top: 20px; }
+        
+        /* 1. 테두리 3px 및 모서리 둥글게 처리 */
+        #canvas-svg { 
+            border: 3px solid #333; 
+            border-radius: 20px; 
+            margin-top: 20px; 
+            background: #000;
+        }
+        
         input { padding: 10px; width: 300px; }
         .dot { transition: fill 0.5s ease; }
     </style>
@@ -21,18 +29,18 @@
         
         const rows = 20;
         const cols = 40;
-        const size = 15; // 원의 간격
+        const size = 15;
 
-        // 1. 격자 초기화 (중앙 정렬 좌표 계산)
+        // 2. 격자 초기화 (중앙 정렬 좌표 계산)
         const circles = [];
-        const startX = (800 - (cols - 1) * size) / 2; // 전체 너비 기준 중앙 배치[cite: 1]
-        const startY = (400 - (rows - 1) * size) / 2; // 전체 높이 기준 중앙 배치[cite: 1]
+        const startX = (800 - (cols - 1) * size) / 2;
+        const startY = (400 - (rows - 1) * size) / 2;
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", startX + j * size); // 중앙 정렬된 X좌표[cite: 1]
-                circle.setAttribute("cy", startY + i * size); // 중앙 정렬된 Y좌표[cite: 1]
+                circle.setAttribute("cx", startX + j * size);
+                circle.setAttribute("cy", startY + i * size);
                 circle.setAttribute("r", "3");
                 circle.setAttribute("fill", "#21252a");
                 circle.classList.add('dot');
@@ -41,7 +49,7 @@
             }
         }
 
-        // 2. 텍스트를 비트맵으로 변환하여 점 상태 변경
+        // 3. 텍스트 비트맵 변환
         input.addEventListener('input', (e) => {
             const text = e.target.value;
             const canvas = document.createElement('canvas');
@@ -57,7 +65,6 @@
 
             const imageData = ctx.getImageData(0, 0, cols, rows).data;
 
-            // 알파 채널이 높으면(글자가 있으면) 밝게, 아니면 어둡게
             for (let i = 0; i < rows * cols; i++) {
                 const alpha = imageData[i * 4 + 3];
                 circles[i].setAttribute("fill", alpha > 128 ? "#ffffff" : "#21252a");
