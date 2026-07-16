@@ -95,7 +95,7 @@
         function updateByteCount() {
             const text = document.getElementById('textInput').value;
             const bytes = new TextEncoder().encode(text).length;
-            document.getElementById('byteCount').textContent = bytes + 'B';
+            document.getElementById('byteCount').textContent = bytes + '/1000 B';
         }
 
         document.getElementById('fileInput').addEventListener('change', function() {
