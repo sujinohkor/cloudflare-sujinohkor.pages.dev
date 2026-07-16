@@ -42,6 +42,8 @@
     
     let pointerPos = { x: 150, y: 150 };
     let hueY = 0;
+    let isDraggingField = false;
+    let isDraggingSlider = false;
 
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
@@ -64,13 +66,8 @@
         let grad = sCtx.createLinearGradient(0, 0, 0, 300);
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
-        
-        // 슬라이더 포인터: 흰색 테두리를 가진 원으로 표시
-        sCtx.strokeStyle = '#fff';
-        sCtx.lineWidth = 2;
-        sCtx.beginPath();
-        sCtx.arc(15, hueY, 8, 0, Math.PI * 2);
-        sCtx.stroke();
+        sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
+        sCtx.beginPath(); sCtx.arc(15, hueY, 8, 0, Math.PI * 2); sCtx.stroke();
     }
 
     function drawField(hue) {
@@ -82,31 +79,19 @@
         let gradB = ctx.createLinearGradient(0, 0, 0, 300);
         gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
-
-        // 컬러 필드 포인터: 흰색 원
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(pointerPos.x, pointerPos.y, 6, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(pointerPos.x, pointerPos.y, 6, 0, Math.PI * 2); ctx.stroke();
     }
 
     function updateColor(x, y) {
         pointerPos = { x: Math.max(0, Math.min(x, 299)), y: Math.max(0, Math.min(y, 299)) };
         const h = (hueY / 300) * 360;
         drawField(h);
-        
         const data = ctx.getImageData(pointerPos.x, pointerPos.y, 1, 1).data;
         const [r, g, b] = [data[0], data[1], data[2]];
         const hsv = rgbToHsv(r, g, b);
-
-        document.getElementById('r').value = r;
-        document.getElementById('g').value = g;
-        document.getElementById('b').value = b;
-        document.getElementById('h').value = hsv.h;
-        document.getElementById('s').value = hsv.s;
-        document.getElementById('v').value = hsv.v;
-        
+        document.getElementById('r').value = r; document.getElementById('g').value = g; document.getElementById('b').value = b;
+        document.getElementById('h').value = hsv.h; document.getElementById('s').value = hsv.s; document.getElementById('v').value = hsv.v;
         const hex = '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();
         document.getElementById('hex').value = hex;
         preview.style.backgroundColor = hex;
@@ -114,17 +99,21 @@
 
     drawHue(); drawField(0);
 
-    field.addEventListener('mousedown', (e) => { 
-        updateColor(e.offsetX, e.offsetY);
-        field.onmousemove = (e) => updateColor(e.offsetX, e.offsetY);
-    });
-    window.addEventListener('mouseup', () => field.onmousemove = null);
+    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateColor(e.offsetX, e.offsetY); });
+    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; hueY = e.offsetY; drawHue(); updateColor(pointerPos.x, pointerPos.y); });
 
-    slider.addEventListener('click', (e) => {
-        hueY = e.offsetY;
-        drawHue();
-        updateColor(pointerPos.x, pointerPos.y);
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingField) {
+            const rect = field.getBoundingClientRect();
+            updateColor(e.clientX - rect.left, e.clientY - rect.top);
+        } else if (isDraggingSlider) {
+            const rect = slider.getBoundingClientRect();
+            hueY = Math.max(0, Math.min(e.clientY - rect.top, 299));
+            drawHue(); updateColor(pointerPos.x, pointerPos.y);
+        }
     });
+
+    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 </script>
 </body>
 </html>
