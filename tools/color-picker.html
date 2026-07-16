@@ -7,11 +7,8 @@
         body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .container { display: flex; gap: 15px; align-items: flex-start; }
         
-        /* 1. 채도/명도 박스 */
-        #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
-        /* 2. 색상 미리보기 */
-        #previewBox { width: 50px; height: 300px; border-radius: 5px; border: 1px solid #555; }
-        /* 3. 색조 슬라이더 */
+        #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; background: red; }
+        #previewBox { width: 50px; height: 300px; border-radius: 5px; border: 1px solid #555; background: red; }
         #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
         
         .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
@@ -34,13 +31,13 @@
 </div>
 
 <script>
-    const sb = document.getElementById('sbBox').getContext('2d', {willReadFrequently: true});
-    const hue = document.getElementById('hueSlider').getContext('2d');
+    const sbCanvas = document.getElementById('sbBox');
+    const sb = sbCanvas.getContext('2d', {willReadFrequently: true});
+    const hueCanvas = document.getElementById('hueSlider');
+    const hue = hueCanvas.getContext('2d');
     const preview = document.getElementById('previewBox');
-    
-    let currentHue = 'red';
 
-    // 색조 슬라이더 초기화
+    // 1. 색조 슬라이더 그리기
     function drawHue() {
         let grad = hue.createLinearGradient(0, 0, 0, 300);
         grad.addColorStop(0, 'red'); grad.addColorStop(0.2, 'yellow');
@@ -49,7 +46,7 @@
         hue.fillStyle = grad; hue.fillRect(0, 0, 30, 300);
     }
 
-    // 채도/명도 박스 그리기
+    // 2. 채도/명도 박스 그리기
     function drawSB(color) {
         sb.fillStyle = color; sb.fillRect(0, 0, 300, 300);
         let gradW = sb.createLinearGradient(0, 0, 300, 0);
@@ -62,13 +59,20 @@
 
     drawHue(); drawSB('red');
 
-    // Picking: 박스 클릭 시 값 추출
-    document.getElementById('sbBox').addEventListener('click', (e) => {
+    // 3. Picking: 박스 클릭 시 값 추출
+    sbCanvas.addEventListener('click', (e) => {
         const data = sb.getImageData(e.offsetX, e.offsetY, 1, 1).data;
         updateUI(data[0], data[1], data[2]);
     });
 
-    // 입력값 변경 시 Picking: 입력하면 색상 반영
+    // 4. 슬라이더 클릭 시 색조 변경 (Picking)
+    hueCanvas.addEventListener('click', (e) => {
+        const data = hue.getImageData(0, e.offsetY, 1, 1).data;
+        const color = `rgb(${data[0]},${data[1]},${data[2]})`;
+        drawSB(color);
+        sbCanvas.style.background = color;
+    });
+
     function updateUI(r, g, b) {
         document.getElementById('rInput').value = r;
         document.getElementById('gInput').value = g;
@@ -77,12 +81,6 @@
         document.getElementById('hexInput').value = hex;
         preview.style.backgroundColor = hex;
     }
-
-    [document.getElementById('rInput'), document.getElementById('gInput'), document.getElementById('bInput')].forEach(input => {
-        input.addEventListener('input', () => {
-            updateUI(document.getElementById('rInput').value, document.getElementById('gInput').value, document.getElementById('bInput').value);
-        });
-    });
 </script>
 
 </body>
