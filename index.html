@@ -41,6 +41,12 @@
         a { text-decoration: none; color: inherit; }
         .highlight-text { color: #ff9e40; text-align: center; margin: 30px 0; }
 
+        /* 하단 Websites 섹션 스타일 */
+        .websites-section { margin-top: 60px; text-align: center; }
+        .websites-list { list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .websites-list li { margin: 0 10px; }
+        .websites-list h4 { color: #ccc; font-weight: normal; }
+
         /* 모바일 대응 미디어 쿼리 */
         @media (max-width: 600px) {
             .card-grid { grid-template-columns: 1fr; } /* 모바일에서는 1열로 배치 */
@@ -73,6 +79,9 @@
                 line-height: 1rem;      /* 줄 높이를 1(rem아님, 그냥 1)로 고정하여 텍스트 정렬 왜곡 방지 */
             }
             .card p, .arrow { display: none; } /* 설명글과 화살표 숨김 */
+            
+            /* 모바일에서 링크들 세로 정렬 */
+            .websites-list { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -123,6 +132,16 @@
             <p>color-picker</p>
             <span class="arrow">Color Picker 바로가기 →</span>
         </a>
+    </div>
+
+    <!-- 추가된 섹션 -->
+    <div class="websites-section">
+        <h3 class="highlight-text">SUJIN's WEBSITES</h3>
+        <ul class="websites-list">
+            <li><h4>Web. <a href="https://www.sujinohkor.kr">https://www.sujinohkor.kr</a></h4></li>
+            <li><h4>Dev. <a href="https://sujinohkor.pages.dev">https://sujinohkor.pages.dev</a></h4></li>
+            <li><h4>GitHub. <a href="https://github.com/sujinohkor">https://github.com/sujinohkor</a></h4></li>
+        </ul>
     </div>
 </div>
 
