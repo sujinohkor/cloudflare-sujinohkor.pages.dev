@@ -6,22 +6,6 @@
     <title>SUJIN's FUN SITE</title>
     <style>
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .header-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0; /* 패딩을 0으로 설정하여 오차 제거 */
-            box-sizing: border-box;
-        }
-        
-        .header-wrapper h1 { 
-            margin: 30px auto; 
-            padding-left: 90px; /* 버튼과 정렬 균형을 위해 살짝 조정 */
-        }
-        
         /* 추가: 컨테이너의 좌우 20px 패딩을 header-wrapper가 아닌 부모(container)에서 관리하게 함 */
         .container { 
             width: 100%; 
@@ -30,15 +14,35 @@
             box-sizing: border-box; 
         }
         
+        /* 1. 헤더 수정 */
+        .header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0; /* 패딩 없음 */
+            box-sizing: border-box;
+        }
+
+        /* 2. 제목 수정: 버튼 크기만큼 정확히 보정 */
+        .header-wrapper h1 { 
+            margin: 30px auto; 
+            padding-left: 95px; /* 버튼(80px)+패딩+border 등을 고려해 살짝 더 줌 */
+        }
+
+        /* 3. 버튼 수정: box-sizing 적용 및 margin 제거 */
         #theme-toggle {
-            position: relative; /* absolute 제거 */
-            right: auto;
+            position: relative;
             padding: 8px 16px;
             cursor: pointer;
             background: #202020;
             color: #ff9e40;
-            border: 1px solid #ff9e40;
+            border: 2px solid #ff9e40; /* border 두께도 영향 줌 */
             border-radius: 20px;
+            box-sizing: border-box; /* 매우 중요 */
+            margin-right: 0; /* 버튼이 삐져나가지 않게 */
         }
         
         /* 라이트 모드 스타일 */
