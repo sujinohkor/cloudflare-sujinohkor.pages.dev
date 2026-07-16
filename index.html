@@ -95,6 +95,38 @@
             .websites-list { flex-direction: column; gap: 5px; }
             .websites-list h4 { font-size: 0.9rem; margin: 2px 0; }
         }
+
+        /* 툴팁 컨테이너 */
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        /* 툴팁 박스 (마우스 오버 시 나타남) */
+        .tooltip::after {
+            content: attr(data-tooltip); /* data-tooltip 속성값 가져오기 */
+            position: absolute;
+            bottom: 150%; /* 마우스 위쪽으로 위치 */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px; /* 둥근 모서리 */
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            pointer-events: none; /* 클릭 방해 방지 */
+            border: 1px solid #ff9e40;
+        }
+        
+        /* 마우스 오버 시 나타나게 하기 */
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
@@ -152,9 +184,15 @@
         <h3 class="highlight-text">SUJIN's WEBSITES</h3>
         <ul class="websites-list">
             <!-- Web 링크에 title 속성 추가 -->
-            <li><h4><strong>Web.</strong> <a href="https://www.sujinohkor.kr" title="This is my CV site.">https://www.sujinohkor.kr</a></h4></li>
-            <li><h4><strong>Dev.</strong> <a href="https://sujinohkor.pages.dev" title="This is my FUN site.">https://sujinohkor.pages.dev</a></h4></li>
-            <li><h4><strong>GitHub.</strong> <a href="https://github.com/sujinohkor" title="This is the CODE for the fun site.">https://github.com/sujinohkor</a></h4></li>
+            <li><h4><strong>Web.</strong> 
+                <a href="https://www.sujinohkor.kr" class="tooltip" data-tooltip="This is my CV site.">https://www.sujinohkor.kr</a>
+            </h4></li>
+            <li><h4><strong>Dev.</strong> 
+                <a href="https://sujinohkor.pages.dev" class="tooltip" data-tooltip="This is my FUN site.">https://sujinohkor.pages.dev</a>
+            </h4></li>
+            <li><h4><strong>GitHub.</strong> 
+                <a href="https://github.com/sujinohkor" class="tooltip" data-tooltip="This is the CODE for the fun site.">https://github.com/sujinohkor</a>
+            </h4></li>
         </ul>
     </div>
 </div>
