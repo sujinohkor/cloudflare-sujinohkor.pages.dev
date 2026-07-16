@@ -8,25 +8,60 @@
         body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .container { width: 100%; max-width: 800px; }
         
-        .header { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; } 
-        .custom-list { list-style: none; padding: 0; width: 100%; text-align: left; margin: 10px 0; }
+        /* 헤더 자식 요소들을 정렬 */
+        .header { display: flex; flex-direction: column; align-items: center; } 
         
-        /* 제목 마진 제거 및 스타일 설정 */
+        /* 리스트 기본 마진/패딩 초기화 및 왼쪽 정렬 */
+        .custom-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+            width: 100%; 
+            text-align: left; 
+        }
+        
+        /* 리스트 내부 항목들의 간격 최소화 */
+        .custom-list li {
+            margin: 0;
+            padding: 0;
+        }
+        .custom-list li h3 {
+            margin: 0;
+            padding: 6px 0; /* 각 도구 링크 간의 최소 간격 조정 */
+            font-size: 1.17em;
+        }
+        
+        /* 주황색 제목 스타일: 불필요한 여백 완전히 제거 */
         .highlight-text { 
             color: #ff9e40; 
             text-align: center;
             margin: 0; 
-            padding: 10px 0; 
+            padding: 15px 0 8px 0; /* 위쪽 여백 15px, 아래쪽 여백 8px로 자연스럽게 밀착 */
         }
         
-        .horizontal-list { display: flex; list-style: none; padding: 0; gap: 30px; flex-wrap: nowrap; margin-top: 10px; }
-        .horizontal-list li { white-space: nowrap; }
-        .horizontal-list li h4 { margin: 0; font-size: 1.1em; }
+        /* Websites 가로 정렬 스타일 */
+        .horizontal-list { 
+            display: flex; 
+            list-style: none; 
+            padding: 0; 
+            margin: 0;
+            gap: 30px; 
+            flex-wrap: nowrap; 
+        }
+        .horizontal-list li { white-space: nowrap; margin: 0; padding: 0; }
+        .horizontal-list li h4 { margin: 0; font-size: 1.1em; padding: 6px 0; }
         
+        /* 반응형: 모바일 */
         @media (max-width: 600px) {
-            .header { align-items: flex-start; } 
-            .highlight-text { text-align: left; }
-            .horizontal-list { flex-direction: column; gap: 15px; }
+            .header { align-items: flex-start; } /* 모바일에서 전체 왼쪽 정렬 */
+            .highlight-text { 
+                text-align: left; 
+                padding: 15px 0 5px 0; /* 모바일 맞춤 간격 축소 */
+            }
+            .horizontal-list { 
+                flex-direction: column; 
+                gap: 12px; 
+            }
             .horizontal-list li { white-space: normal; }
             .horizontal-list a br { display: none; }
         }
@@ -52,6 +87,7 @@
             <li><h3><a href="https://sujinohkor.pages.dev/tools/color-picker">Color Picker</a></h3></li>
         </ul>
 
+        <!-- 불필요한 빈 줄 생성용 <br> 태그 모두 삭제 -->
         <h3 data-i18n="sample_archive" class="highlight-text">SUJIN's SAMPLE ARCHIVE</h3>
         <ul class="custom-list">
             <li><h3><a href="https://helloworld123123.pages.dev/">● helloworld123123: Cloudflare demo</a></h3></li>
