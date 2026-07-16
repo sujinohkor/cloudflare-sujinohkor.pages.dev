@@ -29,14 +29,10 @@
             box-sizing: border-box; 
             resize: vertical; 
             font-size: 1rem;
-            /* 영문 Consolas, 한글 맑은 고딕 적용 */
             font-family: 'Consolas', 'Malgun Gothic', sans-serif;
         }
         
-        textarea:focus {
-            outline: none;
-            border: 2px solid #ff9e40;
-        }
+        textarea:focus { outline: none; border: 2px solid #ff9e40; }
 
         .file-label, button { padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; border: none; transition: background 0.3s; }
         .file-label { display: inline-block; background-color: #ddd; color: black; margin-bottom: 10px; }
@@ -58,7 +54,7 @@
     <div class="box-container">
         <textarea id="textInput" placeholder="생성할 텍스트/URL 입력" oninput="updateByteCount()"></textarea>
         <div class="btn-group">
-            <span id="byteCount">0B</span>
+            <span id="byteCount">0/1000 B</span>
             <button id="genBtn" onclick="generateQR()">QR 코드 생성</button>
             <button id="saveBtn" onclick="saveQR()">저장하기</button>
         </div>
@@ -75,8 +71,8 @@
 
     <script>
         const lang = {
-            ko: { title: "QR 생성 및 해석기", header: "QR 코드 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "저장에 실패했습니다.", alertFile: "이미지를 선택하세요.", alertTooLong: "데이터가 너무 깁니다. (최대 1,000바이트)", fail: "해석 실패" },
-            en: { title: "QR Generator & Decoder", header: "QR Code Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "Save failed.", alertFile: "Please select an image.", alertTooLong: "Data is too long (Max 1,000 bytes)", fail: "Decoding failed" }
+            ko: { title: "QR 생성 및 해석기", header: "QR 코드 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "오류가 발생했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
+            en: { title: "QR Generator & Decoder", header: "QR Code Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "An error occurred.", alertFile: "Please select an image.", fail: "Decoding failed" }
         };
 
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
@@ -93,8 +89,19 @@
         document.getElementById('decodeBtn').textContent = t.decode;
 
         function updateByteCount() {
-            const text = document.getElementById('textInput').value;
-            const bytes = new TextEncoder().encode(text).length;
+            const textarea = document.getElementById('textInput');
+            const encoder = new TextEncoder();
+            let text = textarea.value;
+            
+            // 1000바이트 초과 시 강제 자르기
+            if (encoder.encode(text).length > 1000) {
+                while (encoder.encode(text).length > 1000) {
+                    text = text.slice(0, -1);
+                }
+                textarea.value = text;
+            }
+            
+            const bytes = encoder.encode(text).length;
             document.getElementById('byteCount').textContent = bytes + '/1000 B';
         }
 
@@ -107,11 +114,7 @@
             const qrImg = document.getElementById('qrImg');
             if (!text) return alert(t.alertVal);
 
-            const byteLength = new TextEncoder().encode(text).length;
-            if (byteLength > 1000) return alert(t.alertTooLong);
-
             const url = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
-            
             try {
                 const response = await fetch(url);
                 if (response.ok) {
