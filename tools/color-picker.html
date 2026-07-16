@@ -6,9 +6,16 @@
     <style>
         body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .container { display: flex; gap: 15px; align-items: flex-start; }
+        
+        /* 1. 왼쪽: 넓은 Color Field */
         #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
-        #previewBox { width: 50px; height: 300px; border-radius: 5px; border: 1px solid #555; background: red; }
+        
+        /* 2. 중앙: 미리보기 */
+        #previewBox { width: 40px; height: 300px; border-radius: 5px; border: 1px solid #555; background: red; }
+        
+        /* 3. 오른쪽: 좁은 Hue Slider */
         #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
+        
         .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
         input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
     </style>
@@ -16,6 +23,7 @@
 <body>
 
 <div class="container">
+    <!-- 배치 변경: 왼쪽 박스, 중앙 미리보기, 오른쪽 슬라이더 -->
     <canvas id="sbBox" width="300" height="300"></canvas>
     <div id="previewBox"></div>
     <canvas id="hueSlider" width="30" height="300"></canvas>
@@ -50,26 +58,23 @@
         sb.fillStyle = color;
         sb.fillRect(0, 0, 300, 300);
         
-        // 흰색(채도) 그라데이션
         let gradW = sb.createLinearGradient(0, 0, 300, 0);
-        gradW.addColorStop(0, 'rgba(255,255,255,1)'); gradW.addColorStop(1, 'rgba(255,255,255,0)');
+        gradW.addColorStop(0, 'white'); gradW.addColorStop(1, 'transparent');
         sb.fillStyle = gradW; sb.fillRect(0, 0, 300, 300);
         
-        // 검은색(명도) 그라데이션
         let gradB = sb.createLinearGradient(0, 0, 0, 300);
-        gradB.addColorStop(0, 'rgba(0,0,0,0)'); gradB.addColorStop(1, 'rgba(0,0,0,1)');
+        gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, 'black');
         sb.fillStyle = gradB; sb.fillRect(0, 0, 300, 300);
     }
 
     drawHue(); drawSB('#f00');
 
-    // 3. SB 박스에서 색상 추출
+    // 이벤트 리스너
     sbCanvas.addEventListener('click', (e) => {
         const data = sb.getImageData(e.offsetX, e.offsetY, 1, 1).data;
         updateUI(data[0], data[1], data[2]);
     });
 
-    // 4. 슬라이더에서 색조 선택 시 SB 박스 재생성
     hueCanvas.addEventListener('click', (e) => {
         const data = hue.getImageData(0, e.offsetY, 1, 1).data;
         const color = `rgb(${data[0]},${data[1]},${data[2]})`;
