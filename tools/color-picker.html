@@ -6,12 +6,9 @@
     <style>
         body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .container { display: flex; gap: 20px; align-items: flex-start; }
-        
-        /* 색상 영역 */
-        #colorPicker { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
-        #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
-        
-        /* 입력 폼 */
+        canvas { border-radius: 5px; }
+        #colorPicker { cursor: crosshair; }
+        #hueSlider { cursor: pointer; }
         .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
         input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
         .input-group { display: flex; align-items: center; gap: 10px; }
@@ -24,45 +21,55 @@
     <canvas id="hueSlider" width="30" height="300"></canvas>
     
     <div class="controls">
-        <input type="text" id="hexInput" value="#FF7FD5">
-        <select style="background: #333; color: white; padding: 8px;">
-            <option>RGB</option>
-        </select>
+        <input type="text" id="hexInput" value="#FF0000">
         <div class="input-group"><input type="number" id="rInput" value="255"> <span>빨강</span></div>
-        <div class="input-group"><input type="number" id="gInput" value="127"> <span>녹색</span></div>
-        <div class="input-group"><input type="number" id="bInput" value="213"> <span>파랑</span></div>
+        <div class="input-group"><input type="number" id="gInput" value="0"> <span>녹색</span></div>
+        <div class="input-group"><input type="number" id="bInput" value="0"> <span>파랑</span></div>
     </div>
 </div>
 
 <script>
-    const cp = document.getElementById('colorPicker').getContext('2d');
+    const cp = document.getElementById('colorPicker').getContext('2d', {willReadFrequently: true});
     const hs = document.getElementById('hueSlider').getContext('2d');
+    const hexInput = document.getElementById('hexInput');
+    const rInput = document.getElementById('rInput'), gInput = document.getElementById('gInput'), bInput = document.getElementById('bInput');
 
-    // Hue 슬라이더 그리기
-    let gradHue = hs.createLinearGradient(0, 0, 0, 300);
-    gradHue.addColorStop(0, 'red'); gradHue.addColorStop(0.16, 'yellow');
-    gradHue.addColorStop(0.33, 'lime'); gradHue.addColorStop(0.5, 'cyan');
-    gradHue.addColorStop(0.66, 'blue'); gradHue.addColorStop(0.83, 'magenta');
-    gradHue.addColorStop(1, 'red');
-    hs.fillStyle = gradHue;
-    hs.fillRect(0, 0, 30, 300);
-
-    // 기본 채도/명도 박스 그리기 함수
-    function drawPicker(hueColor) {
-        cp.fillStyle = hueColor;
-        cp.fillRect(0, 0, 300, 300);
-        
+    // 1. 초기 그리기
+    function drawHue() {
+        let grad = hs.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, 'red'); grad.addColorStop(0.2, 'yellow');
+        grad.addColorStop(0.4, 'lime'); grad.addColorStop(0.6, 'cyan');
+        grad.addColorStop(0.8, 'blue'); grad.addColorStop(1, 'magenta');
+        hs.fillStyle = grad; hs.fillRect(0, 0, 30, 300);
+    }
+    
+    function drawPicker(color) {
+        cp.fillStyle = color; cp.fillRect(0, 0, 300, 300);
         let gradW = cp.createLinearGradient(0, 0, 300, 0);
         gradW.addColorStop(0, 'white'); gradW.addColorStop(1, 'transparent');
-        cp.fillStyle = gradW;
-        cp.fillRect(0, 0, 300, 300);
-        
+        cp.fillStyle = gradW; cp.fillRect(0, 0, 300, 300);
         let gradB = cp.createLinearGradient(0, 0, 0, 300);
         gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, 'black');
-        cp.fillStyle = gradB;
-        cp.fillRect(0, 0, 300, 300);
+        cp.fillStyle = gradB; cp.fillRect(0, 0, 300, 300);
     }
-    drawPicker('red');
+
+    drawHue(); drawPicker('red');
+
+    // 2. Picking 로직 (클릭 시 값 추출)
+    document.getElementById('colorPicker').addEventListener('click', (e) => {
+        const data = cp.getImageData(e.offsetX, e.offsetY, 1, 1).data;
+        updateInputs(data[0], data[1], data[2]);
+    });
+
+    // 3. 값 입력 시 색상 반영 로직
+    function updateInputs(r, g, b) {
+        rInput.value = r; gInput.value = g; bInput.value = b;
+        hexInput.value = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+    }
+
+    [rInput, gInput, bInput].forEach(el => el.addEventListener('input', () => {
+        // 입력된 RGB를 기반으로 색상을 다시 설정하는 로직 추가 필요 (간소화됨)
+    }));
 </script>
 
 </body>
