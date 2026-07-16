@@ -7,8 +7,11 @@
     <style>
         body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .container { width: 100%; max-width: 800px; }
-        .header { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
-        .custom-list { list-style: none; padding: 0; }
+        
+        /* 헤더의 자식들을 수직 정렬하되, 자식 요소들은 개별 정렬을 따름 */
+        .header { margin-bottom: 30px; display: flex; flex-direction: column; } 
+        
+        .custom-list { list-style: none; padding: 0; align-self: flex-start; } /* 리스트는 왼쪽 정렬 */
         
         /* 제목 스타일: 가로 전체를 차지하며 가운데 정렬 */
         .highlight-text { 
@@ -28,9 +31,8 @@
         .horizontal-list li { white-space: nowrap; }
         .horizontal-list li h4 { margin: 0; font-size: 1.1em; }
         
-        /* 반응형: 모바일에서 왼쪽 정렬 */
+        /* 반응형 */
         @media (max-width: 600px) {
-            .header { align-items: flex-start; } 
             .highlight-text { text-align: left; }
             .horizontal-list { flex-direction: column; gap: 15px; }
             .horizontal-list li { white-space: normal; }
@@ -45,7 +47,6 @@
 
 <div class="container">
     <div class="header">
-        <!-- Hello World!에 highlight-text 클래스 적용 -->
         <h3 data-i18n="hello" class="highlight-text">Hello World!</h3>
         <h1 data-i18n="title" class="highlight-text">SUJIN's TOOL ARCHIVE</h1>
         
