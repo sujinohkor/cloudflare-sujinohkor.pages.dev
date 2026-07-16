@@ -5,25 +5,24 @@
     <title>색 편집기</title>
     <style>
         body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
-        .container { display: flex; gap: 15px; align-items: flex-start; }
+        .container { display: flex; gap: 10px; align-items: flex-start; }
         
-        /* 1. 왼쪽: 넓은 Color Field */
-        #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
+        /* 1. 왼쪽: Color Field (SB Box) */
+        #sbBox { width: 300px; height: 300px; cursor: crosshair; border-radius: 2px; }
         
-        /* 2. 중앙: 미리보기 */
-        #previewBox { width: 40px; height: 300px; border-radius: 5px; border: 1px solid #555; background: red; }
+        /* 2. 중앙: Color Preview */
+        #previewBox { width: 50px; height: 300px; border-radius: 2px; border: 1px solid #444; background: red; }
         
-        /* 3. 오른쪽: 좁은 Hue Slider */
-        #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
+        /* 3. 오른쪽: Hue Slider */
+        #hueSlider { width: 30px; height: 300px; cursor: pointer; border-radius: 2px; }
         
-        .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
-        input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
+        .controls { display: flex; flex-direction: column; gap: 10px; width: 140px; margin-left: 10px; }
+        input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 2px; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 배치 변경: 왼쪽 박스, 중앙 미리보기, 오른쪽 슬라이더 -->
     <canvas id="sbBox" width="300" height="300"></canvas>
     <div id="previewBox"></div>
     <canvas id="hueSlider" width="30" height="300"></canvas>
@@ -37,13 +36,11 @@
 </div>
 
 <script>
-    const sbCanvas = document.getElementById('sbBox');
-    const sb = sbCanvas.getContext('2d', {willReadFrequently: true});
-    const hueCanvas = document.getElementById('hueSlider');
-    const hue = hueCanvas.getContext('2d');
+    const sb = document.getElementById('sbBox').getContext('2d', {willReadFrequently: true});
+    const hue = document.getElementById('hueSlider').getContext('2d');
     const preview = document.getElementById('previewBox');
 
-    // 1. 색조(Hue) 슬라이더 그리기
+    // Hue Slider 생성
     function drawHue() {
         let grad = hue.createLinearGradient(0, 0, 0, 300);
         grad.addColorStop(0, '#f00'); grad.addColorStop(0.17, '#ff0');
@@ -53,15 +50,12 @@
         hue.fillStyle = grad; hue.fillRect(0, 0, 30, 300);
     }
 
-    // 2. 채도/명도(SB) 박스 렌더링
+    // Color Field 생성
     function drawSB(color) {
-        sb.fillStyle = color;
-        sb.fillRect(0, 0, 300, 300);
-        
+        sb.fillStyle = color; sb.fillRect(0, 0, 300, 300);
         let gradW = sb.createLinearGradient(0, 0, 300, 0);
         gradW.addColorStop(0, 'white'); gradW.addColorStop(1, 'transparent');
         sb.fillStyle = gradW; sb.fillRect(0, 0, 300, 300);
-        
         let gradB = sb.createLinearGradient(0, 0, 0, 300);
         gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, 'black');
         sb.fillStyle = gradB; sb.fillRect(0, 0, 300, 300);
@@ -69,13 +63,13 @@
 
     drawHue(); drawSB('#f00');
 
-    // 이벤트 리스너
-    sbCanvas.addEventListener('click', (e) => {
+    // 클릭 이벤트
+    document.getElementById('sbBox').addEventListener('click', (e) => {
         const data = sb.getImageData(e.offsetX, e.offsetY, 1, 1).data;
         updateUI(data[0], data[1], data[2]);
     });
 
-    hueCanvas.addEventListener('click', (e) => {
+    document.getElementById('hueSlider').addEventListener('click', (e) => {
         const data = hue.getImageData(0, e.offsetY, 1, 1).data;
         const color = `rgb(${data[0]},${data[1]},${data[2]})`;
         drawSB(color);
