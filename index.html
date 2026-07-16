@@ -17,7 +17,7 @@
         }
         .card { 
             width: 370px; 
-            height: 200px; 
+            height: 200px; /* 높이 200px 적용 */
             background: #202020; 
             padding: 24px; 
             border-radius: 12px; 
@@ -25,15 +25,18 @@
             transition: all 0.3s ease; 
             cursor: pointer; 
             display: block;
-            box-sizing: border-box;
+            box-sizing: border-box; /* 패딩이 높이에 포함됨 */
         }
         
         .card:hover { transform: translateY(-10px); border-color: #ff9e40; }
-        .card:hover .icon { transform: rotate(-15deg) scale(1.1); }   /* 15deg는 앞으로 넘어지듯이 기울어짐 */
+        .card:hover .icon { transform: rotate(0deg) scale(1.1); } /* 회전 제거 */
         .card:hover .arrow { transform: translateX(10px); }
 
-        .icon { font-size: 2rem; margin-bottom: 15px; transition: transform 0.3s ease; display: inline-block; }
-        .arrow { display: inline-block; transition: transform 0.3s ease; color: #ff9e40; font-weight: bold; margin-top: 15px; }
+        /* 내부 요소 마진 제거로 높이 확보 */
+        .card h3 { margin: 0; padding: 0 0 5px 0; font-size: 1.25rem; }
+        .card p { margin: 0; padding: 0 0 10px 0; color: #aaa; font-size: 0.9rem; }
+        .icon { font-size: 2rem; margin-bottom: 10px; transition: transform 0.3s ease; display: inline-block; }
+        .arrow { display: inline-block; transition: transform 0.3s ease; color: #ff9e40; font-weight: bold; }
         
         a { text-decoration: none; color: inherit; }
         .highlight-text { color: #ff9e40; text-align: center; margin: 30px 0; }
@@ -43,7 +46,6 @@
 
 <div class="container">
     <h1 class="highlight-text">SUJIN's TOOL ARCHIVE</h1>
-    
     <div class="card-grid">
         <a href="https://sujinohkor.pages.dev/tools/word-counter" class="card">
             <div class="icon">W</div>
