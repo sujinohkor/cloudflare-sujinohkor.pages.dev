@@ -102,30 +102,34 @@
             cursor: pointer;
         }
         
-        /* 툴팁 박스 (마우스 오버 시 나타남) */
+        /* 툴팁 박스 수정 */
         .tooltip::after {
-            content: attr(data-tooltip); /* data-tooltip 속성값 가져오기 */
+            content: attr(data-tooltip);
             position: absolute;
-            bottom: 150%; /* 마우스 위쪽으로 위치 */
+            
+            /* 기존 bottom: 150% 대신 아래 값 적용 */
+            top: -40px; /* 텍스트 위로 40px 고정 이동 */
             left: 50%;
             transform: translateX(-50%);
+            
             background: #333;
             color: #fff;
             padding: 5px 12px;
-            border-radius: 20px; /* 둥근 모서리 */
+            border-radius: 20px;
             font-size: 0.8rem;
             white-space: nowrap;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s;
-            pointer-events: none; /* 클릭 방해 방지 */
+            transition: opacity 0.3s, top 0.3s; /* top 변화도 부드럽게 */
+            pointer-events: none;
             border: 1px solid #ff9e40;
         }
         
-        /* 마우스 오버 시 나타나게 하기 */
+        /* 마우스 오버 시 */
         .tooltip:hover::after {
             opacity: 1;
             visibility: visible;
+            top: -35px; /* 호버 시 약간 위에서 아래로 살짝 올라오는 효과 */
         }
     </style>
 </head>
