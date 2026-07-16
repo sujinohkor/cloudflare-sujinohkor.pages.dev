@@ -10,6 +10,22 @@
 
         .app-container { display: flex; min-height: 100vh; }
 
+        /* 햄버거 버튼 스타일 (모바일용) */
+        .menu-toggle-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            padding: 10px 15px;
+            background: #ff9e40;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #101010;
+        }
+
         .sidebar {
             width: 250px;
             height: 100vh;
@@ -20,6 +36,8 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease;
         }
 
         .menu-btn {
@@ -50,76 +68,32 @@
             transition: all 0.3s;
         }
 
-        /* 다크 모드 기본 hover: 크림색 */
-        .theme-btn:hover { 
-            background-color: #FDF5E6; 
-            color: #F38020; 
-            border-color: #FDF5E6; 
-        }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        .menu-list { 
-            margin: 20px 0; 
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .menu-list a {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            text-decoration: none;
-            color: #FFFFFF;
-            font-size: 0.95rem;
-            cursor: default;
-        }
-
-        .menu-list a span {
-            color: #e68a35;
-            font-weight: bold;
-        }
-
-        .bottom-btns {
-            margin-top: 10px;
-        }
-
+        .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+        .menu-list a { display: flex; justify-content: space-between; padding: 5px 0; text-decoration: none; color: #FFFFFF; font-size: 0.95rem; cursor: default; }
+        .menu-list a span { color: #e68a35; font-weight: bold; }
+        .bottom-btns { margin-top: 10px; }
         .top-section { margin-bottom: 30px; }
         .top-section h1, .top-section p { color: #FFFFFF; }
 
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        .main-content { margin-left: 250px; padding: 40px; flex: 1; display: flex; flex-direction: column; transition: 0.3s; }
 
-        .content-card {
-            background: transparent;
-            border-radius: 16px;
-            border: 2px solid #ff9e40;
-            width: 100%;
-            min-height: calc(100vh - 180px);
-            display: flex; 
-            overflow: hidden;
-        }
-
-        /* textarea에만 적용되는 폰트 설정 */
+        .content-card { background: transparent; border-radius: 16px; border: 2px solid #ff9e40; width: 100%; min-height: calc(100vh - 180px); display: flex; overflow: hidden; }
         .content-card textarea {
-            width: 100%;
-            flex: 1; 
-            border: none;
-            outline: none;
-            resize: none;
+            width: 100%; flex: 1; border: none; outline: none; resize: none;
             font-family: 'Consolas', 'Malgun Gothic', sans-serif;
-            font-size: 1rem;
-            padding: 40px;
-            background-color: transparent; 
-            color: #ffffff;
-            border-radius: 16px;
+            font-size: 1rem; padding: 40px; background-color: transparent; color: #ffffff; border-radius: 16px;
         }
-
         .content-card textarea::placeholder { color: #888888; opacity: 1; }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding-top: 80px; }
+        }
 
         /* 라이트 모드 */
         body.light-mode { background-color: #ffffff; }
@@ -127,14 +101,7 @@
         body.light-mode .menu-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
         body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        
-        /* 라이트 모드 hover: #202020 */
-        body.light-mode .theme-btn:hover { 
-            background-color: #202020; 
-            color: #ff9e40; 
-            border-color: #202020; 
-        }
-
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .content-card { background: #ffffff; }
         body.light-mode .content-card textarea { color: #000000; }
@@ -143,8 +110,10 @@
 </head>
 <body>
 
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
 <div class="app-container">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
         
@@ -178,19 +147,19 @@
 </div>
 
 <script>
-    const textInput = document.getElementById('text-input');
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
 
+    const textInput = document.getElementById('text-input');
     textInput.addEventListener('input', () => {
         const text = textInput.value;
         document.getElementById('char-count-all').innerText = text.length;
         document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
-        
         const words = text.trim().split(/\s+/).filter(w => w.length > 0);
         document.getElementById('word-count').innerText = words.length;
-        
         const paras = text.split('\n').filter(p => p.trim().length > 0);
         document.getElementById('para-count').innerText = paras.length;
-        
         let byteCount = 0;
         for (let i = 0; i < text.length; i++) {
             byteCount += (text.charCodeAt(i) > 127) ? 2 : 1;
@@ -214,7 +183,6 @@
         } else {
             textInput.select();
             document.execCommand('copy');
-            textInput.selectionStart = textInput.selectionEnd;
             alert('Text copied!');
         }
     }
