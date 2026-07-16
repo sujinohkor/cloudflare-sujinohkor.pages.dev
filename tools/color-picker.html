@@ -40,9 +40,8 @@
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
     
-    let isDragging = false;
-    let lastHue = 0;
-    let pointerPos = { x: 0, y: 0 }; // 포인터 위치 저장
+    let pointerPos = { x: 150, y: 150 };
+    let hueY = 0;
 
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
@@ -61,14 +60,20 @@
     }
 
     function drawHue() {
+        sCtx.clearRect(0, 0, 30, 300);
         let grad = sCtx.createLinearGradient(0, 0, 0, 300);
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
+        
+        // 슬라이더 포인터: 흰색 테두리를 가진 원으로 표시
+        sCtx.strokeStyle = '#fff';
+        sCtx.lineWidth = 2;
+        sCtx.beginPath();
+        sCtx.arc(15, hueY, 8, 0, Math.PI * 2);
+        sCtx.stroke();
     }
 
-    // 동그라미 표시 기능이 포함된 drawField
     function drawField(hue) {
-        lastHue = hue;
         ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
         ctx.fillRect(0, 0, 300, 300);
         let gradW = ctx.createLinearGradient(0, 0, 300, 0);
@@ -78,8 +83,8 @@
         gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
 
-        // 포인터 동그라미 그리기
-        ctx.strokeStyle = 'white';
+        // 컬러 필드 포인터: 흰색 원
+        ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(pointerPos.x, pointerPos.y, 6, 0, Math.PI * 2);
@@ -88,7 +93,8 @@
 
     function updateColor(x, y) {
         pointerPos = { x: Math.max(0, Math.min(x, 299)), y: Math.max(0, Math.min(y, 299)) };
-        drawField(lastHue); // 현재 색상 위 포인터 재갱신
+        const h = (hueY / 300) * 360;
+        drawField(h);
         
         const data = ctx.getImageData(pointerPos.x, pointerPos.y, 1, 1).data;
         const [r, g, b] = [data[0], data[1], data[2]];
@@ -108,18 +114,16 @@
 
     drawHue(); drawField(0);
 
-    field.addEventListener('mousedown', (e) => { isDragging = true; updateColor(e.offsetX, e.offsetY); });
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const rect = field.getBoundingClientRect();
-        updateColor(e.clientX - rect.left, e.clientY - rect.top);
+    field.addEventListener('mousedown', (e) => { 
+        updateColor(e.offsetX, e.offsetY);
+        field.onmousemove = (e) => updateColor(e.offsetX, e.offsetY);
     });
-    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mouseup', () => field.onmousemove = null);
 
     slider.addEventListener('click', (e) => {
-        const h = (e.offsetY / 300) * 360;
-        drawField(h);
-        updateColor(pointerPos.x, pointerPos.y); // Hue 변경 시에도 같은 위치 색상 유지
+        hueY = e.offsetY;
+        drawHue();
+        updateColor(pointerPos.x, pointerPos.y);
     });
 </script>
 </body>
