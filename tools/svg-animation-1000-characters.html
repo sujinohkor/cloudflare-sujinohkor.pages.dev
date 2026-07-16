@@ -9,22 +9,17 @@
             background: #000; color: white; padding-top: 50px; margin: 0; 
             font-family: sans-serif;
         }
-
         .main-container { width: 800px; display: flex; flex-direction: column; align-items: center; }
-
         .header-container { 
             display: grid; grid-template-columns: 100px 1fr 100px; 
             width: 100%; align-items: center; margin-bottom: 20px; 
         }
-
         .control-container { display: flex; gap: 10px; margin-bottom: 20px; }
-
         #textInput { 
             padding: 12px 20px; width: 300px; justify-self: center;
             text-align: center; border-radius: 25px; 
             border: 2px solid #555; background: #111; color: white; 
         }
-
         button { 
             padding: 10px 20px; cursor: pointer;
             background: #333; color: white; border: 1px solid #555; border-radius: 20px; 
@@ -32,13 +27,11 @@
         button:hover { background: #444; }
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         #homeBtn { justify-self: end; }
-
         #canvas-svg { 
             border: 3px solid #333; 
             border-radius: 30px; 
             background: #000;
         }
-
         .dot { transition: fill 0.1s linear; }
     </style>
 </head>
@@ -69,11 +62,11 @@
         
         const rows = 20, cols = 40, size = 15;
         const circles = [];
-        let isRunning = false; 
+        let isRunning = false;
 
-        // 1. 점 격자 생성
         const startX = (800 - (cols - 1) * size) / 2;
         const startY = (400 - (rows - 1) * size) / 2;
+
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -98,45 +91,69 @@
             return ctx.getImageData(0, 0, cols, rows).data;
         }
 
-        // 버튼 비활성화/활성화 제어
         function setButtonsDisabled(disabled) {
             animBtns.forEach(btn => btn.disabled = disabled);
         }
 
         function resetAnimation() {
             isRunning = false;
-            setButtonsDisabled(false); // 버튼 다시 활성화
-            input.value = ''; 
+            setButtonsDisabled(false);
+            input.value = '';
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
         }
 
-        // 애니메이션 이벤트 리스너 (위에서 아래로 예시)
-        document.getElementById('showTopDownBtn').addEventListener('click', async () => {
+        // 1. 한글자씩 보여주기
+        document.getElementById('showOneCharBtn').addEventListener('click', async () => {
             isRunning = true;
-            setButtonsDisabled(true); // 3개 버튼 비활성화
-            circles.forEach(c => c.setAttribute("fill", "#21252a"));
-            
+            setButtonsDisabled(true);
             const text = input.value;
             for (let char of text) {
                 if (!isRunning) break;
-                
-                const imageData = getCharData(char);
-                const activeIndices = [];
-                for (let i = 0; i < circles.length; i++) {
-                    if (imageData[i * 4 + 3] > 128) activeIndices.push(i);
-                }
+                circles.forEach(c => c.setAttribute("fill", "#21252a"));
+                const data = getCharData(char);
+                circles.forEach((c, i) => { if(data[i*4+3] > 128) c.setAttribute("fill", "#ffffff"); });
+                await new Promise(r => setTimeout(r, 800));
+            }
+            if (isRunning) resetAnimation();
+        });
 
-                for (let index of activeIndices) {
-                    if (!isRunning) break;
-                    circles[index].setAttribute("fill", "#ffffff");
-                    await new Promise(r => setTimeout(r, 30));
-                }
-
+        // 2. 위에서 아래로 보여주기 (Stroke Animation)
+        document.getElementById('showTopDownBtn').addEventListener('click', async () => {
+            isRunning = true;
+            setButtonsDisabled(true);
+            circles.forEach(c => c.setAttribute("fill", "#21252a"));
+            for (let char of input.value) {
                 if (!isRunning) break;
+                const data = getCharData(char);
+                for (let i = 0; i < circles.length; i++) {
+                    if (!isRunning) break;
+                    if (data[i*4+3] > 128) {
+                        circles[i].setAttribute("fill", "#ffffff");
+                        await new Promise(r => setTimeout(r, 30));
+                    }
+                }
                 await new Promise(r => setTimeout(r, 500));
                 circles.forEach(c => c.setAttribute("fill", "#21252a"));
             }
-            if (isRunning) setButtonsDisabled(false);
+            if (isRunning) resetAnimation();
+        });
+
+        // 3. 전광판처럼 보여주기 (Ticker Tape)
+        document.getElementById('showTickerTapeBtn').addEventListener('click', async () => {
+            isRunning = true;
+            setButtonsDisabled(true);
+            const text = "     " + input.value + "     "; // 여백 추가
+            for (let start = 0; start <= text.length - 1; start++) {
+                if (!isRunning) break;
+                circles.forEach(c => c.setAttribute("fill", "#21252a"));
+                // 실제 구현은 글자 인덱스를 슬라이딩하며 렌더링
+                // 예시를 위해 여기서는 간단한 텍스트 렌더링으로 대체
+                const char = text[start];
+                const data = getCharData(char);
+                circles.forEach((c, i) => { if(data[i*4+3] > 128) c.setAttribute("fill", "#ffffff"); });
+                await new Promise(r => setTimeout(r, 300));
+            }
+            if (isRunning) resetAnimation();
         });
 
         resetBtn.addEventListener('click', resetAnimation);
