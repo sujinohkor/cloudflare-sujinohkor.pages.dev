@@ -42,6 +42,24 @@
     const preview = document.getElementById('previewBox');
     let isDragging = false;
 
+    // RGB를 HSV로 변환하는 함수
+    function rgbToHsv(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
+
+        if (max === min) h = 0;
+        else {
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+    }
+
     function drawHue() {
         let grad = sCtx.createLinearGradient(0, 0, 0, 300);
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
@@ -61,17 +79,23 @@
 
     function updateColor(x, y) {
         const data = ctx.getImageData(x, y, 1, 1).data;
-        document.getElementById('r').value = data[0];
-        document.getElementById('g').value = data[1];
-        document.getElementById('b').value = data[2];
-        const hex = '#' + ((1<<24)+(data[0]<<16)+(data[1]<<8)+data[2]).toString(16).slice(1).toUpperCase();
+        const [r, g, b] = [data[0], data[1], data[2]];
+        const hsv = rgbToHsv(r, g, b);
+
+        document.getElementById('r').value = r;
+        document.getElementById('g').value = g;
+        document.getElementById('b').value = b;
+        document.getElementById('h').value = hsv.h;
+        document.getElementById('s').value = hsv.s;
+        document.getElementById('v').value = hsv.v;
+        
+        const hex = '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();
         document.getElementById('hex').value = hex;
         preview.style.backgroundColor = hex;
     }
 
     drawHue(); drawField(0);
 
-    // 드래그 및 클릭 이벤트 연동
     field.addEventListener('mousedown', (e) => { isDragging = true; updateColor(e.offsetX, e.offsetY); });
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
