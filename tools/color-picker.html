@@ -2151,10 +2151,29 @@
     }));
 
     document.getElementById('hex').addEventListener('input', (e) => {
-        let val = e.target.value.replace('#', '');
-        if(val.length === 6) {
-            let r=parseInt(val.substr(0,2),16), g=parseInt(val.substr(2,2),16), b=parseInt(val.substr(4,2),16);
-            let hsv = rgbToHsv(r,g,b); syncAll(r,g,b,hsv.h,hsv.s,hsv.v);
+        // 1. #을 강제로 앞에 붙임
+        if (!e.target.value.startsWith('#')) {
+            e.target.value = '#' + e.target.value.replace(/#/g, '');
+        }
+    
+        // 2. #을 제외한 입력값에서 16진수 문자(0-9, a-f, A-F)만 남기고 나머지 제거
+        let hexContent = e.target.value.substring(1).replace(/[^0-9a-fA-F]/g, '');
+    
+        // 3. 6글자까지만 제한
+        if (hexContent.length > 6) {
+            hexContent = hexContent.substring(0, 6);
+        }
+    
+        // 4. 입력 필드 업데이트
+        e.target.value = '#' + hexContent;
+    
+        // 5. 6글자가 다 찼을 때만 색상 동기화
+        if (hexContent.length === 6) {
+            let r = parseInt(hexContent.substr(0, 2), 16);
+            let g = parseInt(hexContent.substr(2, 2), 16);
+            let b = parseInt(hexContent.substr(4, 2), 16);
+            let hsv = rgbToHsv(r, g, b);
+            syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
         }
     });
 
