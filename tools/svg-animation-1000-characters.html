@@ -116,13 +116,13 @@
                 circles.forEach((c, i) => { if(data[i*4+3] > 128) c.setAttribute("fill", "#ffffff"); });
                 await new Promise(r => setTimeout(r, 800));
             }
-            if (isRunning) resetAnimation();
+            isRunning = false; setButtonsDisabled(false);
+            circles.forEach(c => c.setAttribute("fill", "#21252a"));
         });
 
         // 2. 위에서 아래로 보여주기 (Stroke)
         document.getElementById('showTopDownBtn').addEventListener('click', async () => {
             isRunning = true; setButtonsDisabled(true);
-            circles.forEach(c => c.setAttribute("fill", "#21252a"));
             for (let char of input.value) {
                 if (!isRunning) break;
                 const data = getCharData(char);
@@ -136,7 +136,7 @@
                 await new Promise(r => setTimeout(r, 500));
                 circles.forEach(c => c.setAttribute("fill", "#21252a"));
             }
-            if (isRunning) resetAnimation();
+            isRunning = false; setButtonsDisabled(false);
         });
 
         // 3. 전광판처럼 보여주기 (Ticker Tape)
@@ -160,7 +160,8 @@
                 });
                 await new Promise(r => setTimeout(r, 80));
             }
-            if (isRunning) resetAnimation();
+            isRunning = false; setButtonsDisabled(false);
+            circles.forEach(c => c.setAttribute("fill", "#21252a"));
         });
     </script>
 </body>
