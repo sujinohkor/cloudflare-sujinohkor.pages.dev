@@ -12,23 +12,19 @@
 
         .main-container { width: 800px; display: flex; flex-direction: column; align-items: center; }
 
-        /* 상단 헤더: 입력창과 집으로 버튼 */
         .header-container { 
             display: grid; grid-template-columns: 100px 1fr 100px; 
             width: 100%; align-items: center; margin-bottom: 20px; 
         }
 
-        /* 컨트롤 영역: 보여주기, 초기화 버튼 */
         .control-container { display: flex; gap: 10px; margin-bottom: 20px; }
 
-        /* 텍스트박스 */
         #textInput { 
             padding: 12px 20px; width: 300px; justify-self: center;
             text-align: center; border-radius: 25px; 
             border: 2px solid #555; background: #111; color: white; 
         }
 
-        /* 버튼 공통 스타일 */
         button { 
             padding: 10px 20px; cursor: pointer;
             background: #333; color: white; border: 1px solid #555; border-radius: 20px; 
@@ -37,7 +33,6 @@
         button:disabled { opacity: 0.3; cursor: not-allowed; }
         #homeBtn { justify-self: end; }
 
-        /* SVG 박스 테두리 */
         #canvas-svg { 
             border: 3px solid #333; 
             border-radius: 30px; 
@@ -50,18 +45,16 @@
 <body>
 
     <div class="main-container">
-        <!-- 상단: 입력창과 집으로 -->
         <div class="header-container">
             <div></div>
             <input type="text" id="textInput" placeholder="텍스트를 입력하세요" maxlength="333">
             <button id="homeBtn" onclick="location.href='../index.html'">집으로</button>
         </div>
 
-        <!-- 중단: 버튼들 -->
         <div class="control-container">
-            <button id="showOneCharBtn">한글자씩 보여주기</button>
-            <button id="showTopDownBtn">위에서 아래로 보여주기</button>
-            <button id="showTickerTapeBtn">전광판처럼 보여주기</button>
+            <button class="animBtn" id="showOneCharBtn">한글자씩 보여주기</button>
+            <button class="animBtn" id="showTopDownBtn">위에서 아래로 보여주기</button>
+            <button class="animBtn" id="showTickerTapeBtn">전광판처럼 보여주기</button>
             <button id="resetBtn">초기화</button>
         </div>
 
@@ -71,19 +64,16 @@
     <script>
         const svg = document.getElementById('canvas-svg');
         const input = document.getElementById('textInput');
-        const showOneCharBtn = document.getElementById('showOneCharBtn');
-        const showTopDownBtn = document.getElementById('showTopDownBtn');
-        const showTickerTapeBtn = document.getElementById('showTickerTapeBtn');
+        const animBtns = document.querySelectorAll('.animBtn');
         const resetBtn = document.getElementById('resetBtn');
         
         const rows = 20, cols = 40, size = 15;
         const circles = [];
-        let isRunning = false; // 애니메이션 상태 플래그
+        let isRunning = false; 
 
-        // 1. 점들을 캔버스 가운데에 정렬하기 위한 좌표 계산
+        // 1. 점 격자 생성
         const startX = (800 - (cols - 1) * size) / 2;
         const startY = (400 - (rows - 1) * size) / 2;
-
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -108,22 +98,27 @@
             return ctx.getImageData(0, 0, cols, rows).data;
         }
 
-        // 초기화 함수
+        // 버튼 비활성화/활성화 제어
+        function setButtonsDisabled(disabled) {
+            animBtns.forEach(btn => btn.disabled = disabled);
+        }
+
         function resetAnimation() {
             isRunning = false;
-            showTopDownBtn.disabled = false;
-            input.value = ''; // 텍스트 박스 내용까지 초기화
+            setButtonsDisabled(false); // 버튼 다시 활성화
+            input.value = ''; 
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
         }
 
-        showTopDownBtn.addEventListener('click', async () => {
+        // 애니메이션 이벤트 리스너 (위에서 아래로 예시)
+        document.getElementById('showTopDownBtn').addEventListener('click', async () => {
             isRunning = true;
-            showTopDownBtn.disabled = true;
+            setButtonsDisabled(true); // 3개 버튼 비활성화
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
             
             const text = input.value;
             for (let char of text) {
-                if (!isRunning) break; 
+                if (!isRunning) break;
                 
                 const imageData = getCharData(char);
                 const activeIndices = [];
@@ -141,7 +136,7 @@
                 await new Promise(r => setTimeout(r, 500));
                 circles.forEach(c => c.setAttribute("fill", "#21252a"));
             }
-            showTopDownBtn.disabled = false;
+            if (isRunning) setButtonsDisabled(false);
         });
 
         resetBtn.addEventListener('click', resetAnimation);
