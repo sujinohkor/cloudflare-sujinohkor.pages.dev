@@ -57,6 +57,10 @@
         /* 기존 라이트 모드 스타일 아래에 추가 */
         body.light-mode .websites-list h4 { color: #000000; }
         body.light-mode .websites-list a { color: #000000; }
+        /* 라이트 모드 스타일 섹션 하단에 추가 */
+        body.light-mode .card:hover { 
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); /* 주황색 톤의 부드러운 그림자 */
+        }
         
         .card-grid { 
             display: grid; 
@@ -78,7 +82,7 @@
             box-sizing: border-box; /* 패딩이 높이에 포함됨 */
         }
         
-        .card:hover { transform: translateY(-10px); border-color: #ff9e40; }
+        .card:hover { transform: translateY(-10px); border-color: #ff9e40; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .card:hover .icon { transform: rotate(-15deg) scale(1.1); } /* 15deg는 앞으로 고꾸라지듯이 움직임 */
         .card:hover .arrow { transform: translateX(10px); }
 
