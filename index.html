@@ -7,6 +7,34 @@
     <style>
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .container { width: 100%; max-width: 1200px; }
+
+        .header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* 제목이 정중앙에 위치하도록 */
+            position: relative;
+            width: 100%;
+        }
+        
+        .header-wrapper h1 { margin: 30px auto; } /* 제목을 가운대로 밀어냄 */
+        
+        #theme-toggle {
+            position: absolute;
+            right: 0;
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            border-radius: 20px;
+        }
+        
+        /* 라이트 모드 스타일 */
+        body.light-mode { background: #FDF5E6; color: #000000; }
+        body.light-mode .card { background: #e0dace; }
+        body.light-mode .card p { color: #555; }
+        body.light-mode .highlight-text { color: #F38020; }
+        body.light-mode #theme-toggle { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         
         .card-grid { 
             display: grid; 
@@ -146,76 +174,84 @@
     </style>
 </head>
 <body>
-
-<div class="container">
-    <!-- Typing SVG를 컨테이너 내부 맨 위로 이동 -->
-    <a href="https://git.io/typing-svg" class="typing-container">
-        <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=25&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice.;I+hope+you+enjoy+it+as+much+as+I+do." alt="Typing SVG" />
-    </a>
+    <div class="container">
+        <!-- Typing SVG를 컨테이너 내부 맨 위로 이동 -->
+        <a href="https://git.io/typing-svg" class="typing-container">
+            <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=25&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice.;I+hope+you+enjoy+it+as+much+as+I+do." alt="Typing SVG" />
+        </a>
+        
+        <!-- 변경된 헤더 부분 -->
+        <div class="header-wrapper">
+            <h1 class="highlight-text">SUJIN's FUN SITE</h1>
+            <button id="theme-toggle">DAY / NIGHT</button>
+        </div>
+        <div class="card-grid">
+            <a href="https://sujinohkor.pages.dev/tools/word-counter" class="card">
+                <div class="icon">W</div>
+                <h3>Word Counter</h3>
+                <p>word-counter</p>
+                <span class="arrow">Go to Word Counter →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/image-ascii" class="card">
+                <div class="icon">I</div>
+                <h3>Image to ASCII</h3>
+                <p>image-ascii</p>
+                <span class="arrow">Go to Image to ASCII →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/qr-generator" class="card">
+                <div class="icon">Q</div>
+                <h3>QR Code Generator</h3>
+                <p>qr-generator</p>
+                <span class="arrow">Go to QR Code Generator →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/text-ascii" class="card">
+                <div class="icon">T</div>
+                <h3>Text to ASCII</h3>
+                <p>text-ascii</p>
+                <span class="arrow">Go to Text to ASCII →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/one-char-animation" class="card">
+                <div class="icon">O</div>
+                <h3>One Char Animation</h3>
+                <p>one-char-animation</p>
+                <span class="arrow">Go to One Char Animation →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/stroke-animation" class="card">
+                <div class="icon">S</div>
+                <h3>Stroke Animation</h3>
+                <p>stroke-animation</p>
+                <span class="arrow">Go to Stroke Animation →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/color-picker" class="card">
+                <div class="icon">C</div>
+                <h3>Color Picker</h3>
+                <p>color-picker</p>
+                <span class="arrow">Go to Color Picker →</span>
+            </a>
+        </div>
     
-    <h1 class="highlight-text">SUJIN's FUN SITE</h1>
-    <div class="card-grid">
-        <a href="https://sujinohkor.pages.dev/tools/word-counter" class="card">
-            <div class="icon">W</div>
-            <h3>Word Counter</h3>
-            <p>word-counter</p>
-            <span class="arrow">Go to Word Counter →</span>
-        </a>
-        <a href="https://sujinohkor.pages.dev/tools/image-ascii" class="card">
-            <div class="icon">I</div>
-            <h3>Image to ASCII</h3>
-            <p>image-ascii</p>
-            <span class="arrow">Go to Image to ASCII →</span>
-        </a>
-        <a href="https://sujinohkor.pages.dev/tools/qr-generator" class="card">
-            <div class="icon">Q</div>
-            <h3>QR Code Generator</h3>
-            <p>qr-generator</p>
-            <span class="arrow">Go to QR Code Generator →</span>
-        </a>
-        <a href="https://sujinohkor.pages.dev/tools/text-ascii" class="card">
-            <div class="icon">T</div>
-            <h3>Text to ASCII</h3>
-            <p>text-ascii</p>
-            <span class="arrow">Go to Text to ASCII →</span>
-        </a>
-        <a href="https://sujinohkor.pages.dev/tools/one-char-animation" class="card">
-            <div class="icon">O</div>
-            <h3>One Char Animation</h3>
-            <p>one-char-animation</p>
-            <span class="arrow">Go to One Char Animation →</span>
-        </a>
-        <a href="https://sujinohkor.pages.dev/tools/stroke-animation" class="card">
-            <div class="icon">S</div>
-            <h3>Stroke Animation</h3>
-            <p>stroke-animation</p>
-            <span class="arrow">Go to Stroke Animation →</span>
-        </a>
-        <a href="https://sujinohkor.pages.dev/tools/color-picker" class="card">
-            <div class="icon">C</div>
-            <h3>Color Picker</h3>
-            <p>color-picker</p>
-            <span class="arrow">Go to Color Picker →</span>
-        </a>
+        <!-- 추가된 섹션 -->
+        <div class="websites-section">
+            <h3 class="highlight-text">SUJIN's WEBSITES</h3>
+            <ul class="websites-list">
+                <!-- Web 링크에 title 속성 추가 -->
+                <li><h4><strong>Web.</strong> 
+                    <a href="https://www.sujinohkor.kr" class="tooltip" data-tooltip="This is my CV site.">https://www.sujinohkor.kr</a>
+                </h4></li>
+                <li><h4><strong>Dev.</strong> 
+                    <a href="https://sujinohkor.pages.dev" class="tooltip" data-tooltip="This is my FUN site.">https://sujinohkor.pages.dev</a>
+                </h4></li>
+                <li><h4><strong>GitHub.</strong> 
+                    <a href="https://github.com/sujinohkor" class="tooltip" data-tooltip="This is the CODE for the fun site.">https://github.com/sujinohkor</a>
+                </h4></li>
+            </ul>
+        </div>
     </div>
 
-    <!-- 추가된 섹션 -->
-    <div class="websites-section">
-        <h3 class="highlight-text">SUJIN's WEBSITES</h3>
-        <ul class="websites-list">
-            <!-- Web 링크에 title 속성 추가 -->
-            <li><h4><strong>Web.</strong> 
-                <a href="https://www.sujinohkor.kr" class="tooltip" data-tooltip="This is my CV site.">https://www.sujinohkor.kr</a>
-            </h4></li>
-            <li><h4><strong>Dev.</strong> 
-                <a href="https://sujinohkor.pages.dev" class="tooltip" data-tooltip="This is my FUN site.">https://sujinohkor.pages.dev</a>
-            </h4></li>
-            <li><h4><strong>GitHub.</strong> 
-                <a href="https://github.com/sujinohkor" class="tooltip" data-tooltip="This is the CODE for the fun site.">https://github.com/sujinohkor</a>
-            </h4></li>
-        </ul>
-    </div>
-</div>
-
+    <script>
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+    </script>
 </body>
 </html>
