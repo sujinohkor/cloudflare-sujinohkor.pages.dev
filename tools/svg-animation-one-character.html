@@ -2,48 +2,16 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- title 태그에 id 추가 -->
     <title id="pageTitle">Text to SVG Grid</title>
     <style>
         body { display: flex; flex-direction: column; align-items: center; background: #000; color: white; padding-top: 50px; margin: 0; }
-        
-        .header-container { 
-            display: flex; 
-            width: 800px; 
-            align-items: center; 
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
+        .header-container { display: flex; width: 800px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .spacer { width: 80px; } 
-
-        #canvas-svg { 
-            border: 3px solid #333; 
-            border-radius: 20px; 
-            background: #000;
-        }
-        
-        input { 
-            padding: 10px 20px; 
-            width: 300px; 
-            text-align: center; 
-            border-radius: 20px; 
-            border: 1px solid #555; 
-            background: #111; 
-            color: white; 
-        }
-        
-        button { 
-            padding: 10px 20px; 
-            cursor: pointer; 
-            background: #333; 
-            color: white; 
-            border: 1px solid #555; 
-            border-radius: 20px; 
-        }
+        #canvas-svg { border: 3px solid #333; border-radius: 20px; background: #000; }
+        input { padding: 10px 20px; width: 300px; text-align: center; border-radius: 20px; border: 1px solid #555; background: #111; color: white; }
+        button { padding: 10px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #555; border-radius: 20px; }
         button:hover { background: #444; }
-        
-        .dot { transition: fill 0.5s ease; }
+        .dot { transition: fill 0.3s ease; } /* 전환 속도 최적화 */
     </style>
 </head>
 <body>
@@ -57,11 +25,11 @@
     <svg id="canvas-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
 
     <script>
-        // 언어 설정 로직
         const isKorean = navigator.language.startsWith('ko');
         const pageTitle = document.getElementById('pageTitle');
         const textInput = document.getElementById('textInput');
         const homeBtn = document.getElementById('homeBtn');
+        let isProcessing = false; // 동작 제어 플래그
 
         if (isKorean) {
             pageTitle.innerText = "텍스트 SVG 그리드";
@@ -93,12 +61,19 @@
         }
 
         textInput.addEventListener('input', (e) => {
-            const text = e.target.value;
+            if (isProcessing) return; // 작업 중이면 무시
+            renderText(e.target.value);
+        });
+
+        function renderText(text) {
+            // 1. 강제 초기화
+            circles.forEach(c => c.setAttribute("fill", "#21252a"));
+
+            if (!text) return;
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = cols;
-            canvas.height = rows;
-
+            canvas.width = cols; canvas.height = rows;
             ctx.fillStyle = 'white';
             ctx.font = '16px Arial';
             ctx.textAlign = 'center';
@@ -107,11 +82,12 @@
 
             const imageData = ctx.getImageData(0, 0, cols, rows).data;
 
+            // 2. 새로운 상태 적용
             for (let i = 0; i < rows * cols; i++) {
                 const alpha = imageData[i * 4 + 3];
                 circles[i].setAttribute("fill", alpha > 128 ? "#ffffff" : "#21252a");
             }
-        });
+        }
     </script>
 </body>
 </html>
