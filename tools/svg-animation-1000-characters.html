@@ -12,10 +12,14 @@
 
         .main-container { width: 800px; display: flex; flex-direction: column; align-items: center; }
 
+        /* 헤더: 입력창과 집으로 버튼 */
         .header-container { 
             display: grid; grid-template-columns: 100px 1fr 100px; 
             width: 100%; align-items: center; margin-bottom: 20px; 
         }
+
+        /* 컨트롤 영역: 보여주기, 초기화 버튼 */
+        .control-container { display: flex; gap: 10px; margin-bottom: 20px; }
 
         #textInput { 
             padding: 12px 20px; width: 300px; justify-self: center;
@@ -23,11 +27,12 @@
             border: 2px solid #555; background: #111; color: white; 
         }
 
-        #showBtn, #homeBtn { 
+        button { 
             padding: 10px 20px; cursor: pointer;
             background: #333; color: white; border: 1px solid #555; border-radius: 20px; 
         }
-        #showBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:hover { background: #444; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
         #homeBtn { justify-self: end; }
 
         #canvas-svg { 
@@ -42,10 +47,17 @@
 <body>
 
     <div class="main-container">
+        <!-- 상단: 입력창과 집으로 -->
         <div class="header-container">
-            <button id="showBtn">보여주기</button>
+            <div></div>
             <input type="text" id="textInput" placeholder="텍스트를 입력하세요" maxlength="333">
             <button id="homeBtn" onclick="location.href='../index.html'">집으로</button>
+        </div>
+
+        <!-- 중단: 버튼들 -->
+        <div class="control-container">
+            <button id="showBtn">보여주기</button>
+            <button id="resetBtn">초기화</button>
         </div>
 
         <svg id="canvas-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
@@ -54,10 +66,12 @@
     <script>
         const svg = document.getElementById('canvas-svg');
         const input = document.getElementById('textInput');
-        const btn = document.getElementById('showBtn');
+        const showBtn = document.getElementById('showBtn');
+        const resetBtn = document.getElementById('resetBtn');
         
         const rows = 20, cols = 40, size = 15;
         const circles = [];
+        let isRunning = false; // 애니메이션 상태 플래그
 
         const startX = (800 - (cols - 1) * size) / 2;
         const startY = (400 - (rows - 1) * size) / 2;
@@ -86,33 +100,42 @@
             return ctx.getImageData(0, 0, cols, rows).data;
         }
 
-        btn.addEventListener('click', async () => {
-            // 버튼 비활성화 및 초기화
-            btn.disabled = true;
+        // 초기화 함수
+        function resetAnimation() {
+            isRunning = false;
+            showBtn.disabled = false;
+            circles.forEach(c => c.setAttribute("fill", "#21252a"));
+        }
+
+        showBtn.addEventListener('click', async () => {
+            isRunning = true;
+            showBtn.disabled = true;
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
             
             const text = input.value;
             for (let char of text) {
+                if (!isRunning) break; // 초기화 시 루프 탈출
+                
                 const imageData = getCharData(char);
                 const activeIndices = [];
-                
                 for (let i = 0; i < circles.length; i++) {
                     if (imageData[i * 4 + 3] > 128) activeIndices.push(i);
                 }
 
                 for (let index of activeIndices) {
+                    if (!isRunning) break;
                     circles[index].setAttribute("fill", "#ffffff");
                     await new Promise(r => setTimeout(r, 30));
                 }
 
+                if (!isRunning) break;
                 await new Promise(r => setTimeout(r, 500));
-                // 다음 글자를 위해 초기화
                 circles.forEach(c => c.setAttribute("fill", "#21252a"));
             }
-            
-            // 애니메이션 완료 후 버튼 활성화
-            btn.disabled = false;
+            showBtn.disabled = false;
         });
+
+        resetBtn.addEventListener('click', resetAnimation);
     </script>
 </body>
 </html>
