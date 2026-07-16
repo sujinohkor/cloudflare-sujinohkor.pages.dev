@@ -16,9 +16,10 @@
         #hueSlider { width: 30px; height: 300px; cursor: pointer; }
         #previewBox { width: 50px; height: 300px; border: 1px solid #444; border-radius: 12px; }
         
-        .controls { display: flex; flex-direction: column; gap: 5px; width: 80px; }
+        .controls { display: flex; flex-direction: column; gap: 5px; width: 120px; }
         .input-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; }
-        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 4px; width: 45px; border-radius: 8px; text-align: center; }
+        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 4px; width: 60px; border-radius: 8px; text-align: center; }
+        #colorName { width: 100%; margin-top: 10px; border: none; background: #222; color: #aaa; cursor: default; }
     </style>
 </head>
 <body>
@@ -34,13 +35,16 @@
     <canvas id="hueSlider" width="30" height="300"></canvas>
     
     <div class="controls">
-        <input type="text" id="hex" value="#6E2828" style="width: 75px; margin-bottom: 5px; border-radius: 20px;">
+        <input type="text" id="hex" value="#6E2828" style="width: 100%; margin-bottom: 5px; border-radius: 20px;">
         <div class="input-row">R <input type="number" id="r" value="110" oninput="this.value = Math.max(0, Math.min(255, this.value))"></div>
         <div class="input-row">G <input type="number" id="g" value="40" oninput="this.value = Math.max(0, Math.min(255, this.value))"></div>
         <div class="input-row">B <input type="number" id="b" value="40" oninput="this.value = Math.max(0, Math.min(255, this.value))"></div>
         <div class="input-row">H <input type="number" id="h" value="0" oninput="this.value = Math.max(0, Math.min(360, this.value))"></div>
         <div class="input-row">S <input type="number" id="s" value="64" oninput="this.value = Math.max(0, Math.min(100, this.value))"></div>
         <div class="input-row">V <input type="number" id="v" value="43" oninput="this.value = Math.max(0, Math.min(100, this.value))"></div>
+        
+        <input type="text" id="colorName" readonly placeholder="색상 이름">
+        <button onclick="saveColor()" style="margin-top: 5px; width: 100%;">저장하기</button>
     </div>
 </div>
 
@@ -50,10 +54,9 @@
     const slider = document.getElementById('hueSlider');
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
+    const colorDB = { "#FF0A54": "Neon Blaze", "#007BFF": "Hyper Blue", "#5A00FF": "Vivid Indigo", "#6E2828": "Rusty Red" };
     
-    let hueY = 0;
-    let isDraggingField = false;
-    let isDraggingSlider = false;
+    let hueY = 0, isDraggingField = false, isDraggingSlider = false;
 
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
@@ -94,6 +97,7 @@
         let hex = '#' + ((1<<24)+(Math.round(r)<<16)+(Math.round(g)<<8)+Math.round(b)).toString(16).slice(1).toUpperCase();
         document.getElementById('hex').value = hex;
         preview.style.backgroundColor = hex;
+        document.getElementById('colorName').value = colorDB[hex.toUpperCase()] || "Unknown Color";
         hueY = (h / 360) * 299;
         drawHue(); drawField(h, s, v);
     }
@@ -158,6 +162,8 @@
         let h = (hueY / 299) * 360, s = parseInt(document.getElementById('s').value), v = parseInt(document.getElementById('v').value);
         let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
     }
+
+    function saveColor() { alert(document.getElementById('colorName').value + " 저장됨!"); }
 
     syncAll(110, 40, 40, 0, 64, 43);
 </script>
