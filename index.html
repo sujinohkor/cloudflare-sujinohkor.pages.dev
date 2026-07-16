@@ -18,22 +18,28 @@
         .header-wrapper {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-between; /* 양 끝 정렬 유지 */
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0; /* 패딩 없음 */
+            padding: 0 20px; /* 컨테이너 패딩과 일치 */
             box-sizing: border-box;
+            position: relative; /* 자식 요소 절대 위치 제어용 */
         }
 
         /* 2. 제목 수정: 버튼 크기만큼 정확히 보정 */
         .header-wrapper h1 { 
             margin: 30px auto; 
-            padding-left: 95px; /* 버튼(80px)+패딩+border 등을 고려해 살짝 더 줌 */
+            position: absolute; /* 절대 위치로 설정 */
+            left: 0; right: 0;   /* 부모 안에서 완벽한 중앙 배치 */
+            pointer-events: none; /* 클릭 방해 방지 */
+            text-align: center;
         }
 
         /* 3. 버튼 수정: box-sizing 적용 및 margin 제거 */
         #theme-toggle {
+            z-index: 10; /* 버튼이 h1 위에 오도록 설정 */
+            margin-left: auto; /* 버튼을 우측 끝으로 밀어냄 */
             position: relative;
             padding: 8px 16px;
             cursor: pointer;
