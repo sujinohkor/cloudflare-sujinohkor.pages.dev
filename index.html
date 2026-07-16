@@ -33,13 +33,13 @@
             .horizontal-list li {
                 white-space: normal;
             }
-            /* 모바일에서만 br 태그 숨김 처리하여 한 줄로 표시 */
+            /* 모바일에서 br 숨김 */
             .horizontal-list a br {
                 display: none;
             }
-            /* br 숨김 시 레이블과 주소 사이 공백 추가 */
-            .horizontal-list a::after {
-                content: "   ";
+            /* 모바일에서 레이블 뒤에 공백 추가 */
+            .horizontal-list a span::after {
+                content: " ";
             }
         }
         
@@ -74,9 +74,10 @@
         <br>
         <h3 data-i18n="websites" class="highlight-text">SUJIN's Websites</h3>
         <ul class="horizontal-list">
-            <li><h4><a href="https://www.sujinohkor.kr">Web.<br>https://www.sujinohkor.kr</a></h4></li>
-            <li><h4><a href="https://sujinohkor.pages.dev">Dev.<br>https://sujinohkor.pages.dev</a></h4></li>
-            <li><h4><a href="https://github.com/sujinohkor">GitHub.<br>https://github.com/sujinohkor</a></h4></li>
+            <!-- span으로 레이블을 감싸 모바일 반응형 대응 -->
+            <li><h4><a href="https://www.sujinohkor.kr"><span>Web.</span><br>https://www.sujinohkor.kr</a></h4></li>
+            <li><h4><a href="https://sujinohkor.pages.dev"><span>Dev.</span><br>https://sujinohkor.pages.dev</a></h4></li>
+            <li><h4><a href="https://github.com/sujinohkor"><span>GitHub.</span><br>https://github.com/sujinohkor</a></h4></li>
         </ul>
     </div>
 </div>
