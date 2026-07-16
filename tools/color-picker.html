@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>윈도우 12 스타일 색 편집기</title>
+    <title>완전 동기화 색 편집기</title>
     <style>
         body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 8px; align-items: flex-start; }
@@ -40,16 +40,13 @@
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
     
-    let pointerPos = { x: 150, y: 150 };
     let hueY = 0;
-    let isDraggingField = false;
-    let isDraggingSlider = false;
 
+    // 변환 로직들
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
         let max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
-        if (max === min) h = 0;
-        else {
+        if (max === min) h = 0; else {
             switch (max) {
                 case r: h = (g - b) / d + (g < b ? 6 : 0); break;
                 case g: h = (b - r) / d + 2; break;
@@ -58,6 +55,35 @@
             h /= 6;
         }
         return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+    }
+
+    function hsvToRgb(h, s, v) {
+        h /= 360; s /= 100; v /= 100;
+        let i = Math.floor(h * 6), f = h * 6 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+        let r, g, b;
+        switch (i % 6) {
+            case 0: r = v, g = t, b = p; break;
+            case 1: r = q, g = v, b = p; break;
+            case 2: r = p, g = v, b = t; break;
+            case 3: r = p, g = q, b = v; break;
+            case 4: r = t, g = p, b = v; break;
+            case 5: r = v, g = p, b = q; break;
+        }
+        return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    // 핵심 통합 함수: 입력된 RGB/HSV/Hex에 맞춰 UI를 일괄 업데이트
+    function syncAll(r, g, b, h, s, v, updateCanvas = true) {
+        document.getElementById('r').value = r; document.getElementById('g').value = g; document.getElementById('b').value = b;
+        document.getElementById('h').value = h; document.getElementById('s').value = s; document.getElementById('v').value = v;
+        const hex = '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();
+        document.getElementById('hex').value = hex;
+        preview.style.backgroundColor = hex;
+        
+        if (updateCanvas) {
+            hueY = (h / 360) * 300;
+            drawHue(); drawField(h, s, v);
+        }
     }
 
     function drawHue() {
@@ -69,53 +95,49 @@
         sCtx.beginPath(); sCtx.arc(15, hueY, 8, 0, Math.PI * 2); sCtx.stroke();
     }
 
-    function drawField(hue) {
-        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+    function drawField(h, s, v) {
+        ctx.fillStyle = `hsl(${h}, 100%, 50%)`;
         ctx.fillRect(0, 0, 300, 300);
         let gradW = ctx.createLinearGradient(0, 0, 300, 0); gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
         ctx.fillStyle = gradW; ctx.fillRect(0, 0, 300, 300);
         let gradB = ctx.createLinearGradient(0, 0, 0, 300); gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
+        
+        // 포인터 위치 계산 (S, V에 기반)
+        let px = (s / 100) * 300;
+        let py = (1 - (v / 100)) * 300;
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(pointerPos.x, pointerPos.y, 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
     }
 
-    function updateFromCanvas(x, y) {
-        pointerPos = { x: Math.max(0, Math.min(x, 299)), y: Math.max(0, Math.min(y, 299)) };
-        const h = (hueY / 300) * 360;
-        drawField(h);
-        const data = ctx.getImageData(pointerPos.x, pointerPos.y, 1, 1).data;
-        const [r, g, b] = [data[0], data[1], data[2]];
-        const hsv = rgbToHsv(r, g, b);
-        document.getElementById('r').value = r; document.getElementById('g').value = g; document.getElementById('b').value = b;
-        document.getElementById('h').value = hsv.h; document.getElementById('s').value = hsv.s; document.getElementById('v').value = hsv.v;
-        const hex = '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();
-        document.getElementById('hex').value = hex;
-        preview.style.backgroundColor = hex;
-    }
-
-    // 텍스트박스 입력 시
+    // 이벤트 리스너 통합
     document.querySelectorAll('.val').forEach(input => {
         input.addEventListener('input', () => {
-            const r = parseInt(document.getElementById('r').value) || 0;
-            const g = parseInt(document.getElementById('g').value) || 0;
-            const b = parseInt(document.getElementById('b').value) || 0;
+            const r = parseInt(document.getElementById('r').value)||0, g = parseInt(document.getElementById('g').value)||0, b = parseInt(document.getElementById('b').value)||0;
             const hsv = rgbToHsv(r, g, b);
-            hueY = (hsv.h / 360) * 300;
-            drawHue(); drawField(hsv.h);
-            preview.style.backgroundColor = `rgb(${r},${g},${b})`;
+            syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
         });
     });
 
-    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromCanvas(e.offsetX, e.offsetY); });
-    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; hueY = e.offsetY; drawHue(); updateFromCanvas(pointerPos.x, pointerPos.y); });
-    window.addEventListener('mousemove', (e) => {
-        if (isDraggingField) { const rect = field.getBoundingClientRect(); updateFromCanvas(e.clientX - rect.left, e.clientY - rect.top); }
-        else if (isDraggingSlider) { const rect = slider.getBoundingClientRect(); hueY = Math.max(0, Math.min(e.clientY - rect.top, 299)); drawHue(); updateFromCanvas(pointerPos.x, pointerPos.y); }
+    document.getElementById('hex').addEventListener('input', (e) => {
+        let h = e.target.value.replace('#', '');
+        if(h.length === 6) {
+            let rgb = {r: parseInt(h.substr(0,2),16), g: parseInt(h.substr(2,2),16), b: parseInt(h.substr(4,2),16)};
+            let hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+            syncAll(rgb.r, rgb.g, rgb.b, hsv.h, hsv.s, hsv.v);
+        }
     });
-    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 
-    drawHue(); drawField(0);
+    // 마우스 이벤트 (기존과 동일)
+    field.addEventListener('mousedown', (e) => {
+        const rect = field.getBoundingClientRect();
+        const px = e.clientX - rect.left, py = e.clientY - rect.top;
+        const data = ctx.getImageData(px, py, 1, 1).data;
+        const hsv = rgbToHsv(data[0], data[1], data[2]);
+        syncAll(data[0], data[1], data[2], hsv.h, hsv.s, hsv.v, false);
+    });
+
+    drawHue(); drawField(0, 100, 100);
 </script>
 </body>
 </html>
