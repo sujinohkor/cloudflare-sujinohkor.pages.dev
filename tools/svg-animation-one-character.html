@@ -4,32 +4,65 @@
     <meta charset="UTF-8">
     <title id="pageTitle">Text to SVG Grid</title>
     <style>
-        body { display: flex; flex-direction: column; align-items: center; background: #000; color: white; padding-top: 50px; margin: 0; }
-        .header-container { display: flex; width: 800px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .spacer { width: 80px; } 
-        #canvas-svg { border: 3px solid #333; border-radius: 20px; background: #000; }
-        input { padding: 10px 20px; width: 300px; text-align: center; border-radius: 20px; border: 1px solid #555; background: #111; color: white; }
-        button { padding: 10px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #555; border-radius: 20px; }
-        button:hover { background: #444; }
-        .dot { transition: fill 0.3s ease; } /* 전환 속도 최적화 */
+        body { 
+            display: flex; flex-direction: column; align-items: center; 
+            background: #000; color: white; padding-top: 50px; margin: 0; 
+            font-family: sans-serif;
+        }
+        
+        /* 전체 컨테이너를 800px로 맞춤 */
+        .main-container { width: 800px; display: flex; flex-direction: column; align-items: center; }
+
+        /* 헤더: 3등분 그리드 배치 */
+        .header-container { 
+            display: grid; 
+            grid-template-columns: 100px 1fr 100px; 
+            width: 100%; 
+            align-items: center; 
+            margin-bottom: 20px;
+        }
+
+        /* 텍스트박스 */
+        #textInput { 
+            padding: 12px 20px; width: 300px; justify-self: center;
+            text-align: center; border-radius: 25px; 
+            border: 2px solid #555; background: #111; color: white; 
+        }
+        
+        /* 버튼 */
+        #homeBtn { 
+            padding: 10px 20px; cursor: pointer; justify-self: end;
+            background: #333; color: white; border: 1px solid #555; border-radius: 20px; 
+        }
+        #homeBtn:hover { background: #444; }
+        
+        /* SVG 테두리 및 둥근 모서리 */
+        #canvas-svg { 
+            border: 3px solid #333; 
+            border-radius: 30px; 
+            background: #000;
+        }
+        
+        .dot { transition: fill 0.3s ease; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div class="spacer"></div>
-        <input type="text" id="textInput" maxlength="1">
-        <button onclick="location.href='../index.html'" id="homeBtn">집으로</button>
-    </div>
+    <div class="main-container">
+        <div class="header-container">
+            <div></div> <!-- 왼쪽 여백용 -->
+            <input type="text" id="textInput" maxlength="1">
+            <button onclick="location.href='../index.html'" id="homeBtn">집으로</button>
+        </div>
 
-    <svg id="canvas-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
+        <svg id="canvas-svg" width="800" height="400" viewBox="0 0 800 400"></svg>
+    </div>
 
     <script>
         const isKorean = navigator.language.startsWith('ko');
         const pageTitle = document.getElementById('pageTitle');
         const textInput = document.getElementById('textInput');
         const homeBtn = document.getElementById('homeBtn');
-        let isProcessing = false; // 동작 제어 플래그
 
         if (isKorean) {
             pageTitle.innerText = "텍스트 SVG 그리드";
@@ -61,14 +94,9 @@
         }
 
         textInput.addEventListener('input', (e) => {
-            if (isProcessing) return; // 작업 중이면 무시
-            renderText(e.target.value);
-        });
-
-        function renderText(text) {
-            // 1. 강제 초기화
+            const text = e.target.value;
+            // 초기화
             circles.forEach(c => c.setAttribute("fill", "#21252a"));
-
             if (!text) return;
 
             const canvas = document.createElement('canvas');
@@ -81,13 +109,12 @@
             ctx.fillText(text, cols / 2, rows / 2);
 
             const imageData = ctx.getImageData(0, 0, cols, rows).data;
-
-            // 2. 새로운 상태 적용
             for (let i = 0; i < rows * cols; i++) {
-                const alpha = imageData[i * 4 + 3];
-                circles[i].setAttribute("fill", alpha > 128 ? "#ffffff" : "#21252a");
+                if (imageData[i * 4 + 3] > 128) {
+                    circles[i].setAttribute("fill", "#ffffff");
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
