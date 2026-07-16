@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>색 편집기</title>
+    <title>윈도우 12 스타일 색 편집기</title>
     <style>
         body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 8px; align-items: flex-start; }
@@ -24,12 +24,12 @@
     
     <div class="controls">
         <input type="text" id="hex" value="#6E2828" style="width: 75px; margin-bottom: 5px;">
-        <div class="input-row">R <input type="number" id="r" value="110"></div>
-        <div class="input-row">G <input type="number" id="g" value="40"></div>
-        <div class="input-row">B <input type="number" id="b" value="40"></div>
-        <div class="input-row">H <input type="number" id="h" value="0"></div>
-        <div class="input-row">S <input type="number" id="s" value="100"></div>
-        <div class="input-row">V <input type="number" id="v" value="100"></div>
+        <div class="input-row">R <input type="number" id="r" value="110" class="val"></div>
+        <div class="input-row">G <input type="number" id="g" value="40" class="val"></div>
+        <div class="input-row">B <input type="number" id="b" value="40" class="val"></div>
+        <div class="input-row">H <input type="number" id="h" value="0" class="val"></div>
+        <div class="input-row">S <input type="number" id="s" value="100" class="val"></div>
+        <div class="input-row">V <input type="number" id="v" value="100" class="val"></div>
     </div>
 </div>
 
@@ -47,8 +47,7 @@
 
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
-        let max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
+        let max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
         if (max === min) h = 0;
         else {
             switch (max) {
@@ -73,17 +72,15 @@
     function drawField(hue) {
         ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
         ctx.fillRect(0, 0, 300, 300);
-        let gradW = ctx.createLinearGradient(0, 0, 300, 0);
-        gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
+        let gradW = ctx.createLinearGradient(0, 0, 300, 0); gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
         ctx.fillStyle = gradW; ctx.fillRect(0, 0, 300, 300);
-        let gradB = ctx.createLinearGradient(0, 0, 0, 300);
-        gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
+        let gradB = ctx.createLinearGradient(0, 0, 0, 300); gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(pointerPos.x, pointerPos.y, 6, 0, Math.PI * 2); ctx.stroke();
     }
 
-    function updateColor(x, y) {
+    function updateFromCanvas(x, y) {
         pointerPos = { x: Math.max(0, Math.min(x, 299)), y: Math.max(0, Math.min(y, 299)) };
         const h = (hueY / 300) * 360;
         drawField(h);
@@ -97,23 +94,28 @@
         preview.style.backgroundColor = hex;
     }
 
-    drawHue(); drawField(0);
-
-    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateColor(e.offsetX, e.offsetY); });
-    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; hueY = e.offsetY; drawHue(); updateColor(pointerPos.x, pointerPos.y); });
-
-    window.addEventListener('mousemove', (e) => {
-        if (isDraggingField) {
-            const rect = field.getBoundingClientRect();
-            updateColor(e.clientX - rect.left, e.clientY - rect.top);
-        } else if (isDraggingSlider) {
-            const rect = slider.getBoundingClientRect();
-            hueY = Math.max(0, Math.min(e.clientY - rect.top, 299));
-            drawHue(); updateColor(pointerPos.x, pointerPos.y);
-        }
+    // 텍스트박스 입력 시
+    document.querySelectorAll('.val').forEach(input => {
+        input.addEventListener('input', () => {
+            const r = parseInt(document.getElementById('r').value) || 0;
+            const g = parseInt(document.getElementById('g').value) || 0;
+            const b = parseInt(document.getElementById('b').value) || 0;
+            const hsv = rgbToHsv(r, g, b);
+            hueY = (hsv.h / 360) * 300;
+            drawHue(); drawField(hsv.h);
+            preview.style.backgroundColor = `rgb(${r},${g},${b})`;
+        });
     });
 
+    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromCanvas(e.offsetX, e.offsetY); });
+    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; hueY = e.offsetY; drawHue(); updateFromCanvas(pointerPos.x, pointerPos.y); });
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingField) { const rect = field.getBoundingClientRect(); updateFromCanvas(e.clientX - rect.left, e.clientY - rect.top); }
+        else if (isDraggingSlider) { const rect = slider.getBoundingClientRect(); hueY = Math.max(0, Math.min(e.clientY - rect.top, 299)); drawHue(); updateFromCanvas(pointerPos.x, pointerPos.y); }
+    });
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
+
+    drawHue(); drawField(0);
 </script>
 </body>
 </html>
