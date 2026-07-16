@@ -24,6 +24,17 @@
         .horizontal-list li { white-space: nowrap; }
         .horizontal-list li h4 { margin: 0; font-size: 1.1em; }
         
+        /* 반응형: 모바일에서 세로 정렬 */
+        @media (max-width: 600px) {
+            .horizontal-list {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .horizontal-list li {
+                white-space: normal;
+            }
+        }
+        
         a { color: white; text-decoration: none; }
         a:hover { text-decoration: underline; }
     </style>
@@ -33,7 +44,6 @@
 <div class="container">
     <div class="header">
         <h3 data-i18n="hello">Hello World!</h3>
-        <!-- 제목에 클래스 적용 -->
         <h1 data-i18n="title" class="highlight-text">SUJIN's TOOL ARCHIVE</h1>
         
         <ul class="custom-list">
@@ -47,7 +57,6 @@
         </ul>
 
         <br>
-        <!-- 제목에 클래스 적용 -->
         <h3 data-i18n="sample_archive" class="highlight-text">SUJIN's SAMPLE ARCHIVE</h3>
         <ul class="custom-list">
             <li><h3><a href="https://helloworld123123.pages.dev/">● helloworld123123: Cloudflare demo</a></h3></li>
@@ -55,7 +64,6 @@
         </ul>
 
         <br>
-        <!-- 제목에 클래스 적용 -->
         <h3 data-i18n="websites" class="highlight-text">SUJIN's Websites</h3>
         <ul class="horizontal-list">
             <li><h4><a href="https://www.sujinohkor.kr">Web.<br>https://www.sujinohkor.kr</a></h4></li>
