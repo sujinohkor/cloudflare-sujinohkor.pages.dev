@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sujin's Note - 글자 수 세기</title>
+    <title>Word Counter</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; transition: background 0.3s; }
@@ -134,33 +134,33 @@
 
 <div class="app-container">
     <aside class="sidebar">
-        <button class="menu-btn" onclick="location.href='#'">집으로</button>
+        <button class="menu-btn" onclick="location.href='#'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
         
         <nav class="menu-list">
-            <a>공백 포함 <span id="char-count-all">0</span></a>
-            <a>공백 제외 <span id="char-count-no-space">0</span></a>
-            <a>단어 수 <span id="word-count">0</span></a>
-            <a>문단 수 <span id="para-count">0</span></a>
-            <a>Byte 수 <span id="byte-count">0</span></a>
+            <a>Characters (with spaces) <span id="char-count-all">0</span></a>
+            <a>Characters (no spaces) <span id="char-count-no-space">0</span></a>
+            <a>Word Count <span id="word-count">0</span></a>
+            <a>Paragraph Count <span id="para-count">0</span></a>
+            <a>Byte Count <span id="byte-count">0</span></a>
         </nav>
 
         <div class="bottom-btns">
-            <button class="menu-btn" onclick="copyText()">복사하기</button>
-            <button class="menu-btn" onclick="saveText()">텍스트 파일로 저장하기</button>
-            <button class="menu-btn" onclick="resetText()">초기화</button>
+            <button class="menu-btn" onclick="copyText()">Copy</button>
+            <button class="menu-btn" onclick="saveText()">Save as Text File</button>
+            <button class="menu-btn" onclick="resetText()">Reset</button>
         </div>
     </aside>
 
     <main class="main-content">
         <header class="top-section">
-            <h1>글자 수 세기</h1>
-            <p>글자 수 등을 셀 수 있습니다.</p>
+            <h1>Word Counter</h1>
+            <p>You can count the number of words, etc.</p>
         </header>
 
         <section class="main-content-section">
             <div class="content-card">
-                <textarea id="text-input" placeholder="여기에 글자를 입력하세요."></textarea>
+                <textarea id="text-input" placeholder="Enter text here."></textarea>
             </div>
         </section>
     </main>
@@ -199,12 +199,12 @@
     function copyText() {
         const text = textInput.value;
         if (text === "") {
-            alert('복사할 텍스트가 없습니다.');
+            alert('No text to copy.');
         } else {
             textInput.select();
             document.execCommand('copy');
             textInput.selectionStart = textInput.selectionEnd;
-            alert('텍스트가 복사되었습니다!');
+            alert('Text copied!');
         }
     }
 
@@ -213,7 +213,7 @@
         const blob = new Blob([text], { type: 'text/plain' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = '글자수세기.txt';
+        link.download = 'WordCounter.txt';
         link.click();
     }
 </script>
