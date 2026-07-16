@@ -2,9 +2,15 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>완전 동기화 색 편집기</title>
+    <title>색 편집기</title>
     <style>
-        body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
+        
+        /* 상단 제목 및 버튼 */
+        .header { width: 550px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        button { background: #3c3c3c; color: white; border: 1px solid #555; padding: 5px 15px; cursor: pointer; }
+        button:hover { background: #555; }
+
         .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 8px; align-items: flex-start; }
         canvas { border: 1px solid #444; }
         #colorField { width: 300px; height: 300px; cursor: crosshair; }
@@ -16,6 +22,11 @@
     </style>
 </head>
 <body>
+
+<div class="header">
+    <h2 style="margin: 0;">색 편집기</h2>
+    <button onclick="alert('집으로 이동')">집으로</button>
+</div>
 
 <div class="container">
     <canvas id="colorField" width="300" height="300"></canvas>
@@ -44,7 +55,6 @@
     let isDraggingField = false;
     let isDraggingSlider = false;
 
-    // 변환 공식
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
         let max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
@@ -74,7 +84,6 @@
         return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     }
 
-    // 화면 동기화 통합 함수
     function syncAll(r, g, b, h, s, v) {
         document.getElementById('r').value = Math.round(r);
         document.getElementById('g').value = Math.round(g);
@@ -82,14 +91,11 @@
         document.getElementById('h').value = Math.round(h);
         document.getElementById('s').value = Math.round(s);
         document.getElementById('v').value = Math.round(v);
-        
         let hex = '#' + ((1<<24)+(Math.round(r)<<16)+(Math.round(g)<<8)+Math.round(b)).toString(16).slice(1).toUpperCase();
         document.getElementById('hex').value = hex;
         preview.style.backgroundColor = hex;
-        
         hueY = (h / 360) * 299;
-        drawHue(); 
-        drawField(h, s, v);
+        drawHue(); drawField(h, s, v);
     }
 
     function drawHue() {
@@ -97,11 +103,8 @@
         let grad = sCtx.createLinearGradient(0, 0, 0, 300);
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
-        
         sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
         sCtx.beginPath(); sCtx.arc(15, hueY, 8, 0, Math.PI * 2); sCtx.stroke();
-        sCtx.strokeStyle = '#000'; sCtx.lineWidth = 1;
-        sCtx.beginPath(); sCtx.arc(15, hueY, 9, 0, Math.PI * 2); sCtx.stroke();
     }
 
     function drawField(h, s, v) {
@@ -111,71 +114,30 @@
         ctx.fillStyle = gradW; ctx.fillRect(0, 0, 300, 300);
         let gradB = ctx.createLinearGradient(0, 0, 0, 300); gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
-        
-        let px = (s / 100) * 299;
-        let py = (1 - (v / 100)) * 299;
-        
+        let px = (s / 100) * 299, py = (1 - (v / 100)) * 299;
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.stroke();
     }
 
-    // 마우스 드래그 연산
-    function updateFromField(e) {
-        const rect = field.getBoundingClientRect();
-        let x = Math.max(0, Math.min(e.clientX - rect.left, 299));
-        let y = Math.max(0, Math.min(e.clientY - rect.top, 299));
-        let h = (hueY / 299) * 360;
-        let s = (x / 299) * 100;
-        let v = (1 - (y / 299)) * 100;
-        let rgb = hsvToRgb(h, s, v);
-        syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
-    }
+    // 입력 이벤트 리스너 (기존 로직)
+    ['r', 'g', 'b'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+        let r=parseInt(document.getElementById('r').value)||0, g=parseInt(document.getElementById('g').value)||0, b=parseInt(document.getElementById('b').value)||0;
+        let hsv = rgbToHsv(r, g, b); syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
+    }));
 
-    function updateFromSlider(e) {
-        const rect = slider.getBoundingClientRect();
-        hueY = Math.max(0, Math.min(e.clientY - rect.top, 299));
-        let h = (hueY / 299) * 360;
-        let s = parseFloat(document.getElementById('s').value) || 0;
-        let v = parseFloat(document.getElementById('v').value) || 0;
-        let rgb = hsvToRgb(h, s, v);
-        syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
-    }
+    ['h', 's', 'v'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+        let h=parseInt(document.getElementById('h').value)||0, s=parseInt(document.getElementById('s').value)||0, v=parseInt(document.getElementById('v').value)||0;
+        let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+    }));
 
-    // 1. RGB 텍스트박스 입력 이벤트
-    ['r', 'g', 'b'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            let r = Math.max(0, Math.min(255, parseInt(document.getElementById('r').value) || 0));
-            let g = Math.max(0, Math.min(255, parseInt(document.getElementById('g').value) || 0));
-            let b = Math.max(0, Math.min(255, parseInt(document.getElementById('b').value) || 0));
-            let hsv = rgbToHsv(r, g, b);
-            syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
-        });
-    });
-
-    // 2. HSV 텍스트박스 입력 이벤트
-    ['h', 's', 'v'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            let h = Math.max(0, Math.min(360, parseInt(document.getElementById('h').value) || 0));
-            let s = Math.max(0, Math.min(100, parseInt(document.getElementById('s').value) || 0));
-            let v = Math.max(0, Math.min(100, parseInt(document.getElementById('v').value) || 0));
-            let rgb = hsvToRgb(h, s, v);
-            syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
-        });
-    });
-
-    // 3. Hex 텍스트박스 입력 이벤트
     document.getElementById('hex').addEventListener('input', (e) => {
         let val = e.target.value.replace('#', '');
         if(val.length === 6) {
-            let r = parseInt(val.substr(0,2), 16), g = parseInt(val.substr(2,2), 16), b = parseInt(val.substr(4,2), 16);
-            let hsv = rgbToHsv(r, g, b);
-            syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
+            let r=parseInt(val.substr(0,2),16), g=parseInt(val.substr(2,2),16), b=parseInt(val.substr(4,2),16);
+            let hsv = rgbToHsv(r,g,b); syncAll(r,g,b,hsv.h,hsv.s,hsv.v);
         }
     });
 
-    // 4. 마우스 이벤트 연동
     field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
     slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
     window.addEventListener('mousemove', (e) => {
@@ -184,7 +146,20 @@
     });
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 
-    // 초기화
+    function updateFromField(e) {
+        const rect = field.getBoundingClientRect();
+        let x = Math.max(0, Math.min(e.clientX - rect.left, 299)), y = Math.max(0, Math.min(e.clientY - rect.top, 299));
+        let h = (hueY / 299) * 360, s = (x / 299) * 100, v = (1 - (y / 299)) * 100;
+        let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+    }
+
+    function updateFromSlider(e) {
+        const rect = slider.getBoundingClientRect();
+        hueY = Math.max(0, Math.min(e.clientY - rect.top, 299));
+        let h = (hueY / 299) * 360, s = parseInt(document.getElementById('s').value), v = parseInt(document.getElementById('v').value);
+        let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+    }
+
     syncAll(110, 40, 40, 0, 64, 43);
 </script>
 </body>
