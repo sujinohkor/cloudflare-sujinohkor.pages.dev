@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>색 편집</title>
+    <style>
+        body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .container { display: flex; gap: 20px; align-items: flex-start; }
+        
+        /* 색상 영역 */
+        #colorPicker { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
+        #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
+        
+        /* 입력 폼 */
+        .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
+        input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
+        .input-group { display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <canvas id="colorPicker" width="300" height="300"></canvas>
+    <canvas id="hueSlider" width="30" height="300"></canvas>
+    
+    <div class="controls">
+        <input type="text" id="hexInput" value="#FF7FD5">
+        <select style="background: #333; color: white; padding: 8px;">
+            <option>RGB</option>
+        </select>
+        <div class="input-group"><input type="number" id="rInput" value="255"> <span>빨강</span></div>
+        <div class="input-group"><input type="number" id="gInput" value="127"> <span>녹색</span></div>
+        <div class="input-group"><input type="number" id="bInput" value="213"> <span>파랑</span></div>
+    </div>
+</div>
+
+<script>
+    const cp = document.getElementById('colorPicker').getContext('2d');
+    const hs = document.getElementById('hueSlider').getContext('2d');
+
+    // Hue 슬라이더 그리기
+    let gradHue = hs.createLinearGradient(0, 0, 0, 300);
+    gradHue.addColorStop(0, 'red'); gradHue.addColorStop(0.16, 'yellow');
+    gradHue.addColorStop(0.33, 'lime'); gradHue.addColorStop(0.5, 'cyan');
+    gradHue.addColorStop(0.66, 'blue'); gradHue.addColorStop(0.83, 'magenta');
+    gradHue.addColorStop(1, 'red');
+    hs.fillStyle = gradHue;
+    hs.fillRect(0, 0, 30, 300);
+
+    // 기본 채도/명도 박스 그리기 함수
+    function drawPicker(hueColor) {
+        cp.fillStyle = hueColor;
+        cp.fillRect(0, 0, 300, 300);
+        
+        let gradW = cp.createLinearGradient(0, 0, 300, 0);
+        gradW.addColorStop(0, 'white'); gradW.addColorStop(1, 'transparent');
+        cp.fillStyle = gradW;
+        cp.fillRect(0, 0, 300, 300);
+        
+        let gradB = cp.createLinearGradient(0, 0, 0, 300);
+        gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, 'black');
+        cp.fillStyle = gradB;
+        cp.fillRect(0, 0, 300, 300);
+    }
+    drawPicker('red');
+</script>
+
+</body>
+</html>
