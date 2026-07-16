@@ -6,19 +6,25 @@
     <style>
         body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
         
-        /* 상단 제목 및 버튼 */
         .header { width: 550px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        button { background: #3c3c3c; color: white; border: 1px solid #555; padding: 5px 15px; cursor: pointer; }
+        
+        /* 버튼과 입력창 둥글게 처리 */
+        button { background: #3c3c3c; color: white; border: 1px solid #555; padding: 5px 15px; cursor: pointer; border-radius: 20px; }
         button:hover { background: #555; }
 
-        .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 8px; align-items: flex-start; }
-        canvas { border: 1px solid #444; }
+        .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 20px; align-items: flex-start; }
+        
+        /* 캔버스 및 미리보기 둥글게 처리 */
+        canvas { border: 1px solid #444; border-radius: 12px; }
         #colorField { width: 300px; height: 300px; cursor: crosshair; }
         #hueSlider { width: 30px; height: 300px; cursor: pointer; }
-        #previewBox { width: 50px; height: 300px; border: 1px solid #444; }
+        #previewBox { width: 50px; height: 300px; border: 1px solid #444; border-radius: 12px; }
+        
         .controls { display: flex; flex-direction: column; gap: 5px; width: 80px; }
         .input-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; }
-        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 4px; width: 45px; }
+        
+        /* 텍스트박스 둥글게 처리 */
+        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 4px; width: 45px; border-radius: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -34,7 +40,7 @@
     <canvas id="hueSlider" width="30" height="300"></canvas>
     
     <div class="controls">
-        <input type="text" id="hex" value="#6E2828" style="width: 75px; margin-bottom: 5px;">
+        <input type="text" id="hex" value="#6E2828" style="width: 75px; margin-bottom: 5px; border-radius: 20px;">
         <div class="input-row">R <input type="number" id="r" value="110"></div>
         <div class="input-row">G <input type="number" id="g" value="40"></div>
         <div class="input-row">B <input type="number" id="b" value="40"></div>
@@ -45,6 +51,7 @@
 </div>
 
 <script>
+    // 기능 로직은 이전과 동일하게 유지됩니다.
     const field = document.getElementById('colorField');
     const ctx = field.getContext('2d');
     const slider = document.getElementById('hueSlider');
@@ -119,7 +126,6 @@
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
     }
 
-    // 입력 이벤트 리스너 (기존 로직)
     ['r', 'g', 'b'].forEach(id => document.getElementById(id).addEventListener('input', () => {
         let r=parseInt(document.getElementById('r').value)||0, g=parseInt(document.getElementById('g').value)||0, b=parseInt(document.getElementById('b').value)||0;
         let hsv = rgbToHsv(r, g, b); syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
