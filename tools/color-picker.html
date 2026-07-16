@@ -24,25 +24,27 @@
     
     <div class="controls">
         <input type="text" id="hex" value="#6E2828" style="width: 75px; margin-bottom: 5px;">
-        <div class="input-row">R <input type="number" id="r" value="110" class="val"></div>
-        <div class="input-row">G <input type="number" id="g" value="40" class="val"></div>
-        <div class="input-row">B <input type="number" id="b" value="40" class="val"></div>
-        <div class="input-row">H <input type="number" id="h" value="0" class="val"></div>
-        <div class="input-row">S <input type="number" id="s" value="100" class="val"></div>
-        <div class="input-row">V <input type="number" id="v" value="100" class="val"></div>
+        <div class="input-row">R <input type="number" id="r" value="110"></div>
+        <div class="input-row">G <input type="number" id="g" value="40"></div>
+        <div class="input-row">B <input type="number" id="b" value="40"></div>
+        <div class="input-row">H <input type="number" id="h" value="0"></div>
+        <div class="input-row">S <input type="number" id="s" value="64"></div>
+        <div class="input-row">V <input type="number" id="v" value="43"></div>
     </div>
 </div>
 
 <script>
     const field = document.getElementById('colorField');
-    const ctx = field.getContext('2d', {willReadFrequently: true});
+    const ctx = field.getContext('2d');
     const slider = document.getElementById('hueSlider');
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
     
     let hueY = 0;
+    let isDraggingField = false;
+    let isDraggingSlider = false;
 
-    // 변환 로직들
+    // 변환 공식
     function rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
         let max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
@@ -72,18 +74,22 @@
         return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     }
 
-    // 핵심 통합 함수: 입력된 RGB/HSV/Hex에 맞춰 UI를 일괄 업데이트
-    function syncAll(r, g, b, h, s, v, updateCanvas = true) {
-        document.getElementById('r').value = r; document.getElementById('g').value = g; document.getElementById('b').value = b;
-        document.getElementById('h').value = h; document.getElementById('s').value = s; document.getElementById('v').value = v;
-        const hex = '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();
+    // 화면 동기화 통합 함수
+    function syncAll(r, g, b, h, s, v) {
+        document.getElementById('r').value = Math.round(r);
+        document.getElementById('g').value = Math.round(g);
+        document.getElementById('b').value = Math.round(b);
+        document.getElementById('h').value = Math.round(h);
+        document.getElementById('s').value = Math.round(s);
+        document.getElementById('v').value = Math.round(v);
+        
+        let hex = '#' + ((1<<24)+(Math.round(r)<<16)+(Math.round(g)<<8)+Math.round(b)).toString(16).slice(1).toUpperCase();
         document.getElementById('hex').value = hex;
         preview.style.backgroundColor = hex;
         
-        if (updateCanvas) {
-            hueY = (h / 360) * 300;
-            drawHue(); drawField(h, s, v);
-        }
+        hueY = (h / 360) * 299;
+        drawHue(); 
+        drawField(h, s, v);
     }
 
     function drawHue() {
@@ -91,8 +97,11 @@
         let grad = sCtx.createLinearGradient(0, 0, 0, 300);
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
+        
         sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
         sCtx.beginPath(); sCtx.arc(15, hueY, 8, 0, Math.PI * 2); sCtx.stroke();
+        sCtx.strokeStyle = '#000'; sCtx.lineWidth = 1;
+        sCtx.beginPath(); sCtx.arc(15, hueY, 9, 0, Math.PI * 2); sCtx.stroke();
     }
 
     function drawField(h, s, v) {
@@ -103,41 +112,80 @@
         let gradB = ctx.createLinearGradient(0, 0, 0, 300); gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
         
-        // 포인터 위치 계산 (S, V에 기반)
-        let px = (s / 100) * 300;
-        let py = (1 - (v / 100)) * 300;
+        let px = (s / 100) * 299;
+        let py = (1 - (v / 100)) * 299;
+        
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.stroke();
     }
 
-    // 이벤트 리스너 통합
-    document.querySelectorAll('.val').forEach(input => {
-        input.addEventListener('input', () => {
-            const r = parseInt(document.getElementById('r').value)||0, g = parseInt(document.getElementById('g').value)||0, b = parseInt(document.getElementById('b').value)||0;
-            const hsv = rgbToHsv(r, g, b);
+    // 마우스 드래그 연산
+    function updateFromField(e) {
+        const rect = field.getBoundingClientRect();
+        let x = Math.max(0, Math.min(e.clientX - rect.left, 299));
+        let y = Math.max(0, Math.min(e.clientY - rect.top, 299));
+        let h = (hueY / 299) * 360;
+        let s = (x / 299) * 100;
+        let v = (1 - (y / 299)) * 100;
+        let rgb = hsvToRgb(h, s, v);
+        syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+    }
+
+    function updateFromSlider(e) {
+        const rect = slider.getBoundingClientRect();
+        hueY = Math.max(0, Math.min(e.clientY - rect.top, 299));
+        let h = (hueY / 299) * 360;
+        let s = parseFloat(document.getElementById('s').value) || 0;
+        let v = parseFloat(document.getElementById('v').value) || 0;
+        let rgb = hsvToRgb(h, s, v);
+        syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+    }
+
+    // 1. RGB 텍스트박스 입력 이벤트
+    ['r', 'g', 'b'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            let r = Math.max(0, Math.min(255, parseInt(document.getElementById('r').value) || 0));
+            let g = Math.max(0, Math.min(255, parseInt(document.getElementById('g').value) || 0));
+            let b = Math.max(0, Math.min(255, parseInt(document.getElementById('b').value) || 0));
+            let hsv = rgbToHsv(r, g, b);
             syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
         });
     });
 
+    // 2. HSV 텍스트박스 입력 이벤트
+    ['h', 's', 'v'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            let h = Math.max(0, Math.min(360, parseInt(document.getElementById('h').value) || 0));
+            let s = Math.max(0, Math.min(100, parseInt(document.getElementById('s').value) || 0));
+            let v = Math.max(0, Math.min(100, parseInt(document.getElementById('v').value) || 0));
+            let rgb = hsvToRgb(h, s, v);
+            syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+        });
+    });
+
+    // 3. Hex 텍스트박스 입력 이벤트
     document.getElementById('hex').addEventListener('input', (e) => {
-        let h = e.target.value.replace('#', '');
-        if(h.length === 6) {
-            let rgb = {r: parseInt(h.substr(0,2),16), g: parseInt(h.substr(2,2),16), b: parseInt(h.substr(4,2),16)};
-            let hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-            syncAll(rgb.r, rgb.g, rgb.b, hsv.h, hsv.s, hsv.v);
+        let val = e.target.value.replace('#', '');
+        if(val.length === 6) {
+            let r = parseInt(val.substr(0,2), 16), g = parseInt(val.substr(2,2), 16), b = parseInt(val.substr(4,2), 16);
+            let hsv = rgbToHsv(r, g, b);
+            syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
         }
     });
 
-    // 마우스 이벤트 (기존과 동일)
-    field.addEventListener('mousedown', (e) => {
-        const rect = field.getBoundingClientRect();
-        const px = e.clientX - rect.left, py = e.clientY - rect.top;
-        const data = ctx.getImageData(px, py, 1, 1).data;
-        const hsv = rgbToHsv(data[0], data[1], data[2]);
-        syncAll(data[0], data[1], data[2], hsv.h, hsv.s, hsv.v, false);
+    // 4. 마우스 이벤트 연동
+    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
+    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingField) updateFromField(e);
+        else if (isDraggingSlider) updateFromSlider(e);
     });
+    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 
-    drawHue(); drawField(0, 100, 100);
+    // 초기화
+    syncAll(110, 40, 40, 0, 64, 43);
 </script>
 </body>
 </html>
