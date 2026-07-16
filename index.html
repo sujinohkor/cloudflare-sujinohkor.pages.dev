@@ -6,22 +6,28 @@
     <title>SUJIN's FUN SITE</title>
     <style>
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .container { width: 100%; max-width: 1200px; }
-
         .header-wrapper {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* 양 끝으로 정렬 */
+            justify-content: space-between;
             width: 100%;
-            max-width: 1200px; /* 컨테이너와 동일한 너비 제한 */
-            margin: 0 auto;    /* 중앙 정렬 */
-            padding: 0 20px;   /* 카드와 여백 맞춤 */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0; /* 패딩을 0으로 설정하여 오차 제거 */
             box-sizing: border-box;
         }
         
         .header-wrapper h1 { 
-            margin: 30px auto; /* 제목은 여전히 가운데 */
-            padding-left: 80px; /* 버튼 너비만큼 왼쪽 여백을 주어 중앙 유지 */
+            margin: 30px auto; 
+            padding-left: 90px; /* 버튼과 정렬 균형을 위해 살짝 조정 */
+        }
+        
+        /* 추가: 컨테이너의 좌우 20px 패딩을 header-wrapper가 아닌 부모(container)에서 관리하게 함 */
+        .container { 
+            width: 100%; 
+            max-width: 1200px; 
+            padding: 0 20px; /* 여기서 좌우 여백을 줌 */
+            box-sizing: border-box; 
         }
         
         #theme-toggle {
