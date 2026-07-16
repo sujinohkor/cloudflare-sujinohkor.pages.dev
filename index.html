@@ -10,20 +10,16 @@
         .header { margin-bottom: 30px; }
         .custom-list { list-style: none; padding: 0; }
         
+        /* Websites 전용 가로 정렬 스타일 */
         .horizontal-list { 
             display: flex; 
             list-style: none; 
             padding: 0; 
-            gap: 20px; 
-            flex-wrap: nowrap; /* wrap에서 nowrap으로 변경 */
+            gap: 30px; /* 간격 확대 */
+            flex-wrap: nowrap; /* 강제 한 줄 유지 */
         }
         
-        /* h4로 변경된 리스트 항목 스타일 */
-        .horizontal-list li h4 {
-            margin: 0;
-            font-size: 1.17em;
-        }
-    
+        .horizontal-list li h4 { margin: 0; font-size: 1.1em; }
         a { color: white; text-decoration: none; }
         a:hover { text-decoration: underline; }
     </style>
@@ -48,45 +44,31 @@
         <br>
         <h3 data-i18n="sample_archive">SUJIN's SAMPLE ARCHIVE</h3>
         <ul class="custom-list">
-            <li><h3><a href="https://helloworld123123.pages.dev/">helloworld123123: Cloudflare demo</a></h3></li>
-            <li><h3><a href="https://helloworld.sujinohkor.workers.dev/">helloworld: hello world</a></h3></li>
+            <li><h3><a href="https://helloworld123123.pages.dev/">● helloworld123123: Cloudflare demo</a></h3></li>
+            <li><h3><a href="https://helloworld.sujinohkor.workers.dev/">● helloworld: hello world</a></h3></li>
         </ul>
 
         <br>
         <h3 data-i18n="websites">SUJIN's Websites</h3>
         <ul class="horizontal-list">
-            <li><h4><a href="https://www.sujinohkor.kr">Web. https://www.sujinohkor.kr</a></h4></li>
-            <li><h4><a href="https://sujinohkor.pages.dev">Dev. https://sujinohkor.pages.dev</a></h4></li>
-            <li><h4><a href="https://github.com/sujinohkor">GitHub. https://github.com/sujinohkor</a></h4></li>
+            <li><h4><a href="https://www.sujinohkor.kr">Web.</a></h4></li>
+            <li><h4><a href="https://sujinohkor.pages.dev">Dev.</a></h4></li>
+            <li><h4><a href="https://github.com/sujinohkor">GitHub.</a></h4></li>
         </ul>
     </div>
 </div>
 
 <script>
     const i18n = {
-        'ko': { 
-            title: 'SUJIN\'s TOOL ARCHIVE', 
-            hello: 'Hello World!', 
-            sample_archive: 'SUJIN\'s SAMPLE ARCHIVE', 
-            websites: 'SUJIN\'s Websites' 
-        },
-        'en': { 
-            title: 'SUJIN\'s TOOL ARCHIVE', 
-            hello: 'Hello World!', 
-            sample_archive: 'SUJIN\'s SAMPLE ARCHIVE', 
-            websites: 'SUJIN\'s Websites' 
-        }
+        'ko': { title: 'SUJIN\'s TOOL ARCHIVE', hello: 'Hello World!', sample_archive: 'SUJIN\'s SAMPLE ARCHIVE', websites: 'SUJIN\'s Websites' },
+        'en': { title: 'SUJIN\'s TOOL ARCHIVE', hello: 'Hello World!', sample_archive: 'SUJIN\'s SAMPLE ARCHIVE', websites: 'SUJIN\'s Websites' }
     };
-
     function applyLanguage() {
         const lang = navigator.language.startsWith('ko') ? 'ko' : 'en';
-        // data-i18n 속성을 가진 모든 요소를 찾아 번역 적용
         document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            el.innerText = i18n[lang][key];
+            el.innerText = i18n[lang][el.getAttribute('data-i18n')];
         });
     }
-
     applyLanguage();
 </script>
 
