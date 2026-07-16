@@ -6,11 +6,9 @@
     <style>
         body { background-color: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .container { display: flex; gap: 15px; align-items: flex-start; }
-        
-        #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; background: red; }
+        #sbBox { width: 300px; height: 300px; border-radius: 5px; cursor: crosshair; }
         #previewBox { width: 50px; height: 300px; border-radius: 5px; border: 1px solid #555; background: red; }
         #hueSlider { width: 30px; height: 300px; border-radius: 5px; cursor: pointer; }
-        
         .controls { display: flex; flex-direction: column; gap: 10px; width: 150px; }
         input { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
     </style>
@@ -37,51 +35,55 @@
     const hue = hueCanvas.getContext('2d');
     const preview = document.getElementById('previewBox');
 
-    // 1. 색조 슬라이더 그리기
+    // 1. 색조(Hue) 슬라이더 그리기
     function drawHue() {
         let grad = hue.createLinearGradient(0, 0, 0, 300);
-        grad.addColorStop(0, 'red'); grad.addColorStop(0.2, 'yellow');
-        grad.addColorStop(0.4, 'lime'); grad.addColorStop(0.6, 'cyan');
-        grad.addColorStop(0.8, 'blue'); grad.addColorStop(1, 'magenta');
+        grad.addColorStop(0, '#f00'); grad.addColorStop(0.17, '#ff0');
+        grad.addColorStop(0.33, '#0f0'); grad.addColorStop(0.5, '#0ff');
+        grad.addColorStop(0.67, '#00f'); grad.addColorStop(0.83, '#f0f');
+        grad.addColorStop(1, '#f00');
         hue.fillStyle = grad; hue.fillRect(0, 0, 30, 300);
     }
 
-    // 2. 채도/명도 박스 그리기
+    // 2. 채도/명도(SB) 박스 렌더링
     function drawSB(color) {
-        sb.fillStyle = color; sb.fillRect(0, 0, 300, 300);
+        sb.fillStyle = color;
+        sb.fillRect(0, 0, 300, 300);
+        
+        // 흰색(채도) 그라데이션
         let gradW = sb.createLinearGradient(0, 0, 300, 0);
-        gradW.addColorStop(0, 'white'); gradW.addColorStop(1, 'transparent');
+        gradW.addColorStop(0, 'rgba(255,255,255,1)'); gradW.addColorStop(1, 'rgba(255,255,255,0)');
         sb.fillStyle = gradW; sb.fillRect(0, 0, 300, 300);
+        
+        // 검은색(명도) 그라데이션
         let gradB = sb.createLinearGradient(0, 0, 0, 300);
-        gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, 'black');
+        gradB.addColorStop(0, 'rgba(0,0,0,0)'); gradB.addColorStop(1, 'rgba(0,0,0,1)');
         sb.fillStyle = gradB; sb.fillRect(0, 0, 300, 300);
     }
 
-    drawHue(); drawSB('red');
+    drawHue(); drawSB('#f00');
 
-    // 3. Picking: 박스 클릭 시 값 추출
+    // 3. SB 박스에서 색상 추출
     sbCanvas.addEventListener('click', (e) => {
         const data = sb.getImageData(e.offsetX, e.offsetY, 1, 1).data;
         updateUI(data[0], data[1], data[2]);
     });
 
-    // 4. 슬라이더 클릭 시 색조 변경 (Picking)
+    // 4. 슬라이더에서 색조 선택 시 SB 박스 재생성
     hueCanvas.addEventListener('click', (e) => {
         const data = hue.getImageData(0, e.offsetY, 1, 1).data;
         const color = `rgb(${data[0]},${data[1]},${data[2]})`;
         drawSB(color);
-        sbCanvas.style.background = color;
     });
 
     function updateUI(r, g, b) {
         document.getElementById('rInput').value = r;
         document.getElementById('gInput').value = g;
         document.getElementById('bInput').value = b;
-        const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+        const hex = '#' + ((1 << 24) + (parseInt(r) << 16) + (parseInt(g) << 8) + parseInt(b)).toString(16).slice(1).toUpperCase();
         document.getElementById('hexInput').value = hex;
         preview.style.backgroundColor = hex;
     }
 </script>
-
 </body>
 </html>
