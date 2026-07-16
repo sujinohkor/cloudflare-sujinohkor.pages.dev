@@ -8,17 +8,17 @@
         body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .container { width: 100%; max-width: 800px; }
         
-        /* 헤더의 자식들을 수직 정렬하되, 자식 요소들은 개별 정렬을 따름 */
-        .header { margin-bottom: 30px; display: flex; flex-direction: column; } 
+        /* 헤더의 자식들을 수직으로 배치하되, 기본적으로 가운데 정렬 */
+        .header { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; } 
         
-        .custom-list { list-style: none; padding: 0; align-self: flex-start; } /* 리스트는 왼쪽 정렬 */
+        /* 리스트는 왼쪽 정렬 */
+        .custom-list { list-style: none; padding: 0; width: 100%; text-align: left; }
         
-        /* 제목 스타일: 가로 전체를 차지하며 가운데 정렬 */
+        /* 제목 스타일: 가운데 정렬 */
         .highlight-text { 
             color: #ff9e40; 
             text-align: center;
-            width: 100%;
-            display: block;
+            margin: 15px 0; 
         }
         
         .horizontal-list { 
@@ -31,8 +31,9 @@
         .horizontal-list li { white-space: nowrap; }
         .horizontal-list li h4 { margin: 0; font-size: 1.1em; }
         
-        /* 반응형 */
+        /* 반응형: 모바일 */
         @media (max-width: 600px) {
+            .header { align-items: flex-start; } /* 모바일에서 왼쪽 정렬 */
             .highlight-text { text-align: left; }
             .horizontal-list { flex-direction: column; gap: 15px; }
             .horizontal-list li { white-space: normal; }
