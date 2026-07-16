@@ -47,7 +47,7 @@
             .card { 
                 width: 100%; 
                 height: auto; /* 높이를 내용에 맞게 자동 조절 */
-                padding: 15px; 
+                padding: 15px 20px; 
                 display: flex; /* 가로 배치를 위해 flex 사용 */
                 align-items: center; /* 핵심: 모든 요소를 세로 중앙 정렬 */
                 justify-content: flex-start; /* 왼쪽부터 차례로 배치 */
@@ -57,16 +57,19 @@
             .icon { 
                 font-size: 1.5rem; 
                 margin: 0; 
-                width: 30px; /* 아이콘 영역 너비 고정 */
+                width: 35px; /* 아이콘 영역 너비 고정 */
+                height: 35px; /* 아이콘 영역 높이 고정 */
                 text-align: center; /* 아이콘 내부 텍스트 중앙 정렬 */
                 display: flex; 
                 justify-content: center;
-                align-items: center;
+                align-items: center; /* 아이콘을 박스 정중앙에 */
+                flex-shrink: 0; /* 아이콘 크기가 찌그러지지 않게 */
             }
             .card h3 { 
                 margin: 0; 
+                padding: 0;
                 font-size: 1.1rem; 
-                line-height: 1.2; /* 줄 높이 조정으로 텍스트 중앙 정렬 최적화 */
+                line-height: 1.5rem; /* 아이콘 높이와 비슷하게 설정 */
             }
             .card p, .arrow { display: none; } /* 설명글과 화살표 숨김 */
         }
