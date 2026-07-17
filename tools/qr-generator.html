@@ -62,17 +62,20 @@
             .content-top, .content-down { flex-direction: column; overflow-y: visible; }
             
             /* 1. 컨트롤러 전체 구조 변경: 가로 배치 */
-            .qr-generator-controls { flex-direction: row; width: 100%; min-height: auto; border-left: none; border-top: 2px dashed #ff9e40; align-items: flex-start; justify-content: flex-start; gap: 10px; }
+            .qr-generator-controls { flex-direction: row; width: 100%; min-height: auto; border-left: none; border-top: 2px dashed #ff9e40; align-items: center; justify-content: flex-start; gap: 20px; }
         
             /* 2. 버튼 그룹을 세로로 정렬 */
             .button-group { flex-direction: column; width: 100px; flex-shrink: 0; }
             
             /* 버튼 모양도 살짝 다듬기 */
             .action-btn { width: 100px; margin-bottom: 5px; }
-        
+
+            /* placeholder-container가 전체 높이를 차지하며 중앙 정렬되도록 */
+            #placeholder-container { height: 100%; width: 100%; }
+            
             /* 3. 이미지 영역 설정 */
             #qr-image { width: 150px; height: 150px; margin-top: 0; }
-            #qr-placeholder { margin-top: 40px !important; }
+            #qr-placeholder { margin-top: 0; }
         
             #text-input { min-height: 150px; }
             .qr-decoder-controls { width: 100%; border-right: none; border-top: 2px dashed #ff9e40; }
@@ -108,7 +111,9 @@
                     <button class="action-btn" onclick="resetGenerator()">Reset</button>
                 </div>
                 <img id="qr-image" alt="QR">
-                <div id="qr-placeholder" style="margin-top: 150px; color: #888;">QR will be here.</div>
+                <div id="placeholder-container" style="display: flex; align-items: center; justify-content: center; flex-grow: 1;">
+                    <div id="qr-placeholder" style="color: #888;">QR will be here.</div>
+                </div>
             </div>
         </section>
         
