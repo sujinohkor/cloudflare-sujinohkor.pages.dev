@@ -32,7 +32,7 @@
         .qr-generator-controls { width: auto; min-width: 500px; min-height: 500px; border-left: 2px dashed #ff9e40; }
         .qr-decoder-controls { width: auto; min-width: 300px; min-height: 200px; border-right: 2px dashed #ff9e40; }
         
-        .button-group, .decoder-button-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; flex-direction: column; }
+        .button-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .action-btn { width: 100px; padding: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; transition: all 0.3s; }
         .action-btn:hover { background: #ff9e40; color: #101010; }
         
@@ -62,20 +62,34 @@
             
             .content-top, .content-down { flex-direction: column; overflow-y: visible; }
             
+            /* 1. 컨트롤러 전체 구조 변경: 가로 배치 */
             .qr-generator-controls { flex-direction: row; width: 100%; min-width: 0; min-height: auto; border-left: none; border-top: 2px dashed #ff9e40; align-items: flex-start; justify-content: flex-start; gap: 20px; }
+        
+            /* 2. 버튼 그룹을 세로로 정렬 */
             .button-group { flex-direction: column; width: 100px; flex-shrink: 0; }
+            
+            /* 버튼 모양도 살짝 다듬기 */
             .action-btn { width: 100px; margin-bottom: 5px; }
+
+            /* placeholder-container가 전체 높이를 차지하며 중앙 정렬되도록 */
             #placeholder-container { width: calc(100% - 120px); height: 100%; flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; }
             
+            /* 3. 이미지 영역 설정 */
             #qr-image { width: 150px; height: 150px; margin-top: 0; }
             #qr-placeholder { margin-top: 0; }
+        
             #text-input { min-height: 150px; }
-            
-            .qr-decoder-controls { width: 100%; min-height: 0; height: auto; border-right: none; border-bottom: 2px dashed #ff9e40; display: flex; flex-direction: column; align-items: flex-start; padding: 20px; padding-left: 10px; gap: 10px; }
+            .qr-decoder-controls { width: 100%; min-height: 0; height: auto; border-right: none; border-bottom: 2px dashed #ff9e40; display: flex; flex-direction: column; align-items: flex-start; padding: 20px; gap 10px; }
+
+            /* Load Image 컨테이너 왼쪽 정렬 */
             .qr-decoder-controls > div:first-child { justify-content: flex-start !important; }
-            #file-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-            .decoder-button-group { display: flex; flex-direction: row; gap: 10px; justify-content: flex-start; }
             
+            /* 로드 이미지 영역의 span 스타일 조정 */
+            #file-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+            .decoder-button-group { display: flex; flex-direction: row; gap: 10px; justify-content: flex-start; }
+
+            /* 2. 결과창(textarea)의 border 제거 (위쪽 구분선이 없도록) */
             #resultText { border-top: none !important; }
         }
     </style>
@@ -109,7 +123,7 @@
                     <button class="action-btn" onclick="resetGenerator()">Reset</button>
                 </div>
                 <img id="qr-image" alt="QR">
-                <div id="placeholder-container">
+                <div id="placeholder-container" style="display: flex; align-items: center; justify-content: center; flex-grow: 1;">
                     <div id="qr-placeholder" style="color: #888;">QR will be here.</div>
                 </div>
             </div>
@@ -117,10 +131,12 @@
         
         <section class="content-down">
             <div class="qr-decoder-controls">
+                <!-- 가로 배치를 위해 컨테이너로 감쌈 -->
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center;">
                     <button class="action-btn" onclick="document.getElementById('fileInput').click()">Load Image</button>
-                    <span id="file-name">No file chosen</span>
+                    <span id="file-name" style="font-size: 0.8rem;">No file chosen</span>
                 </div>
+                <!-- 이 부분을 수정: 두 버튼을 감싸는 div 추가 -->
                 <div class="decoder-button-group">
                     <button class="action-btn" onclick="decodeQR()">Decode QR</button>
                     <button class="action-btn" onclick="resetDecoder()">Reset</button>
@@ -140,9 +156,11 @@
     const resultText = document.getElementById('resultText');
     const byteCountDisplay = document.getElementById('byte-count');
 
+    // UI 및 이벤트 설정
     document.getElementById('theme-toggle').addEventListener('click', () => document.body.classList.toggle('light-mode'));
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
     
+    // 바이트 계산 및 제한
     function updateByteCount() {
         const encoder = new TextEncoder();
         let text = textInput.value;
@@ -154,6 +172,7 @@
     }
     textInput.addEventListener('input', updateByteCount);
 
+    // QR 생성
     async function generateQR() {
         updateByteCount();
         const text = textInput.value.trim();
@@ -174,6 +193,7 @@
         }
     }
 
+    // QR 저장
     async function saveQR() {
         if (!qrImage.src || qrImage.style.display === 'none') return alert("Please generate a QR first.");
         const response = await fetch(qrImage.src);
@@ -185,6 +205,7 @@
         link.click();
     }
 
+    // 리셋
     function resetGenerator() {
         textInput.value = '';
         qrImage.style.display = 'none';
@@ -197,6 +218,7 @@
         resultText.value = '';
     }
 
+    // 디코딩
     fileInput.addEventListener('change', (e) => { if (e.target.files[0]) fileName.innerText = e.target.files[0].name; });
     async function decodeQR() {
         const file = fileInput.files[0];
