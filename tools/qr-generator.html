@@ -79,10 +79,13 @@
             #qr-placeholder { margin-top: 0; }
         
             #text-input { min-height: 150px; }
-            .qr-decoder-controls { width: 100%; border-right: none; border-top: 2px dashed #ff9e40; display: flex; flex-direction: column; align-items: center; gap 10px; }
+            .qr-decoder-controls { width: 100%; border-right: none; border-bottom: 2px dashed #ff9e40; display: flex; flex-direction: column; align-items: center; padding: 20px; gap 10px; }
 
             /* 로드 이미지 영역의 span 스타일 조정 */
             #file-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+            /* 2. 결과창(textarea)의 border 제거 (위쪽 구분선이 없도록) */
+            #resultText { border-top: none !important; }
         }
     </style>
 </head>
