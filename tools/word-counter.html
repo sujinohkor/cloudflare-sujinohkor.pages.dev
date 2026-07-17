@@ -210,19 +210,24 @@
     }
 
     function saveText() {
-    const text = textInput.value;
+        const text = textInput.value;
     
-    // BOM을 추가하여 UTF-8 인코딩임을 명시
-    const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
+        // 입력값이 없거나 공백만 있는 경우 체크
+        if (!text || text.trim() === "") {
+            alert("No text to save.");
+            return;
+        }
     
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'WordCounter.txt';
-    link.click();
+        // BOM을 포함한 Blob 생성
+        const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'WordCounter.txt';
+        link.click();
     
-    // 메모리 누수 방지를 위한 URL 해제
-    URL.revokeObjectURL(link.href);
-}
+        // 메모리 해제
+        URL.revokeObjectURL(link.href);
+    }
 
 </script>
 
