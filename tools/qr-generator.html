@@ -58,8 +58,23 @@
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; }
-            .content-top, .content-down { flex-direction: column; }
-            .qr-generator-controls, .qr-decoder-controls { width: 100%; }
+            
+            /* 모바일에서 섹션을 세로로 배치 */
+            .content-top, .content-down { flex-direction: column; overflow-y: visible; }
+            
+            /* textarea와 controls의 높이 배분 */
+            #text-input { min-height: 200px; } /* 텍스트 입력 영역 확보 */
+            .qr-generator-controls { 
+                width: 100%; 
+                min-height: 400px; /* 세로로 길게 영역 확보 */
+                border-left: none; 
+                border-top: 2px dashed #ff9e40; 
+            }
+            .qr-decoder-controls { width: 100%; border-right: none; border-top: 2px dashed #ff9e40; }
+            
+            /* 모바일에서는 QR 이미지가 너무 크지 않게 조절 */
+            #qr-image { width: 250px; height: 250px; }
+            #qr-placeholder { margin-top: 80px !important; }
         }
     </style>
 </head>
