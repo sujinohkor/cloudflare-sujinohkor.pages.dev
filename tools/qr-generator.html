@@ -2,168 +2,193 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="pageTitle">QR 생성 및 해석기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Generator</title>
     <style>
-        body { font-family: 'Malgun Gothic', 'Consolas', monospace; background-color: #FDF5E6; padding: 20px; text-align: center; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
         
-        .header-container, .box-container { 
-            width: 90%; 
-            max-width: 1000px; 
-            margin: 0 auto 20px auto; 
-        }
+        /* Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; height: 100vh; position: fixed; left: 0; top: 0; background-color: #101010; padding: 20px; z-index: 1000; display: flex; flex-direction: column; transition: transform 0.3s ease; }
+        .main-content { margin-left: 250px; padding: 40px; flex: 1; display: flex; flex-direction: column; height: 100vh; gap: 10px; overflow: hidden; transition: 0.3s; }
 
-        .header-container { display: flex; justify-content: space-between; align-items: center; }
-        .header-container h2 { margin: 0; font-size: 1.5rem; }
-        .home-btn { text-decoration: none; background: #ddd; color: black; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-        
-        .box-container { padding: 20px; border-radius: 20px; border: 3px solid #ff9e40; background: white; }
-        
-        textarea { 
-            width: 100%; 
-            height: 150px; 
-            padding: 15px; 
-            border-radius: 15px; 
-            border: 2px solid #ff9e40; 
-            margin-bottom: 10px; 
-            box-sizing: border-box; 
-            resize: vertical; 
-            font-size: 1rem;
-            font-family: 'Consolas', 'Malgun Gothic', sans-serif;
-        }
-        
-        textarea:focus { outline: none; border: 2px solid #ff9e40; }
+        /* Buttons & Menu */
+        .menu-btn, .theme-btn { width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; transition: all 0.3s; }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+        .menu-list a { display: flex; justify-content: space-between; color: #fff; font-size: 0.95rem; }
+        .menu-list span { color: #e68a35; font-weight: bold; }
 
-        .file-label, button { padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; border: none; transition: background 0.3s; }
-        .file-label { display: inline-block; background-color: #ddd; color: black; margin-bottom: 10px; }
-        .file-label:hover { background-color: #ccc; }
-        button { background: #ff9e40; color: white; }
-        button:hover { background-color: #e68a35; }
-        .btn-group { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 10px; }
+        /* Sections */
+        .top-section { margin-bottom: 0; padding-bottom: 10px; }
+        .content-top, .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
+        .content-down { flex: 1; }
+        textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; outline: none; }
         
-        #byteCount { color: #ff9e40; font-weight: bold; font-size: 0.9rem; margin-right: 10px; }
-        #qrImg { max-width: 200px; margin-top: 10px; display: none; }
-        #fileName { display: block; margin-top: 5px; font-size: 0.9rem; color: #555; }
+        /* Controls */
+        .qr-generator-controls, .qr-decoder-controls { background-color: #101010; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: flex-start; flex-shrink: 0; overflow-y: auto; }
+        .qr-generator-controls { width: auto; min-width: 500px; min-height: 500px; border-left: 2px dashed #ff9e40; }
+        .qr-decoder-controls { width: auto; min-width: 300px; min-height: 200px; border-right: 2px dashed #ff9e40; }
+        
+        .button-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .action-btn { width: 100px; padding: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; transition: all 0.3s; }
+        .action-btn:hover { background: #ff9e40; color: #101010; }
+        
+        #qr-image { max-width: 100%; margin-top: 10px; border: none; display: none; }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #000; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .top-section { color: #202020; }
+        body.light-mode .qr-generator-controls, body.light-mode .qr-decoder-controls { background-color: #FDF5E6; }
+        body.light-mode textarea { color: #000; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover, body.light-mode .action-btn:hover { background: #F38020; color: #fff; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+
+        /* Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        @media (max-width: 768px) {
+            .menu-toggle-btn { display: block; color: #fff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .content-top, .content-down { flex-direction: column; }
+            .qr-generator-controls, .qr-decoder-controls { width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="header-container">
-        <h2 id="headerTitle">QR 생성기</h2>
-        <a href="../index" class="home-btn" id="homeBtn">집으로</a>
-    </div>
-    <div class="box-container">
-        <textarea id="textInput" placeholder="생성할 텍스트/URL 입력" oninput="updateByteCount()"></textarea>
-        <div class="btn-group">
-            <span id="byteCount">0/1000 B</span>
-            <button id="genBtn" onclick="generateQR()">QR 코드 생성</button>
-            <button id="saveBtn" onclick="saveQR()">저장하기</button>
-        </div>
-        <img id="qrImg" src="" alt="QR Code">
-    </div>
-    <div class="box-container">
-        <label for="fileInput" id="fileLabel" class="file-label">파일 선택</label>
-        <span id="fileName">선택된 파일 없음</span>
-        <input type="file" id="fileInput" accept="image/*" style="display:none;">
-        <br>
-        <button id="decodeBtn" onclick="decodeQR()">QR 코드 해석</button>
-        <p id="resultText" style="margin-top:10px; word-break: break-all;"></p>
-    </div>
 
-    <script>
-        const lang = {
-            ko: { title: "QR 생성기", header: "QR 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "오류가 발생했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
-            en: { title: "QR Generator & Decoder", header: "QR Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "An error occurred.", alertFile: "Please select an image.", fail: "Decoding failed" }
-        };
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+<input type="file" id="fileInput" accept="image/*" style="display:none;">
 
-        const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
-        const t = lang[userLang];
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <nav class="menu-list">
+            <a>Byte Count <span id="byte-count">0/1000 B</span></a>
+        </nav>
+    </aside>
 
-        document.getElementById('pageTitle').textContent = t.title;
-        document.getElementById('headerTitle').textContent = t.header;
-        document.getElementById('homeBtn').textContent = t.home;
-        document.getElementById('textInput').placeholder = t.placeholder;
-        document.getElementById('genBtn').textContent = t.gen;
-        document.getElementById('saveBtn').textContent = t.save;
-        document.getElementById('fileLabel').textContent = t.label;
-        document.getElementById('fileName').textContent = t.file;
-        document.getElementById('decodeBtn').textContent = t.decode;
+    <main class="main-content">
+        <header class="top-section">
+            <h1>QR Generator</h1>
+            <p>You can make your own QR, etc.</p>
+        </header>
 
-        function updateByteCount() {
-            const textarea = document.getElementById('textInput');
-            const encoder = new TextEncoder();
-            let text = textarea.value;
-            
-            // 1000바이트 초과 시 강제 자르기
-            if (encoder.encode(text).length > 1000) {
-                while (encoder.encode(text).length > 1000) {
-                    text = text.slice(0, -1);
-                }
-                textarea.value = text;
+        <section class="content-top">
+            <textarea id="text-input" placeholder="Enter text or url here. Maximum 1,000 bytes."></textarea>
+            <div class="qr-generator-controls">
+                <div class="button-group">
+                    <button class="action-btn" onclick="generateQR()">Generate</button>
+                    <button class="action-btn" onclick="saveQR()">Save QR</button>
+                    <button class="action-btn" onclick="resetGenerator()">Reset</button>
+                </div>
+                <img id="qr-image" alt="QR Code">
+                <div id="qr-placeholder" style="margin-top: 150px; color: #888;">[QR Image]</div>
+            </div>
+        </section>
+        
+        <section class="content-down">
+            <div class="qr-decoder-controls">
+                <button class="action-btn" onclick="document.getElementById('fileInput').click()">Load Image</button>
+                <span id="file-name" style="font-size: 0.8rem; text-align: center;">No file chosen</span>
+                <button class="action-btn" onclick="decodeQR()">Decode QR</button>
+                <button class="action-btn" onclick="resetDecoder()">Reset</button>
+            </div>
+            <textarea id="resultText" readonly placeholder="Decoded text will appear here."></textarea>
+        </section>
+    </main>
+</div>
+
+<script>
+    const textInput = document.getElementById('text-input');
+    const qrImage = document.getElementById('qr-image');
+    const qrPlaceholder = document.getElementById('qr-placeholder');
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('file-name');
+    const resultText = document.getElementById('resultText');
+    const byteCountDisplay = document.getElementById('byte-count');
+
+    // UI 및 이벤트 설정
+    document.getElementById('theme-toggle').addEventListener('click', () => document.body.classList.toggle('light-mode'));
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+    
+    // 바이트 계산 및 제한
+    function updateByteCount() {
+        const encoder = new TextEncoder();
+        let text = textInput.value;
+        if (encoder.encode(text).length > 1000) {
+            while (encoder.encode(text).length > 1000) text = text.slice(0, -1);
+            textInput.value = text;
+        }
+        byteCountDisplay.textContent = encoder.encode(text).length + '/1000 B';
+    }
+    textInput.addEventListener('input', updateByteCount);
+
+    // QR 생성
+    async function generateQR() {
+        updateByteCount();
+        const text = textInput.value.trim();
+        if (!text) return alert("Please enter text first.");
+        
+        const url = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(text)}`;
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                qrImage.src = url;
+                qrImage.style.display = "inline-block";
+                qrPlaceholder.style.display = "none";
+            } else {
+                alert("Failed to generate QR code.");
             }
-            
-            const bytes = encoder.encode(text).length;
-            document.getElementById('byteCount').textContent = bytes + '/1000 B';
+        } catch (e) {
+            alert("An error occurred.");
         }
+    }
 
-        document.getElementById('fileInput').addEventListener('change', function() {
-            document.getElementById('fileName').textContent = this.files.length > 0 ? this.files[0].name : t.file;
-        });
+    // QR 저장
+    async function saveQR() {
+        if (!qrImage.src || qrImage.style.display === 'none') return alert("Please generate a QR code first.");
+        const response = await fetch(qrImage.src);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'QRGenerator.png';
+        link.click();
+    }
 
-        async function generateQR() {
-            const text = document.getElementById('textInput').value;
-            const qrImg = document.getElementById('qrImg');
-            if (!text) return alert(t.alertVal);
+    // 리셋
+    function resetGenerator() {
+        textInput.value = '';
+        qrImage.style.display = 'none';
+        qrPlaceholder.style.display = 'block';
+        updateByteCount();
+    }
+    function resetDecoder() {
+        fileInput.value = '';
+        fileName.innerText = "No file chosen";
+        resultText.value = '';
+    }
 
-            const url = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
-            try {
-                const response = await fetch(url);
-                if (response.ok) {
-                    qrImg.src = url;
-                    qrImg.style.display = "inline-block";
-                } else {
-                    alert(t.alertErr);
-                }
-            } catch (e) {
-                alert(t.alertErr);
-            }
-        }
-
-        async function saveQR() {
-            const qrImg = document.getElementById('qrImg');
-            if (qrImg.style.display === "none") return alert(t.alertImg);
-            try {
-                const response = await fetch(qrImg.src);
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'qrcode.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            } catch (e) {
-                alert(t.alertErr);
-            }
-        }
-
-        function decodeQR() {
-            const file = document.getElementById('fileInput').files[0];
-            if (!file) return alert(t.alertFile);
-            const formData = new FormData();
-            formData.append('file', file);
-                        
-            fetch('https://api.qrserver.com/v1/read-qr-code/', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const res = data[0]?.symbol[0]?.data;
-                document.getElementById('resultText').textContent = res || t.fail;
-            })
-            .catch(() => alert(t.fail));
-        }
-    </script>
+    // 디코딩
+    fileInput.addEventListener('change', (e) => { if (e.target.files[0]) fileName.innerText = e.target.files[0].name; });
+    async function decodeQR() {
+        const file = fileInput.files[0];
+        if (!file) return alert("Please load a QR code first.");
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const response = await fetch('https://api.qrserver.com/v1/read-qr-code/', { method: 'POST', body: formData });
+            const data = await response.json();
+            resultText.value = data[0]?.symbol[0]?.data || "QR code not found.";
+        } catch { alert("Failed to decode."); }
+    }
+</script>
 </body>
 </html>
