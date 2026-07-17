@@ -48,7 +48,7 @@
 </head>
 <body>
     <div class="header-container">
-        <h2 id="headerTitle">QR 코드 생성기</h2>
+        <h2 id="headerTitle">QR 생성기</h2>
         <a href="../index" class="home-btn" id="homeBtn">집으로</a>
     </div>
     <div class="box-container">
@@ -71,8 +71,8 @@
 
     <script>
         const lang = {
-            ko: { title: "QR 생성 및 해석기", header: "QR 코드 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "오류가 발생했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
-            en: { title: "QR Generator & Decoder", header: "QR Code Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "An error occurred.", alertFile: "Please select an image.", fail: "Decoding failed" }
+            ko: { title: "QR 생성기", header: "QR 생성기", home: "집으로", placeholder: "생성할 텍스트/URL 입력", gen: "QR 코드 생성", save: "저장하기", label: "파일 선택", file: "선택된 파일 없음", decode: "QR 코드 해석", alertVal: "값을 입력하세요.", alertImg: "먼저 QR을 생성하세요.", alertErr: "오류가 발생했습니다.", alertFile: "이미지를 선택하세요.", fail: "해석 실패" },
+            en: { title: "QR Generator & Decoder", header: "QR Generator", home: "Go Home", placeholder: "Enter text/URL to generate", gen: "Generate QR", save: "Save", label: "Select File", file: "No file selected", decode: "Decode QR", alertVal: "Please enter a value.", alertImg: "Generate QR first.", alertErr: "An error occurred.", alertFile: "Please select an image.", fail: "Decoding failed" }
         };
 
         const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
