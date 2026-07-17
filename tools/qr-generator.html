@@ -62,26 +62,13 @@
             .content-top, .content-down { flex-direction: column; overflow-y: visible; }
             
             /* 1. 컨트롤러 전체 구조 변경: 가로 배치 */
-            .qr-generator-controls { 
-                flex-direction: row !important; /* 가로로 배치 (버튼 | 이미지) */
-                width: 100%; 
-                min-height: auto; 
-                border-left: none; 
-                border-top: 2px dashed #ff9e40; 
-                align-items: flex-start; /* 상단 정렬 */
-                justify-content: flex-start;
-                gap: 10px;
-            }
+            .qr-generator-controls { flex-direction: row; width: 100%; min-height: auto; border-left: none; border-top: 2px dashed #ff9e40; align-items: flex-start; justify-content: flex-start; gap: 10px; }
         
             /* 2. 버튼 그룹을 세로로 정렬 */
-            .button-group { 
-                flex-direction: column; 
-                width: 100px; /* 버튼 너비 고정 */
-                flex-shrink: 0;
-            }
+            .button-group { flex-direction: column; width: 100px; flex-shrink: 0; }
             
             /* 버튼 모양도 살짝 다듬기 */
-            .action-btn { width: 100%; margin-bottom: 5px; }
+            .action-btn { width: 100px; margin-bottom: 5px; }
         
             /* 3. 이미지 영역 설정 */
             #qr-image { width: 150px; height: 150px; margin-top: 0; }
