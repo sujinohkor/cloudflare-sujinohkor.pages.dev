@@ -59,22 +59,36 @@
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; }
             
-            /* 모바일에서 섹션을 세로로 배치 */
             .content-top, .content-down { flex-direction: column; overflow-y: visible; }
             
-            /* textarea와 controls의 높이 배분 */
-            #text-input { min-height: 200px; } /* 텍스트 입력 영역 확보 */
+            /* 1. 컨트롤러 전체 구조 변경: 가로 배치 */
             .qr-generator-controls { 
+                flex-direction: row !important; /* 가로로 배치 (버튼 | 이미지) */
                 width: 100%; 
-                min-height: 400px; /* 세로로 길게 영역 확보 */
+                min-height: auto; 
                 border-left: none; 
                 border-top: 2px dashed #ff9e40; 
+                align-items: flex-start; /* 상단 정렬 */
+                justify-content: flex-start;
+                gap: 10px;
             }
-            .qr-decoder-controls { width: 100%; border-right: none; border-top: 2px dashed #ff9e40; }
+        
+            /* 2. 버튼 그룹을 세로로 정렬 */
+            .button-group { 
+                flex-direction: column; 
+                width: 100px; /* 버튼 너비 고정 */
+                flex-shrink: 0;
+            }
             
-            /* 모바일에서는 QR 이미지가 너무 크지 않게 조절 */
-            #qr-image { width: 250px; height: 250px; }
-            #qr-placeholder { margin-top: 80px !important; }
+            /* 버튼 모양도 살짝 다듬기 */
+            .action-btn { width: 100%; margin-bottom: 5px; }
+        
+            /* 3. 이미지 영역 설정 */
+            #qr-image { width: 150px; height: 150px; margin-top: 0; }
+            #qr-placeholder { margin-top: 40px !important; }
+        
+            #text-input { min-height: 150px; }
+            .qr-decoder-controls { width: 100%; border-right: none; border-top: 2px dashed #ff9e40; }
         }
     </style>
 </head>
