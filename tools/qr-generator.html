@@ -84,6 +84,8 @@
             /* 로드 이미지 영역의 span 스타일 조정 */
             #file-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+            .decoder-button-group { display: flex; flex-direction: row; gap: 10px; justify-content: center; }
+
             /* 2. 결과창(textarea)의 border 제거 (위쪽 구분선이 없도록) */
             #resultText { border-top: none !important; }
         }
@@ -131,8 +133,11 @@
                     <button class="action-btn" onclick="document.getElementById('fileInput').click()">Load Image</button>
                     <span id="file-name" style="font-size: 0.8rem;">No file chosen</span>
                 </div>
-                <button class="action-btn" onclick="decodeQR()">Decode QR</button>
-                <button class="action-btn" onclick="resetDecoder()">Reset</button>
+                <!-- 이 부분을 수정: 두 버튼을 감싸는 div 추가 -->
+                <div class="decoder-button-group">
+                    <button class="action-btn" onclick="decodeQR()">Decode QR</button>
+                    <button class="action-btn" onclick="resetDecoder()">Reset</button>
+                </div>
             </div>
             <textarea id="resultText" readonly placeholder="Decoded text will appear here."></textarea>
         </section>
