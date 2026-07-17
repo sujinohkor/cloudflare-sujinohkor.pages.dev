@@ -14,7 +14,7 @@
         .typing-container img { width: 100%; height: auto; }
         
         .header-wrapper { display: flex; align-items: center; justify-content: flex-end; min-height: 80px; position: relative; }
-        .header-wrapper h1 { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; color: #ff9e40; font-size: 1.5rem; }
+        .header-wrapper h1 { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; color: #ff9e40; font-size: 3rem; transition: font-size 0.3s ease; }
         #theme-toggle { z-index: 10; padding: 8px 16px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 20px; }
 
         .card-grid { display: grid; grid-template-columns: repeat(auto-fit, 370px); justify-content: center; gap: 20px; margin-top: 30px; }
@@ -44,6 +44,8 @@
 
         /* 모바일 최적화 핵심 복원 */
         @media (max-width: 600px) {
+            .header-wrapper { min-height: 80px; }
+            .header-wrapper h1 { font-size: 1.5rem; }
             .card-grid { grid-template-columns: 1fr; gap: 10px; padding: 0 10px; }
             .card { width: 100%; height: 70px; display: flex; align-items: center; padding: 10px 20px; border-radius: 40px; }
             .icon { font-size: 1.5rem; margin: 0 15px 0 0; width: 35px; text-align: center; }
