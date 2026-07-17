@@ -46,9 +46,9 @@
 
         /* 모바일 최적화 핵심 복원 */
         @media (max-width: 600px) {
-            .header-wrapper { flex-direction: column; min-height: auto; gap: 10px; margin-bottom: 20px; position: relative; }
-            .header-wrapper h1 { position: relative; font-size: 1.5rem; margin: 0; }
-            .theme-toggle { margin: 0; }
+            .header-wrapper { flex-direction: column; min-height: auto; gap: 10px; margin-bottom: 20px; position: relative; align-items: flex-end; }
+            .header-wrapper h1 { position: relative; font-size: 1.5rem; margin: 0; width: 100%; text-align: center; }
+            #theme-toggle { margin: 0; align-self: flex-end; }
             .card-grid { grid-template-columns: 1fr; gap: 10px; padding: 0 10px; }
             .card { width: 100%; height: 70px; display: flex; align-items: center; padding: 10px 20px; border-radius: 40px; }
             .icon { font-size: 1.5rem; margin: 0 15px 0 0; width: 35px; text-align: center; }
