@@ -5,129 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Counter</title>
     <style>
+        /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; transition: background 0.3s; }
-
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+        
+        /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
-
-        /* 햄버거 버튼 스타일 (모바일용) */
-        .menu-toggle-btn {
-            display: none;
-            position: fixed;
-            bottom: 20px; /* top 대신 bottom 사용 */
-            left: 20px;
-            z-index: 2000;
-            padding: 10px 15px;
-            background: #ff9e40;
-            border: none;
-            cursor: pointer;
-            border-radius: 50px;
-            font-weight: bold;
-            color: #101010;
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed; 
-            left: 0;
-            top: 0;
-            background-color: #101010;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            transition: transform 0.3s ease;
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
         }
-
-        .menu-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
         .menu-btn:hover { background: #ff9e40; color: #101010; }
-
-        .theme-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-
+        
         .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
-        .menu-list a { display: flex; justify-content: space-between; padding: 5px 0; text-decoration: none; color: #FFFFFF; font-size: 0.95rem; cursor: default; }
-        .menu-list a span { color: #e68a35; font-weight: bold; }
-        .bottom-btns { margin-top: 10px; }
-        .top-section { margin-bottom: 30px; }
-        .top-section h1, .top-section p { color: #FFFFFF; }
+        .menu-list a { display: flex; justify-content: space-between; color: #fff; font-size: 0.95rem; }
+        .menu-list span { color: #e68a35; font-weight: bold; }
 
-        .main-content { margin-left: 250px; padding: 40px; flex: 1; display: flex; flex-direction: column; transition: 0.3s; height: 100vh; overflow: hidden; }
-
-        .content-card { background: transparent; border-radius: 16px; border: 2px solid #ff9e40; width: 100%; min-height: calc(100vh - 180px); flex: 1; display: flex; overflow: hidden; margin-bottom: 20px; }
-        .content-card textarea {
-            width: 100%; flex: 1; border: none; outline: none; resize: none;
-            font-family: 'Consolas', 'Malgun Gothic', sans-serif;
-            font-size: 1rem; padding: 40px; background-color: transparent; color: #ffffff; border-radius: 16px;
+        .content-card { 
+            border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
+            display: flex; overflow: hidden; background: transparent;
         }
-        .content-card textarea::placeholder { color: #888888; opacity: 1; }
+        textarea { 
+            width: 100%; padding: 40px; background: transparent; border: none; 
+            color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; outline: none;
+        }
 
-        /* 모바일 대응 */
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
+        body.light-mode textarea { color: #000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
         @media (max-width: 768px) {
             .menu-toggle-btn { display: block; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content {
-                margin-left: 0 !important;
-                padding: 20px;
-                width: 100%;
-                /* 1. height 고정 대신 최대 높이 제한 사용 */
-                max-height: 100svh;
-                /* 2. Flexbox가 남은 공간을 정확히 계산하도록 명시 */
-                flex: 1; 
-                display: flex;
-                flex-direction: column;
-            }
-        
-            .main-content-section {
-                /* 3. 섹션 자체가 flex로 남은 높이를 채우도록 설정 */
-                flex: 1;
-                min-height: 0; /* 중요: 이 설정이 있어야 내부 textarea가 넘치지 않고 영역 안에 갇힘 */
-            }
-        
-            .content-card {
-                min-height: 0; /* textarea가 잘리지 않게 설정 */
-                height: 100%;  /* 부모인 section에 맞춤 */
-            }
+            .main-content { margin-left: 0 !important; padding: 20px; }
         }
-
-        /* 라이트 모드 */
-        body.light-mode { background-color: #ffffff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
-        body.light-mode .menu-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
-        body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-card { background: #ffffff; }
-        body.light-mode .content-card textarea { color: #000000; }
-        body.light-mode .menu-list a { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #FFFFFF; }
     </style>
 </head>
 <body>
@@ -159,34 +90,28 @@
             <h1>Word Counter</h1>
             <p>You can count the number of words, etc.</p>
         </header>
-
-        <section class="main-content-section">
-            <div class="content-card">
-                <textarea id="text-input" placeholder="Enter text here."></textarea>
-            </div>
+        <section class="content-card" style="margin-top: 20px;">
+            <textarea id="text-input" placeholder="Enter text here."></textarea>
         </section>
     </main>
 </div>
 
 <script>
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('active');
-    }
-
     const textInput = document.getElementById('text-input');
+    const sidebar = document.getElementById('sidebar');
+
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+
     textInput.addEventListener('input', () => {
         const text = textInput.value;
         document.getElementById('char-count-all').innerText = text.length;
         document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
-        const words = text.trim().split(/\s+/).filter(w => w.length > 0);
-        document.getElementById('word-count').innerText = words.length;
-        const paras = text.split('\n').filter(p => p.trim().length > 0);
-        document.getElementById('para-count').innerText = paras.length;
-        let byteCount = 0;
-        for (let i = 0; i < text.length; i++) {
-            byteCount += (text.charCodeAt(i) > 127) ? 2 : 1;
-        }
-        document.getElementById('byte-count').innerText = byteCount;
+        document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('para-count').innerText = text.split('\n').filter(p => p.trim().length > 0).length;
+        
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
+        document.getElementById('byte-count').innerText = bytes;
     });
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -199,37 +124,22 @@
     }
 
     function copyText() {
-        const text = textInput.value;
-        if (text === "") {
-            alert('No text to copy.');
-        } else {
-            textInput.select();
-            document.execCommand('copy');
-            alert('Text copied!');
-        }
+        if (!textInput.value) return alert('No text to copy.');
+        textInput.select();
+        document.execCommand('copy');
+        alert('Text copied!');
     }
 
     function saveText() {
         const text = textInput.value;
-    
-        // 입력값이 없거나 공백만 있는 경우 체크
-        if (!text || text.trim() === "") {
-            alert("No text to save.");
-            return;
-        }
-    
-        // BOM을 포함한 Blob 생성
+        if (!text.trim()) return alert("No text to save.");
         const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'WordCounter.txt';
         link.click();
-    
-        // 메모리 해제
         URL.revokeObjectURL(link.href);
     }
-
 </script>
-
 </body>
 </html>
