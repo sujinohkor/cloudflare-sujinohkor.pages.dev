@@ -54,19 +54,27 @@
         /* Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
         @media (max-width: 768px) {
-            .menu-toggle-btn { display: block; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+            .menu-toggle-btn { display: block; color: #fff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; }
+            .main-content { margin-left: 0; padding: 15px; }
             
-            .content-top, .content-down { flex-direction: column; overflow: visible; }
+            /* 모바일에서 섹션을 세로로 배치 */
+            .content-top, .content-down { flex-direction: column; overflow-y: visible; }
             
-            /* 핵심 수정: 버튼 세로, 오른쪽 QR 배치 */
-            .qr-generator-controls { flex-direction: row !important; align-items: flex-start !important; }
-            .button-group { flex-direction: column; width: auto; }
+            /* textarea와 controls의 높이 배분 */
+            #text-input { min-height: 200px; } /* 텍스트 입력 영역 확보 */
+            .qr-generator-controls { 
+                width: 100%; 
+                min-height: 400px; /* 세로로 길게 영역 확보 */
+                border-left: none; 
+                border-top: 2px dashed #ff9e40; 
+            }
+            .qr-decoder-controls { width: 100%; border-right: none; border-top: 2px dashed #ff9e40; }
             
-            #text-input { min-height: 150px; }
-            #qr-image { width: 150px; height: 150px; }
+            /* 모바일에서는 QR 이미지가 너무 크지 않게 조절 */
+            #qr-image { width: 250px; height: 250px; }
+            #qr-placeholder { margin-top: 80px !important; }
         }
     </style>
 </head>
