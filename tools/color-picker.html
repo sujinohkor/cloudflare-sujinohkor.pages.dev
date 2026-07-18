@@ -2354,21 +2354,32 @@
     }
 
     field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
+    field.addEventListener('touchstart', (e) => { isDraggingField = true; updateFromField(e.touches[0]); e.preventDefault(); }, {passive: false});
     slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
+    slider.addEventListener('touchstart', (e) => { isDraggingSlider = true; updateFromSlider(e.touches[0]); e.preventDefault(); }, {passive: false});
     window.addEventListener('mousemove', (e) => {
         if (isDraggingField) updateFromField(e);
         else if (isDraggingSlider) updateFromSlider(e);
     });
+    window.addEventListener('touchmove', (e) => {
+        if (isDraggingField) updateFromField(e.touches[0]);
+        else if (isDraggingSlider) updateFromSlider(e.touches[0]);
+        e.preventDefault();
+    }, {passive: false});
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
+    window.addEventListener('touchend', () => { isDraggingField = false; isDraggingSlider = false; });
 
 // 이벤트 핸들러에서 호출하는 함수 수정
 function updateFromField(e) {
     const rect = field.getBoundingClientRect();
-    let x = Math.max(0, Math.min(e.clientX - rect.left, 499));
-    let y = Math.max(0, Math.min(e.clientY - rect.top, 499));
-    let h = (hueY / 499) * 360;
-    let s = (x / 499) * 100;
-    let v = (1 - (y / 499)) * 100;
+    // 상대 좌표를 내부 캔버스 해상도에 맞게 보정
+    let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
+    let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
+    
+    let h = (hueY / (slider.height - 1)) * 360; // 슬라이더 높이 기준 수정
+    let s = (x / (field.width - 1)) * 100;
+    let v = (1 - (y / (field.height - 1))) * 100;
+    
     let rgb = hsvToRgb(h, s, v);
     // syncAll 대신 기존에 잘 작성된 updateAll 사용
     updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
