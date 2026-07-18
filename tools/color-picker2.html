@@ -2280,7 +2280,7 @@
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 50, 500);
         sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
-        sCtx.beginPath(); sCtx.arc(25, hueY, 6, 0, Math.PI * 2); sCtx.stroke();
+        sCtx.beginPath(); sCtx.arc(25, hueY, 20, 0, Math.PI * 2); sCtx.stroke();
     }
 
     function drawField(h, s, v) {
@@ -2292,7 +2292,7 @@
         ctx.fillStyle = gradB; ctx.fillRect(0, 0, 500, 500);
         let px = (s / 100) * 499, py = (1 - (v / 100)) * 499;
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px, py, 20, 0, Math.PI * 2); ctx.stroke();
     }
 
     field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
