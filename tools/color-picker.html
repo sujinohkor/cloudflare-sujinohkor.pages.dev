@@ -2261,8 +2261,8 @@
         document.getElementById('name-input').value = getColorName(hex);
 
         // 캔버스 강제 갱신
-        drawField(Math.round(h), Math.round(s), Math.round(v));
-        drawHue();
+        //drawField(Math.round(h), Math.round(s), Math.round(v));
+        //drawHue();
         document.getElementById('previewBox').style.backgroundColor = hex;
     }
 
@@ -2388,6 +2388,8 @@ function updateFromField(e) {
     let rgb = hsvToRgb(h, s, v);
     // syncAll 대신 기존에 잘 작성된 updateAll 사용
     updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
+
+    drawField(Math.round(h), Math.round(s), Math.round(v));
 }
 
 function updateFromSlider(e) {
@@ -2412,6 +2414,9 @@ function updateFromSlider(e) {
         let rgb = hsvToRgb(h, s, v);
         updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
     }
+
+    drawField(Math.round(h), Math.round(s), Math.round(v));
+    drawHue();
 }
 
     function getColorName(hex) {
@@ -2531,6 +2536,8 @@ HSL: (${h_l}°, ${s_l}%, ${l_l}%)`;
     drawField(hue, sat, val);
     drawHue();
     updateAll('init', { r: 255, g: 0, b: 0 });
+    drawField(0, 100, 100); // 초기화 시 캔버스 위치 명시
+    drawHue();
 </script>
 </body>
 </html>
