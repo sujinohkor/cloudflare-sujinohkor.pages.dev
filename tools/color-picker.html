@@ -2261,8 +2261,8 @@
         document.getElementById('name-input').value = getColorName(hex);
 
         // 캔버스 강제 갱신
-        //drawField(Math.round(h), Math.round(s), Math.round(v));
-        //drawHue();
+        drawField(Math.round(h), Math.round(s), Math.round(v));
+        drawHue();
         document.getElementById('previewBox').style.backgroundColor = hex;
     }
 
@@ -2527,9 +2527,9 @@ HSL: (${h_l}°, ${s_l}%, ${l_l}%)`;
     }
 
     hue = 0; sat = 100; val = 100; hueY = 0;
-    updateAll('init', { r: 255, g: 0, b: 0 });
     drawField(hue, sat, val);
     drawHue();
+    updateAll('init', { r: 255, g: 0, b: 0 });
 </script>
 </body>
 </html>
