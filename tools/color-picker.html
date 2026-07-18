@@ -2390,7 +2390,7 @@ function updateFromField(e) {
 }
 
 function updateFromSlider(e) {
-    const rect = slider.getBoundingClientRect();
+    /*const rect = slider.getBoundingClientRect();
     const isMobile = window.innerWidth <= 600;
     
     if (isMobile) {
@@ -2410,7 +2410,28 @@ function updateFromSlider(e) {
         let v = parseInt(document.getElementById('v').value) || 0;
         let rgb = hsvToRgb(h, s, v);
         updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+    }*/
+
+    const rect = slider.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 600;
+    
+    // 현재 입력창 값을 가져오되, 없으면 100으로 초기화
+    let s = parseInt(document.getElementById('s').value) || 100;
+    let v = parseInt(document.getElementById('v').value) || 100;
+    
+    let h;
+    if (isMobile) {
+        let hueX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        hueY = (hueX / rect.width) * 500; 
+        h = (hueX / rect.width) * 360;
+    } else {
+        hueY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+        h = (hueY / rect.height) * 360;
     }
+    
+    let rgb = hsvToRgb(h, s, v);
+    // updateAll 호출 시 s, v를 같이 넘겨줌
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b, s: s, v: v });
 }
 
     function getColorName(hex) {
