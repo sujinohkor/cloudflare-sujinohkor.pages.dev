@@ -2372,20 +2372,26 @@
 // 이벤트 핸들러에서 호출하는 함수 수정
 function updateFromField(e) {
     const rect = field.getBoundingClientRect();
-    // 요소의 가로/세로 길이를 정확히 계산
-    const scaleX = field.width / rect.width;
-    const scaleY = field.height / rect.height;
     
-    // 상대 좌표를 내부 캔버스 해상도에 맞게 보정
-    let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
-    let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
+    // 1. 마우스 위치를 캔버스 내부 범위로 강제 제한 (0 ~ rect.width)
+    let clientX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    let clientY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
     
-    let h = (hueY / (slider.height - 1)) * 360; // 슬라이더 높이 기준 수정
-    let s = (x / (field.width - 1)) * 100;
-    let v = (1 - (y / (field.height - 1))) * 100;
+    // 2. 캔버스 해상도(500x500)에 맞게 비율 계산
+    let x = (clientX / rect.width) * 500;
+    let y = (clientY / rect.height) * 500;
+    
+    // 3. 0~499 범위로 최종 보정
+    x = Math.max(0, Math.min(x, 499));
+    y = Math.max(0, Math.min(y, 499));
+    
+    // 4. 슬라이더 위치(hueY)를 통해 현재 선택된 H값 가져오기
+    // hueY는 현재 전역 변수로 관리되므로, 이를 활용하여 HSV 계산
+    let h = (hueY / 500) * 360; 
+    let s = (x / 500) * 100;
+    let v = (1 - (y / 500)) * 100;
     
     let rgb = hsvToRgb(h, s, v);
-    // syncAll 대신 기존에 잘 작성된 updateAll 사용
     updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
 }
 
