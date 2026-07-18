@@ -2311,7 +2311,7 @@
     });
 
     function drawHue() {
-        const isMobile = window.innerWidth <= 600;
+        /*const isMobile = window.innerWidth <= 600;
         const width = isMobile ? 350 : 50;
         const height = isMobile ? 30 : 500;
         
@@ -2337,6 +2337,40 @@
             sCtx.arc(hueX, height/2, height/2 - 2, 0, Math.PI*2);
         } else {
             sCtx.arc(width/2, hueY, 20, 0, Math.PI * 2);
+        }
+        sCtx.stroke();*/
+
+        const isMobile = window.innerWidth <= 600;
+        const width = isMobile ? 350 : 50;
+        const height = isMobile ? 30 : 500;
+        
+        slider.width = width;
+        slider.height = height;
+        sCtx.clearRect(0, 0, width, height);
+        
+        // 그라데이션 (기존과 동일)
+        let grad = isMobile ? 
+            sCtx.createLinearGradient(0, 0, width, 0) : 
+            sCtx.createLinearGradient(0, 0, 0, height);
+        for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
+        sCtx.fillStyle = grad; 
+        sCtx.fillRect(0, 0, width, height);
+        
+        // 원 위치 결정 (전역변수 대신 입력창의 h값 사용)
+        let h = parseInt(document.getElementById('h').value) || 0;
+        
+        sCtx.strokeStyle = '#fff'; 
+        sCtx.lineWidth = 2;
+        sCtx.beginPath();
+        
+        if (isMobile) {
+            // 모바일: 가로 슬라이더 (0~360을 0~width로 변환)
+            let hueX = (h / 360) * width;
+            sCtx.arc(hueX, height / 2, height / 2 - 4, 0, Math.PI * 2);
+        } else {
+            // PC: 세로 슬라이더 (0~360을 0~height로 변환)
+            let hueY_val = (h / 360) * height;
+            sCtx.arc(width / 2, hueY_val, 15, 0, Math.PI * 2);
         }
         sCtx.stroke();
     }
@@ -2371,7 +2405,7 @@
 
 // 이벤트 핸들러에서 호출하는 함수 수정
 function updateFromField(e) {
-    const rect = field.getBoundingClientRect();
+    /*const rect = field.getBoundingClientRect();
     // 요소의 가로/세로 길이를 정확히 계산
     const scaleX = field.width / rect.width;
     const scaleY = field.height / rect.height;
@@ -2386,11 +2420,24 @@ function updateFromField(e) {
     
     let rgb = hsvToRgb(h, s, v);
     // syncAll 대신 기존에 잘 작성된 updateAll 사용
-    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); */
+
+    const rect = field.getBoundingClientRect();
+    
+    let x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    let y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+    
+    // 전역 hueY 대신 현재 입력창의 h값을 사용
+    let h = parseInt(document.getElementById('h').value) || 0;
+    let s = (x / rect.width) * 100;
+    let v = 100 - (y / rect.height) * 100;
+    
+    let rgb = hsvToRgb(h, s, v);
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
 }
 
 function updateFromSlider(e) {
-    const rect = slider.getBoundingClientRect();
+    /*const rect = slider.getBoundingClientRect();
     const isMobile = window.innerWidth <= 600;
     
     if (isMobile) {
@@ -2410,7 +2457,29 @@ function updateFromSlider(e) {
         let v = parseInt(document.getElementById('v').value) || 0;
         let rgb = hsvToRgb(h, s, v);
         updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+    }*/
+
+    const rect = slider.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 600;
+    
+    // 현재 입력된 S, V 유지
+    let s = parseInt(document.getElementById('s').value) || 100;
+    let v = parseInt(document.getElementById('v').value) || 100;
+    
+    let h;
+    if (isMobile) {
+        let hueX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        h = (hueX / rect.width) * 360;
+        // drawHue를 위해 전역 hueY 업데이트 (비율 유지)
+        hueY = (hueX / rect.width) * 500; 
+    } else {
+        let hueY_local = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+        h = (hueY_local / rect.height) * 360;
+        hueY = hueY_local; // PC는 그대로
     }
+    
+    let rgb = hsvToRgb(h, s, v);
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
 }
 
     function getColorName(hex) {
