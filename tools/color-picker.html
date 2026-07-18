@@ -136,8 +136,8 @@
             <p>You can pick any color what you want, etc.</p>
         </header>
         <section class="content-card" style="margin-top: 20px;">
-            <canvas id="colorField"></canvas>
-            <canvas id="hueSlider"></canvas>
+            <canvas id="colorField" width="500" height="500"></canvas>
+            <canvas id="hueSlider" width="50" height="500"></canvas>
             <div id="previewBox"></div>
         </section>
     </main>
@@ -2310,31 +2310,6 @@
         document.body.classList.toggle('light-mode');
     });
 
-    // 캔버스 사이즈를 계산하는 함수
-    function resizeCanvas() {
-        const isMobile = window.innerWidth <= 600;
-        
-        // colorField 설정
-        field.width = isMobile ? 350 : 500;
-        field.height = isMobile ? 350 : 500;
-        
-        // hueSlider 설정
-        slider.width = isMobile ? 350 : 50;
-        slider.height = isMobile ? 30 : 500;
-        
-        // 다시 그리기
-        const h = parseInt(document.getElementById('h').value) || 0;
-        const s = parseInt(document.getElementById('s').value) || 0;
-        const v = parseInt(document.getElementById('v').value) || 0;
-        drawField(h, s, v);
-        drawHue();
-    }
-    
-    // 창 크기 변경 시마다 실행
-    window.addEventListener('resize', resizeCanvas);
-    // 초기 실행
-    resizeCanvas();
-    
     function drawHue() {
         const isMobile = window.innerWidth <= 600;
         const width = isMobile ? 350 : 50;
@@ -2386,48 +2361,17 @@
     });
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 
-    /*// 필드 터치/클릭 이벤트
-    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
-    field.addEventListener('touchstart', (e) => { isDraggingField = true; updateFromField(e); e.preventDefault(); }, {passive: false});
-    
-    // 슬라이더 터치/클릭 이벤트
-    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
-    slider.addEventListener('touchstart', (e) => { isDraggingSlider = true; updateFromSlider(e); e.preventDefault(); }, {passive: false});
-    
-    // 마우스 이동 및 터치 이동
-    window.addEventListener('mousemove', (e) => {
-        if (isDraggingField) updateFromField(e);
-        else if (isDraggingSlider) updateFromSlider(e);
-    });
-    window.addEventListener('touchmove', (e) => {
-        if (isDraggingField) updateFromField(e);
-        else if (isDraggingSlider) updateFromSlider(e);
-    }, {passive: false});
-    
-    // 드래그 종료
-    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
-    window.addEventListener('touchend', () => { isDraggingField = false; isDraggingSlider = false; });*/
-
-    
 // 이벤트 핸들러에서 호출하는 함수 수정
 function updateFromField(e) {
     const rect = field.getBoundingClientRect();
-    const isMobile = window.innerWidth <= 600;
-    const size = isMobile ? 350 : 500; // 현재 캔버스 크기
-    
-    // 터치 위치 계산 (ClientX/Y는 페이지 전체 기준)
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-    let x = Math.max(0, Math.min(clientX - rect.left, size - 1));
-    let y = Math.max(0, Math.min(clientY - rect.top, size - 1));
-    
-    let h = (hueY / (isMobile ? 30 : 500)) * 360; // 슬라이더 로직도 맞춰야 함
-    let s = (x / (size - 1)) * 100;
-    let v = (1 - (y / (size - 1))) * 100;
-    
+    let x = Math.max(0, Math.min(e.clientX - rect.left, 499));
+    let y = Math.max(0, Math.min(e.clientY - rect.top, 499));
+    let h = (hueY / 499) * 360;
+    let s = (x / 499) * 100;
+    let v = (1 - (y / 499)) * 100;
     let rgb = hsvToRgb(h, s, v);
-    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+    // syncAll 대신 기존에 잘 작성된 updateAll 사용
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
 }
 
 function updateFromSlider(e) {
