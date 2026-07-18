@@ -35,6 +35,8 @@
         #hueSlider { width: 50px; height: 500px; cursor: pointer; }
         #previewBox { width: 50px; height: 500px; border: 1px solid #444; border-radius: 15px; }
 
+        .menu-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555; color: #555; }
+
         /* Light Mode */
         body.light-mode { background-color: #fff; }
         body.light-mode .sidebar { background-color: #FDF5E6; }
@@ -116,8 +118,8 @@
         </nav>
 
         <div class="bottom-btns" style="margin-top: 10px;">
-            <button class="menu-btn" onclick="copyColor()">Copy</button>
-            <button class="menu-btn" onclick="saveColor()">Save the Color Swatch</button>
+            <button id="copy-btn" class="menu-btn" onclick="copyColor()">Copy</button>
+            <button id="save-btn" class="menu-btn" onclick="saveColor()">Save the Color Swatch</button>
         </div>
     </aside>
 
@@ -2158,9 +2160,36 @@
     // Hex 입력 제어
     hexInput.addEventListener('input', (e) => {
         let val = e.target.value;
+        
+        // 1. '#'을 강제로 유지하되, '#' 뒤의 문자들만 처리
         if (!val.startsWith('#')) val = '#' + val.replace(/#/g, '');
+        
+        // 2. '#'을 제외한 나머지 부분에서 0-9, a-f, A-F를 제외한 모든 문자(한글 포함) 제거
         let hexPart = val.substring(1).replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        
+        // 3. 다시 '#'을 붙여서 입력창 값 업데이트
         e.target.value = '#' + hexPart.substring(0, 6);
+        
+        const copyBtn = document.getElementById('copy-btn');
+        const saveBtn = document.getElementById('save-btn');
+
+        // 6자리 완성 여부 확인
+        if (hexPart.length === 6) {
+            // 색상 적용
+            updateAll('hex', { 
+                r: parseInt(hexPart.substr(0, 2), 16), 
+                g: parseInt(hexPart.substr(2, 2), 16), 
+                b: parseInt(hexPart.substr(4, 2), 16) 
+            });
+        
+            // 버튼 활성화
+            copyBtn.disabled = false;
+            saveBtn.disabled = false;
+        } else {
+            // 버튼 비활성화
+            copyBtn.disabled = true;
+            saveBtn.disabled = true;
+        }
     });
 
     // --- 유기적 동기화 핵심 엔진 ---
