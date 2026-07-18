@@ -2202,12 +2202,6 @@
     // --- 유기적 동기화 핵심 엔진 ---
     function updateAll(sourceType, values) {
         let { r, g, b } = values;
-
-        // [핵심 수정] 갱신 시 현재 입력창의 s, v 값을 가져와 보존합니다.
-        // 입력창이 비어있으면 기본값 100을 사용합니다.
-        let currentS = parseInt(document.getElementById('s').value) || 100;
-        let currentV = parseInt(document.getElementById('v').value) || 100;
-        
         const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
         
         let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
@@ -2230,9 +2224,9 @@
             else h = (r - g) / d + 4;
             h *= 60;
         }
-        // 위에서 계산한 h를 사용하고, s와 v는 보존된 값을 사용합니다.
-        let s = (sourceType === 'hsv') ? values.s || 0 : currentS;
-        let v = (sourceType === 'hsv') ? values.v || 0 : currentV;
+        // max가 0일 때 NaN 방지
+        let s = (max === 0) ? 0 : (d / max) * 100;
+        let v = (max / 255) * 100;
 
         // 3. HSL 계산
         let maxVal = max / 255;
@@ -2266,8 +2260,8 @@
 
         document.getElementById('name-input').value = getColorName(hex);
 
-        // [핵심 수정] 캔버스 그릴 때 보존된 h, s, v 값을 전달합니다.
-        drawField(Math.round(h), Math.round(currentS), Math.round(currentV));
+        // 캔버스 강제 갱신
+        drawField(Math.round(h), Math.round(s), Math.round(v));
         drawHue();
         document.getElementById('previewBox').style.backgroundColor = hex;
     }
@@ -2396,7 +2390,7 @@ function updateFromField(e) {
 }
 
 function updateFromSlider(e) {
-    /*const rect = slider.getBoundingClientRect();
+    const rect = slider.getBoundingClientRect();
     const isMobile = window.innerWidth <= 600;
     
     if (isMobile) {
@@ -2416,28 +2410,7 @@ function updateFromSlider(e) {
         let v = parseInt(document.getElementById('v').value) || 0;
         let rgb = hsvToRgb(h, s, v);
         updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
-    }*/
-
-    const rect = slider.getBoundingClientRect();
-    const isMobile = window.innerWidth <= 600;
-    
-    // 현재 입력창 값을 가져오되, 없으면 100으로 초기화
-    let s = parseInt(document.getElementById('s').value) || 100;
-    let v = parseInt(document.getElementById('v').value) || 100;
-    
-    let h;
-    if (isMobile) {
-        let hueX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        hueY = (hueX / rect.width) * 500; 
-        h = (hueX / rect.width) * 360;
-    } else {
-        hueY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-        h = (hueY / rect.height) * 360;
     }
-    
-    let rgb = hsvToRgb(h, s, v);
-    // updateAll 호출 시 s, v를 같이 넘겨줌
-    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b, s: s, v: v });
 }
 
     function getColorName(hex) {
