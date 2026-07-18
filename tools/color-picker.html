@@ -2380,7 +2380,8 @@ function updateFromField(e) {
     let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
     let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
     
-    let h = (hueY / (slider.height - 1)) * 360; // 슬라이더 높이 기준 수정
+    //let h = (hueY / (slider.height - 1)) * 360; // 슬라이더 높이 기준 수정
+    let h = parseInt(document.getElementById('h').value) || 0;
     let s = (x / (field.width - 1)) * 100;
     let v = (1 - (y / (field.height - 1))) * 100;
     
