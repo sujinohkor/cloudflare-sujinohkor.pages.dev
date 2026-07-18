@@ -2372,6 +2372,10 @@
 // 이벤트 핸들러에서 호출하는 함수 수정
 function updateFromField(e) {
     const rect = field.getBoundingClientRect();
+    // 요소의 가로/세로 길이를 정확히 계산
+    const scaleX = field.width / rect.width;
+    const scaleY = field.height / rect.height;
+    
     // 상대 좌표를 내부 캔버스 해상도에 맞게 보정
     let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
     let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
