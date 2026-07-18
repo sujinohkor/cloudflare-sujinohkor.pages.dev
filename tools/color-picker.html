@@ -2199,72 +2199,85 @@
         }
     });
 
-    // --- 유기적 동기화 핵심 엔진 ---
-    function updateAll(sourceType, values) {
-        let { r, g, b } = values;
-        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-        
-        let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
-        let k = Math.min(c, m, y);
-        c = Math.round(((c - k) / (1 - k) || 0) * 100);
-        m = Math.round(((m - k) / (1 - k) || 0) * 100);
-        y = Math.round(((y - k) / (1 - k) || 0) * 100);
-        k = Math.round(k * 100);
+// --- 유기적 동기화 핵심 엔진 ---
+function updateAll(sourceType, values) {
+    let { r, g, b } = values;
+    
+    // 1. HEX 계산
+    const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    
+    // 2. CMYK 계산
+    let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
+    let k = Math.min(c, m, y);
+    c = Math.round(((c - k) / (1 - k) || 0) * 100);
+    m = Math.round(((m - k) / (1 - k) || 0) * 100);
+    y = Math.round(((y - k) / (1 - k) || 0) * 100);
+    k = Math.round(k * 100);
 
-        // 1. 기본값 계산
-        let max = Math.max(r, g, b);
-        let min = Math.min(r, g, b);
-        let d = max - min;
-
-        // 2. HSV 계산
-        let h = 0;
-        if (d !== 0) {
-            if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-            else if (max === g) h = (b - r) / d + 2;
-            else h = (r - g) / d + 4;
-            h *= 60;
-        }
-        // max가 0일 때 NaN 방지
-        let s = (max === 0) ? 0 : (d / max) * 100;
-        let v = (max / 255) * 100;
-
-        // 3. HSL 계산
-        let maxVal = max / 255;
-        let minVal = min / 255;
-        let l = (maxVal + minVal) / 2 * 100; 
-        let s_l = 0;
-
-        let delta = d / 255;
-        let range = (1 - Math.abs(2 * (l / 100) - 1));
-
-        // 아주 작은 값(1e-10)으로 비교하여 오차 방지
-        if (range > 1e-10) {
-            s_l = (delta / range) * 100;
-        } else {
-            s_l = 0;
-        }
-
-        if (sourceType !== 'hex') hexInput.value = hex;
-        if (sourceType !== 'rgb') {
-            document.getElementById('r').value = r; document.getElementById('g').value = g; document.getElementById('b').value = b;
-        }
-        if (sourceType !== 'cmyk') {
-            document.getElementById('c').value = c; document.getElementById('m').value = m; document.getElementById('y').value = y; document.getElementById('k').value = k;
-        }
-        if (sourceType !== 'hsv') {
-            document.getElementById('h').value = Math.round(h); document.getElementById('s').value = Math.round(s); document.getElementById('v').value = Math.round(v);
-        }
-        if (sourceType !== 'hsl') {
-            document.getElementById('h_l').value = Math.round(h); document.getElementById('s_l').value = Math.round(s_l); document.getElementById('l_l').value = Math.round(l);
-        }
-
-        document.getElementById('name-input').value = getColorName(hex);
-
-        // 캔버스 강제 갱신
-        drawField(Math.round(h), Math.round(s), Math.round(v));
-        drawHue();
-        document.getElementById('previewBox').style.backgroundColor = hex;
+    // 3. HSV 계산
+    let max = Math.max(r, g, b);
+    let min = Math.min(r, g, b);
+    let d = max - min;
+    let h = 0;
+    if (d !== 0) {
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h *= 60;
     }
+    let s = (max === 0) ? 0 : (d / max) * 100;
+    let v = (max / 255) * 100;
+
+    // 4. HSL 계산
+    let maxVal = max / 255;
+    let minVal = min / 255;
+    let l = (maxVal + minVal) / 2 * 100; 
+    let s_l = 0;
+    let delta = d / 255;
+    let range = (1 - Math.abs(2 * (l / 100) - 1));
+    if (range > 1e-10) {
+        s_l = (delta / range) * 100;
+    }
+
+    // 5. 모든 입력창 업데이트
+    // hexInput은 사용자가 직접 타이핑 중일 때 값이 꼬이는 것을 방지
+    if (sourceType !== 'hex') hexInput.value = hex;
+    
+    // RGB
+    if (sourceType !== 'rgb') {
+        document.getElementById('r').value = r;
+        document.getElementById('g').value = g;
+        document.getElementById('b').value = b;
+    }
+    
+    // CMYK
+    if (sourceType !== 'cmyk') {
+        document.getElementById('c').value = c;
+        document.getElementById('m').value = m;
+        document.getElementById('y').value = y;
+        document.getElementById('k').value = k;
+    }
+    
+    // HSV (이제 sourceType이 무엇이든 항상 값을 갱신합니다)
+    document.getElementById('h').value = Math.round(h);
+    document.getElementById('s').value = Math.round(s);
+    document.getElementById('v').value = Math.round(v);
+    
+    // HSL
+    if (sourceType !== 'hsl') {
+        document.getElementById('h_l').value = Math.round(h);
+        document.getElementById('s_l').value = Math.round(s_l);
+        document.getElementById('l_l').value = Math.round(l);
+    }
+
+    // 6. 기타 UI 업데이트
+    document.getElementById('name-input').value = getColorName(hex);
+    document.getElementById('previewBox').style.backgroundColor = hex;
+
+    // 7. 캔버스 갱신
+    drawField(Math.round(h), Math.round(s), Math.round(v));
+    drawHue();
+}
 
     // --- 동기화 핸들러들 ---
     hexInput.addEventListener('input', (e) => {
