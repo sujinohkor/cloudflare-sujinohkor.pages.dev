@@ -40,6 +40,7 @@
         
         #qr-image { max-width: 100%; margin-top: 10px; border: none; display: none; }
         #file-name { color: #888; }
+        .load-image-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
 
         /* Light Mode */
         body.light-mode { background-color: #fff; color: #000; }
@@ -70,12 +71,11 @@
             
             #placeholder-container { width: calc(100% - 120px); height: 100%; flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; }
             #qr-image { width: 150px; height: 150px; margin-top: 0; }
-            #qr-placeholder { margin-top: 0; }
             
             #text-input { min-height: 150px; }
-            .qr-decoder-controls { width: 100%; min-height: 0; height: auto; border-right: none; border-bottom: 2px dashed #ff9e40; display: flex; flex-direction: column; align-items: flex-start; padding: 20px; gap: 10px; }
+            .qr-decoder-controls { width: 100%; min-height: 0; height: auto; border-right: none; border-bottom: 2px dashed #ff9e40; display: flex; flex-direction: column; align-items: flex-start; padding: 20px; padding-left: 10px; gap: 10px; }
             
-            .qr-decoder-controls > div:first-child { justify-content: flex-start !important; width: 100%; }
+            .load-image-container { flex-direction: row; justify-content: flex-start; }
             .decoder-button-group { flex-direction: row; justify-content: flex-start; }
             
             #file-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -120,7 +120,7 @@
         
         <section class="content-down">
             <div class="qr-decoder-controls">
-                <div style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center;">
+                <div class="load-image-container">
                     <button class="action-btn" onclick="document.getElementById('fileInput').click()">Load Image</button>
                     <span id="file-name">No file chosen</span>
                 </div>
