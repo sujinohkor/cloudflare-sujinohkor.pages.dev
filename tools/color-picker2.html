@@ -2303,19 +2303,28 @@
     });
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 
-    function updateFromField() {
-        // HSV 값을 바탕으로 색상 동기화
-        let h = hue, s = sat, v = val;
-        // 기존 syncFromHSV 로직을 활용하여 updateAll 호출
-        document.getElementById('h').value = h;
-        document.getElementById('s').value = s;
-        document.getElementById('v').value = v;
-        syncFromHSV(); 
-        drawField(hue, sat, val);
-        drawHue();
-        // 미리보기 박스 색상 업데이트
-        document.getElementById('previewBox').style.backgroundColor = hexInput.value;
-    }
+// 이벤트 핸들러에서 호출하는 함수 수정
+function updateFromField(e) {
+    const rect = field.getBoundingClientRect();
+    let x = Math.max(0, Math.min(e.clientX - rect.left, 499));
+    let y = Math.max(0, Math.min(e.clientY - rect.top, 499));
+    let h = (hueY / 499) * 360;
+    let s = (x / 499) * 100;
+    let v = (1 - (y / 499)) * 100;
+    let rgb = hsvToRgb(h, s, v);
+    // syncAll 대신 기존에 잘 작성된 updateAll 사용
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
+}
+
+function updateFromSlider(e) {
+    const rect = slider.getBoundingClientRect();
+    hueY = Math.max(0, Math.min(e.clientY - rect.top, 499));
+    let h = (hueY / 499) * 360;
+    let s = parseInt(document.getElementById('s').value) || 0;
+    let v = parseInt(document.getElementById('v').value) || 0;
+    let rgb = hsvToRgb(h, s, v);
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+}
 
     function getColorName(hex) {
         hex = hex.replace('#', '');
@@ -2328,6 +2337,20 @@
         }
         return name;
     }
+
+    let hueY = 0, isDraggingField = false, isDraggingSlider = false;
+    function hsvToRgb(h, s, v) {
+        s /= 100; v /= 100;
+        let i = Math.floor(h / 60), f = h / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s), r, g, b;
+        if (i % 6 == 0) { r = v; g = t; b = p; }
+        else if (i % 6 == 1) { r = q; g = v; b = p; }
+        else if (i % 6 == 2) { r = p; g = v; b = t; }
+        else if (i % 6 == 3) { r = p; g = q; b = v; }
+        else if (i % 6 == 4) { r = t; g = p; b = v; }
+        else { r = v; g = p; b = q; }
+        return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
 
 function copyColor() {
         // 각 입력 필드에서 값을 가져옵니다.
