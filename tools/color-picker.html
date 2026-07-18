@@ -2319,11 +2319,9 @@
         slider.height = height;
         sCtx.clearRect(0, 0, width, height);
         
-        // 가로/세로 방향에 따른 그라데이션 설정
         let grad = isMobile ? 
             sCtx.createLinearGradient(0, 0, width, 0) : 
             sCtx.createLinearGradient(0, 0, 0, height);
-            
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; 
         sCtx.fillRect(0, 0, width, height);
@@ -2331,11 +2329,13 @@
         sCtx.strokeStyle = '#fff'; 
         sCtx.lineWidth = 2;
         sCtx.beginPath();
-        // 모바일이면 가로 좌표(hueX), PC면 세로 좌표(hueY) 사용
+        
         if (isMobile) {
-            let hueX = (hueY / 500) * width; // 기존 hueY 값을 가로 비율로 변환
+            // 모바일은 hueY(0~500)를 width 비율로 환산
+            let hueX = (hueY / 500) * width;
             sCtx.arc(hueX, height/2, height/2 - 2, 0, Math.PI*2);
         } else {
+            // PC는 hueY 그대로 사용
             sCtx.arc(width/2, hueY, 20, 0, Math.PI * 2);
         }
         sCtx.stroke();
@@ -2372,45 +2372,43 @@
 // 이벤트 핸들러에서 호출하는 함수 수정
 function updateFromField(e) {
     const rect = field.getBoundingClientRect();
-    // 요소의 가로/세로 길이를 정확히 계산
     const scaleX = field.width / rect.width;
     const scaleY = field.height / rect.height;
     
-    // 상대 좌표를 내부 캔버스 해상도에 맞게 보정
     let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
     let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
     
-    let h = (hueY / (slider.height - 1)) * 360; // 슬라이더 높이 기준 수정
+    // 현재 hueY에서 h값 추출
+    let h = (hueY / (slider.height > 0 ? slider.height : 500)) * 360;
     let s = (x / (field.width - 1)) * 100;
     let v = (1 - (y / (field.height - 1))) * 100;
     
     let rgb = hsvToRgb(h, s, v);
-    // syncAll 대신 기존에 잘 작성된 updateAll 사용
-    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
 }
 
 function updateFromSlider(e) {
     const rect = slider.getBoundingClientRect();
     const isMobile = window.innerWidth <= 600;
     
+    // S, V가 비어있으면 100(최대)을 기본값으로 사용
+    let s = parseInt(document.getElementById('s').value);
+    if(isNaN(s)) s = 100;
+    let v = parseInt(document.getElementById('v').value);
+    if(isNaN(v)) v = 100;
+    
+    let h;
     if (isMobile) {
-        // 모바일: 가로 기준 계산
         let hueX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        hueY = (hueX / rect.width) * 500; // drawHue와의 호환성을 위해 비율 유지
-        let h = (hueX / rect.width) * 360;
-        let s = parseInt(document.getElementById('s').value) || 0;
-        let v = parseInt(document.getElementById('v').value) || 0;
-        let rgb = hsvToRgb(h, s, v);
-        updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+        hueY = (hueX / rect.width) * 500; 
+        h = (hueX / rect.width) * 360;
     } else {
-        // PC: 세로 기준 계산
         hueY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-        let h = (hueY / rect.height) * 360;
-        let s = parseInt(document.getElementById('s').value) || 0;
-        let v = parseInt(document.getElementById('v').value) || 0;
-        let rgb = hsvToRgb(h, s, v);
-        updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+        h = (hueY / rect.height) * 360;
     }
+    
+    let rgb = hsvToRgb(h, s, v);
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
 }
 
     function getColorName(hex) {
