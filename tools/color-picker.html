@@ -2,56 +2,150 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title data-i18n="title">색 편집기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker</title>
     <style>
-        body { background: #202020; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-        .header { width: 550px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        button { background: #3c3c3c; color: white; border: 1px solid #555; padding: 5px 15px; cursor: pointer; border-radius: 20px; }
-        button:hover { background: #555; }
-        .container { display: flex; gap: 15px; background: #2d2d2d; padding: 20px; border-radius: 20px; align-items: flex-start; }
-        canvas { border: 1px solid #444; border-radius: 12px; }
-        #colorField { width: 300px; height: 300px; cursor: crosshair; }
-        #hueSlider { width: 30px; height: 300px; cursor: pointer; }
-        #previewBox { width: 50px; height: 300px; border: 1px solid #444; border-radius: 12px; }
-        .controls { display: flex; flex-direction: column; gap: 5px; width: 120px; }
-        .input-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; }
-        input { background: #3c3c3c; border: 1px solid #555; color: white; padding: 4px; width: 60px; border-radius: 8px; text-align: center; }
-        #colorName { width: 100%; margin-top: 10px; border: none; background: #222; color: #aaa; cursor: default; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+        
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; height: 100vh; position: fixed; left: 0; top: 0; background-color: #101010; padding: 20px; z-index: 1000; display: flex; flex-direction: column; transition: transform 0.3s ease; }
+        .main-content { margin-left: 250px; padding: 40px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow: visible; }
+
+        .menu-btn, .theme-btn { width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; transition: all 0.3s; }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        
+        .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
+        .menu-item { display: flex; flex-direction: column; gap: 8px; }
+        
+        .input-group { display: flex; align-items: center; justify-content: space-between; }
+        .menu-list .color-label { color: #ff9e40; font-weight: bold; }
+        
+        .side-input { width: 100px; padding: 4px; background: #202020; border: 2px solid #ff9e40; color: #888888; border-radius: 50px; text-align: center; }
+        .multi-input-container { display: flex; gap: 4px; }
+        .small-input { flex: 1; min-width: 0; padding: 4px; background: #202020; border: 2px solid #ff9e40; color: #888888; border-radius: 50px; text-align: center; }
+        .name-input-field { width: 100%; padding: 4px; background: #202020; border: 2px solid #ff9e40; color: #888888; border-radius: 50px; text-align: center; }
+        
+        .side-input:focus, .small-input:focus, .name-input-field:focus { outline: none; }
+
+        .content-card { border: 2px solid #ff9e40; border-radius: 16px; flex: 1; display: inline-flex; width: fit-content; height: fit-content; overflow: visible; flex-shirink: 0; background: transparent; gap: 20px; }
+        canvas { border: 1px solid #444; border-radius: 15px; flex-shrink: 0; }
+        #colorField { width: 500px; height: 500px; cursor: crosshair; }
+        #hueSlider { width: 50px; height: 500px; cursor: pointer; }
+        #previewBox { width: 50px; height: 500px; border: 1px solid #444; border-radius: 15px; }
+
+        .menu-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555; color: #555; }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .menu-list .color-label { color: #e68a35; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #000000; }
+        body.light-mode .side-input, body.light-mode .small-input, body.light-mode .name-input-field { background: #FDF5E6; border-color: #e68a35; color: #888888 !important; }
+        body.light-mode textarea { color: #000000; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (max-width: 600px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h2 style="margin: 0;" data-i18n="title">색 편집기</h2>
-    <button onclick="window.location.href='../index'" data-i18n="home">집으로</button>
-</div>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
-<div class="container">
-    <canvas id="colorField" width="300" height="300"></canvas>
-    <div id="previewBox"></div>
-    <canvas id="hueSlider" width="30" height="300"></canvas>
-    
-    <div class="controls">
-        <input type="text" id="hex" value="#6E2828" style="width: 100%; margin-bottom: 5px; border-radius: 20px;">
-        <div class="input-row">R <input type="number" id="r" value="110" oninput="this.value = Math.max(0, Math.min(255, this.value))"></div>
-        <div class="input-row">G <input type="number" id="g" value="40" oninput="this.value = Math.max(0, Math.min(255, this.value))"></div>
-        <div class="input-row">B <input type="number" id="b" value="40" oninput="this.value = Math.max(0, Math.min(255, this.value))"></div>
-        <div class="input-row">H <input type="number" id="h" value="0" oninput="this.value = Math.max(0, Math.min(360, this.value))"></div>
-        <div class="input-row">S <input type="number" id="s" value="64" oninput="this.value = Math.max(0, Math.min(100, this.value))"></div>
-        <div class="input-row">V <input type="number" id="v" value="43" oninput="this.value = Math.max(0, Math.min(100, this.value))"></div>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
         
-        <input type="text" id="colorName" readonly data-i18n-placeholder="color_name">
-        <button onclick="saveColor()" style="margin-top: 5px; width: 100%;" data-i18n="save">저장하기</button>
-    </div>
+        <nav class="menu-list">
+            <div class="input-group">
+                <a class="color-label">Hex</a>
+                <input type="text" id="hex-input" class="side-input" value="#" maxlength="7">
+            </div>
+
+            <div class="menu-item">
+                <a class="color-label">RGB</a>
+                <div class="multi-input-container">
+                    <input type="text" id="r" class="small-input" placeholder="R" maxlength="3" oninput="limitRange(this, 255); syncFromRGB()">
+                    <input type="text" id="g" class="small-input" placeholder="G" maxlength="3" oninput="limitRange(this, 255); syncFromRGB()">
+                    <input type="text" id="b" class="small-input" placeholder="B" maxlength="3" oninput="limitRange(this, 255); syncFromRGB()">
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a class="color-label">CMYK</a>
+                <div class="multi-input-container">
+                    <input type="text" id="c" class="small-input" placeholder="C" maxlength="3" oninput="limitRange(this, 100); syncFromCMYK()">
+                    <input type="text" id="m" class="small-input" placeholder="M" maxlength="3" oninput="limitRange(this, 100); syncFromCMYK()">
+                    <input type="text" id="y" class="small-input" placeholder="Y" maxlength="3" oninput="limitRange(this, 100); syncFromCMYK()">
+                    <input type="text" id="k" class="small-input" placeholder="K" maxlength="3" oninput="limitRange(this, 100); syncFromCMYK()">
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a class="color-label">HSV</a>
+                <div class="multi-input-container">
+                    <input type="text" id="h" class="small-input" placeholder="H" maxlength="3" oninput="limitRange(this, 360); syncFromHSV()">
+                    <input type="text" id="s" class="small-input" placeholder="S" maxlength="3" oninput="limitRange(this, 100); syncFromHSV()">
+                    <input type="text" id="v" class="small-input" placeholder="V" maxlength="3" oninput="limitRange(this, 100); syncFromHSV()">
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a class="color-label">HSL</a>
+                <div class="multi-input-container">
+                    <input type="text" id="h_l" class="small-input" placeholder="H" maxlength="3" oninput="limitRange(this, 360); syncFromHSL()">
+                    <input type="text" id="s_l" class="small-input" placeholder="S" maxlength="3" oninput="limitRange(this, 100); syncFromHSL()">
+                    <input type="text" id="l_l" class="small-input" placeholder="L" maxlength="3" oninput="limitRange(this, 100); syncFromHSL()">
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a class="color-label">Color Name</a>
+                <input type="text" id="name-input" class="name-input-field" readonly placeholder="Name">
+            </div>
+        </nav>
+
+        <div class="bottom-btns" style="margin-top: 10px;">
+            <button id="copy-btn" class="menu-btn" onclick="copyColor()">Copy</button>
+            <button id="save-btn" class="menu-btn" onclick="saveColor()">Save the Color Swatch</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Color Picker</h1>
+            <p>You can pick any color what you want, etc.</p>
+        </header>
+        <section class="content-card" style="margin-top: 20px;">
+            <canvas id="colorField" width="500" height="500"></canvas>
+            <canvas id="hueSlider" width="50" height="500"></canvas>
+            <div id="previewBox"></div>
+        </section>
+    </main>
 </div>
 
 <script>
+    const sidebar = document.getElementById('sidebar');
+    const hexInput = document.getElementById('hex-input');
+
     const field = document.getElementById('colorField');
     const ctx = field.getContext('2d');
     const slider = document.getElementById('hueSlider');
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
-    
+
     // 색상 데이터베이스 (이곳에 색상을 추가하세요)
     const ntcColors = [
         ["000000", "black"],
@@ -2061,24 +2155,206 @@
         ["FDF5E6", "oldlace"]
     ];
 
-    const i18n = {
-        'ko': { title: '색 편집기', home: '집으로', save: '저장하기', color_name: '색상 이름' },
-        'en': { title: 'Color Picker', home: 'Go Home', save: 'Save', color_name: 'Color Name' }
-    };
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
 
-    function applyLanguage() {
-        const lang = navigator.language.startsWith('ko') ? 'ko' : 'en';
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            el.innerText = i18n[lang][el.getAttribute('data-i18n')];
-        });
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-            el.placeholder = i18n[lang][el.getAttribute('data-i18n-placeholder')];
-        });
+    // Hex 입력 제어
+    hexInput.addEventListener('input', (e) => {
+        let val = e.target.value;
+        
+        // 1. '#'을 강제로 유지하되, '#' 뒤의 문자들만 처리
+        if (!val.startsWith('#')) val = '#' + val.replace(/#/g, '');
+        
+        // 2. '#'을 제외한 나머지 부분에서 0-9, a-f, A-F를 제외한 모든 문자(한글 포함) 제거
+        let hexPart = val.substring(1).replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        
+        // 3. 다시 '#'을 붙여서 입력창 값 업데이트
+        e.target.value = '#' + hexPart.substring(0, 6);
+        
+        const copyBtn = document.getElementById('copy-btn');
+        const saveBtn = document.getElementById('save-btn');
+
+        // 6자리 완성 여부 확인
+        if (hexPart.length === 6) {
+            // 색상 적용
+            updateAll('hex', { 
+                r: parseInt(hexPart.substr(0, 2), 16), 
+                g: parseInt(hexPart.substr(2, 2), 16), 
+                b: parseInt(hexPart.substr(4, 2), 16) 
+            });
+        
+            // 버튼 활성화
+            copyBtn.disabled = false;
+            saveBtn.disabled = false;
+        } else {
+            // 버튼 비활성화
+            copyBtn.disabled = true;
+            saveBtn.disabled = true;
+        }
+    });
+
+    // --- 유기적 동기화 핵심 엔진 ---
+    function updateAll(sourceType, values) {
+        let { r, g, b } = values;
+        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        
+        let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
+        let k = Math.min(c, m, y);
+        c = Math.round(((c - k) / (1 - k) || 0) * 100);
+        m = Math.round(((m - k) / (1 - k) || 0) * 100);
+        y = Math.round(((y - k) / (1 - k) || 0) * 100);
+        k = Math.round(k * 100);
+
+        // 1. 기본값 계산
+        let max = Math.max(r, g, b);
+        let min = Math.min(r, g, b);
+        let d = max - min;
+
+        // 2. HSV 계산
+        let h = 0;
+        if (d !== 0) {
+            if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+            else if (max === g) h = (b - r) / d + 2;
+            else h = (r - g) / d + 4;
+            h *= 60;
+        }
+        // max가 0일 때 NaN 방지
+        let s = (max === 0) ? 0 : (d / max) * 100;
+        let v = (max / 255) * 100;
+
+        // 3. HSL 계산
+        let maxVal = max / 255;
+        let minVal = min / 255;
+        let l = (maxVal + minVal) / 2 * 100; 
+        let s_l = 0;
+
+        let delta = d / 255;
+        let range = (1 - Math.abs(2 * (l / 100) - 1));
+
+        // 아주 작은 값(1e-10)으로 비교하여 오차 방지
+        if (range > 1e-10) {
+            s_l = (delta / range) * 100;
+        } else {
+            s_l = 0;
+        }
+
+        if (sourceType !== 'hex') hexInput.value = hex;
+        if (sourceType !== 'rgb') {
+            document.getElementById('r').value = r; document.getElementById('g').value = g; document.getElementById('b').value = b;
+        }
+        if (sourceType !== 'cmyk') {
+            document.getElementById('c').value = c; document.getElementById('m').value = m; document.getElementById('y').value = y; document.getElementById('k').value = k;
+        }
+        if (sourceType !== 'hsv') {
+            document.getElementById('h').value = Math.round(h); document.getElementById('s').value = Math.round(s); document.getElementById('v').value = Math.round(v);
+        }
+        if (sourceType !== 'hsl') {
+            document.getElementById('h_l').value = Math.round(h); document.getElementById('s_l').value = Math.round(s_l); document.getElementById('l_l').value = Math.round(l);
+        }
+
+        document.getElementById('name-input').value = getColorName(hex);
+
+        // 캔버스 강제 갱신
+        drawField(Math.round(h), Math.round(s), Math.round(v));
+        drawHue();
+        document.getElementById('previewBox').style.backgroundColor = hex;
     }
-    
-    // 페이지 로드 시 언어 적용
-    applyLanguage();
-    
+
+    // --- 동기화 핸들러들 ---
+    hexInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace('#', '');
+        if (val.length === 6) updateAll('hex', { r: parseInt(val.substr(0,2), 16), g: parseInt(val.substr(2,2), 16), b: parseInt(val.substr(4,2), 16) });
+    });
+
+    function syncFromRGB() { updateAll('rgb', { r: parseInt(document.getElementById('r').value)||0, g: parseInt(document.getElementById('g').value)||0, b: parseInt(document.getElementById('b').value)||0 }); }
+    function syncFromCMYK() {
+        let c=(parseInt(document.getElementById('c').value)||0)/100, m=(parseInt(document.getElementById('m').value)||0)/100, y=(parseInt(document.getElementById('y').value)||0)/100, k=(parseInt(document.getElementById('k').value)||0)/100;
+        updateAll('cmyk', { r: Math.round(255*(1-c)*(1-k)), g: Math.round(255*(1-m)*(1-k)), b: Math.round(255*(1-y)*(1-k)) });
+    }
+    function syncFromHSV() {
+        let h=(parseInt(document.getElementById('h').value)||0)/360, s=(parseInt(document.getElementById('s').value)||0)/100, v=(parseInt(document.getElementById('v').value)||0)/100;
+        let i=Math.floor(h*6), f=h*6-i, p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s), r, g, b;
+        if(i%6==0){r=v;g=t;b=p}else if(i%6==1){r=q;g=v;b=p}else if(i%6==2){r=p;g=v;b=t}else if(i%6==3){r=p;g=q;b=v}else if(i%6==4){r=t;g=p;b=v}else{r=v;g=p;b=q}
+        updateAll('hsv', { r: Math.round(r*255), g: Math.round(g*255), b: Math.round(b*255) });
+    }
+    function syncFromHSL() {
+        let h=(parseInt(document.getElementById('h_l').value)||0)/360, s=(parseInt(document.getElementById('s_l').value)||0)/100, l=(parseInt(document.getElementById('l_l').value)||0)/100;
+        let r, g, b;
+        if(s==0) r=g=b=l;
+        else {
+            let q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+            const t2rgb = (p,q,t) => { if(t<0)t+=1; if(t>1)t-=1; if(t<1/6)return p+(q-p)*6*t; if(t<1/2)return q; if(t<2/3)return p+(q-p)*(2/3-t)*6; return p; };
+            r=t2rgb(p,q,h+1/3); g=t2rgb(p,q,h); b=t2rgb(p,q,h-1/3);
+        }
+        updateAll('hsl', { r: Math.round(r*255), g: Math.round(g*255), b: Math.round(b*255) });
+    }
+
+    // 숫자 범위 제한 함수
+    function limitRange(input, max) {
+        let value = input.value.replace(/[^0-9]/g, '');
+        if (value !== '') {
+            let num = parseInt(value);
+            if (num > max) num = max;
+            input.value = num;
+        } else {
+            input.value = '';
+        }
+    }
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+    });
+
+    function drawHue() {
+        sCtx.clearRect(0, 0, 50, 500);
+        let grad = sCtx.createLinearGradient(0, 0, 0, 500);
+        for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
+        sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 50, 500);
+        sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
+        sCtx.beginPath(); sCtx.arc(25, hueY, 20, 0, Math.PI * 2); sCtx.stroke();
+    }
+
+    function drawField(h, s, v) {
+        ctx.fillStyle = `hsl(${h}, 100%, 50%)`;
+        ctx.fillRect(0, 0, 500, 500);
+        let gradW = ctx.createLinearGradient(0, 0, 500, 0); gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradW; ctx.fillRect(0, 0, 500, 500);
+        let gradB = ctx.createLinearGradient(0, 0, 0, 500); gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
+        ctx.fillStyle = gradB; ctx.fillRect(0, 0, 500, 500);
+        let px = (s / 100) * 499, py = (1 - (v / 100)) * 499;
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(px, py, 20, 0, Math.PI * 2); ctx.stroke();
+    }
+
+    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
+    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingField) updateFromField(e);
+        else if (isDraggingSlider) updateFromSlider(e);
+    });
+    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
+
+// 이벤트 핸들러에서 호출하는 함수 수정
+function updateFromField(e) {
+    const rect = field.getBoundingClientRect();
+    let x = Math.max(0, Math.min(e.clientX - rect.left, 499));
+    let y = Math.max(0, Math.min(e.clientY - rect.top, 499));
+    let h = (hueY / 499) * 360;
+    let s = (x / 499) * 100;
+    let v = (1 - (y / 499)) * 100;
+    let rgb = hsvToRgb(h, s, v);
+    // syncAll 대신 기존에 잘 작성된 updateAll 사용
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
+}
+
+function updateFromSlider(e) {
+    const rect = slider.getBoundingClientRect();
+    hueY = Math.max(0, Math.min(e.clientY - rect.top, 499));
+    let h = (hueY / 499) * 360;
+    let s = parseInt(document.getElementById('s').value) || 0;
+    let v = parseInt(document.getElementById('v').value) || 0;
+    let rgb = hsvToRgb(h, s, v);
+    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+}
+
     function getColorName(hex) {
         hex = hex.replace('#', '');
         let r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
@@ -2092,134 +2368,58 @@
     }
 
     let hueY = 0, isDraggingField = false, isDraggingSlider = false;
-
-    function rgbToHsv(r, g, b) {
-        r /= 255; g /= 255; b /= 255;
-        let max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min, h, s = (max === 0 ? 0 : d / max), v = max;
-        if (max === min) h = 0; else {
-            switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
-            }
-            h /= 6;
-        }
-        return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
-    }
-
     function hsvToRgb(h, s, v) {
-        h /= 360; s /= 100; v /= 100;
-        let i = Math.floor(h * 6), f = h * 6 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-        let r, g, b;
-        switch (i % 6) {
-            case 0: r = v, g = t, b = p; break;
-            case 1: r = q, g = v, b = p; break;
-            case 2: r = p, g = v, b = t; break;
-            case 3: r = p, g = q, b = v; break;
-            case 4: r = t, g = p, b = v; break;
-            case 5: r = v, g = p, b = q; break;
-        }
+        s /= 100; v /= 100;
+        let i = Math.floor(h / 60), f = h / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s), r, g, b;
+        if (i % 6 == 0) { r = v; g = t; b = p; }
+        else if (i % 6 == 1) { r = q; g = v; b = p; }
+        else if (i % 6 == 2) { r = p; g = v; b = t; }
+        else if (i % 6 == 3) { r = p; g = q; b = v; }
+        else if (i % 6 == 4) { r = t; g = p; b = v; }
+        else { r = v; g = p; b = q; }
         return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     }
 
-    function syncAll(r, g, b, h, s, v) {
-        document.getElementById('r').value = Math.round(r);
-        document.getElementById('g').value = Math.round(g);
-        document.getElementById('b').value = Math.round(b);
-        document.getElementById('h').value = Math.round(h);
-        document.getElementById('s').value = Math.round(s);
-        document.getElementById('v').value = Math.round(v);
-        let hex = '#' + ((1<<24)+(Math.round(r)<<16)+(Math.round(g)<<8)+Math.round(b)).toString(16).slice(1).toUpperCase();
-        document.getElementById('hex').value = hex;
-        preview.style.backgroundColor = hex;
-        document.getElementById('colorName').value = getColorName(hex);
-        hueY = (h / 360) * 299;
-        drawHue(); drawField(h, s, v);
-    }
 
-    function drawHue() {
-        sCtx.clearRect(0, 0, 30, 300);
-        let grad = sCtx.createLinearGradient(0, 0, 0, 300);
-        for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
-        sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 30, 300);
-        sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
-        sCtx.beginPath(); sCtx.arc(15, hueY, 8, 0, Math.PI * 2); sCtx.stroke();
-    }
+function copyColor() {
+        // 각 입력 필드에서 값을 가져옵니다.
+        const hex = document.getElementById('hex-input').value;
+        const r = document.getElementById('r').value;
+        const g = document.getElementById('g').value;
+        const b = document.getElementById('b').value;
+        const c = document.getElementById('c').value;
+        const m = document.getElementById('m').value;
+        const y = document.getElementById('y').value;
+        const k = document.getElementById('k').value;
+        const h = document.getElementById('h').value;
+        const s = document.getElementById('s').value;
+        const v = document.getElementById('v').value;
+        const h_l = document.getElementById('h_l').value;
+        const s_l = document.getElementById('s_l').value;
+        const l_l = document.getElementById('l_l').value;
+        const name = document.getElementById('name-input').value;
 
-    function drawField(h, s, v) {
-        ctx.fillStyle = `hsl(${h}, 100%, 50%)`;
-        ctx.fillRect(0, 0, 300, 300);
-        let gradW = ctx.createLinearGradient(0, 0, 300, 0); gradW.addColorStop(0, '#fff'); gradW.addColorStop(1, 'transparent');
-        ctx.fillStyle = gradW; ctx.fillRect(0, 0, 300, 300);
-        let gradB = ctx.createLinearGradient(0, 0, 0, 300); gradB.addColorStop(0, 'transparent'); gradB.addColorStop(1, '#000');
-        ctx.fillStyle = gradB; ctx.fillRect(0, 0, 300, 300);
-        let px = (s / 100) * 299, py = (1 - (v / 100)) * 299;
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.stroke();
-    }
+        // 복사할 문자열 형식 구성
+        const copyText =
+`Color Name: ${name}
+HEX: ${hex}
+RGB: (${r}, ${g}, ${b})
+CMYK: (${c}%, ${m}%, ${y}%, ${k}%)
+HSV: (${h}°, ${s}%, ${v}%)
+HSL: (${h_l}°, ${s_l}%, ${l_l}%)`;
 
-    ['r', 'g', 'b'].forEach(id => document.getElementById(id).addEventListener('input', () => {
-        let r=parseInt(document.getElementById('r').value)||0, g=parseInt(document.getElementById('g').value)||0, b=parseInt(document.getElementById('b').value)||0;
-        let hsv = rgbToHsv(r, g, b); syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
-    }));
-
-    ['h', 's', 'v'].forEach(id => document.getElementById(id).addEventListener('input', () => {
-        let h=parseInt(document.getElementById('h').value)||0, s=parseInt(document.getElementById('s').value)||0, v=parseInt(document.getElementById('v').value)||0;
-        let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
-    }));
-
-    document.getElementById('hex').addEventListener('input', (e) => {
-        // 1. #을 강제로 앞에 붙임
-        if (!e.target.value.startsWith('#')) {
-            e.target.value = '#' + e.target.value.replace(/#/g, '');
-        }
-    
-        // 2. #을 제외한 입력값에서 16진수 문자(0-9, a-f, A-F)만 남기고 나머지 제거
-        let hexContent = e.target.value.substring(1).replace(/[^0-9a-fA-F]/g, '');
-    
-        // 3. 6글자까지만 제한
-        if (hexContent.length > 6) {
-            hexContent = hexContent.substring(0, 6);
-        }
-    
-        // 4. 입력 필드 업데이트
-        e.target.value = '#' + hexContent;
-    
-        // 5. 6글자가 다 찼을 때만 색상 동기화
-        if (hexContent.length === 6) {
-            let r = parseInt(hexContent.substr(0, 2), 16);
-            let g = parseInt(hexContent.substr(2, 2), 16);
-            let b = parseInt(hexContent.substr(4, 2), 16);
-            let hsv = rgbToHsv(r, g, b);
-            syncAll(r, g, b, hsv.h, hsv.s, hsv.v);
-        }
-    });
-
-    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
-    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
-    window.addEventListener('mousemove', (e) => {
-        if (isDraggingField) updateFromField(e);
-        else if (isDraggingSlider) updateFromSlider(e);
-    });
-    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
-
-    function updateFromField(e) {
-        const rect = field.getBoundingClientRect();
-        let x = Math.max(0, Math.min(e.clientX - rect.left, 299)), y = Math.max(0, Math.min(e.clientY - rect.top, 299));
-        let h = (hueY / 299) * 360, s = (x / 299) * 100, v = (1 - (y / 299)) * 100;
-        let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
-    }
-
-    function updateFromSlider(e) {
-        const rect = slider.getBoundingClientRect();
-        hueY = Math.max(0, Math.min(e.clientY - rect.top, 299));
-        let h = (hueY / 299) * 360, s = parseInt(document.getElementById('s').value), v = parseInt(document.getElementById('v').value);
-        let rgb = hsvToRgb(h, s, v); syncAll(rgb.r, rgb.g, rgb.b, h, s, v);
+        // 클립보드에 복사
+        navigator.clipboard.writeText(copyText).then(() => {
+            alert("Color information has been copied to the clipboard!\n\n" + copyText);
+        }).catch(err => {
+            console.error('Copy failed:', err);
+            alert("Failed to copy.");
+        });
     }
 
     function saveColor() {
-        const hex = document.getElementById('hex').value;
-        const name = document.getElementById('colorName').value;
+        const hex = document.getElementById('hex-input').value;
+        const name = document.getElementById('name-input').value;
         const filename = `${name}(${hex}).png`;
     
         // 1. 임시 캔버스 생성 (500x700)
@@ -2268,12 +2468,10 @@
         link.click();
     }
 
-    syncAll(110, 40, 40, 0, 64, 43);
+    hue = 0; sat = 100; val = 100; hueY = 0;
+    drawField(hue, sat, val);
+    drawHue();
+    updateAll('init', { r: 255, g: 0, b: 0 });
 </script>
 </body>
 </html>
-
-<!-- 좌측 넓은 사각형 영역 (Color Field / Saturation-Brightness Box): 선택한 색조(Hue) 내에서 채도(Saturation)와 명도(Brightness)를 조절하는 영역입니다. 가로축으로는 채도, 세로축으로는 명도를 선택할 수 있습니다.
-      중앙 얇은 직사각형 영역 (Color Preview): 현재 선택된 최종 색상을 미리 보여주는 색상 미리보기(Color Preview) 영역입니다.
-      우측 세로형 막대 영역 (Hue Slider): 색상환에서 기본이 되는 색조(Hue)를 선택하는 슬라이더입니다. 여기서 색조를 바꾸면 좌측 사각형 영역의 색상 구성이 변하게 됩니다.
-      https://cdn.jsdelivr.net/npm/color-namer@1.4.0/dist/ -->
