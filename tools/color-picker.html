@@ -144,15 +144,6 @@
 </div>
 
 <script>
-    const sidebar = document.getElementById('sidebar');
-    const hexInput = document.getElementById('hex-input');
-
-    const field = document.getElementById('colorField');
-    const ctx = field.getContext('2d');
-    const slider = document.getElementById('hueSlider');
-    const sCtx = slider.getContext('2d');
-    const preview = document.getElementById('previewBox');
-
     // 색상 데이터베이스 (이곳에 색상을 추가하세요)
     const ntcColors = [
         ["000000", "black"],
@@ -2161,6 +2152,15 @@
         ["B0C4DE", "lightsteelblue"],
         ["FDF5E6", "oldlace"]
     ];
+
+    const sidebar = document.getElementById('sidebar');
+    const hexInput = document.getElementById('hex-input');
+
+    const field = document.getElementById('colorField');
+    const ctx = field.getContext('2d');
+    const slider = document.getElementById('hueSlider');
+    const sCtx = slider.getContext('2d');
+    const preview = document.getElementById('previewBox');
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
