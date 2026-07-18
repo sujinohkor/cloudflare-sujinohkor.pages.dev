@@ -2311,12 +2311,34 @@
     });
 
     function drawHue() {
-        sCtx.clearRect(0, 0, 50, 500);
-        let grad = sCtx.createLinearGradient(0, 0, 0, 500);
+        const isMobile = window.innerWidth <= 600;
+        const width = isMobile ? 300 : 50;
+        const height = isMobile ? 30 : 500;
+        
+        slider.width = width;
+        slider.height = height;
+        sCtx.clearRect(0, 0, width, height);
+        
+        // 가로/세로 방향에 따른 그라데이션 설정
+        let grad = isMobile ? 
+            sCtx.createLinearGradient(0, 0, width, 0) : 
+            sCtx.createLinearGradient(0, 0, 0, height);
+            
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
-        sCtx.fillStyle = grad; sCtx.fillRect(0, 0, 50, 500);
-        sCtx.strokeStyle = '#fff'; sCtx.lineWidth = 2;
-        sCtx.beginPath(); sCtx.arc(25, hueY, 20, 0, Math.PI * 2); sCtx.stroke();
+        sCtx.fillStyle = grad; 
+        sCtx.fillRect(0, 0, width, height);
+        
+        sCtx.strokeStyle = '#fff'; 
+        sCtx.lineWidth = 2;
+        sCtx.beginPath();
+        // 모바일이면 가로 좌표(hueX), PC면 세로 좌표(hueY) 사용
+        if (isMobile) {
+            let hueX = (hueY / 500) * width; // 기존 hueY 값을 가로 비율로 변환
+            sCtx.arc(hueX, height/2, 10, 0, Math.PI * 2);
+        } else {
+            sCtx.arc(width/2, hueY, 20, 0, Math.PI * 2);
+        }
+        sCtx.stroke();
     }
 
     function drawField(h, s, v) {
