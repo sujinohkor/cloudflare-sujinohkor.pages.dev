@@ -2378,15 +2378,15 @@
         ctx.beginPath(); ctx.arc(px, py, 20, 0, Math.PI * 2); ctx.stroke();
     }
 
-    //field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
-    //slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
-    //window.addEventListener('mousemove', (e) => {
-    //    if (isDraggingField) updateFromField(e);
-    //    else if (isDraggingSlider) updateFromSlider(e);
-    //});
-    //window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
+    field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
+    slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingField) updateFromField(e);
+        else if (isDraggingSlider) updateFromSlider(e);
+    });
+    window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
 
-    // 필드 터치/클릭 이벤트
+    /*// 필드 터치/클릭 이벤트
     field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
     field.addEventListener('touchstart', (e) => { isDraggingField = true; updateFromField(e); e.preventDefault(); }, {passive: false});
     
@@ -2406,7 +2406,7 @@
     
     // 드래그 종료
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
-    window.addEventListener('touchend', () => { isDraggingField = false; isDraggingSlider = false; });
+    window.addEventListener('touchend', () => { isDraggingField = false; isDraggingSlider = false; });*/
 
     
 // 이벤트 핸들러에서 호출하는 함수 수정
