@@ -2155,12 +2155,15 @@
 
     const sidebar = document.getElementById('sidebar');
     const hexInput = document.getElementById('hex-input');
-
     const field = document.getElementById('colorField');
     const ctx = field.getContext('2d');
     const slider = document.getElementById('hueSlider');
     const sCtx = slider.getContext('2d');
     const preview = document.getElementById('previewBox');
+
+    let currentH = 0, currentS = 100, currentV = 100;
+    let isDraggingField = false, isDraggingSlider = false;
+    let hue = 0; sat = 100; val = 100; hueY = 0;
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
@@ -2199,17 +2202,16 @@
         }
     });
 
-    // 1. 전역으로 관리
-    let currentH = 0, currentS = 100, currentV = 100;
-    let isDraggingField = false, isDraggingSlider = false;
-    
     function updateAll(sourceType, values) {
-        // 1. 상태 갱신 (HSV가 기준이 됨)
-        if (sourceType === 'hsv') {
-            if (values.h !== undefined) hue = values.h;
-            if (values.s !== undefined) sat = values.s;
-            if (values.v !== undefined) val = values.v;
-        }
+    // 1. 전역 상태 갱신 (HEX나 RGB가 들어올 경우 HSV로 변환 후 전역변수 업데이트)
+    if (sourceType === 'hex' || sourceType === 'rgb') {
+        let hsv = rgbToHsv(values.r, values.g, values.b);
+        hue = hsv.h; sat = hsv.s; val = hsv.v;
+    } else if (sourceType === 'hsv') {
+        if (values.h !== undefined) hue = values.h;
+        if (values.s !== undefined) sat = values.s;
+        if (values.v !== undefined) val = values.v;
+    }
     
         // 2. HSV -> RGB 변환
         let rgb = hsvToRgb(hue, sat, val);
@@ -2259,11 +2261,6 @@
         drawHue();
     }
     // --- 동기화 핸들러들 ---
-    hexInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace('#', '');
-        if (val.length === 6) updateAll('hex', { r: parseInt(val.substr(0,2), 16), g: parseInt(val.substr(2,2), 16), b: parseInt(val.substr(4,2), 16) });
-    });
-    
     function syncFromRGB() { updateAll('rgb', { r: parseInt(document.getElementById('r').value)||0, g: parseInt(document.getElementById('g').value)||0, b: parseInt(document.getElementById('b').value)||0 }); }
     function syncFromCMYK() {
         let c=(parseInt(document.getElementById('c').value)||0)/100, m=(parseInt(document.getElementById('m').value)||0)/100, y=(parseInt(document.getElementById('y').value)||0)/100, k=(parseInt(document.getElementById('k').value)||0)/100;
@@ -2287,6 +2284,10 @@
         updateAll('hsl', { r: Math.round(r*255), g: Math.round(g*255), b: Math.round(b*255) });
     }
     
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+    });
+    
     // 숫자 범위 제한 함수
     function limitRange(input, max) {
         let value = input.value.replace(/[^0-9]/g, '');
@@ -2298,10 +2299,7 @@
             input.value = '';
         }
     }
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-    });
-    
+
     function drawHue() {
         const isMobile = window.innerWidth <= 600;
         const width = isMobile ? 350 : 50;
@@ -2358,8 +2356,10 @@
 
     field.addEventListener('mousedown', (e) => { isDraggingField = true; updateFromField(e); });
     field.addEventListener('touchstart', (e) => { isDraggingField = true; updateFromField(e.touches[0]); e.preventDefault(); }, {passive: false});
+
     slider.addEventListener('mousedown', (e) => { isDraggingSlider = true; updateFromSlider(e); });
     slider.addEventListener('touchstart', (e) => { isDraggingSlider = true; updateFromSlider(e.touches[0]); e.preventDefault(); }, {passive: false});
+
     window.addEventListener('mousemove', (e) => {
         if (isDraggingField) updateFromField(e);
         else if (isDraggingSlider) updateFromSlider(e);
@@ -2369,6 +2369,7 @@
         else if (isDraggingSlider) updateFromSlider(e.touches[0]);
         e.preventDefault();
     }, {passive: false});
+
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
     window.addEventListener('touchend', () => { isDraggingField = false; isDraggingSlider = false; });
 
@@ -2423,7 +2424,6 @@
         return name;
     }
 
-    let hueY = 0;
     function hsvToRgb(h, s, v) {
         s /= 100; v /= 100;
         let i = Math.floor(h / 60), f = h / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s), r, g, b;
@@ -2524,10 +2524,25 @@ HSL: (${h_l}°, ${s_l}%, ${l_l}%)`;
         link.click();
     }
 
-    hue = 0; sat = 100; val = 100; hueY = 0;
     drawField(hue, sat, val);
     drawHue();
     updateAll('init', { r: 255, g: 0, b: 0 });
+
+function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    let max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, v = max;
+    let d = max - min;
+    s = max === 0 ? 0 : d / max;
+    if (max === min) h = 0;
+    else {
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else if (max === b) h = (r - g) / d + 4;
+        h /= 6;
+    }
+    return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+}
 </script>
 </body>
 </html>
