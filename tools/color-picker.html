@@ -2199,92 +2199,71 @@
         }
     });
 
-// --- 유기적 동기화 핵심 엔진 ---
-function updateAll(sourceType, values) {
-    let { r, g, b } = values;
+    // 1. 전역으로 관리
+    let currentH = 0, currentS = 100, currentV = 100;
+    let isDraggingField = false, isDraggingSlider = false;
     
-    // 1. HEX 계산
-    const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    function updateAll(sourceType, values) {
+        // 1. 상태 갱신 (HSV가 기준이 됨)
+        if (sourceType === 'hsv') {
+            if (values.h !== undefined) hue = values.h;
+            if (values.s !== undefined) sat = values.s;
+            if (values.v !== undefined) val = values.v;
+        }
     
-    // 2. CMYK 계산
-    let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
-    let k = Math.min(c, m, y);
-    c = Math.round(((c - k) / (1 - k) || 0) * 100);
-    m = Math.round(((m - k) / (1 - k) || 0) * 100);
-    y = Math.round(((y - k) / (1 - k) || 0) * 100);
-    k = Math.round(k * 100);
-
-    // 3. HSV 계산
-    let max = Math.max(r, g, b);
-    let min = Math.min(r, g, b);
-    let d = max - min;
-    let h = 0;
-    if (d !== 0) {
-        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-        else if (max === g) h = (b - r) / d + 2;
-        else h = (r - g) / d + 4;
-        h *= 60;
-    }
-    let s = (max === 0) ? 0 : (d / max) * 100;
-    let v = (max / 255) * 100;
-
-    // 4. HSL 계산
-    let maxVal = max / 255;
-    let minVal = min / 255;
-    let l = (maxVal + minVal) / 2 * 100; 
-    let s_l = 0;
-    let delta = d / 255;
-    let range = (1 - Math.abs(2 * (l / 100) - 1));
-    if (range > 1e-10) {
-        s_l = (delta / range) * 100;
-    }
-
-    // 5. 모든 입력창 업데이트
-    // hexInput은 사용자가 직접 타이핑 중일 때 값이 꼬이는 것을 방지
-    if (sourceType !== 'hex') hexInput.value = hex;
+        // 2. HSV -> RGB 변환
+        let rgb = hsvToRgb(hue, sat, val);
+        let r = rgb.r, g = rgb.g, b = rgb.b;
+        
+        // 3. HEX 계산
+        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        
+        // 4. CMYK 계산
+        let c = 1 - (r / 255), m = 1 - (g / 255), y = 1 - (b / 255);
+        let k = Math.min(c, m, y);
+        c = Math.round(((c - k) / (1 - k) || 0) * 100);
+        m = Math.round(((m - k) / (1 - k) || 0) * 100);
+        y = Math.round(((y - k) / (1 - k) || 0) * 100);
+        k = Math.round(k * 100);
     
-    // RGB
-    if (sourceType !== 'rgb') {
+        // 5. HSL 계산
+        let maxVal = Math.max(r,g,b)/255, minVal = Math.min(r,g,b)/255;
+        let l = (maxVal + minVal) / 2 * 100;
+        let s_l = 0;
+        if (maxVal !== minVal) {
+            s_l = (l > 50) ? (maxVal - minVal) / (2 - maxVal - minVal) : (maxVal - minVal) / (maxVal + minVal);
+        }
+        s_l = Math.round(s_l * 100);
+    
+        // 6. UI 업데이트
+        if (sourceType !== 'hex') hexInput.value = hex;
         document.getElementById('r').value = r;
         document.getElementById('g').value = g;
         document.getElementById('b').value = b;
-    }
-    
-    // CMYK
-    if (sourceType !== 'cmyk') {
         document.getElementById('c').value = c;
         document.getElementById('m').value = m;
         document.getElementById('y').value = y;
         document.getElementById('k').value = k;
-    }
-    
-    // HSV (이제 sourceType이 무엇이든 항상 값을 갱신합니다)
-    document.getElementById('h').value = Math.round(h);
-    document.getElementById('s').value = Math.round(s);
-    document.getElementById('v').value = Math.round(v);
-    
-    // HSL
-    if (sourceType !== 'hsl') {
-        document.getElementById('h_l').value = Math.round(h);
-        document.getElementById('s_l').value = Math.round(s_l);
+        document.getElementById('h').value = Math.round(hue);
+        document.getElementById('s').value = Math.round(sat);
+        document.getElementById('v').value = Math.round(val);
+        document.getElementById('h_l').value = Math.round(hue);
+        document.getElementById('s_l').value = s_l;
         document.getElementById('l_l').value = Math.round(l);
+        
+        document.getElementById('name-input').value = getColorName(hex);
+        document.getElementById('previewBox').style.backgroundColor = hex;
+    
+        // 7. 캔버스 갱신 (직접 전역 상태 사용)
+        drawField(Math.round(hue), Math.round(sat), Math.round(val));
+        drawHue();
     }
-
-    // 6. 기타 UI 업데이트
-    document.getElementById('name-input').value = getColorName(hex);
-    document.getElementById('previewBox').style.backgroundColor = hex;
-
-    // 7. 캔버스 갱신
-    drawField(Math.round(h), Math.round(s), Math.round(v));
-    drawHue();
-}
-
     // --- 동기화 핸들러들 ---
     hexInput.addEventListener('input', (e) => {
         let val = e.target.value.replace('#', '');
         if (val.length === 6) updateAll('hex', { r: parseInt(val.substr(0,2), 16), g: parseInt(val.substr(2,2), 16), b: parseInt(val.substr(4,2), 16) });
     });
-
+    
     function syncFromRGB() { updateAll('rgb', { r: parseInt(document.getElementById('r').value)||0, g: parseInt(document.getElementById('g').value)||0, b: parseInt(document.getElementById('b').value)||0 }); }
     function syncFromCMYK() {
         let c=(parseInt(document.getElementById('c').value)||0)/100, m=(parseInt(document.getElementById('m').value)||0)/100, y=(parseInt(document.getElementById('y').value)||0)/100, k=(parseInt(document.getElementById('k').value)||0)/100;
@@ -2307,7 +2286,7 @@ function updateAll(sourceType, values) {
         }
         updateAll('hsl', { r: Math.round(r*255), g: Math.round(g*255), b: Math.round(b*255) });
     }
-
+    
     // 숫자 범위 제한 함수
     function limitRange(input, max) {
         let value = input.value.replace(/[^0-9]/g, '');
@@ -2322,7 +2301,7 @@ function updateAll(sourceType, values) {
     document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
     });
-
+    
     function drawHue() {
         const isMobile = window.innerWidth <= 600;
         const width = isMobile ? 350 : 50;
@@ -2332,26 +2311,37 @@ function updateAll(sourceType, values) {
         slider.height = height;
         sCtx.clearRect(0, 0, width, height);
         
-        // 가로/세로 방향에 따른 그라데이션 설정
+        // 1. 그라데이션 설정
         let grad = isMobile ? 
             sCtx.createLinearGradient(0, 0, width, 0) : 
             sCtx.createLinearGradient(0, 0, 0, height);
-            
+                
         for(let i=0; i<=6; i++) grad.addColorStop(i/6, `hsl(${i*60}, 100%, 50%)`);
         sCtx.fillStyle = grad; 
         sCtx.fillRect(0, 0, width, height);
         
-        sCtx.strokeStyle = '#fff'; 
-        sCtx.lineWidth = 2;
-        sCtx.beginPath();
-        // 모바일이면 가로 좌표(hueX), PC면 세로 좌표(hueY) 사용
+        // 2. 현재 전역 hue 값을 기반으로 핸들(원) 위치 계산
+        // 0~360도의 hue 값을 캔버스 크기에 비례하는 좌표로 변환
+        let x = 0, y = 0;
         if (isMobile) {
-            let hueX = (hueY / 500) * width; // 기존 hueY 값을 가로 비율로 변환
-            sCtx.arc(hueX, height/2, height/2 - 2, 0, Math.PI*2);
+            x = (hue / 360) * width;
+            y = height / 2;
         } else {
-            sCtx.arc(width/2, hueY, 20, 0, Math.PI * 2);
+            x = width / 2;
+            y = (hue / 360) * height;
         }
+        
+        // 3. 핸들 그리기
+        sCtx.strokeStyle = '#fff'; 
+        sCtx.lineWidth = 3;
+        sCtx.beginPath();
+        // 모바일에서는 원의 크기를 약간 작게 조절 (높이가 30px이므로)
+        let radius = isMobile ? (height / 2 - 4) : 20;
+        sCtx.arc(x, y, radius, 0, Math.PI * 2);
         sCtx.stroke();
+        
+        // 참고: hueY 전역 변수를 사용하는 로직이 있다면 여기서 동기화
+        // hueY = y; // 만약 다른 곳에서 hueY를 사용 중이라면 추가
     }
 
     function drawField(h, s, v) {
@@ -2382,49 +2372,44 @@ function updateAll(sourceType, values) {
     window.addEventListener('mouseup', () => { isDraggingField = false; isDraggingSlider = false; });
     window.addEventListener('touchend', () => { isDraggingField = false; isDraggingSlider = false; });
 
-// 이벤트 핸들러에서 호출하는 함수 수정
-function updateFromField(e) {
-    const rect = field.getBoundingClientRect();
-    // 요소의 가로/세로 길이를 정확히 계산
-    const scaleX = field.width / rect.width;
-    const scaleY = field.height / rect.height;
-    
-    // 상대 좌표를 내부 캔버스 해상도에 맞게 보정
-    let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
-    let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
-    
-    let h = (hueY / (slider.height - 1)) * 360; // 슬라이더 높이 기준 수정
-    let s = (x / (field.width - 1)) * 100;
-    let v = (1 - (y / (field.height - 1))) * 100;
-    
-    let rgb = hsvToRgb(h, s, v);
-    // syncAll 대신 기존에 잘 작성된 updateAll 사용
-    updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b }); 
-}
-
-function updateFromSlider(e) {
-    const rect = slider.getBoundingClientRect();
-    const isMobile = window.innerWidth <= 600;
-    
-    if (isMobile) {
-        // 모바일: 가로 기준 계산
-        let hueX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        hueY = (hueX / rect.width) * 500; // drawHue와의 호환성을 위해 비율 유지
-        let h = (hueX / rect.width) * 360;
-        let s = parseInt(document.getElementById('s').value) || 0;
-        let v = parseInt(document.getElementById('v').value) || 0;
-        let rgb = hsvToRgb(h, s, v);
-        updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
-    } else {
-        // PC: 세로 기준 계산
-        hueY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-        let h = (hueY / rect.height) * 360;
-        let s = parseInt(document.getElementById('s').value) || 0;
-        let v = parseInt(document.getElementById('v').value) || 0;
-        let rgb = hsvToRgb(h, s, v);
-        updateAll('hsv', { r: rgb.r, g: rgb.g, b: rgb.b });
+    // 이벤트 핸들러에서 호출하는 함수 수정
+    function updateFromField(e) {
+        const rect = field.getBoundingClientRect();
+        // 캔버스 실제 크기 대비 마우스 상대 좌표 계산
+        const scaleX = field.width / rect.width;
+        const scaleY = field.height / rect.height;
+        
+        let x = Math.max(0, Math.min((e.clientX - rect.left) * scaleX, field.width - 1));
+        let y = Math.max(0, Math.min((e.clientY - rect.top) * scaleY, field.height - 1));
+        
+        // Saturation(S)과 Value(V)만 갱신 (Hue는 전역값 그대로)
+        let s = (x / (field.width - 1)) * 100;
+        let v = (1 - (y / (field.height - 1))) * 100;
+        
+        updateAll('hsv', { h: hue, s: s, v: v }); 
     }
-}
+    
+    function updateFromSlider(e) {
+        const rect = slider.getBoundingClientRect();
+        const isMobile = window.innerWidth <= 600;
+        
+        let h;
+        if (isMobile) {
+            let x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            h = (x / rect.width) * 360;
+            hueY = (h / 360) * 500; // hueY를 강제 업데이트
+        } else {
+            let y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+            hueY = y; // 슬라이더 세로 위치 저장
+            h = (hueY / rect.height) * 360;
+        }
+        
+        let s = parseInt(document.getElementById('s').value) || 0;
+        let v = parseInt(document.getElementById('v').value) || 0;
+        
+        // 이제 updateAll을 호출하면 여기서 hue가 갱신됩니다.
+        updateAll('hsv', { h: h, s: s, v: v });
+    }
 
     function getColorName(hex) {
         hex = hex.replace('#', '');
@@ -2438,7 +2423,7 @@ function updateFromSlider(e) {
         return name;
     }
 
-    let hueY = 0, isDraggingField = false, isDraggingSlider = false;
+    let hueY = 0;
     function hsvToRgb(h, s, v) {
         s /= 100; v /= 100;
         let i = Math.floor(h / 60), f = h / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s), r, g, b;
@@ -2452,7 +2437,7 @@ function updateFromSlider(e) {
     }
 
 
-function copyColor() {
+    function copyColor() {
         // 각 입력 필드에서 값을 가져옵니다.
         const hex = document.getElementById('hex-input').value;
         const r = document.getElementById('r').value;
