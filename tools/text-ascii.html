@@ -113,6 +113,9 @@
     figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => document.body.classList.toggle('light-mode'));
+    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
     textInput.addEventListener('input', () => {
         const text = textInput.value;
