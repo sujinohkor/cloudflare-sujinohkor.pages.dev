@@ -2168,6 +2168,8 @@
     let hue = 0, sat = 100, val = 100, hueY = 0;
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
+    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
     // Hex 입력 제어
     hexInput.addEventListener('input', (e) => {
