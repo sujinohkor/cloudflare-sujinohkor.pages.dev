@@ -138,6 +138,7 @@
     const fileSelector = document.getElementById('file-selector');
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); } );
     // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
@@ -170,10 +171,6 @@
         document.getElementById('byte-count').innerText = bytes;
 
         generateHashes(text);
-    });
-
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
     });
 
     // 해시 연산 함수 (호출 시 텍스트나 WordArray 객체를 인자로 받음)
