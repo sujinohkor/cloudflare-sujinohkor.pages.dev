@@ -131,7 +131,7 @@ function generateAscii() {
     const text = textInput.value;
     if (!text.trim()) { alert("Please enter text."); return; }
     if (/[^\x00-\x7F]/.test(text)) {
-        asciiOutput.value = "Unicode not supported";
+        if (!asciiOutput.value) return alert('Unicode not supported.');
         return;
     }
 
