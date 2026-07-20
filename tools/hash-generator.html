@@ -181,11 +181,21 @@
             const md5Hash = CryptoJS.MD5(targetData).toString();
             const sha1Hash = CryptoJS.SHA1(targetData).toString();
             const sha256Hash = CryptoJS.SHA256(targetData).toString();
-    
+            const sha224Hash = CryptoJS.SHA224(targetData).toString();
+            const sha512Hash = CryptoJS.SHA512(targetData).toString();
+            const sha384Hash = CryptoJS.SHA384(targetData).toString();
+            const sha3Hash = CryptoJS.SHA3(targetData).toString();
+            const ripemd160Hash = CryptoJS.RIPEMD160(targetData).toString();
+            
             hashOutput.value = [
                 `MD5: ${md5Hash}\n`,
                 `SHA-1: ${sha1Hash}\n`,
-                `SHA-256: ${sha256Hash}`
+                `SHA-256: ${sha256Hash}\n`,
+                `SHA-224: ${sha224Hash}\n`,
+                `SHA-512: ${sha512Hash}\n`,
+                `SHA-384: ${sha384Hash}\n`,
+                `SHA-3: ${sha3Hash}\n`,
+                `RIPEMD-160: ${ripemd160Hash}`
             ].join('\n');
     
         } catch (error) {
