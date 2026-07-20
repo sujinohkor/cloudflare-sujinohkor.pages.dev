@@ -113,9 +113,9 @@
     figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => document.body.classList.toggle('light-mode'));
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode') } );
     // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } } );
 
     textInput.addEventListener('input', () => {
         const text = textInput.value;
@@ -127,10 +127,6 @@
         let bytes = 0;
         for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
         document.getElementById('byte-count').innerText = bytes;
-    });
-
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
     });
 
 function generateAscii() {
