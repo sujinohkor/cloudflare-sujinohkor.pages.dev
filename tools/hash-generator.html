@@ -38,25 +38,13 @@
 
         .content-top { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         
-        /* content-mid: 상하 정렬 스타일 및 파일 업로드 상태 디자인 추가 */
+        /* content-mid: 여백(padding)과 폰트 스타일을 textarea와 동일하게 맞춤 */
         .content-mid { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; 
             padding: 20px; color: #888; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem;
-            cursor: pointer; transition: all 0.3s ease; user-select: none;
-            flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
+            cursor: pointer; transition: all 0.3s ease; user-select: none; 
         }
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1 ); border-style: dashed; color: #ff9e40; }
-        
-        .content-mid.has-file {
-            background-color: rgba(255, 158, 64, 0.05);
-            color: #ff9e40;
-            font-weight: bold;
-        }
-        body.light-mode .content-mid.has-file {
-            background-color: rgba(243, 128, 32, 0.05);
-            color: #F38020;
-        }
-
         .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
 
@@ -90,7 +78,7 @@
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
-<!-- 파일 업로드를 수행할 숨겨진 input 태그 (모든 파일 허용) -->
+<!-- 파일 업로드를 수행할 숨겨진 input 태그 추가 -->
 <input type="file" id="file-selector" style="display: none;">
 
 <div class="app-container">
@@ -180,20 +168,28 @@
     }
 
     // 1. content-mid 영역 초기 텍스트 설정
-    contentMid.innerHTML = `<div>📄</div><div>Drag & Drop a text file here or click to upload.</div>`;
+    contentMid.innerText = "Drag & Drop a text file here or click to upload.";
     
     // 2. 파일 읽기 및 입력창 업데이트 공통 함수
     function handleFile(file) {
         if (!file) return;
-    
+            
         const reader = new FileReader();
         reader.onload = (e) => {
-            const fileText = e.target.result;
+            const arrayBuffer = e.target.result;
             
-            textInput.value = fileText;
-            textInput.dispatchEvent(new Event('input'));
+            // ArrayBuffer를 CryptoJS가 연산할 수 있는 WordArray 형태로 변환 (바이너리 직접 매핑)
+            const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
             
-            // 파일 정보 표시 반영
+            // 파일 크기를 기준으로 사이드바 메타데이터 카운터 업데이트
+            clearCounters();
+            document.getElementById('byte-count').innerText = file.size;
+            
+            // text-input 창은 건드리지 않고 비워둔 채 해시값 생성
+            textInput.value = ''; 
+            generateHashes(wordArray);
+            
+            // content-mid 영역 업로드 완료 피드백 표시
             contentMid.classList.add('has-file');
             contentMid.innerHTML = `
                 <div style="font-size: 2rem;">✅</div>
@@ -201,7 +197,8 @@
                 <div style="font-size: 0.8rem; font-weight: normal; opacity: 0.7;">(Click or drag another file to change)</div>
             `;
         };
-        reader.readAsText(file, 'UTF-8');
+        // 텍스트가 아닌 원시 바이너리 배열 구조로 파일을 읽습니다.
+        reader.readAsArrayBuffer(file);
     }
     
     // 3. 드래그 앤 드롭 이벤트 리스너 등록
@@ -242,8 +239,6 @@
     
     function resetAll() {
         textInput.value = ''; 
-        contentMid.classList.remove('has-file');
-        contentMid.innerHTML = `<div>📄</div><div>Drag & Drop a text file here or click to upload.</div>`;
         textInput.dispatchEvent(new Event('input'));
     }
 </script>
