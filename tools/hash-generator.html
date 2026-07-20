@@ -1,11 +1,10 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hash Generator</title>
+    <title>Text to ASCII</title>
+    <script src="https://cdn.jsdelivr.net/npm/figlet@1.8.0/lib/figlet.min.js"></script>
     <style>
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -91,8 +90,8 @@
 
     <main class="main-content">
         <header class="top-section">
-            <h1>Hash Generator</h1>
-            <p>Please enter your text below to generate hash values.</p>
+            <h1>Text to ASCII</h1>
+            <p>Please enter your text below to generate ASCII art.</p>
         </header>
         <section class="content-top" style="margin-top: 20px;">
             <textarea id="text-input" placeholder="Enter text here."></textarea>
@@ -109,6 +108,8 @@
     const sidebar = document.getElementById('sidebar');
 
     figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
+
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
 
     textInput.addEventListener('input', () => {
         const text = textInput.value;
