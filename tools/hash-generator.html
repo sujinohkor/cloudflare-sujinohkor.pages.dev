@@ -143,9 +143,9 @@
     
             // 결과를 보기 좋게 포맷팅하여 출력창에 주입
             hashOutput.value = [
-                `[ MD5 ]\n${md5Hash}\n`,
-                `[ SHA-1 ]\n${sha1Hash}\n`,
-                `[ SHA-256 ]\n${sha256Hash}`
+                `MD5: ${md5Hash}\n`,
+                `SHA-1: ${sha1Hash}\n`,
+                `SHA-256: ${sha256Hash}`
             ].join('\n');
     
         } catch (error) {
