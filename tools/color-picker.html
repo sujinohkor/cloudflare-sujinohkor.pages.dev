@@ -2168,6 +2168,7 @@
     let hue = 0, sat = 100, val = 100, hueY = 0;
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); } );
     // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
@@ -2287,10 +2288,6 @@
         }
         updateAll('hsl', { r: Math.round(r*255), g: Math.round(g*255), b: Math.round(b*255) });
     }
-    
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-    });
     
     // 숫자 범위 제한 함수
     function limitRange(input, max) {
