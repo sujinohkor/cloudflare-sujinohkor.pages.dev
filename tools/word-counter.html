@@ -108,6 +108,8 @@
     const sidebar = document.getElementById('sidebar');
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
+    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
     textInput.addEventListener('input', () => {
         const text = textInput.value;
