@@ -38,13 +38,24 @@
 
         .content-top { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         
-        /* content-mid: 여백(padding)과 폰트 스타일을 textarea와 동일하게 맞춤 */
         .content-mid { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; 
             padding: 20px; color: #888; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem;
-            cursor: pointer; transition: all 0.3s ease; user-select: none; 
+            cursor: pointer; transition: all 0.3s ease; user-select: none;
+            flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
         }
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1 ); border-style: dashed; color: #ff9e40; }
+        
+        .content-mid.has-file {
+            background-color: rgba(255, 158, 64, 0.05);
+            color: #ff9e40;
+            font-weight: bold;
+        }
+        body.light-mode .content-mid.has-file {
+            background-color: rgba(243, 128, 32, 0.05);
+            color: #F38020;
+        }
+
         .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
 
@@ -78,7 +89,6 @@
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
-<!-- 파일 업로드를 수행할 숨겨진 input 태그 추가 -->
 <input type="file" id="file-selector" style="display: none;">
 
 <div class="app-container">
@@ -127,8 +137,25 @@
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
+    // 사이드바 카운터 초기화 함수
+    function clearCounters() {
+        document.getElementById('char-count-all').innerText = '0';
+        document.getElementById('char-count-no-space').innerText = '0';
+        document.getElementById('word-count').innerText = '0';
+        document.getElementById('para-count').innerText = '0';
+        document.getElementById('byte-count').innerText = '0';
+    }
+
+    // 텍스트 타이핑 실시간 감지
     textInput.addEventListener('input', () => {
         const text = textInput.value;
+        
+        // 텍스트 창에 타이핑이 시작되면 content-mid 파일 업로드 상태를 초기화
+        if (contentMid.classList.contains('has-file')) {
+            contentMid.classList.remove('has-file');
+            contentMid.innerHTML = `<div>📄</div><div>Drag & Drop a text file here or click to upload.</div>`;
+        }
+
         document.getElementById('char-count-all').innerText = text.length;
         document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
         document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
@@ -138,22 +165,21 @@
         for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
         document.getElementById('byte-count').innerText = bytes;
 
-        generateHashes();
+        generateHashes(text);
     });
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
     });
 
-    function generateHashes() {
-        const text = textInput.value;
-        
-        if (!text) { hashOutput.value = 'Hashes will be generated here.'; return; }
+    // 해시 연산 함수 (호출 시 텍스트나 WordArray 객체를 인자로 받음)
+    function generateHashes(targetData) {
+        if (!targetData) { hashOutput.value = 'Hashes will be generated here.'; return; }
     
         try {
-            const md5Hash = CryptoJS.MD5(text).toString();
-            const sha1Hash = CryptoJS.SHA1(text).toString();
-            const sha256Hash = CryptoJS.SHA256(text).toString();
+            const md5Hash = CryptoJS.MD5(targetData).toString();
+            const sha1Hash = CryptoJS.SHA1(targetData).toString();
+            const sha256Hash = CryptoJS.SHA256(targetData).toString();
     
             hashOutput.value = [
                 `MD5: ${md5Hash}\n`,
@@ -167,13 +193,12 @@
         }
     }
 
-    // 1. content-mid 영역 초기 텍스트 설정
-    contentMid.innerText = "Drag & Drop a text file here or click to upload.";
+    contentMid.innerHTML = `<div>📄</div><div>Drag & Drop a text file here or click to upload.</div>`;
     
-    // 2. 파일 읽기 및 입력창 업데이트 공통 함수
+    // 💡 변경된 핵심 로직: 파일을 ArrayBuffer(바이너리)로 읽어 직접 해싱
     function handleFile(file) {
         if (!file) return;
-            
+    
         const reader = new FileReader();
         reader.onload = (e) => {
             const arrayBuffer = e.target.result;
@@ -201,18 +226,13 @@
         reader.readAsArrayBuffer(file);
     }
     
-    // 3. 드래그 앤 드롭 이벤트 리스너 등록
     contentMid.addEventListener('dragover', (e) => { e.preventDefault(); contentMid.classList.add('dragover'); });
     contentMid.addEventListener('dragleave', () => { contentMid.classList.remove('dragover'); });
     contentMid.addEventListener('drop', (e) => { e.preventDefault(); contentMid.classList.remove('dragover'); const file = e.dataTransfer.files[0]; handleFile(file); });
-    
-    // 4. 영역 클릭 시에도 파일 선택창이 열리도록 설정
     contentMid.addEventListener('click', () => { fileSelector.click(); });
     
-    // 5. 사이드바의 Upload 버튼 기능 구현
     function uploadFile() { fileSelector.click(); }
     
-    // 파일 선택창에서 파일이 선택되었을 때의 이벤트
     fileSelector.addEventListener('change', (e) => {
         const file = e.target.files[0];
         handleFile(file);
@@ -239,7 +259,10 @@
     
     function resetAll() {
         textInput.value = ''; 
-        textInput.dispatchEvent(new Event('input'));
+        contentMid.classList.remove('has-file');
+        contentMid.innerHTML = `<div>📄</div><div>Drag & Drop a text file here or click to upload.</div>`;
+        clearCounters();
+        generateHashes('');
     }
 </script>
 </body>
