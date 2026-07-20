@@ -37,7 +37,8 @@
         .menu-list span { color: #e68a35; font-weight: bold; }
 
         .content-top { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
-        .content-mid { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
+        .content-mid { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; align-items: left; justify-content: left; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1 ); border-style: dashed; color: #ff9e40; }
         .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
 
@@ -49,6 +50,7 @@
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
         body.light-mode textarea { color: #000; }
+        body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1 ); border-style: dashed; color: #f38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
         /* 5. Mobile Responsive */
