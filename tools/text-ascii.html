@@ -1,117 +1,175 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- 모바일 대응 viewport 설정[cite: 3] -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">텍스트 → 아스키 아트</title>
+    <title>Text to ASCII</title>
     <script src="https://cdn.jsdelivr.net/npm/figlet@1.8.0/lib/figlet.min.js"></script>
     <style>
-        body { background-color: #FDF5E6; padding: 20px; text-align: center; font-family: 'Malgun Gothic', 'Consolas', monospace; }
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
         
-        .header-area { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
-        
-        textarea { 
-            width: 90%; /* 모바일 대응을 위해 %로 변경 */
-            max-width: 300px;
-            height: 100px; 
-            border-radius: 20px; 
-            padding: 10px; 
-            border: 2px solid #ff9e40; 
-            outline: none;
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 10px; overflow-y: auto; overflow: hidden; transition: 0.3s;
         }
 
-        button { 
-            padding: 10px 20px; 
-            border-radius: 20px; 
-            border: none; 
-            background: #ff9e40; 
-            color: white; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin: 5px;
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
         }
-        button:hover { background: #e68a35; }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
         
-        .home-btn { background: #ddd; color: black; text-decoration: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
-        .home-btn:hover { background: #ccc; }
+        .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+        .menu-list a { display: flex; justify-content: space-between; color: #fff; font-size: 0.95rem; }
+        .menu-list span { color: #e68a35; font-weight: bold; }
 
-        #asciiOutput { 
-            white-space: pre; 
-            font-family: monospace; 
-            margin-top: 20px; 
-            background: white; 
-            padding: 20px; 
-            border: 3px solid #ff9e40; 
-            border-radius: 20px; 
-            display: inline-block; 
-            font-size: 12px; /* 기본 글자 크기 */
-            text-align: left;
-            overflow-x: auto; /* 너무 길면 옆으로 스크롤 */
-            max-width: 90vw;
-        }
+        .content-top { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
+        .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
+        textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
 
-        /* 모바일 최적화 미디어 쿼리[cite: 3] */
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
+        body.light-mode textarea { color: #000; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
         @media (max-width: 600px) {
-            #asciiOutput { font-size: 8px; } /* 모바일에서는 글자를 작게 줄여서 한 줄에 다 보이게 함 */
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            .main-content-section { flex: 1; min-height: 0; }
+            .content-top, .content-down { flex-direction: column; overflow-y: visible; }
         }
     </style>
 </head>
 <body>
-    <div class="header-area">
-        <h2 id="mainTitle">텍스트 → 아스키 아트</h2>
-        <a href="../index.html" class="home-btn" id="homeBtn">집으로</a>
-    </div>
 
-    <textarea id="textInput" placeholder="영문 글자를 입력하세요(유니코드 미지원)"></textarea>
-    <br>
-    <button id="convertBtn" onclick="convertText()">변환하기</button>
-    <br>
-    <div id="asciiOutput"></div>
-    <br>
-    <button id="saveBtn" style="display:none;" onclick="saveASCII()">저장하기</button>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
-    <script>
-        const lang = {
-            ko: { title: "텍스트 → 아스키 아트", home: "집으로", placeholder: "영문 글자를 입력하세요(유니코드 미지원)", convert: "변환하기", alertInput: "글자를 입력해 주세요.", errUnicode: "변환 불가: 유니코드가 포함되어 있습니다.", errFail: "변환 오류", save: "저장하기" },
-            en: { title: "Text → ASCII Art", home: "Go Home", placeholder: "Enter English text (No Unicode)", convert: "Convert", alertInput: "Please enter text.", errUnicode: "Conversion failed: Unicode characters are not supported.", errFail: "Conversion error", save: "Save" }
-        };
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <nav class="menu-list">
+            <a>Characters (with spaces) <span id="char-count-all">0</span></a>
+            <a>Characters (no spaces) <span id="char-count-no-space">0</span></a>
+            <a>Word Count <span id="word-count">0</span></a>
+            <a>Paragraph Count <span id="para-count">0</span></a>
+            <a>Byte Count <span id="byte-count">0</span></a>
+        </nav>
 
-        const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
-        const t = lang[userLang];
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="generateAscii()">Genertate</button>
+            <button class="menu-btn" onclick="copyAscii()">Copy</button>
+            <button class="menu-btn" onclick="saveAscii()">Save as Text File</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </div>
+    </aside>
 
-        document.getElementById('pageTitle').textContent = t.title;
-        document.getElementById('mainTitle').textContent = t.title;
-        document.getElementById('homeBtn').textContent = t.home;
-        document.getElementById('textInput').placeholder = t.placeholder;
-        document.getElementById('convertBtn').textContent = t.convert;
-        document.getElementById('saveBtn').textContent = t.save;
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Text to ASCII</h1>
+            <p>Text to ASCII Art</p>
+        </header>
+        <section class="content-top" style="margin-top: 20px;">
+            <textarea id="text-input" placeholder="Enter text here."></textarea>
+        </section>
+        <section class="content-down">
+            <textarea id="ascii-output" placeholder="Enter text to generate ASCII art."></textarea>
+        </section>
+    </main>
+</div>
 
-        figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
+<script>
+    const textInput = document.getElementById('text-input');
+    const asciiOutput = document.getElementById('ascii-output');
+    const sidebar = document.getElementById('sidebar');
 
-        function convertText() {
-            const text = document.getElementById('textInput').value;
-            if (!text.trim()) { alert(t.alertInput); return; }
-            if (/[^\x00-\x7F]/.test(text)) {
-                document.getElementById('asciiOutput').textContent = t.errUnicode;
-                document.getElementById('saveBtn').style.display = 'none';
-                return;
-            }
-            figlet.text(text, { font: 'Standard' }, function(err, data) {
-                if (err) { document.getElementById('asciiOutput').textContent = t.errFail; return; }
-                document.getElementById('asciiOutput').textContent = data;
-                document.getElementById('saveBtn').style.display = 'inline-block';
-            });
+    figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
+
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+    textInput.addEventListener('input', () => {
+        const text = textInput.value;
+        document.getElementById('char-count-all').innerText = text.length;
+        document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
+        document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('para-count').innerText = text.split('\n').filter(p => p.trim().length > 0).length;
+        
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
+        document.getElementById('byte-count').innerText = bytes;
+    });
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+    });
+
+function generateAscii() {
+    const text = textInput.value;
+    if (!text.trim()) { alert("텍스트를 입력해주세요."); return; }
+    if (/[^\x00-\x7F]/.test(text)) {
+        asciiOutput.value = "유니코드 미지원";
+        return;
+    }
+
+    // 비동기 방식 사용 (textSync 아님!)
+    figlet.text(text, { font: 'Standard' }, function(err, data) {
+        if (err) { 
+            asciiOutput.value = "변환오류"; 
+            console.error(err);
+            return; 
         }
+        asciiOutput.value = data; 
+    });
+}
 
-        function saveASCII() {
-            const asciiData = document.getElementById('asciiOutput').textContent;
-            const blob = new Blob([asciiData], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'ascii_art.txt';
-            a.click();
-        }
-    </script>
+    function resetAll() {
+        textInput.value = '';
+        textInput.dispatchEvent(new Event('input'));
+        asciiOutput.value = '';
+        asciiOutput.dispatchEvent(new Event('input'));
+    }
+
+    function copyAscii() {
+        if (!asciiOutput.value) return alert('No ASCII art to copy.');
+        asciiOutput.select();
+        document.execCommand('copy');
+        alert('ASCII art copied!');
+    }
+
+    function saveAscii() {
+        const text = asciiOutput.value;
+        if (!text.trim()) return alert("No ASCII art to save.");
+        const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'TextASCII.txt';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+</script>
 </body>
 </html>
