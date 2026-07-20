@@ -37,7 +37,13 @@
         .menu-list span { color: #e68a35; font-weight: bold; }
 
         .content-top { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
-        .content-mid { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; align-items: left; justify-content: left; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+        
+        /* content-mid: 여백(padding)과 폰트 스타일을 textarea와 동일하게 맞춤 */
+        .content-mid { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; 
+            padding: 20px; color: #888; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem;
+            cursor: pointer; transition: all 0.3s ease; user-select: none; 
+        }
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1 ); border-style: dashed; color: #ff9e40; }
         .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
@@ -50,6 +56,7 @@
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
         body.light-mode textarea { color: #000; }
+        body.light-mode .content-mid { color: #666; }
         body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1 ); border-style: dashed; color: #f38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
@@ -70,6 +77,9 @@
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<!-- 파일 업로드를 수행할 숨겨진 input 태그 추가 -->
+<input type="file" id="file-selector" style="display: none;" accept=".txt,.json,.csv,.html,.css,.js">
 
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
@@ -138,16 +148,13 @@
     function generateHashes() {
         const text = textInput.value;
         
-        // 입력값 검증
         if (!text) { hashOutput.value = 'Hashes will be generated here.'; return; }
     
         try {
-            // 각 알고리즘별 해시 값 계산 (CryptoJS 사용)
             const md5Hash = CryptoJS.MD5(text).toString();
             const sha1Hash = CryptoJS.SHA1(text).toString();
             const sha256Hash = CryptoJS.SHA256(text).toString();
     
-            // 결과를 보기 좋게 포맷팅하여 출력창에 주입
             hashOutput.value = [
                 `MD5: ${md5Hash}\n`,
                 `SHA-1: ${sha1Hash}\n`,
@@ -170,8 +177,6 @@
         const reader = new FileReader();
         reader.onload = (e) => {
             textInput.value = e.target.result;
-            
-            // 중요: text-input에 강제로 input 이벤트를 발생시켜 글자 수 및 해시 연산을 실시간으로 실행합니다.
             textInput.dispatchEvent(new Event('input'));
         };
         reader.readAsText(file, 'UTF-8');
@@ -192,12 +197,11 @@
     fileSelector.addEventListener('change', (e) => {
         const file = e.target.files[0];
         handleFile(file);
-        // 동일한 파일을 연속으로 올릴 때도 인식할 수 있도록 value 초기화
         e.target.value = ''; 
     });
 
     function copyHashes() {
-        if (!hashOutput.value) return alert('No hash values to copy.');
+        if (!hashOutput.value || hashOutput.value === 'Hashes will be generated here.') return alert('No hash values to copy.');
         hashOutput.select();
         document.execCommand('copy');
         alert('Hash values copied!');
@@ -205,7 +209,7 @@
 
     function saveHashes() {
         const text = hashOutput.value;
-        if (!text.trim()) return alert("No hash values to save.");
+        if (!text.trim() || text === 'Hashes will be generated here.') return alert("No hash values to save.");
         const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -215,8 +219,8 @@
     }
     
     function resetAll() {
-        textInput.value = ''; hashOutput.value = '';
-        hashOutput.dispatchEvent(new Event('input'));
+        textInput.value = ''; 
+        textInput.dispatchEvent(new Event('input'));
     }
 </script>
 </body>
