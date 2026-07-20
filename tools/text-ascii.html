@@ -97,7 +97,7 @@
             <textarea id="text-input" placeholder="Enter text here."></textarea>
         </section>
         <section class="content-down">
-            <textarea id="ascii-output" placeholder="Enter text to generate ASCII art."></textarea>
+            <textarea id="ascii-output" placeholder="Enter text to generate ASCII art." readonly></textarea>
         </section>
     </main>
 </div>
@@ -129,16 +129,16 @@
 
 function generateAscii() {
     const text = textInput.value;
-    if (!text.trim()) { alert("텍스트를 입력해주세요."); return; }
+    if (!text.trim()) { alert("Please enter text."); return; }
     if (/[^\x00-\x7F]/.test(text)) {
-        asciiOutput.value = "유니코드 미지원";
+        asciiOutput.value = "Unicode not supported";
         return;
     }
 
     // 비동기 방식 사용 (textSync 아님!)
     figlet.text(text, { font: 'Standard' }, function(err, data) {
         if (err) { 
-            asciiOutput.value = "변환오류"; 
+            asciiOutput.value = "Conversion failed."; 
             console.error(err);
             return; 
         }
