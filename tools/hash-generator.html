@@ -123,6 +123,8 @@
         let bytes = 0;
         for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
         document.getElementById('byte-count').innerText = bytes;
+
+        generateHashes();
     });
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -133,7 +135,7 @@
         const text = textInput.value;
         
         // 입력값 검증
-        if (!text) { alert("Please enter text."); return; }
+        if (!text) { hashOutput.value = 'Hashes will be generated here.'; return; }
     
         try {
             // 각 알고리즘별 해시 값 계산 (CryptoJS 사용)
@@ -156,7 +158,6 @@
 
     function resetAll() {
         textInput.value = '';
-        textInput.dispatchEvent(new Event('input'));
         hashOutput.value = '';
         hashOutput.dispatchEvent(new Event('input'));
     }
@@ -165,7 +166,7 @@
         if (!hashOutput.value) return alert('No hash values to copy.');
         hashOutput.select();
         document.execCommand('copy');
-        alert('ASCII art copied!');
+        alert('Hash values copied!');
     }
 
     function saveHashes() {
