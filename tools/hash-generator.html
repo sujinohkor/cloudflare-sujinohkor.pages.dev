@@ -112,6 +112,8 @@
     const textInput = document.getElementById('text-input');
     const hashOutput = document.getElementById('hash-output');
     const sidebar = document.getElementById('sidebar');
+    const contentMid = document.querySelector('.content-mid');
+    const fileSelector = document.getElementById('file-selector');
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
@@ -158,11 +160,41 @@
         }
     }
 
-    function resetAll() {
-        textInput.value = '';
-        hashOutput.value = '';
-        hashOutput.dispatchEvent(new Event('input'));
+    // 1. content-mid 영역 초기 텍스트 설정
+    contentMid.innerText = "Drag & Drop a text file here or click to upload.";
+    
+    // 2. 파일 읽기 및 입력창 업데이트 공통 함수
+    function handleFile(file) {
+        if (!file) return;
+    
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            textInput.value = e.target.result;
+            
+            // 중요: text-input에 강제로 input 이벤트를 발생시켜 글자 수 및 해시 연산을 실시간으로 실행합니다.
+            textInput.dispatchEvent(new Event('input'));
+        };
+        reader.readAsText(file, 'UTF-8');
     }
+    
+    // 3. 드래그 앤 드롭 이벤트 리스너 등록
+    contentMid.addEventListener('dragover', (e) => { e.preventDefault(); contentMid.classList.add('dragover'); });
+    contentMid.addEventListener('dragleave', () => { contentMid.classList.remove('dragover'); });
+    contentMid.addEventListener('drop', (e) => { e.preventDefault(); contentMid.classList.remove('dragover'); const file = e.dataTransfer.files[0]; handleFile(file); });
+    
+    // 4. 영역 클릭 시에도 파일 선택창이 열리도록 설정
+    contentMid.addEventListener('click', () => { fileSelector.click(); });
+    
+    // 5. 사이드바의 Upload 버튼 기능 구현
+    function uploadFile() { fileSelector.click(); }
+    
+    // 파일 선택창에서 파일이 선택되었을 때의 이벤트
+    fileSelector.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFile(file);
+        // 동일한 파일을 연속으로 올릴 때도 인식할 수 있도록 value 초기화
+        e.target.value = ''; 
+    });
 
     function copyHashes() {
         if (!hashOutput.value) return alert('No hash values to copy.');
@@ -180,6 +212,11 @@
         link.download = 'Hashes.txt';
         link.click();
         URL.revokeObjectURL(link.href);
+    }
+    
+    function resetAll() {
+        textInput.value = ''; hashOutput.value = '';
+        hashOutput.dispatchEvent(new Event('input'));
     }
 </script>
 </body>
