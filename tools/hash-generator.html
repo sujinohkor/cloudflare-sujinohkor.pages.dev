@@ -129,24 +129,30 @@
         document.body.classList.toggle('light-mode');
     });
 
-function generateHashes() {
-    const text = textInput.value;
-    if (!text.trim()) { alert("Please enter text."); return; }
-    if (/[^\x00-\x7F]/.test(text)) {
-        if (!hashOutput.value) return alert('Unicode not supported.');
-        return;
-    }
-
-    // 비동기 방식 사용 (textSync 아님!)
-    figlet.text(text, { font: 'Standard' }, function(err, data) {
-        if (err) { 
-            hashOutput.value = "Conversion failed."; 
-            console.error(err);
-            return; 
+    function generateHashes() {
+        const text = textInput.value;
+        
+        // 입력값 검증
+        if (!text) { alert("Please enter text."); return; }
+    
+        try {
+            // 각 알고리즘별 해시 값 계산 (CryptoJS 사용)
+            const md5Hash = CryptoJS.MD5(text).toString();
+            const sha1Hash = CryptoJS.SHA1(text).toString();
+            const sha256Hash = CryptoJS.SHA256(text).toString();
+    
+            // 결과를 보기 좋게 포맷팅하여 출력창에 주입
+            hashOutput.value = [
+                `[ MD5 ]\n${md5Hash}\n`,
+                `[ SHA-1 ]\n${sha1Hash}\n`,
+                `[ SHA-256 ]\n${sha256Hash}`
+            ].join('\n');
+    
+        } catch (error) {
+            hashOutput.value = "Hash generation failed.";
+            console.error(error);
         }
-        hashOutput.value = data; 
-    });
-}
+    }
 
     function resetAll() {
         textInput.value = '';
