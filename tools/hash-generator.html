@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hash Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.min.js"></script>
     <style>
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +60,7 @@
             .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
             .main-content-section { flex: 1; min-height: 0; }
             .content-top, .content-down { flex-direction: column; overflow-y: visible; }
-            #ascii-output { font-family: monospace; white-space: pre; overflow-x: auto; word-break: keep-all; }
+            #hash-output { font-family: monospace; white-space: pre; overflow-x: auto; word-break: keep-all; }
         }
     </style>
 </head>
@@ -81,9 +82,9 @@
         </nav>
 
         <div class="bottom-btns">
-            <button class="menu-btn" onclick="generateAscii()">Genertate</button>
-            <button class="menu-btn" onclick="copyAscii()">Copy</button>
-            <button class="menu-btn" onclick="saveAscii()">Save as Text File</button>
+            <button class="menu-btn" onclick="generateHashes()">Genertate</button>
+            <button class="menu-btn" onclick="copyHashes()">Copy</button>
+            <button class="menu-btn" onclick="saveHashes()">Save as Text File</button>
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
     </aside>
@@ -99,17 +100,15 @@
         <section class="content-middle">
         </section>
         <section class="content-down">
-            <textarea id="ascii-output" placeholder="Enter text to generate ASCII art." readonly></textarea>
+            <textarea id="hash-output" placeholder="Enter text to generate hash values." readonly></textarea>
         </section>
     </main>
 </div>
 
 <script>
     const textInput = document.getElementById('text-input');
-    const asciiOutput = document.getElementById('ascii-output');
+    const hashOutput = document.getElementById('hash-output');
     const sidebar = document.getElementById('sidebar');
-
-    //figlet.defaults({ fontPath: 'https://cdn.jsdelivr.net/npm/figlet@1.8.0/fonts' });
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
@@ -129,46 +128,46 @@
         document.body.classList.toggle('light-mode');
     });
 
-function generateAscii() {
+function generateHashes() {
     const text = textInput.value;
     if (!text.trim()) { alert("Please enter text."); return; }
     if (/[^\x00-\x7F]/.test(text)) {
-        if (!asciiOutput.value) return alert('Unicode not supported.');
+        if (!hashOutput.value) return alert('Unicode not supported.');
         return;
     }
 
     // 비동기 방식 사용 (textSync 아님!)
     figlet.text(text, { font: 'Standard' }, function(err, data) {
         if (err) { 
-            asciiOutput.value = "Conversion failed."; 
+            hashOutput.value = "Conversion failed."; 
             console.error(err);
             return; 
         }
-        asciiOutput.value = data; 
+        hashOutput.value = data; 
     });
 }
 
     function resetAll() {
         textInput.value = '';
         textInput.dispatchEvent(new Event('input'));
-        asciiOutput.value = '';
-        asciiOutput.dispatchEvent(new Event('input'));
+        hashOutput.value = '';
+        hashOutput.dispatchEvent(new Event('input'));
     }
 
-    function copyAscii() {
-        if (!asciiOutput.value) return alert('No ASCII art to copy.');
-        asciiOutput.select();
+    function copyHashes() {
+        if (!hashOutput.value) return alert('No hash values to copy.');
+        hashOutput.select();
         document.execCommand('copy');
         alert('ASCII art copied!');
     }
 
-    function saveAscii() {
-        const text = asciiOutput.value;
-        if (!text.trim()) return alert("No ASCII art to save.");
+    function saveHashes() {
+        const text = hashOutput.value;
+        if (!text.trim()) return alert("No hash values to save.");
         const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'TextASCII.txt';
+        link.download = 'Hashes.txt';
         link.click();
         URL.revokeObjectURL(link.href);
     }
