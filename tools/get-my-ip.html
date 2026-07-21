@@ -107,7 +107,11 @@
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; width: 100%; overflow-y: auto; }
             .content-down { flex-direction: column; flex: none; height: auto; min-height: 600px; }
-            .half-box { min-height: 280px; }
+            /*.half-box { min-height: 280px; }
+            /* 💡 1:3 비율 설정을 위한 flex 속성 지정 */
+            /* 첫 번째 상자 (map-container) -> 비율 1 */
+            .content-down .half-box:nth-child(1) { flex: 1; min-height: 200px; }
+            .content-down .half-box:nth-child(2) { flex: 3; min-height: 0; }
             .ip-address { font-size: 1.3rem; }
         }
     </style>
