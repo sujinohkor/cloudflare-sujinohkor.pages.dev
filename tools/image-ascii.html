@@ -2,165 +2,231 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="pageTitle">ASCII Art Converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to ASCII</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        body { 
-            font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; 
-            background-color: #FDF5E6; 
-            padding: 40px 20px; 
-            text-align: center; 
-            margin: 0;
-        }
-        h2 { font-size: 2.2rem; margin-bottom: 30px; }
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
         
-        #asciiOutput { 
-            white-space: pre; 
-            margin-top: 40px; 
-            background: white; 
-            padding: 15px; 
-            display: block; 
-            border-radius: 20px;
-            /* 테두리 색상 적용 */
-            border: 3px solid #ff9e40; 
-            width: calc(100% - 40px); 
-            max-width: 800px; 
-            margin-left: auto; 
-            margin-right: auto;
-            overflow-x: hidden; 
-            word-break: break-all;
-            box-sizing: border-box; 
-            text-align: center;
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
         }
-        
-        /* 캔버스 완전히 숨김[cite: 3] */
-        canvas { 
-            display: none !important; 
-            visibility: hidden; 
-            width: 0; 
-            height: 0; 
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 10px; overflow-y: auto; overflow: hidden; transition: 0.3s;
         }
-        
-        .btn-container { 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; 
-            flex-wrap: nowrap; 
-            max-width: 600px; 
-            margin: 20px auto; 
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
         }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
         
-        .btn-style { 
-            padding: 15px 10px; 
-            cursor: pointer; 
-            border-radius: 15px; 
-            border: none; 
-            background: #ddd; 
-            font-size: 1rem; 
-            flex: 1; 
-            min-width: 0; 
-            max-width: 150px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: black;
-            font-family: inherit;
+        .content-mid { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; 
+            padding: 20px; color: #888; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem;
+            cursor: pointer; transition: all 0.3s ease; user-select: none;
+            flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
         }
+        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1 ); border-style: dashed; color: #ff9e40; }
         
-        .file-upload-btn { background-color: #ff9e40; color: white; font-weight: bold; }
-        .file-upload-btn:hover { background-color: #e68a35; }
-        .btn-style:hover { background-color: #ccc; }
+        .content-mid.has-file {
+            background-color: rgba(255, 158, 64, 0.05);
+            color: #ff9e40;
+            font-weight: bold;
+        }
+        body.light-mode .content-mid.has-file {
+            background-color: rgba(243, 128, 32, 0.05);
+            color: #F38020;
+        }
+
+        .content-down { flex: 3; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
+        textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; line-height: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode textarea { color: #000; }
+        body.light-mode .content-mid { color: #666; }
+        body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1 ); border-style: dashed; color: #f38020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (max-width: 600px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            #ascii-output { font-family: monospace; white-space: pre; overflow-x: auto; }
+        }
     </style>
 </head>
 <body>
-    <h2 id="mainHeading">이미지 → 아스키 아트 변환기</h2>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<input type="file" id="file-selector" accept="image/*" style="display: none;">
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="menu-btn" onclick="copyASCII()">Copy</button>
+            <button class="menu-btn" onclick="saveASCII()">Save as Text File</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Image to ASCII</h1>
+            <p>Upload an image below to generate ASCII art.</p>
+        </header>
+        <section class="content-mid" style="margin-top: 20px;"></section>
+        <section class="content-down">
+            <textarea id="ascii-output" placeholder="Generated ASCII image will appear here." readonly></textarea>
+        </section>
+    </main>
+</div>
+
+<script>
+    const asciiOutput = document.getElementById('ascii-output');
+    const sidebar = document.getElementById('sidebar');
+    const contentMid = document.querySelector('.content-mid');
+    const fileSelector = document.getElementById('file-selector');
     
-    <div class="btn-container">
-        <label for="imageInput" class="btn-style file-upload-btn" id="fileLabel">이미지 선택하기</label>
-        <a href="../index" class="btn-style" id="homeBtn">집으로</a>
-    </div>
-    <input type="file" id="imageInput" accept="image/*" style="display:none;">
-    
-    <div id="asciiOutput"></div>
+    // ASCII 밀도 밀집도 문자열 (어두움 -> 밝음 순)
+    const chars = " .:-=+*#%@";
 
-    <div class="btn-container">
-        <button class="btn-style" id="copyBtn">복사하기</button>
-        <button class="btn-style" id="saveBtn">저장</button>
-        <button class="btn-style" id="resetBtn">초기화</button>
-    </div>
-    
-    <canvas id="canvas"></canvas>
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    <script>
-        const lang = {
-            ko: { heading: "이미지 → 아스키 아트 변환기", label: "이미지 선택하기", home: "집으로", copy: "복사하기", save: "저장", reset: "초기화", alertCopy: "복사되었습니다." },
-            en: { heading: "Image to ASCII Art Converter", label: "Select Image", home: "Go Home", copy: "Copy", save: "Save", reset: "Reset", alertCopy: "Copied!" }
-        };
-        const userLang = (navigator.language || navigator.userLanguage).startsWith('ko') ? 'ko' : 'en';
-        const t = lang[userLang];
+    // 초기 UI 설정
+    function setInitialUI() {
+        contentMid.classList.remove('has-file');
+        contentMid.innerHTML = `<div style="font-size: 3rem;">🖼️</div><div>Drag & Drop an image file here or click to upload.</div>`;
+    }
+    setInitialUI();
 
-        document.getElementById('pageTitle').textContent = t.title;
-        document.getElementById('mainHeading').textContent = t.heading;
-        document.getElementById('fileLabel').textContent = t.label;
-        document.getElementById('homeBtn').textContent = t.home;
-        document.getElementById('copyBtn').textContent = t.copy;
-        document.getElementById('saveBtn').textContent = t.save;
-        document.getElementById('resetBtn').textContent = t.reset;
+    // 핵심 파일 처리 및 ASCII 변환 로직
+    function handleFile(file) {
+        if (!file) return;
 
-        const imageInput = document.getElementById('imageInput'), asciiOutput = document.getElementById('asciiOutput'), canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d'), chars = " .:-=+*#%@";
+        // 이미지 파일 여부 검증
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file.');
+            return;
+        }
 
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    const baseWidth = 60; 
-                    const fontSize = Math.min(8, 350 / baseWidth); 
-                    asciiOutput.style.fontSize = fontSize + "px";
-                    asciiOutput.style.lineHeight = fontSize + "px";
-                    canvas.width = baseWidth;
-                    canvas.height = Math.floor((img.height / img.width) * baseWidth * 0.5);
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    let asciiStr = "";
-                    for (let y = 0; y < canvas.height; y++) {
-                        for (let x = 0; x < canvas.width; x++) {
-                            const offset = (y * canvas.width + x) * 4;
-                            const avg = (imageData.data[offset] + imageData.data[offset+1] + imageData.data[offset+2]) / 3;
-                            asciiStr += chars[Math.min(Math.floor((avg / 255) * (chars.length - 1)), chars.length - 1)];
-                        }
-                        asciiStr += "\n";
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                // 가상 캔버스 생성
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 가로 글자 수 기준 설정 (너비 80자 기준)
+                const baseWidth = 80; 
+                canvas.width = baseWidth;
+                // 폰트 세로 비율(약 0.5)을 고려한 높이 계산
+                canvas.height = Math.floor((img.height / img.width) * baseWidth * 0.5);
+
+                // 캔버스에 리사이징하여 그리기
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                let asciiStr = "";
+                for (let y = 0; y < canvas.height; y++) {
+                    for (let x = 0; x < canvas.width; x++) {
+                        const offset = (y * canvas.width + x) * 4;
+                        // RGB 평균으로 밝기 계산
+                        const avg = (imageData.data[offset] + imageData.data[offset+1] + imageData.data[offset+2]) / 3;
+                        const charIndex = Math.min(Math.floor((avg / 255) * (chars.length - 1)), chars.length - 1);
+                        asciiStr += chars[charIndex];
                     }
-                    asciiOutput.textContent = asciiStr;
-                };
-                img.src = event.target.result;
+                    asciiStr += "\n";
+                }
+
+                // 결과 출력
+                asciiOutput.value = asciiStr;
+
+                // UI 업데이트
+                contentMid.classList.add('has-file');
+                contentMid.innerHTML = `
+                    <div style="font-size: 3rem;">🖼️</div>
+                    <div style="word-break: break-all;">Uploaded File: ${file.name}</div>
+                    <div style="font-size: 0.8rem; font-weight: normal; opacity: 0.7;">(Click or drag another image to change)</div>
+                `;
             };
-            reader.readAsDataURL(file);
-        });
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
 
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            if (!asciiOutput.textContent) return;
-            navigator.clipboard.writeText(asciiOutput.textContent);
-            alert(t.alertCopy);
-        });
+    // 드래그 앤 드롭 이벤트
+    contentMid.addEventListener('dragover', (e) => { e.preventDefault(); contentMid.classList.add('dragover'); });
+    contentMid.addEventListener('dragleave', () => { contentMid.classList.remove('dragover'); });
+    contentMid.addEventListener('drop', (e) => { 
+        e.preventDefault(); 
+        contentMid.classList.remove('dragover'); 
+        const file = e.dataTransfer.files[0]; 
+        handleFile(file); 
+    });
+    contentMid.addEventListener('click', () => { fileSelector.click(); });
 
-        document.getElementById('saveBtn').addEventListener('click', () => {
-            if (!asciiOutput.textContent) return;
-            const blob = new Blob([asciiOutput.textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'ascii-art.txt';
-            a.click();
-        });
+    function uploadFile() { fileSelector.click(); }
 
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            asciiOutput.textContent = '';
-            imageInput.value = '';
-        });
-    </script>
+    fileSelector.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFile(file);
+        e.target.value = ''; 
+    });
+
+    // 텍스트 복사 기능
+    function copyASCII() {
+        if (!asciiOutput.value) return alert('No ASCII image to copy.');
+        asciiOutput.select();
+        document.execCommand('copy');
+        alert('ASCII art copied to clipboard!');
+    }
+
+    // 텍스트 파일 저장 기능
+    function saveASCII() {
+        const text = asciiOutput.value;
+        if (!text.trim()) return alert("No ASCII image to save.");
+        const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'ASCII_Art.txt';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // 초기화 기능
+    function resetAll() {
+        setInitialUI();
+        asciiOutput.value = '';
+    }
+</script>
 </body>
 </html>
