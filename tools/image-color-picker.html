@@ -1,1 +1,69 @@
-will develop
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>대표 색상 추출기</title>
+  <!-- Color Thief 라이브러리 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background-color: #121212; color: #fff; }
+    .container { max-width: 600px; margin: 0 auto; }
+    #preview { max-width: 100%; height: auto; margin-top: 15px; border-radius: 8px; }
+    .palette { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .color-box {
+      width: 80px; height: 80px; border-radius: 6px;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 5px; font-size: 12px; font-weight: bold; color: #fff;
+      text-shadow: 0 0 3px #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>대표 색상 10개 추출기</h2>
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
+    <img id="preview" alt="업로드 이미지 미리보기" style="display:none;">
+    <div class="palette" id="palette"></div>
+  </div>
+
+  <script>
+    const colorThief = new ColorThief();
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const paletteContainer = document.getElementById('palette');
+
+    // RGB 배열을 Hex 코드 형태로 변환
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        preview.src = event.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    preview.addEventListener('load', () => {
+      // getPalette(이미지요소, 추출할_색상_개수)
+      const palette = colorThief.getPalette(preview, 10);
+      paletteContainer.innerHTML = '';
+
+      palette.forEach(color => {
+        const hex = rgbToHex(color[0], color[1], color[2]);
+        const box = document.createElement('div');
+        box.className = 'color-box';
+        box.style.backgroundColor = hex;
+        box.textContent = hex;
+        paletteContainer.appendChild(box);
+      });
+    });
+  </script>
+</body>
+</html>
