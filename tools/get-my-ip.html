@@ -143,7 +143,6 @@
                 <div id="map-container"></div>
             </div>
             <div class="half-box" id="info-container">
-                <!-- 정보 수신 시 스크립트로 동적 바인딩 -->
                 <div style="text-align: center; color: #ff9e40; margin-top: 20px;">Fetching IP Details...</div>
             </div>
         </section>
@@ -158,17 +157,23 @@
     let marker = null;
     let currentIP = '';
 
+    // 역지오코딩 결과를 보관할 객체
+    let gpsLocationData = {
+        city: "Requesting...",
+        region: "Requesting...",
+        country: "Requesting...",
+        postal: "Requesting..."
+    };
+
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    // Client OS 및 Browser 파싱 함수
     function getClientEnv() {
         const ua = navigator.userAgent;
         let os = "Unknown OS";
         let browser = "Unknown Browser";
 
-        // OS 판별
         if (ua.indexOf("Android") !== -1) {
             const match = ua.match(/Android\s([0-9\.]+)/);
             os = match ? `Android ${match[1]}` : "Android";
@@ -182,7 +187,6 @@
             os = "Linux";
         }
 
-        // Browser 판별
         if (ua.indexOf("Chrome") !== -1 && ua.indexOf("Edg") === -1) {
             const match = ua.match(/Chrome\/([0-9\.]+)/);
             browser = match ? `Chrome ${match[1]}` : "Chrome";
@@ -208,35 +212,57 @@
             if (!response.ok) throw new Error('Network response was not ok');
 
             const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.message || 'IP lookup failed');
-            }
+            if (!data.success) throw new Error(data.message || 'IP lookup failed');
 
             currentIP = data.ip;
             userIpElement.innerText = currentIP;
 
-            // info-container 상세 정보 표시
             renderDetails(data);
 
-            // 기본 IP 위치 지도 표시
             if (data.latitude && data.longitude) {
                 renderMap(data.latitude, data.longitude, `${data.city || 'IP Location'} (IP)`);
             }
 
-            // 기기 정밀 위치(GPS/Wi-Fi) 요청
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    async (position) => {
                         const gpsLat = position.coords.latitude;
                         const gpsLon = position.coords.longitude;
+                        
                         renderMap(gpsLat, gpsLon, "My Exact Location (GPS)");
+
+                        // GPS 좌표 -> 주소/우편번호 변환 (OpenStreetMap Nominatim API)
+                        try {
+                            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}`);
+                            const geoData = await geoRes.json();
+
+                            if (geoData && geoData.address) {
+                                const addr = geoData.address;
+                                gpsLocationData.city = addr.city || addr.county || addr.district || "Unknown";
+                                gpsLocationData.region = addr.state || addr.province || "Unknown";
+                                gpsLocationData.country = addr.country || "Unknown";
+                                gpsLocationData.postal = addr.postcode || "Unknown";
+                            } else {
+                                setGpsFailedStatus("Not Found");
+                            }
+                        } catch (geoErr) {
+                            console.warn("역지오코딩 에러:", geoErr);
+                            setGpsFailedStatus("Error");
+                        }
+
+                        // GPS 데이터 반영하여 UI 재출력
+                        renderDetails(data);
                     },
                     (geoError) => {
                         console.warn("GPS 권한 거부 또는 조회 불가:", geoError);
+                        setGpsFailedStatus("Permission Denied");
+                        renderDetails(data);
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
+            } else {
+                setGpsFailedStatus("Not Supported");
+                renderDetails(data);
             }
         } catch (error) {
             console.error("IP Fetch Error:", error);
@@ -245,11 +271,16 @@
         }
     }
 
-    // info-container 데이터 매핑 및 출력 함수
+    function setGpsFailedStatus(statusText) {
+        gpsLocationData.city = statusText;
+        gpsLocationData.region = statusText;
+        gpsLocationData.country = statusText;
+        gpsLocationData.postal = statusText;
+    }
+
     function renderDetails(data) {
         const env = getClientEnv();
         
-        // Time Zone 포맷팅 (+09:00 형식)
         let tzOffset = "UTC";
         if (data.timezone && data.timezone.offset !== undefined) {
             const hours = data.timezone.offset / 3600;
@@ -263,6 +294,10 @@
             { label: "State/Region", value: data.region || "Unknown" },
             { label: "Country", value: data.country || "Unknown" },
             { label: "Postal Code", value: data.postal || "Unknown" },
+            { label: "City (GPS)", value: gpsLocationData.city },
+            { label: "State/Region (GPS)", value: gpsLocationData.region },
+            { label: "Country (GPS)", value: gpsLocationData.country },
+            { label: "Postal Code (GPS)", value: gpsLocationData.postal },
             { label: "Time Zone", value: tzOffset },
             { label: "ISP", value: data.connection?.isp || "Unknown" },
             { label: "ASN", value: data.connection?.asn || "Unknown" },
