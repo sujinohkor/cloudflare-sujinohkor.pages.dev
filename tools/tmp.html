@@ -7,19 +7,8 @@
     body { font-family: sans-serif; padding: 20px; background-color: #121212; color: #fff; }
     .container { max-width: 600px; margin: 0 auto; }
     .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-    #toggleBtn {
-      padding: 8px 16px;
-      background-color: #ff9800;
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #toggleBtn.off {
-      background-color: #555;
-      color: #fff;
-    }
+    #toggleBtn { padding: 8px 16px; background-color: #ff9800; color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    #toggleBtn.off { background-color: #555; color: #fff; }
     #preview { max-width: 100%; height: auto; border-radius: 8px; }
     .palette { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
     .color-box {
@@ -72,9 +61,7 @@
       }
 
       // 이미지가 로드된 상태라면 즉시 재분석
-      if (preview.src && preview.style.display !== 'none') {
-        extractColors();
-      }
+      if (preview.src && preview.style.display !== 'none') { extractColors(); }
     });
 
     imageInput.addEventListener('change', (e) => {
@@ -122,9 +109,7 @@
         const finalB = clamp(b);
 
         // 무채색 제외 옵션이 켜져있고 해당 픽셀이 무채색인 경우 스킵
-        if (filterAchromatic && isAchromatic(finalR, finalG, finalB)) {
-          continue;
-        }
+        if (filterAchromatic && isAchromatic(finalR, finalG, finalB)) { continue; }
 
         const hex = "#" + [finalR, finalG, finalB]
           .map(x => x.toString(16).padStart(2, '0'))
@@ -188,9 +173,7 @@ function extractColors() {
   const finalG = imgData[i + 1];
   const finalB = imgData[i + 2];
 
-  if (filterAchromatic && isAchromatic(finalR, finalG, finalB)) {
-    continue;
-  }
+  if (filterAchromatic && isAchromatic(finalR, finalG, finalB)) { continue; }
 
   const hex = "#" + [finalR, finalG, finalB]
     .map(x => x.toString(16).padStart(2, '0'))
@@ -217,9 +200,7 @@ function extractColors() {
     });
 
     // 충분히 다른 색상일 때만 최종 팔레트에 추가
-    if (!isTooSimilar) {
-      finalPalette.push(hex);
-    }
+    if (!isTooSimilar) { finalPalette.push(hex); }
   }
 
   // 화면 출력
