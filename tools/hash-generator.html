@@ -271,7 +271,7 @@
     function resetAll() {
         textInput.value = ''; 
         contentMid.classList.remove('has-file');
-        contentMid.innerHTML = `<div>📄</div><div>Drag & Drop a file here or click to upload.</div>`;
+        contentMid.innerHTML = `<div style="font-size: 3rem;">📄</div><div>Drag & Drop a file here or click to upload.</div>`;
         clearCounters();
         generateHashes('');
     }
