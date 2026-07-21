@@ -49,6 +49,13 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }//*/
+        .bounce-text { font-size: 2.5rem; font-weight: bold; color: #ff9e40; display: flex; justify-content: center; align-items: center; }
+        .bounce-text span { display: inline-block; animation: bounce 1.2s infinite ease-in-out; animation-delay: calc(0.08s * var(--i)); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-15px); }
+            50% { transform: translateY(0); }
+        }
         .websites-list { list-style: none; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .websites-list h4 { font-weight: normal; color: #ccc; }
 
@@ -167,9 +174,19 @@
     </div>
 
     <script>
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
+        const title = document.getElementById('site-title');
+        const text = title.innerText;
+        title.innerHTML = ''; // 기존 텍스트 비우기
+    
+        // 글자별로 span 태그 및 --i 변수 자동 부여
+        [...text].forEach((char, index) => {
+            const span = document.createElement('span');
+            // 공백 처리
+            span.innerHTML = char === ' ' ? '&nbsp;' : char;
+            span.style.setProperty('--i', index + 1);
+            title.appendChild(span);
         });
+        document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     </script>
 </body>
 </html>
