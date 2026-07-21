@@ -30,8 +30,8 @@
         .card:hover .arrow { transform: translateX(10px); }
         
         /* Guest Book 카드 전용 특별 배경색 (다크 모드 기준) */
-        .card.guest-book-card { background: rgba(243, 128, 32, 0.15); border: 2px solid rgba(243, 128, 32, 0.4); }
-        .card.guest-book-card:hover { background: rgba(243, 128, 32, 0.25); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
+        .card.guest-book-card { background: rgba(243, 128, 32, 0.15); border: 2px solid transparent; }
+        .card.guest-book-card:hover { background: rgba(243, 128, 32, 0.25); border: 2px solid; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
 
         .websites-section { margin-top: 40px; text-align: center; }
         .highlight-text { color: #ff9e40; margin: 20px 0; }
@@ -56,9 +56,9 @@
         body.light-mode .card { background: #FDF5E6; }
         body.light-mode .card:hover { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
         body.light-mode .card p { color: #555; }
-        body.light-mode .card.guest-book-card { background: #fde8d7; border-color: #F38020; }
+        body.light-mode .card.guest-book-card { background: #fde8d7; border: 2px solid transparent; }
         /* 💡 라이트모드 호버 보완 */
-        body.light-mode .card.guest-book-card:hover { background: #fcd2b2; }
+        body.light-mode .card.guest-book-card:hover { background: #fcd2b2; border: 2px solid #F38020; }
         body.light-mode #theme-toggle { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #000; }
 
@@ -72,7 +72,7 @@
             .icon { font-size: 1.5rem; margin: 0 15px 0 0; width: 35px; text-align: center; }
             .card h3 { font-size: 1rem; margin: 0; }
             .card p, .card .arrow { display: none; }
-            .card.guest-book-card { background: rgba(243, 128, 32, 0.2); border: 2px solid #F38020; }
+            .card.guest-book-card { background: rgba(243, 128, 32, 0.2); border: 2px solid transparent; }
             body.light-mode .card.guest-book-card { background: #FFE8D6; }
             .websites-list { flex-direction: column; gap: 10px; }
         }
