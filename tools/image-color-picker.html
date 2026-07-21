@@ -32,14 +32,15 @@
     const preview = document.getElementById('preview');
     const paletteContainer = document.getElementById('palette');
 
-    // Hex 변환 함수 (한 자릿수 수치 앞에는 0을 붙임)
-    function componentToHex(c) {
-      const hex = c.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
+    // 수치가 0~255 정수인지 검증
+    function isValidRGBComponent(val) {
+      return Number.isInteger(val) && val >= 0 && val <= 255;
     }
 
+    // RGB -> Hex 변환
     function rgbToHex(r, g, b) {
-      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+      const toHex = (c) => c.toString(16).padStart(2, '0');
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
     }
 
     imageInput.addEventListener('change', (e) => {
@@ -58,24 +59,36 @@
       paletteContainer.innerHTML = '';
 
       try {
-        // Color Thief로 최대 10개 추출
-        const palette = colorThief.getPalette(preview, 10);
+        // 최대 10개 색상 요청
+        const rawPalette = colorThief.getPalette(preview, 10);
+        if (!rawPalette) return;
 
-        if (!palette) return;
+        const validHexSet = new Set(); // 중복 제거용 Set
 
-        palette.forEach(color => {
-          // 유효한 [r, g, b] 배열인 경우에만 DOM 생성
-          if (Array.isArray(color) && color.length === 3) {
-            const hex = rgbToHex(color[0], color[1], color[2]);
-            const box = document.createElement('div');
-            box.className = 'color-box';
-            box.style.backgroundColor = hex;
-            box.textContent = hex;
-            paletteContainer.appendChild(box);
+        rawPalette.forEach(color => {
+          // 1. 배열 형태 검증
+          if (!Array.isArray(color) || color.length < 3) return;
+
+          const [r, g, b] = color;
+
+          // 2. RGB 값이 모두 0~255 사이의 유효한 정수인지 검증
+          if (isValidRGBComponent(r) && isValidRGBComponent(g) && isValidRGBComponent(b)) {
+            const hex = rgbToHex(r, g, b);
+            validHexSet.add(hex); // 유효한 Hex 값만 저장 (중복 자동 제거)
           }
         });
+
+        // 검증을 통과한 순수 색상만 화면에 표시
+        validHexSet.forEach(hex => {
+          const box = document.createElement('div');
+          box.className = 'color-box';
+          box.style.backgroundColor = hex;
+          box.textContent = hex;
+          paletteContainer.appendChild(box);
+        });
+
       } catch (e) {
-        console.error("색상 추출 중 오류 발생:", e);
+        console.error("색상 추출 실패:", e);
       }
     });
   </script>
