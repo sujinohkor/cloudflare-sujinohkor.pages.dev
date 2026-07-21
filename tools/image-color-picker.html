@@ -51,19 +51,26 @@
     });
 
     preview.addEventListener('load', () => {
-      // getPalette(이미지요소, 추출할_색상_개수)
-      const palette = colorThief.getPalette(preview, 10);
-      paletteContainer.innerHTML = '';
+  // Color Thief로 팔레트 추출
+  const palette = colorThief.getPalette(preview, 10);
+  paletteContainer.innerHTML = '';
 
-      palette.forEach(color => {
-        const hex = rgbToHex(color[0], color[1], color[2]);
-        const box = document.createElement('div');
-        box.className = 'color-box';
-        box.style.backgroundColor = hex;
-        box.textContent = hex;
-        paletteContainer.appendChild(box);
-      });
-    });
+  // 팔레트 결과가 없거나 비어있는 경우 예외 처리
+  if (!palette || palette.length === 0) return;
+
+  // 실제 추출된 개수만큼만 반복문 수행
+  palette.forEach(color => {
+    // color 배열에 r, g, b 값이 정상적으로 존재하는지 확인
+    if (color && color.length === 3) {
+      const hex = rgbToHex(color[0], color[1], color[2]);
+      const box = document.createElement('div');
+      box.className = 'color-box';
+      box.style.backgroundColor = hex;
+      box.textContent = hex;
+      paletteContainer.appendChild(box);
+    }
+  });
+});
   </script>
 </body>
 </html>
