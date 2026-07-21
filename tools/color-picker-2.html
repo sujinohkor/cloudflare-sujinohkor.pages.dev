@@ -48,7 +48,7 @@
       // Canvas를 생성하여 이미지 픽셀 데이터 읽기
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
+
       // 계산 속도 최적화를 위해 가로세로 최대 150px로 축소하여 분석
       const scale = Math.min(150 / preview.naturalWidth, 150 / preview.naturalHeight, 1);
       canvas.width = Math.floor(preview.naturalWidth * scale);
