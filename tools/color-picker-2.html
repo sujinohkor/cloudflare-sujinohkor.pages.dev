@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>대표 색상 추출기</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background-color: #121212; color: #fff; }
+    .container { max-width: 600px; margin: 0 auto; }
+    #preview { max-width: 100%; height: auto; margin-top: 15px; border-radius: 8px; }
+    .palette { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .color-box {
+      width: 80px; height: 80px; border-radius: 6px;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 5px; font-size: 12px; font-weight: bold; color: #fff;
+      text-shadow: 0 0 3px #000; border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>대표 색상 추출기</h2>
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
+    <img id="preview" alt="업로드 이미지 미리보기" style="display:none;">
+    <div class="palette" id="palette"></div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const paletteContainer = document.getElementById('palette');
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        preview.src = event.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    preview.addEventListener('load', () => {
+      paletteContainer.innerHTML = '';
+
+      // Canvas를 생성하여 이미지 픽셀 데이터 읽기
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // 계산 속도 최적화를 위해 가로세로 최대 150px로 축소하여 분석
+      const scale = Math.min(150 / preview.naturalWidth, 150 / preview.naturalHeight, 1);
+      canvas.width = Math.floor(preview.naturalWidth * scale);
+      canvas.height = Math.floor(preview.naturalHeight * scale);
+
+      ctx.drawImage(preview, 0, 0, canvas.width, canvas.height);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      const colorCounts = {};
+
+      // 4바이트(R, G, B, A) 단위로 픽셀 순회
+      for (let i = 0; i < imgData.length; i += 4) {
+        const alpha = imgData[i + 3];
+        if (alpha < 128) continue; // 투명 영역 무시
+
+        // 색상을 살짝 양자화하여 유사한 색상을 하나로 묶음 (가장자리 노이즈 방지)
+        const quant = 8; // 8단위로 양자화
+        const r = Math.round(imgData[i] / quant) * quant;
+        const g = Math.round(imgData[i + 1] / quant) * quant;
+        const b = Math.round(imgData[i + 2] / quant) * quant;
+
+        // 범위 보정 (0~255)
+        const clamp = (v) => Math.min(255, Math.max(0, v));
+        const hex = "#" + [clamp(r), clamp(g), clamp(b)]
+          .map(x => x.toString(16).padStart(2, '0'))
+          .join('');
+
+        colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+      }
+
+      // 빈도수가 높은 순으로 정렬하여 상위 최대 10개 선택
+      const sortedColors = Object.keys(colorCounts)
+        .sort((a, b) => colorCounts[b] - colorCounts[a])
+        .slice(0, 10);
+
+      // 화면 출력
+      sortedColors.forEach(hex => {
+        const box = document.createElement('div');
+        box.className = 'color-box';
+        box.style.backgroundColor = hex;
+        box.textContent = hex;
+        paletteContainer.appendChild(box);
+      });
+    });
+  </script>
+</body>
+</html>
