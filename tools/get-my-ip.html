@@ -158,7 +158,7 @@
                     (geoError) => {
                         console.warn("GPS 권한 거부 또는 조회 불가:", geoError);
                     },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             }
         } catch (error) {
