@@ -28,6 +28,9 @@
         .card p { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; }
         .arrow { font-weight: bold; color: #ff9e40; transition: transform 0.3s; display: inline-block; }
         .card:hover .arrow { transform: translateX(10px); }
+        /* Guest Book 카드 전용 특별 배경색 (다크 모드 기준) */
+        .card.guest-book-card { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.4); }
+        .card.guest-book-card:hover { background: rgba(243, 128, 32, 0.25); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
 
         .websites-section { margin-top: 40px; text-align: center; }
         .highlight-text { color: #ff9e40; margin: 20px 0; }
@@ -68,6 +71,7 @@
         body.light-mode .card { background: #FDF5E6; }
         body.light-mode .card:hover { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
         body.light-mode .card p { color: #555; }
+        body.light-mode .card.guest-book-card { background: #fde8d7; border-color: #F38020; }
         body.light-mode #theme-toggle { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #000; }
 
@@ -141,7 +145,7 @@
                 <span class="arrow">Go to Color Picker →</span>
             </a>
 
-            <a href="https://sujinohkor.pages.dev/tools/hash-generator" class="card">
+            <a href="https://sujinohkor.pages.dev/tools/hash-generator" class="card guest-book-card">
                 <div class="icon">H</div>
                 <h3>Hash Generator</h3>
                 <p>hash-generator</p>
@@ -160,6 +164,13 @@
                 <h3>Get My IP</h3>
                 <p>get-my-ip</p>
                 <span class="arrow">Go to Get My IP →</span>
+            </a>
+
+            <a href="https://sujinohkor.pages.dev/tools/guest-book" class="card">
+                <div class="icon">📝</div>
+                <h3>Guest Book</h3>
+                <p>guest-book</p>
+                <span class="arrow">Go to Guest Book →</span>
             </a>
         </div>
 
