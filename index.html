@@ -28,31 +28,16 @@
         .card p { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; }
         .arrow { font-weight: bold; color: #ff9e40; transition: transform 0.3s; display: inline-block; }
         .card:hover .arrow { transform: translateX(10px); }
+        
         /* Guest Book 카드 전용 특별 배경색 (다크 모드 기준) */
         .card.guest-book-card { background: rgba(243, 128, 32, 0.15); border: 2px solid rgba(243, 128, 32, 0.4); }
         .card.guest-book-card:hover { background: rgba(243, 128, 32, 0.25); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
 
         .websites-section { margin-top: 40px; text-align: center; }
         .highlight-text { color: #ff9e40; margin: 20px 0; }
-        /*.highlight-text { animation: float 3s ease-in-out infinite; }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }//*/
-        /*.highlight-text { animation: colorChange 5s infinite; }
-        @keyframes colorChange {
-            0% { color: #ff9e40; }
-            50% { color: #ffc107; }
-            100% { color: #ff9e40; }
-        }//*/
-        /*.highlight-text { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }//*/
-        .bounce-text { font-size: 2.5rem; font-weight: bold; color: #ff9e40; display: flex; justify-content: center; align-items: center; }
+        
+        /* 💡 flex 속성을 inline-block 및 text-align으로 변경하여 공백 파싱 레이아웃 유지 */
+        .bounce-text { font-size: 2.5rem; font-weight: bold; color: #ff9e40; display: inline-block; text-align: center; width: 100%; }
         .bounce-text span { display: inline-block; animation: bounce 1.2s infinite ease-in-out; animation-delay: calc(0.08s * var(--i)); }
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
@@ -72,10 +57,12 @@
         body.light-mode .card:hover { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.3); }
         body.light-mode .card p { color: #555; }
         body.light-mode .card.guest-book-card { background: #fde8d7; border-color: #F38020; }
+        /* 💡 라이트모드 호버 보완 */
+        body.light-mode .card.guest-book-card:hover { background: #fcd2b2; }
         body.light-mode #theme-toggle { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #000; }
 
-        /* 모바일 최적화 핵심 복원 */
+        /* 모바일 최적화 */
         @media (max-width: 600px) {
             .header-wrapper { flex-direction: column; min-height: auto; gap: 10px; margin-bottom: 20px; position: relative; align-items: flex-end; }
             .header-wrapper h1 { position: relative; font-size: 1.5rem; margin: 0; width: 100%; text-align: center; }
@@ -92,7 +79,6 @@
     </style>
 </head>
 <body>
-    <!-- (본문 내용은 이전과 동일) -->
     <div class="container">
         <a href="https://git.io/typing-svg" class="typing-container">
             <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=25&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice.;I+hope+you+enjoy+it+as+much+as+I+do." alt="Typing SVG" />
