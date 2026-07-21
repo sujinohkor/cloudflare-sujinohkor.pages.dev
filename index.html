@@ -175,17 +175,17 @@
 
     <script>
         const title = document.getElementById('site-title');
-        const text = title.innerText;
-        title.innerHTML = ''; // 기존 텍스트 비우기
+        if (title) {
+            const text = title.innerText;
+            title.innerHTML = ''; 
     
-        // 글자별로 span 태그 및 --i 변수 자동 부여
-        [...text].forEach((char, index) => {
-            const span = document.createElement('span');
-            // 공백 처리
-            span.innerHTML = char === ' ' ? '&nbsp;' : char;
-            span.style.setProperty('--i', index + 1);
-            title.appendChild(span);
-        });
+            [...text].forEach((char, index) => {
+                const span = document.createElement('span');
+                span.innerHTML = char === ' ' ? '&nbsp;' : char;
+                span.style.setProperty('--i', index + 1);
+                title.appendChild(span);
+            });
+        }
         document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     </script>
 </body>
