@@ -175,7 +175,7 @@
 
     // 해시 연산 함수 (호출 시 텍스트나 WordArray 객체를 인자로 받음)
     function generateHashes(targetData) {
-        if (!targetData) { hashOutput.value = 'Hashes will be generated here.'; return; }
+        if (!targetData) { hashOutput.value = ''; return; }
     
         try {
             const md5Hash = CryptoJS.MD5(targetData).toString();
