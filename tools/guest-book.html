@@ -262,15 +262,15 @@
         bodyDiv.textContent = data.content || "";
 
         // 메타 정보 (날짜/시간, 국가)
-        let dateString = "방금 전";
+        let dateString = "Just Now";
         if (data.createdAt) {
-          dateString = data.createdAt.toDate().toLocaleString("ko-KR");
+          dateString = data.createdAt.toDate().toLocaleString("en-US");
         }
-        const countryVal = data.country || "알 수 없음";
+        const countryVal = data.country || "Unknown";
 
         const metaDiv = document.createElement("div");
         metaDiv.className = "meta";
-        metaDiv.textContent = `${dateString} | 국가: ${countryVal}`;
+        metaDiv.textContent = `${dateString} | Location: ${countryVal}`;
 
         li.appendChild(authorDiv);
         li.appendChild(bodyDiv);
