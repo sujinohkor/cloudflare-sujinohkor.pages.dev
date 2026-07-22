@@ -5,12 +5,12 @@ export async function onRequestPost(context) {
 
     const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: "GEMINI_API_KEY가 설정되지 않았습니다." }), { status: 500 });
+      return new Response(JSON.stringify({ error: "Cloudflare 대시보드에 GEMINI_API_KEY가 설정되지 않았습니다." }), { status: 500 });
     }
 
-    // models/gemini-1.5-flash 경로 적용
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-    
+    // 파이썬 코드의 'v1' 버전 + 'models/gemini-2.5-flash' 반영
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
     const response = await fetch(geminiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
