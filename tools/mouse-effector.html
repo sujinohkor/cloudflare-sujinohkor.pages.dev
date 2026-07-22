@@ -443,25 +443,26 @@
 
     // 구문 강조 함수
     // 구문 강조 함수 (버그 수정 버전)
+    // 구문 강조 함수 (토큰 분리 방식)
     function highlightSyntax(code) {
-        // 1. 특수문자 이스케이프
-        let str = code
+        // 1. 기본 HTML 이스케이프
+        const escaped = code
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
     
-        // 2. 치환된 &lt;script&gt; 형태의 태그 치환 (HTML 이스케이프 상태를 고려)
-        str = str.replace(/(&lt;\/?script&gt;|&lt;\/?span&gt;|&lt;\/?div&gt;)/g, '<span class="hl-tag">$1</span>');
+        // 2. 단일 정규식 패턴으로 토큰화 및 하이라이팅
+        const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;\/?[a-zA-Z0-9]+.*?&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
     
-        // 3. 주석, 문자열, 예약어 치환
-        str = str
-            .replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/|&lt;!--[\s\S]*?--&gt;)/g, '<span class="hl-comment">$1</span>')
-            .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g, '<span class="hl-string">$1</span>')
-            .replace(/\b(const|let|var|function|return|if|else|for|while|new|this)\b/g, '<span class="hl-keyword">$1</span>')
-            .replace(/\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b/g, '<span class="hl-builtin">$1</span>')
-            .replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
-    
-        return str;
+        return escaped.replace(tokenPattern, (match, comment, string, tag, keyword, builtin, number) => {
+            if (comment) return `<span class="hl-comment">${comment}</span>`;
+            if (string)  return `<span class="hl-string">${string}</span>`;
+            if (tag)     return `<span class="hl-tag">${tag}</span>`;
+            if (keyword) return `<span class="hl-keyword">${keyword}</span>`;
+            if (builtin) return `<span class="hl-builtin">${builtin}</span>`;
+            if (number)  return `<span class="hl-number">${number}</span>`;
+            return match;
+        });
     }
 
     // 코드 갱신 및 줄 번호 생성
