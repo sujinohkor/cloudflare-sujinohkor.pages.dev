@@ -1,29 +1,188 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>방명록</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Book</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+        
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 16px; overflow: hidden; transition: 0.3s;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        
+        .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+        .menu-list a { display: flex; justify-content: space-between; color: #fff; font-size: 0.95rem; }
+        .menu-list span { color: #e68a35; font-weight: bold; }
+
+        .content-top { 
+            flex: 0 0 auto; border: 2px solid #ff9e40; border-radius: 16px; 
+            display: flex; flex-direction: column; padding: 16px; gap: 12px; 
+        }
+        .content-top input[type="text"] {
+            background: transparent; border: 1px solid #ff9e40; border-radius: 8px;
+            padding: 10px 14px; color: #fff; font-size: 0.95rem; outline: none;
+            font-family: inherit;
+        }
+        
+        .content-wrapper {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .char-counter {
+            text-align: right; font-size: 0.8rem; color: #ff9e40; padding-right: 4px;
+        }
+
+        .content-down { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; 
+            padding: 20px; overflow-y: auto; display: flex; flex-direction: column; 
+        }
+
+        /* Guestbook List Styling */
+        .guestbook-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .guestbook-item {
+            background: rgba(255, 158, 64, 0.05); border: 1px solid rgba(255, 158, 64, 0.3);
+            border-radius: 8px; padding: 12px 16px; word-break: break-all;
+        }
+        .guestbook-item .author { color: #ff9e40; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; }
+        .guestbook-item .body { color: #eee; font-size: 0.95rem; white-space: pre-wrap; }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
+        body.light-mode input[type="text"] { color: #000; border-color: #F38020; }
+        body.light-mode .char-counter { color: #F38020; }
+        body.light-mode .content-top, body.light-mode .content-down { border-color: #F38020; }
+        body.light-mode .guestbook-item { background: rgba(243, 128, 32, 0.05); border-color: rgba(243, 128, 32, 0.3); }
+        body.light-mode .guestbook-item .author { color: #F38020; }
+        body.light-mode .guestbook-item .body { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (max-width: 600px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; height: 100vh; }
+        }
+    </style>
 </head>
 <body>
-  <h2>방명록 작성</h2>
-  <form id="guestbook-form">
-    <input type="text" id="nickname" placeholder="닉네임" required><br><br>
-    <textarea id="content" placeholder="내용을 입력하세요" required></textarea><br><br>
-    <button type="submit">등록</button>
-  </form>
 
-  <hr>
+<button class="menu-toggle-btn" id="menu-toggle">MENU</button>
 
-  <h2>방명록 목록</h2>
-  <ul id="guestbook-list"></ul>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <nav class="menu-list">
+            <a>Total Entries <span id="note-count-all">0</span></a>
+        </nav>
 
-  <!-- Firebase SDK 불러오기 -->
-  <script type="module">
+        <div class="bottom-btns" style="margin-top: auto;">
+            <button class="menu-btn" id="submit-btn">Save Note</button>
+        </div>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header class="top-section">
+            <h1>Guest Book</h1>
+            <p>Leave a message below.</p>
+        </header>
+
+        <form id="guestbook-form" style="display: contents;">
+            <section class="content-top">
+                <input type="text" id="nickname" placeholder="Nickname" maxlength="20" required autocomplete="off">
+                
+                <div class="content-wrapper">
+                    <input type="text" id="content" placeholder="Enter your message here..." maxlength="1000" required autocomplete="off">
+                    <div class="char-counter"><span id="char-count">0</span>/1000자</div>
+                </div>
+            </section>
+        </form>
+
+        <section class="content-down">
+            <ul id="guestbook-list" class="guestbook-list"></ul>
+        </section>
+    </main>
+</div>
+
+<script>
+    // UI Event Handlers
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menu-toggle');
+    const mainContent = document.getElementById('main-content');
+    const themeToggle = document.getElementById('theme-toggle');
+    const nicknameInput = document.getElementById('nickname');
+    const contentInput = document.getElementById('content');
+    const charCount = document.getElementById('char-count');
+    const guestbookForm = document.getElementById('guestbook-form');
+
+    menuToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
+    themeToggle.addEventListener('click', () => document.body.classList.toggle('light-mode'));
+    mainContent.addEventListener('click', () => {
+        if (sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    // content 글자 수 카운터
+    contentInput.addEventListener('input', () => {
+        charCount.textContent = contentInput.value.length;
+    });
+
+    // Enter 키 동작 제어
+    nicknameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            contentInput.focus();
+        }
+    });
+
+    contentInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            guestbookForm.requestSubmit();
+        }
+    });
+
+    // 사이드바의 Save Note 버튼 클릭 시 폼 제출
+    document.getElementById('submit-btn').addEventListener('click', () => {
+        guestbookForm.requestSubmit();
+    });
+</script>
+
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } 
       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 아까 복사해둔 CDN / Config 설정 값을 여기에 그대로 유지합니다.
     const firebaseConfig = {
       apiKey: "AIzaSyBaH4OIqC_x0-6jIq4RnJv_wCD9efC4wUU",
       authDomain: "test-73099.firebaseapp.com",
@@ -35,42 +194,59 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // 아까 생성한 컬렉션 이름 대소문자 동일하게 설정
     const collectionRef = collection(db, "GUEST-BOOK");
 
     // 1. 방명록 등록
-    document.getElementById("guestbook-form").addEventListener("submit", async (e) => {
+    guestbookForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const nickname = document.getElementById("nickname").value;
-      const content = document.getElementById("content").value;
+      
+      const nicknameVal = nicknameInput.value.trim();
+      const contentVal = contentInput.value.trim();
+
+      if (!nicknameVal || !contentVal) return;
 
       try {
         await addDoc(collectionRef, {
-          nickname: nickname,
-          content: content,
+          nickname: nicknameVal,
+          content: contentVal,
           createdAt: serverTimestamp()
         });
 
-        document.getElementById("nickname").value = "";
-        document.getElementById("content").value = "";
+        nicknameInput.value = "";
+        contentInput.value = "";
+        charCount.textContent = "0";
       } catch (error) {
         console.error("저장 실패:", error);
       }
     });
 
-    // 2. 방명록 실시간 조회 및 화면 표시
+    // 2. 방명록 실시간 조회 및 목록 렌더링
     const q = query(collectionRef, orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
       const listElement = document.getElementById("guestbook-list");
+      const countElement = document.getElementById("note-count-all");
+      
       listElement.innerHTML = "";
+      countElement.textContent = snapshot.docs.length;
 
       snapshot.docs.forEach((doc) => {
         const data = doc.data();
         const li = document.createElement("li");
-        li.textContent = `[${data.nickname}] ${data.content}`;
+        li.className = "guestbook-item";
+
+        const authorDiv = document.createElement("div");
+        authorDiv.className = "author";
+        authorDiv.textContent = data.nickname || "Anonymous";
+
+        const bodyDiv = document.createElement("div");
+        bodyDiv.className = "body";
+        bodyDiv.textContent = data.content || "";
+
+        li.appendChild(authorDiv);
+        li.appendChild(bodyDiv);
         listElement.appendChild(li);
       });
     });
-  </script>
+</script>
 </body>
 </html>
