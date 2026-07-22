@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Text Follower Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #202020;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        /* 입력 영역 (content-top) */
+        .content-top {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .content-top label {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+        .content-top input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: #101010;
+            border: 2px solid #ff9e40;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* 소스코드 출력 영역 (content-mid) */
+        .content-mid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .content-mid label {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+        .content-mid textarea {
+            width: 100%;
+            height: 220px;
+            padding: 12px;
+            background: #101010;
+            border: 2px solid #ff9e40;
+            border-radius: 8px;
+            color: #00ff66;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        /* 미리보기 및 테스트 영역 (content-down) */
+        .content-down {
+            position: relative;
+            flex: 1;
+            min-height: 250px;
+            border: 2px dashed #ff9e40;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 158, 64, 0.05);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        .content-down p {
+            color: #888;
+            font-size: 1.1rem;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* 마우스 뒤따라오는 글자 스타일 */
+        .trail-char {
+            position: absolute;
+            pointer-events: none;
+            font-weight: bold;
+            color: #ff9e40;
+            text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
+            transition: transform 0.1s ease-out, opacity 0.2s ease;
+            user-select: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단: 텍스트 입력박스 -->
+    <div class="content-top">
+        <label for="text-input">마우스 뒤에 표시할 텍스트 입력</label>
+        <input type="text" id="text-input" value="Hello World!" placeholder="글자를 입력하세요...">
+    </div>
+
+    <!-- 중단: readonly 텍스트에어리어 (생성된 소스코드 표출) -->
+    <div class="content-mid">
+        <label for="code-output">생성된 HTML 소스코드</label>
+        <textarea id="code-output" readonly></textarea>
+    </div>
+
+    <!-- 하단: 마우스오버 테스트 영역 -->
+    <div class="content-down" id="preview-area">
+        <p>이 영역 위에 마우스를 올리면 효과를 확인할 수 있습니다.</p>
+    </div>
+
+<script>
+    const textInput = document.getElementById('text-input');
+    const codeOutput = document.getElementById('code-output');
+    const previewArea = document.getElementById('preview-area');
+
+    let trailElements = [];
+    let mousePos = { x: 0, y: 0 };
+    let charPositions = [];
+
+    // 1. 소스코드 자동 생성 및 업데이트
+    function updateGeneratedCode(text) {
+        const template = 
+`<div id="preview-area" style="position:relative; width:100%; height:300px; border:1px solid #ccc; overflow:hidden;">
+  <p>마우스를 올려보세요.</p>
+</div>
+
+<script>
+(function() {
+  const text = "${text}";
+  const container = document.getElementById('preview-area');
+  const chars = [];
+  let pos = { x: 0, y: 0 };
+  let history = [];
+
+  text.split('').forEach((ch, i) => {
+    const el = document.createElement('span');
+    el.style.cssText = 'position:absolute; pointer-events:none; color:#ff9e40; font-weight:bold; transition:transform 0.1s ease-out;';
+    el.textContent = ch;
+    container.appendChild(el);
+    chars.push(el);
+    history.push({ x: 0, y: 0 });
+  });
+
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    pos.x = e.clientX - rect.left;
+    pos.y = e.clientY - rect.top;
+  });
+
+  function render() {
+    history.unshift({ ...pos });
+    history.pop();
+    chars.forEach((el, i) => {
+      const p = history[Math.min(i * 3, history.length - 1)];
+      el.style.transform = \`translate(\${p.x + (i * 12) + 10}px, \${p.y + 10}px)\`;
+    });
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+<\/script>`;
+        codeOutput.value = template;
+    }
+
+    // 2. 미리보기 영역 요소 세팅
+    function setupPreviewText(text) {
+        // 기존 요소 제거
+        trailElements.forEach(el => el.remove());
+        trailElements = [];
+        charPositions = [];
+
+        const chars = text.split('');
+        chars.forEach((ch, index) => {
+            const span = document.createElement('span');
+            span.className = 'trail-char';
+            span.textContent = ch === ' ' ? '\u00A0' : ch;
+            span.style.opacity = '0';
+            previewArea.appendChild(span);
+            trailElements.push(span);
+            charPositions.push({ x: 0, y: 0 });
+        });
+    }
+
+    // 3. 입력창 이벤트 핸들러
+    textInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        updateGeneratedCode(val);
+        setupPreviewText(val);
+    });
+
+    // 4. 하단 영역 마우스 이동 처리
+    previewArea.addEventListener('mousemove', (e) => {
+        const rect = previewArea.getBoundingClientRect();
+        mousePos.x = e.clientX - rect.left;
+        mousePos.y = e.clientY - rect.top;
+
+        trailElements.forEach(el => el.style.opacity = '1');
+    });
+
+    previewArea.addEventListener('mouseleave', () => {
+        trailElements.forEach(el => el.style.opacity = '0');
+    });
+
+    // 5. 프레임 애니메이션 처리 (마우스 뒤를 부드럽게 쫓아오는 효과)
+    function animate() {
+        let currentX = mousePos.x;
+        let currentY = mousePos.y;
+
+        for (let i = 0; i < trailElements.length; i++) {
+            if (i === 0) {
+                charPositions[i].x += (currentX + 12 - charPositions[i].x) * 0.3;
+                charPositions[i].y += (currentY + 12 - charPositions[i].y) * 0.3;
+            } else {
+                const prev = charPositions[i - 1];
+                charPositions[i].x += (prev.x + 12 - charPositions[i].x) * 0.3;
+                charPositions[i].y += (prev.y - charPositions[i].y) * 0.3;
+            }
+
+            if (trailElements[i]) {
+                trailElements[i].style.left = `${charPositions[i].x}px`;
+                trailElements[i].style.top = `${charPositions[i].y}px`;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    // 초기화 실행
+    updateGeneratedCode(textInput.value);
+    setupPreviewText(textInput.value);
+    animate();
+</script>
+
+</body>
+</html>
