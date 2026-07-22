@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Effector</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+        
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; min-height: 100vh; gap: 20px; overflow-y: auto; transition: 0.3s;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        }
+        .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        
+        /* Workspace Structure */
+        .workspace-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .content-top { display: flex; flex-direction: column; gap: 8px; }
+        .content-top label { color: #ff9e40; font-weight: bold; }
+        .content-top input[type="text"] {
+            width: 100%; padding: 12px; background: #101010; border: 2px solid #ff9e40;
+            border-radius: 16px; color: #fff; font-size: 1rem; outline: none;
+        }
+
+        .content-mid { display: flex; flex-direction: column; gap: 8px; }
+        .content-mid label { color: #ff9e40; font-weight: bold; }
+        .content-mid textarea {
+            width: 100%; height: 100%; min-height: 250px; padding: 12px;
+            background: #101010; border: 2px solid #ff9e40; border-radius: 16px;
+            color: #00ff66; font-family: 'Consolas', monospace; font-size: 0.9rem;
+            resize: none; outline: none;
+        }
+
+        .content-down-wrapper { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .content-down-wrapper label { color: #ff9e40; font-weight: bold; }
+        .content-down {
+            position: relative; flex: 1; min-height: 250px;
+            border: 2px dashed #ff9e40; border-radius: 16px; display: flex;
+            align-items: center; justify-content: center; background: rgba(255, 158, 64, 0.05);
+            overflow: hidden; cursor: crosshair;
+        }
+        .content-down p { color: #888; font-size: 1.1rem; pointer-events: none; user-select: none; }
+
+        .trail-char {
+            position: absolute; pointer-events: none; font-weight: bold;
+            color: #ff9e40; text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
+            transition: transform 0.1s ease-out, opacity 0.2s ease; user-select: none; z-index: 100;
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-mid textarea, body.light-mode .content-top input { background: #FDF5E6; color: #000; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (min-width: 769px) {
+            .workspace-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            .content-mid { flex: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; min-height: 100svh; }
+            .workspace-container { gap: 15px; }
+            .content-mid { flex: initial; }
+            .content-mid textarea { height: 180px; min-height: 180px; }
+            .content-down-wrapper { flex: 1; }
+            .content-down { height: 100%; min-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <div class="bottom-btns">
+            <button class="menu-btn active" id="btn-none" onclick="switchMode('none')">None</button>
+            <button class="menu-btn" id="btn-type-a" onclick="switchMode('typeA')">Type A</button>
+            <button class="menu-btn" onclick="alert('Not Applied')">Type B</button>
+            <button class="menu-btn" onclick="alert('Not Applied')">Type C</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1 id="page-title">Mouse Effector</h1>
+            <p id="page-desc">Select a mode from the sidebar to generate custom mouse effects.</p>
+        </header>
+
+        <!-- 레이아웃 틀 유지: 문구창 / 코드창 / 프리뷰창 -->
+        <div class="content-top">
+            <label for="text-input">텍스트 입력</label>
+            <input type="text" id="text-input" value="Hello World!" placeholder="글자를 입력하세요...">
+        </div>
+
+        <div class="workspace-container">
+            <div class="content-mid">
+                <label for="code-output">생성된 HTML 소스코드</label>
+                <textarea id="code-output" readonly></textarea>
+            </div>
+
+            <div class="content-down-wrapper">
+                <label>미리보기 (Preview)</label>
+                <div class="content-down" id="preview-area">
+                    <p id="preview-msg">이 영역 위에 마우스를 올리면 효과를 확인할 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const textInput = document.getElementById('text-input');
+    const codeOutput = document.getElementById('code-output');
+    const previewArea = document.getElementById('preview-area');
+    const previewMsg = document.getElementById('preview-msg');
+
+    let currentMode = 'none';
+    let trailElements = [];
+    let mousePos = { x: 0, y: 0 };
+    let charPositions = [];
+    let trailAnimationId = null;
+
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+
+    // 모드 변경 제어 (None / Type A)
+    function switchMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active'));
+
+        // 기존 마우스 애니메이션 및 추적 요소 초기화
+        if (trailAnimationId) cancelAnimationFrame(trailAnimationId);
+        trailElements.forEach(el => el.remove());
+        trailElements = [];
+        charPositions = [];
+
+        if (mode === 'none') {
+            document.getElementById('btn-none').classList.add('active');
+            previewMsg.textContent = "현재 적용된 마우스 효과가 없습니다 (None).";
+            updateUI();
+        } else if (mode === 'typeA') {
+            document.getElementById('btn-type-a').classList.add('active');
+            previewMsg.textContent = "이 영역 위에 마우스를 올리면 효과를 확인할 수 있습니다.";
+            updateUI();
+            animate();
+        }
+    }
+
+    // 통합 UI 갱신 함수
+    function updateUI() {
+        const text = textInput.value;
+
+        if (currentMode === 'none') {
+            // None 모드: 효과 미적용 코드 생성
+            codeOutput.value = `<!-- No Mouse Effect Applied -->\n<span>${text}</span>`;
+            
+            // 기존 효과 요소 제거
+            trailElements.forEach(el => el.remove());
+            trailElements = [];
+        } 
+        else if (currentMode === 'typeA') {
+            // Type A 모드: 스크립트 생성 및 미리보기 노드 세팅
+            codeOutput.value = `<script>
+(function() {
+  const text = "${text}";
+  const chars = [];
+  let pos = { x: 0, y: 0 };
+  let history = [];
+
+  text.split('').forEach((ch, i) => {
+    const el = document.createElement('span');
+    el.style.cssText = 'position:fixed; pointer-events:none; color:#ff9e40; font-weight:bold; z-index:9999; transition:transform 0.1s ease-out;';
+    el.textContent = ch === ' ' ? '\\u00A0' : ch;
+    document.body.appendChild(el);
+    chars.push(el);
+    history.push({ x: 0, y: 0 });
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    pos.x = e.clientX;
+    pos.y = e.clientY;
+  });
+
+  function render() {
+    history.unshift({ ...pos });
+    history.pop();
+    chars.forEach((el, i) => {
+      const p = history[Math.min(i * 3, history.length - 1)];
+      el.style.transform = \`translate(\${p.x + (i * 12) + 15}px, \${p.y + 15}px)\`;
+    });
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+<\/script>`;
+
+            setupPreviewText(text);
+        }
+    }
+
+    function setupPreviewText(text) {
+        trailElements.forEach(el => el.remove());
+        trailElements = [];
+        charPositions = [];
+
+        const chars = text.split('');
+        chars.forEach((ch) => {
+            const span = document.createElement('span');
+            span.className = 'trail-char';
+            span.textContent = ch === ' ' ? '\u00A0' : ch;
+            span.style.opacity = '0';
+            previewArea.appendChild(span);
+            trailElements.push(span);
+            charPositions.push({ x: 0, y: 0 });
+        });
+    }
+
+    // 이벤트 리스너
+    textInput.addEventListener('input', updateUI);
+
+    previewArea.addEventListener('mousemove', (e) => {
+        if (currentMode !== 'typeA') return;
+        const rect = previewArea.getBoundingClientRect();
+        mousePos.x = e.clientX - rect.left;
+        mousePos.y = e.clientY - rect.top;
+        trailElements.forEach(el => el.style.opacity = '1');
+    });
+
+    previewArea.addEventListener('mouseleave', () => {
+        if (currentMode !== 'typeA') return;
+        trailElements.forEach(el => el.style.opacity = '0');
+    });
+
+    function animate() {
+        if (currentMode === 'typeA') {
+            let currentX = mousePos.x;
+            let currentY = mousePos.y;
+
+            for (let i = 0; i < trailElements.length; i++) {
+                if (i === 0) {
+                    charPositions[i].x += (currentX + 12 - charPositions[i].x) * 0.3;
+                    charPositions[i].y += (currentY + 12 - charPositions[i].y) * 0.3;
+                } else {
+                    const prev = charPositions[i - 1];
+                    charPositions[i].x += (prev.x + 12 - charPositions[i].x) * 0.3;
+                    charPositions[i].y += (prev.y - charPositions[i].y) * 0.3;
+                }
+
+                if (trailElements[i]) {
+                    trailElements[i].style.left = `${charPositions[i].x}px`;
+                    trailElements[i].style.top = `${charPositions[i].y}px`;
+                }
+            }
+        }
+        trailAnimationId = requestAnimationFrame(animate);
+    }
+
+    // 초기 실행
+    switchMode('none');
+</script>
+</body>
+</html>
