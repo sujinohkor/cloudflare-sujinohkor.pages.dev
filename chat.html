@@ -75,31 +75,31 @@
     inputEl.focus();
   }
 
-  // Gemini 요청 함수 (제시해주신 엔드포인트 /chat 적용)
-  async function sendMessage(userInput, loadingMsgEl) {
-    try {
-      const response = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userInput })
-      });
+// chat.html 내 sendMessage 함수 수정 예시
+async function sendMessage(userInput, loadingMsgEl) {
+  try {
+    const response = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userInput })
+    });
 
-      if (!response.ok) {
-        throw new Error(`서버 응답 오류 (상태 코드: ${response.status})`);
-      }
+    const data = await response.json();
 
-      const data = await response.json();
-      
-      // 대기 메시지 삭제 후 실제 답변 출력
-      loadingMsgEl.remove();
-      appendMessage(data.reply || "답변을 가져오지 못했습니다.", 'bot');
-
-    } catch (error) {
-      console.error("Gemini 호출 에러:", error);
-      loadingMsgEl.remove();
-      appendMessage("오류가 발생했습니다: " + error.message, 'bot');
+    if (!response.ok) {
+      // 서버(chat.js)가 전달한 세부 에러 메시지가 있다면 출력
+      throw new Error(data.error || `서버 응답 오류 (상태 코드: ${response.status})`);
     }
+    
+    loadingMsgEl.remove();
+    appendMessage(data.reply || "답변을 가져오지 못했습니다.", 'bot');
+
+  } catch (error) {
+    console.error("Gemini 호출 에러:", error);
+    loadingMsgEl.remove();
+    appendMessage("오류가 발생했습니다: " + error.message, 'bot');
   }
+}
 </script>
 
 </body>
