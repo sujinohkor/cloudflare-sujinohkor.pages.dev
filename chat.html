@@ -75,10 +75,10 @@
     inputEl.focus();
   }
 
-  // Gemini 요청 함수 (제시해주신 엔드포인트 /codes/chat 적용)
+  // Gemini 요청 함수 (제시해주신 엔드포인트 /functions/chat 적용)
   async function sendMessage(userInput, loadingMsgEl) {
     try {
-      const response = await fetch('/codes/chat', {
+      const response = await fetch('/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userInput })
