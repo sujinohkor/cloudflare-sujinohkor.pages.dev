@@ -65,10 +65,11 @@
         }
         .content-down p { color: #888; font-size: 1.1rem; pointer-events: none; user-select: none; }
 
-        .trail-char {
+        /* 비처럼 떨어지는 요소 및 트레일 전용 스타일 */
+        .rain-char, .trail-char {
             position: absolute; pointer-events: none; font-weight: bold;
             color: #ff9e40; text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
-            transition: transform 0.1s ease-out, opacity 0.2s ease; user-select: none; z-index: 100;
+            user-select: none; z-index: 100;
         }
 
         /* 4. Theme (Light Mode) */
@@ -158,22 +159,19 @@
     let charPositions = [];
     let trailAnimationId = null;
     let typeBCharIndex = 0;
-    let lastTypeBTime = 0; // 누락되어 있던 변수 추가 선언
+    let lastTypeBTime = 0;
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    // 모드 변경 제어 (None / Type A / Type B)
+    // 모드 변경 제어
     function switchMode(mode) {
         currentMode = mode;
         document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active'));
 
-        // 기존 마우스 애니메이션 및 추적 요소 초기화
         if (trailAnimationId) cancelAnimationFrame(trailAnimationId);
-        trailElements.forEach(el => el.remove());
-        trailElements = [];
-        charPositions = [];
+        clearTrailElements();
 
         if (mode === 'none') {
             document.getElementById('btn-none').classList.add('active');
@@ -186,19 +184,24 @@
             animate();
         } else if (mode === 'typeB') {
             document.getElementById('btn-type-b').classList.add('active');
-            previewMsg.textContent = "이 영역 위에 마우스를 올리면 글자가 비처럼 떨어집니다.";
+            previewMsg.textContent = "이 영역 위에서 마우스를 움직이면 글자가 흩날리며 떨어집니다.";
             updateUI();
         }
     }
 
-    // 통합 UI 갱신 함수
+    function clearTrailElements() {
+        trailElements.forEach(el => el.remove());
+        trailElements = [];
+        charPositions = [];
+    }
+
+    // UI 및 생성 소스코드 갱신
     function updateUI() {
         const text = textInput.value;
 
         if (currentMode === 'none') {
             codeOutput.value = `<!-- No Mouse Effect Applied -->\n<span>${text}</span>`;
-            trailElements.forEach(el => el.remove());
-            trailElements = [];
+            clearTrailElements();
         } 
         else if (currentMode === 'typeA') {
             codeOutput.value = `<script>
@@ -234,7 +237,6 @@
   render();
 })();
 <\/script>`;
-
             setupPreviewText(text);
         }
         else if (currentMode === 'typeB') {
@@ -244,7 +246,7 @@
   const chars = text.split('');
   let charIndex = 0;
   let lastTime = 0;
-  const cooldown = 100;
+  const cooldown = 50; // 생성 속도 (숫자가 작을수록 촘촘하게 흩날림)
 
   window.addEventListener('mousemove', (e) => {
     const now = Date.now();
@@ -258,19 +260,20 @@
     el.textContent = ch === ' ' ? '\\u00A0' : ch;
     el.style.cssText = \`
       position: fixed;
-      left: \${e.clientX + (Math.random() * 16 - 8)}px;
-      top: \${e.clientY + 12}px;
+      left: \${e.clientX + (Math.random() * 20 - 10)}px;
+      top: \${e.clientY + 10}px;
       pointer-events: none;
       color: #ff9e40;
       font-weight: bold;
       z-index: 9999;
-      transition: transform 1.2s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 1.2s ease-in;
+      transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease-out;
       opacity: 1;
+      transform: translateY(0px);
     \`;
     document.body.appendChild(el);
 
     requestAnimationFrame(() => {
-      el.style.transform = 'translateY(120px)';
+      el.style.transform = \`translateY(\${80 + Math.random() * 40}px) rotate(\${Math.random() * 40 - 20}deg)\`;
       el.style.opacity = '0';
     });
 
@@ -280,17 +283,12 @@
   });
 })();
 <\/script>`;
-
-            trailElements.forEach(el => el.remove());
-            trailElements = [];
+            clearTrailElements();
         }
     }
 
     function setupPreviewText(text) {
-        trailElements.forEach(el => el.remove());
-        trailElements = [];
-        charPositions = [];
-
+        clearTrailElements();
         const chars = text.split('');
         chars.forEach((ch) => {
             const span = document.createElement('span');
@@ -303,7 +301,7 @@
         });
     }
 
-    // 이벤트 리스너
+    // 이벤트 처리
     textInput.addEventListener('input', updateUI);
 
     previewArea.addEventListener('mousemove', (e) => {
@@ -317,7 +315,7 @@
         } 
         else if (currentMode === 'typeB') {
             const now = Date.now();
-            if (now - lastTypeBTime < 100) return;
+            if (now - lastTypeBTime < 50) return; // 50ms마다 자연스럽게 흩날림
             lastTypeBTime = now;
 
             const rect = previewArea.getBoundingClientRect();
@@ -329,20 +327,29 @@
             typeBCharIndex++;
 
             const el = document.createElement('span');
-            el.className = 'trail-char';
+            el.className = 'rain-char';
             el.textContent = ch === ' ' ? '\u00A0' : ch;
-            el.style.left = `${e.clientX - rect.left + (Math.random() * 16 - 8)}px`;
-            el.style.top = `${e.clientY - rect.top + 12}px`;
+            
+            // 초기 위치 지정 (마우스 좌표 부근)
+            const startX = e.clientX - rect.left + (Math.random() * 24 - 12);
+            const startY = e.clientY - rect.top + 10;
+            
+            el.style.left = `${startX}px`;
+            el.style.top = `${startY}px`;
             el.style.opacity = '1';
-            el.style.transition = 'transform 1.2s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 1.2s ease-in';
+            el.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease-out';
 
             previewArea.appendChild(el);
 
+            // 낙하 + 살짝 회전하는 부드러운 애니메이션
             requestAnimationFrame(() => {
-                el.style.transform = 'translateY(120px)';
+                const dropDistance = 80 + Math.random() * 40;
+                const rotateDeg = Math.random() * 40 - 20;
+                el.style.transform = `translateY(${dropDistance}px) rotate(${rotateDeg}deg)`;
                 el.style.opacity = '0';
             });
 
+            // 생성된 요소 자동 정리
             setTimeout(() => {
                 el.remove();
             }, 1200);
@@ -350,8 +357,9 @@
     });
 
     previewArea.addEventListener('mouseleave', () => {
-        if (currentMode !== 'typeA') return;
-        trailElements.forEach(el => el.style.opacity = '0');
+        if (currentMode === 'typeA') {
+            trailElements.forEach(el => el.style.opacity = '0');
+        }
     });
 
     function animate() {
