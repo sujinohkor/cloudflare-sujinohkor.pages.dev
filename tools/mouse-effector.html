@@ -131,18 +131,18 @@
         </header>
 
         <div class="content-top">
-            <label for="text-input">텍스트 입력</label>
+            <label for="text-input">Text</label>
             <input type="text" id="text-input" value="Hello World!" placeholder="글자를 입력하세요...">
         </div>
 
         <div class="workspace-container">
             <div class="content-mid">
-                <label for="code-output">생성된 HTML 소스코드</label>
+                <label for="code-output">HTML</label>
                 <textarea id="code-output" readonly></textarea>
             </div>
 
             <div class="content-down-wrapper">
-                <label>미리보기 (Preview)</label>
+                <label>Preview</label>
                 <div class="content-down" id="preview-area">
                     <p id="preview-msg">이 영역 위에 마우스를 올리면 효과를 확인할 수 있습니다.</p>
                 </div>
@@ -182,20 +182,20 @@
 
         if (mode === 'none') {
             document.getElementById('btn-none').classList.add('active');
-            previewMsg.textContent = "현재 적용된 마우스 효과가 없습니다 (None).";
+            previewMsg.textContent = "No mouse effect currently applied (None).";
             updateUI();
         } else if (mode === 'typeA') {
             document.getElementById('btn-type-a').classList.add('active');
-            previewMsg.textContent = "이 영역 위에 마우스를 올리면 효과를 확인할 수 있습니다.";
+            previewMsg.textContent = "Hover over this area to preview the effect.";
             updateUI();
             animate();
         } else if (mode === 'typeB') {
             document.getElementById('btn-type-b').classList.add('active');
-            previewMsg.textContent = "이 영역 위에서 마우스를 움직이면 글자가 흩날리며 떨어집니다.";
+            previewMsg.textContent = "Move your mouse over this area to scatter and drop the text.";
             updateUI();
         } else if (mode === 'typeC') {
             document.getElementById('btn-type-c').classList.add('active');
-            previewMsg.textContent = "이 영역에 마우스를 가져다 대면 커서가 입력한 글자로 바뀝니다.";
+            previewMsg.textContent = "Hover over this area to change the cursor to your entered text.";
             previewArea.classList.add('hide-cursor');
             updateUI();
         }
