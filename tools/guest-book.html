@@ -57,7 +57,8 @@
             border-radius: 8px; padding: 12px 16px; word-break: break-all;
         }
         .guestbook-item .author { color: #ff9e40; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; }
-        .guestbook-item .body { color: #eee; font-size: 0.95rem; white-space: pre-wrap; }
+        .guestbook-item .body { color: #eee; font-size: 0.95rem; white-space: pre-wrap; margin-bottom: 8px; }
+        .guestbook-item .meta { color: #aaa; font-size: 0.8rem; }
 
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
@@ -71,6 +72,7 @@
         body.light-mode .guestbook-item { background: rgba(243, 128, 32, 0.05); border-color: rgba(243, 128, 32, 0.3); }
         body.light-mode .guestbook-item .author { color: #F38020; }
         body.light-mode .guestbook-item .body { color: #202020; }
+        body.light-mode .guestbook-item .meta { color: #666; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
         /* 5. Mobile Responsive */
@@ -185,6 +187,29 @@
     const db = getFirestore(app);
     const collectionRef = collection(db, "GUEST-BOOK");
 
+    // 접속 국가 가져오기 (여러 API 순차 시도)
+    async function getCountry() {
+      try {
+        const res = await fetch("https://ipwho.is/");
+        const data = await res.json();
+        if (data.success && data.country_code) return data.country_code;
+      } catch (e) {}
+
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        if (data.country_code) return data.country_code;
+      } catch (e) {}
+
+      try {
+        const res = await fetch("https://freeipapi.com/api/json");
+        const data = await res.json();
+        if (data.countryCode) return data.countryCode;
+      } catch (e) {}
+
+      return "Unknown";
+    }
+
     // 1. 방명록 등록
     guestbookForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -194,10 +219,13 @@
 
       if (!nicknameVal || !contentVal) return;
 
+      const countryVal = await getCountry();
+
       try {
         await addDoc(collectionRef, {
           nickname: nicknameVal,
           content: contentVal,
+          country: countryVal,
           createdAt: serverTimestamp()
         });
 
@@ -223,16 +251,30 @@
         const li = document.createElement("li");
         li.className = "guestbook-item";
 
+        // 작성자
         const authorDiv = document.createElement("div");
         authorDiv.className = "author";
         authorDiv.textContent = data.nickname || "Anonymous";
 
+        // 내용
         const bodyDiv = document.createElement("div");
         bodyDiv.className = "body";
         bodyDiv.textContent = data.content || "";
 
+        // 메타 정보 (날짜/시간, 국가)
+        let dateString = "방금 전";
+        if (data.createdAt) {
+          dateString = data.createdAt.toDate().toLocaleString("ko-KR");
+        }
+        const countryVal = data.country || "알 수 없음";
+
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "meta";
+        metaDiv.textContent = `${dateString} | 국가: ${countryVal}`;
+
         li.appendChild(authorDiv);
         li.appendChild(bodyDiv);
+        li.appendChild(metaDiv);
         listElement.appendChild(li);
       });
     });
