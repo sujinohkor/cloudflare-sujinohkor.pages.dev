@@ -44,23 +44,6 @@
             padding: 10px 14px; color: #fff; font-size: 0.95rem; outline: none;
             font-family: inherit; width: 100%;
         }
-        
-        /* content 입력창 및 내부 카운터 레이아웃 */
-        .content-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .content-wrapper input[type="text"] {
-            padding-right: 85px; /* 카운터와 텍스트 겹침 방지 */
-        }
-        .char-counter {
-            position: absolute;
-            right: 14px;
-            font-size: 0.8rem;
-            color: #ff9e40;
-            pointer-events: none;
-        }
 
         .content-down { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; 
@@ -84,7 +67,6 @@
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
         body.light-mode input[type="text"] { color: #000; border-color: #F38020; }
-        body.light-mode .char-counter { color: #F38020; }
         body.light-mode .content-top, body.light-mode .content-down { border-color: #F38020; }
         body.light-mode .guestbook-item { background: rgba(243, 128, 32, 0.05); border-color: rgba(243, 128, 32, 0.3); }
         body.light-mode .guestbook-item .author { color: #F38020; }
@@ -113,9 +95,10 @@
         
         <nav class="menu-list">
             <a>Total Entries <span id="note-count-all">0</span></a>
+            <a>Character Count <span><span id="char-count">0</span>/1,000</span></a>
         </nav>
 
-        <div class="bottom-btns" style="margin-top: auto;">
+        <div class="bottom-btns">
             <button class="menu-btn" id="submit-btn">Save Note</button>
         </div>
     </aside>
@@ -129,11 +112,7 @@
         <form id="guestbook-form" style="display: contents;">
             <section class="content-top">
                 <input type="text" id="nickname" placeholder="Nickname" maxlength="20" required autocomplete="off">
-                
-                <div class="content-wrapper">
-                    <input type="text" id="content" placeholder="Enter your message here..." maxlength="1000" required autocomplete="off">
-                    <div class="char-counter"><span id="char-count">0</span>/1,000</div>
-                </div>
+                <input type="text" id="content" placeholder="Enter your message here..." maxlength="1000" required autocomplete="off">
             </section>
         </form>
 
