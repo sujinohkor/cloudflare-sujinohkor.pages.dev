@@ -157,7 +157,8 @@
     let mousePos = { x: 0, y: 0 };
     let charPositions = [];
     let trailAnimationId = null;
-    let typeBCharIndex = 0; // Type B 인덱스 변수 추가
+    let typeBCharIndex = 0;
+    let lastTypeBTime = 0; // 누락되어 있던 변수 추가 선언
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
@@ -243,11 +244,11 @@
   const chars = text.split('');
   let charIndex = 0;
   let lastTime = 0;
-  const cooldown = 100; // 글자 생성 간격 (ms 단위) - 숫자가 클수록 천천히 생성됨
+  const cooldown = 100;
 
   window.addEventListener('mousemove', (e) => {
     const now = Date.now();
-    if (now - lastTime < cooldown) return; // 일정 시간이 지나지 않았으면 생성 스킵
+    if (now - lastTime < cooldown) return;
     lastTime = now;
 
     const el = document.createElement('span');
@@ -269,7 +270,7 @@
     document.body.appendChild(el);
 
     requestAnimationFrame(() => {
-      el.style.transform = 'translateY(120px)'; // 낙하 거리
+      el.style.transform = 'translateY(120px)';
       el.style.opacity = '0';
     });
 
@@ -316,7 +317,7 @@
         } 
         else if (currentMode === 'typeB') {
             const now = Date.now();
-            if (now - lastTypeBTime < 100) return; // 100ms 쿨다운
+            if (now - lastTypeBTime < 100) return;
             lastTypeBTime = now;
 
             const rect = previewArea.getBoundingClientRect();
@@ -333,8 +334,6 @@
             el.style.left = `${e.clientX - rect.left + (Math.random() * 16 - 8)}px`;
             el.style.top = `${e.clientY - rect.top + 12}px`;
             el.style.opacity = '1';
-            
-            // 자연스러운 중력 가속도(cubic-bezier)와 opacity ease-in 적용
             el.style.transition = 'transform 1.2s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 1.2s ease-in';
 
             previewArea.appendChild(el);
