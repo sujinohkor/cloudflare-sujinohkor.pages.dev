@@ -42,14 +42,24 @@
         .content-top input[type="text"] {
             background: transparent; border: 1px solid #ff9e40; border-radius: 8px;
             padding: 10px 14px; color: #fff; font-size: 0.95rem; outline: none;
-            font-family: inherit;
+            font-family: inherit; width: 100%;
         }
         
+        /* content 입력창 및 내부 카운터 레이아웃 */
         .content-wrapper {
-            display: flex; flex-direction: column; gap: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .content-wrapper input[type="text"] {
+            padding-right: 85px; /* 카운터와 텍스트 겹침 방지 */
         }
         .char-counter {
-            text-align: right; font-size: 0.8rem; color: #ff9e40; padding-right: 4px;
+            position: absolute;
+            right: 14px;
+            font-size: 0.8rem;
+            color: #ff9e40;
+            pointer-events: none;
         }
 
         .content-down { 
@@ -102,7 +112,6 @@
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
         
         <nav class="menu-list">
-            <a>Character Count <span id="char-count">0</span>/1,000</a>
             <a>Total Entries <span id="note-count-all">0</span></a>
         </nav>
 
@@ -123,6 +132,7 @@
                 
                 <div class="content-wrapper">
                     <input type="text" id="content" placeholder="Enter your message here..." maxlength="1000" required autocomplete="off">
+                    <div class="char-counter"><span id="char-count">0</span>/1,000</div>
                 </div>
             </section>
         </form>
@@ -152,7 +162,7 @@
         }
     });
 
-    // content 글자 수 카운터
+    // content 글자 수 카운터 업데이트
     contentInput.addEventListener('input', () => {
         charCount.textContent = contentInput.value.length;
     });
@@ -172,7 +182,7 @@
         }
     });
 
-    // 사이드바의 Save Note 버튼 클릭 시 폼 제출
+    // 사이드바 Save Note 버튼 클릭 시 폼 제출
     document.getElementById('submit-btn').addEventListener('click', () => {
         guestbookForm.requestSubmit();
     });
