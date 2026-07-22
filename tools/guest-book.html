@@ -1,1 +1,76 @@
-devleop soon
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>방명록</title>
+</head>
+<body>
+  <h2>방명록 작성</h2>
+  <form id="guestbook-form">
+    <input type="text" id="nickname" placeholder="닉네임" required><br><br>
+    <textarea id="content" placeholder="내용을 입력하세요" required></textarea><br><br>
+    <button type="submit">등록</button>
+  </form>
+
+  <hr>
+
+  <h2>방명록 목록</h2>
+  <ul id="guestbook-list"></ul>
+
+  <!-- Firebase SDK 불러오기 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } 
+      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 아까 복사해둔 CDN / Config 설정 값을 여기에 그대로 유지합니다.
+    const firebaseConfig = {
+      apiKey: "AIzaSyBaH4OIqC_x0-6jIq4RnJv_wCD9efC4wUU",
+      authDomain: "test-73099.firebaseapp.com",
+      projectId: "test-73099",
+      storageBucket: "test-73099.firebasestorage.app",
+      messagingSenderId: "226251046164",
+      appId: "1:226251046164:web:18e6465b25137163fa1601"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    // 아까 생성한 컬렉션 이름 대소문자 동일하게 설정
+    const collectionRef = collection(db, "GUEST-BOOK");
+
+    // 1. 방명록 등록
+    document.getElementById("guestbook-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nickname = document.getElementById("nickname").value;
+      const content = document.getElementById("content").value;
+
+      try {
+        await addDoc(collectionRef, {
+          nickname: nickname,
+          content: content,
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("nickname").value = "";
+        document.getElementById("content").value = "";
+      } catch (error) {
+        console.error("저장 실패:", error);
+      }
+    });
+
+    // 2. 방명록 실시간 조회 및 화면 표시
+    const q = query(collectionRef, orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const listElement = document.getElementById("guestbook-list");
+      listElement.innerHTML = "";
+
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        const li = document.createElement("li");
+        li.textContent = `[${data.nickname}] ${data.content}`;
+        listElement.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
