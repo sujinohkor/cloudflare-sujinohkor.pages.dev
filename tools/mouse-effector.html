@@ -7,30 +7,76 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
-        .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; min-height: 100vh; gap: 20px; overflow-y: auto; transition: 0.3s;
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #202020;
+            color: #fff;
+            transition: background 0.3s;
+        }
+
+        /* 2. Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: #101010;
+            padding: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            gap: 20px;
+            overflow-y: auto;
+            transition: 0.3s;
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        .menu-btn, .theme-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background: #202020;
+            color: #ff9e40;
+            border: 2px solid #ff9e40;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s;
         }
-        .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-        
+
+        .menu-btn:hover, .menu-btn.active {
+            background: #ff9e40;
+            color: #101010;
+        }
+
+        .theme-btn:hover {
+            background-color: #FDF5E6;
+            color: #F38020;
+            border-color: #FDF5E6;
+        }
+
         /* Workspace Structure */
         .workspace-container {
             display: flex;
@@ -39,71 +85,275 @@
             flex: 1;
         }
 
-        .content-top { display: flex; flex-direction: column; gap: 8px; }
-        .content-top label { color: #ff9e40; font-weight: bold; }
+        .content-top {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .content-top label {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+
         .content-top input[type="text"] {
-            width: 100%; padding: 12px; background: #101010; border: 2px solid #ff9e40;
-            border-radius: 16px; color: #fff; font-size: 1rem; outline: none;
+            width: 100%;
+            padding: 12px;
+            background: #101010;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
         }
 
-        .content-mid { display: flex; flex-direction: column; gap: 8px; }
-        .content-mid label { color: #ff9e40; font-weight: bold; }
-        .content-mid textarea {
-            width: 100%; height: 100%; min-height: 250px; padding: 12px;
-            background: #101010; border: 2px solid #ff9e40; border-radius: 16px;
-            color: #00ff66; font-family: 'Consolas', monospace; font-size: 0.9rem;
-            resize: none; outline: none;
+        /* ===== [개선된 Code Editor 스타일] ===== */
+        .content-mid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .content-down-wrapper { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-        .content-down-wrapper label { color: #ff9e40; font-weight: bold; }
+        .content-mid label {
+            color: #ff9e40;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-editor-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            min-height: 280px;
+            background: #141414;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            overflow: hidden;
+            font-family: 'Consolas', 'Fira Code', Monaco, monospace;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .line-numbers {
+            padding: 12px 8px 12px 12px;
+            background: #0a0a0a;
+            color: #555;
+            text-align: right;
+            user-select: none;
+            border-right: 1px solid #282828;
+            font-family: inherit;
+        }
+
+        .code-output-wrapper {
+            flex: 1;
+            overflow: auto;
+            padding: 12px;
+        }
+
+        .code-output-wrapper pre {
+            margin: 0;
+            white-space: pre;
+            font-family: inherit;
+        }
+
+        /* Syntax Highlighting Colors */
+        .hl-keyword { color: #ff79c6; font-weight: bold; }   /* const, let, function 등 */
+        .hl-string  { color: #f1fa8c; }                   /* 문자열 */
+        .hl-number  { color: #bd93f9; }                   /* 숫자 */
+        .hl-comment { color: #6272a4; font-style: italic; }/* 주석 */
+        .hl-tag     { color: #ff5555; }                   /* HTML 태그 */
+        .hl-builtin { color: #8be9fd; }                   /* document, window 등 */
+
+        /* Copy Button */
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ff9e40;
+            color: #ff9e40;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+
+        .content-down-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .content-down-wrapper label {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+
         .content-down {
-            position: relative; flex: 1; min-height: 250px;
-            border: 2px dashed #ff9e40; border-radius: 16px; display: flex;
-            align-items: center; justify-content: center; background: rgba(255, 158, 64, 0.05);
-            overflow: hidden; cursor: crosshair;
+            position: relative;
+            flex: 1;
+            min-height: 250px;
+            border: 2px dashed #ff9e40;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 158, 64, 0.05);
+            overflow: hidden;
+            cursor: crosshair;
         }
-        .content-down p { color: #888; font-size: 1.1rem; pointer-events: none; user-select: none; }
+
+        .content-down p {
+            color: #888;
+            font-size: 1.1rem;
+            pointer-events: none;
+            user-select: none;
+        }
 
         /* 마우스 효과용 클래스 */
         .rain-char, .trail-char, .cursor-text {
-            position: absolute; pointer-events: none; font-weight: bold;
-            color: #ff9e40; text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
-            user-select: none; z-index: 100;
+            position: absolute;
+            pointer-events: none;
+            font-weight: bold;
+            color: #ff9e40;
+            text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
+            user-select: none;
+            z-index: 100;
         }
-        
+
         /* Type C 전용: 미리보기 영역 내 커서 숨기기 */
         .content-down.hide-cursor {
             cursor: none;
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-mid textarea, body.light-mode .content-top input { background: #FDF5E6; color: #000; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode {
+            background-color: #fff;
+        }
+
+        body.light-mode .sidebar {
+            background-color: #FDF5E6;
+        }
+
+        body.light-mode .menu-btn, 
+        body.light-mode .theme-btn {
+            background: #FDF5E6;
+            color: #F38020;
+            border-color: #F38020;
+        }
+
+        body.light-mode .menu-btn:hover, 
+        body.light-mode .menu-btn.active {
+            background: #F38020;
+            color: #ffffff;
+        }
+
+        body.light-mode .top-section h1, 
+        body.light-mode .top-section p {
+            color: #202020;
+        }
+
+        body.light-mode .content-top input {
+            background: #FDF5E6;
+            color: #000;
+        }
+
+        body.light-mode .menu-toggle-btn {
+            color: #000000;
+        }
+
+        /* Light Mode Code Editor adjustments */
+        body.light-mode .code-editor-container {
+            background: #fafafa;
+            border-color: #F38020;
+        }
+
+        body.light-mode .line-numbers {
+            background: #f0f0f0;
+            color: #aaa;
+            border-right-color: #ddd;
+        }
+
+        body.light-mode .code-output-wrapper pre {
+            color: #24292e;
+        }
+
+        body.light-mode .hl-keyword { color: #d73a49; }
+        body.light-mode .hl-string  { color: #032f62; }
+        body.light-mode .hl-number  { color: #005cc5; }
+        body.light-mode .hl-comment { color: #6a737d; }
+        body.light-mode .hl-tag     { color: #22863a; }
+        body.light-mode .hl-builtin { color: #6f42c1; }
+        body.light-mode .copy-btn   { border-color: #F38020; color: #F38020; }
+        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
 
         /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        
+        .menu-toggle-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2000;
+            padding: 10px 15px;
+            background: #ff9e40;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         @media (min-width: 769px) {
-            .workspace-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-            .content-mid { flex: 1; }
+            .workspace-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            .content-mid {
+                flex: 1;
+            }
         }
 
         @media (max-width: 768px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; min-height: 100svh; }
-            .workspace-container { gap: 15px; }
-            .content-mid { flex: initial; }
-            .content-mid textarea { height: 180px; min-height: 180px; }
-            .content-down-wrapper { flex: 1; }
-            .content-down { height: 100%; min-height: 200px; }
+            .menu-toggle-btn {
+                display: block;
+                color: #ffffff;
+            }
+            .sidebar {
+                transform: translateX(-250px);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                width: 100%;
+                min-height: 100svh;
+            }
+            .workspace-container {
+                gap: 15px;
+            }
+            .content-mid {
+                flex: initial;
+            }
+            .code-editor-container {
+                height: 200px;
+                min-height: 200px;
+            }
+            .content-down-wrapper {
+                flex: 1;
+            }
+            .content-down {
+                height: 100%;
+                min-height: 200px;
+            }
         }
     </style>
 </head>
@@ -115,7 +365,7 @@
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
+
         <div class="bottom-btns">
             <button class="menu-btn active" id="btn-none" onclick="switchMode('none')">None</button>
             <button class="menu-btn" id="btn-type-a" onclick="switchMode('typeA')">Type A</button>
@@ -137,8 +387,16 @@
 
         <div class="workspace-container">
             <div class="content-mid">
-                <label for="code-output">HTML</label>
-                <textarea id="code-output" readonly></textarea>
+                <label>
+                    <span>HTML Output</span>
+                    <button class="copy-btn" onclick="copyCode()">Copy</button>
+                </label>
+                <div class="code-editor-container">
+                    <div class="line-numbers" id="line-numbers">1</div>
+                    <div class="code-output-wrapper">
+                        <pre><code id="code-output-display"></code></pre>
+                    </div>
+                </div>
             </div>
 
             <div class="content-down-wrapper">
@@ -154,10 +412,12 @@
 <script>
     const sidebar = document.getElementById('sidebar');
     const textInput = document.getElementById('text-input');
-    const codeOutput = document.getElementById('code-output');
+    const codeDisplay = document.getElementById('code-output-display');
+    const lineNumbers = document.getElementById('line-numbers');
     const previewArea = document.getElementById('preview-area');
     const previewMsg = document.getElementById('preview-msg');
 
+    let rawCodeText = "";
     let currentMode = 'none';
     let trailElements = [];
     let mousePos = { x: 0, y: 0 };
@@ -167,9 +427,53 @@
     let lastTypeBTime = 0;
     let customCursorEl = null;
 
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    function toggleSidebar() { 
+        sidebar.classList.toggle('active'); 
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    document.querySelector('.main-content').addEventListener('click', () => { 
+        if (sidebar.classList.contains('active')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
+
+    // 구문 강조 함수
+    function highlightSyntax(code) {
+        let escaped = code
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        return escaped
+            .replace(/(&lt;\/?script&gt;|&lt;\/?span&gt;|&lt;\/?div&gt;)/g, '<span class="hl-tag">$1</span>')
+            .replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/|&lt;!--[\s\S]*?--&gt;)/g, '<span class="hl-comment">$1</span>')
+            .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g, '<span class="hl-string">$1</span>')
+            .replace(/\b(const|let|var|function|return|if|else|for|while|new|this)\b/g, '<span class="hl-keyword">$1</span>')
+            .replace(/\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b/g, '<span class="hl-builtin">$1</span>')
+            .replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
+    }
+
+    // 코드 갱신 및 줄 번호 생성
+    function setCodeOutput(code) {
+        rawCodeText = code;
+        codeDisplay.innerHTML = highlightSyntax(code);
+
+        const lineCount = code.split('\n').length;
+        lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
+    }
+
+    function copyCode() {
+        if (!rawCodeText) return;
+        navigator.clipboard.writeText(rawCodeText).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+        });
+    }
 
     // 모드 변경 제어
     function switchMode(mode) {
@@ -216,12 +520,12 @@
         const text = textInput.value;
 
         if (currentMode === 'none') {
-            codeOutput.value = `<!-- No Mouse Effect Applied -->\n<span>${text}</span>`;
+            setCodeOutput(`<!-- No Mouse Effect Applied -->\n<span>${text}</span>`);
             clearTrailElements();
         } 
         else if (currentMode === 'typeA') {
-            codeOutput.value = `<script>
-(function() {
+            setCodeOutput(
+`<script>(function() {
   const text = "${text}";
   const chars = [];
   let pos = { x: 0, y: 0 };
@@ -251,13 +555,13 @@
     requestAnimationFrame(render);
   }
   render();
-})();
-<\/script>`;
+})();<\/script>`
+            );
             setupPreviewText(text);
         }
         else if (currentMode === 'typeB') {
-            codeOutput.value = `<script>
-(function() {
+            setCodeOutput(
+`<script>(function() {
   const text = "${text}";
   const chars = text.split('');
   let charIndex = 0;
@@ -297,16 +601,14 @@
       el.remove();
     }, 1200);
   });
-})();
-<\/script>`;
+})();<\/script>`
+            );
             clearTrailElements();
         }
         else if (currentMode === 'typeC') {
-            // Type C: 커서 자체를 텍스트로 바꾸는 스크립트 생성
-            codeOutput.value = `<script>
-(function() {
+            setCodeOutput(
+`<script>(function() {
   const text = "${text}";
-  
   // 마우스 커서 숨기기
   document.body.style.cursor = 'none';
 
@@ -330,9 +632,8 @@
     cursorEl.style.left = \`\${e.clientX + 10}px\`;
     cursorEl.style.top = \`\${e.clientY + 10}px\`;
   });
-})();
-<\/script>`;
-
+})();<\/script>`
+            );
             setupCustomCursor(text);
         }
     }
@@ -367,7 +668,6 @@
         if (currentMode === 'none') return;
 
         const rect = previewArea.getBoundingClientRect();
-        
         if (currentMode === 'typeA') {
             mousePos.x = e.clientX - rect.left;
             mousePos.y = e.clientY - rect.top;
@@ -388,10 +688,10 @@
             const el = document.createElement('span');
             el.className = 'rain-char';
             el.textContent = ch === ' ' ? '\u00A0' : ch;
-            
+
             const startX = e.clientX - rect.left + (Math.random() * 24 - 12);
             const startY = e.clientY - rect.top + 10;
-            
+
             el.style.left = `${startX}px`;
             el.style.top = `${startY}px`;
             el.style.opacity = '1';
