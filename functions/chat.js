@@ -8,8 +8,8 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: "GEMINI_API_KEY가 설정되지 않았습니다." }), { status: 500 });
     }
 
-    // gemini-1.5-flash 사용 (alias 제외)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // v1 엔드포인트 사용
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     
     const response = await fetch(geminiUrl, {
       method: "POST",
@@ -17,7 +17,6 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         contents: [
           {
-            role: "user",
             parts: [{ text: message }]
           }
         ]
