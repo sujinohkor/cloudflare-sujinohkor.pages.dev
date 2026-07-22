@@ -23,7 +23,8 @@
         /* 2. Layout */
         .app-container {
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .sidebar {
@@ -46,9 +47,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
             gap: 20px;
-            overflow-y: auto;
+            overflow: hidden;
             transition: 0.3s;
         }
 
@@ -77,18 +78,20 @@
             border-color: #FDF5E6;
         }
 
-        /* Workspace Structure */
+        /* Workspace Structure (고정 비율 및 레이아웃 유지) */
         .workspace-container {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
             flex: 1;
+            min-height: 0; /* 컨텐츠 확장 방지 필수 속성 */
         }
 
         .content-top {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .content-top label {
@@ -107,11 +110,14 @@
             outline: none;
         }
 
-        /* ===== [개선된 Code Editor 스타일] ===== */
+        /* ===== [Code Editor 영역 - 크기 고정] ===== */
         .content-mid {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            height: 100%;
+            min-height: 0;
+            min-width: 0;
         }
 
         .content-mid label {
@@ -120,14 +126,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .code-editor-container {
             position: relative;
             display: flex;
             width: 100%;
-            height: 100%;
-            min-height: 280px;
+            flex: 1;
+            min-height: 0; /* 컨텐츠가 커져도 부모를 늘리지 않음 */
             background: #141414;
             border: 2px solid #ff9e40;
             border-radius: 16px;
@@ -145,6 +152,7 @@
             user-select: none;
             border-right: 1px solid #282828;
             font-family: inherit;
+            overflow-y: hidden;
         }
 
         .code-output-wrapper {
@@ -160,12 +168,12 @@
         }
 
         /* Syntax Highlighting Colors */
-        .hl-keyword { color: #ff79c6; font-weight: bold; }   /* const, let, function 등 */
-        .hl-string  { color: #f1fa8c; }                   /* 문자열 */
-        .hl-number  { color: #bd93f9; }                   /* 숫자 */
-        .hl-comment { color: #6272a4; font-style: italic; }/* 주석 */
-        .hl-tag     { color: #ff5555; }                   /* HTML 태그 */
-        .hl-builtin { color: #8be9fd; }                   /* document, window 등 */
+        .hl-keyword { color: #ff79c6; font-weight: bold; }
+        .hl-string  { color: #f1fa8c; }
+        .hl-number  { color: #bd93f9; }
+        .hl-comment { color: #6272a4; font-style: italic; }
+        .hl-tag     { color: #ff5555; }
+        .hl-builtin { color: #8be9fd; }
 
         /* Copy Button */
         .copy-btn {
@@ -184,22 +192,26 @@
             color: #101010;
         }
 
+        /* ===== [Preview 영역 - 크기 고정] ===== */
         .content-down-wrapper {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            flex: 1;
+            height: 100%;
+            min-height: 0;
+            min-width: 0;
         }
 
         .content-down-wrapper label {
             color: #ff9e40;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .content-down {
             position: relative;
             flex: 1;
-            min-height: 250px;
+            min-height: 0;
             border: 2px dashed #ff9e40;
             border-radius: 16px;
             display: flex;
@@ -228,63 +240,22 @@
             z-index: 100;
         }
 
-        /* Type C 전용: 미리보기 영역 내 커서 숨기기 */
         .content-down.hide-cursor {
             cursor: none;
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode {
-            background-color: #fff;
-        }
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-top input { background: #FDF5E6; color: #000; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
 
-        body.light-mode .sidebar {
-            background-color: #FDF5E6;
-        }
-
-        body.light-mode .menu-btn, 
-        body.light-mode .theme-btn {
-            background: #FDF5E6;
-            color: #F38020;
-            border-color: #F38020;
-        }
-
-        body.light-mode .menu-btn:hover, 
-        body.light-mode .menu-btn.active {
-            background: #F38020;
-            color: #ffffff;
-        }
-
-        body.light-mode .top-section h1, 
-        body.light-mode .top-section p {
-            color: #202020;
-        }
-
-        body.light-mode .content-top input {
-            background: #FDF5E6;
-            color: #000;
-        }
-
-        body.light-mode .menu-toggle-btn {
-            color: #000000;
-        }
-
-        /* Light Mode Code Editor adjustments */
-        body.light-mode .code-editor-container {
-            background: #fafafa;
-            border-color: #F38020;
-        }
-
-        body.light-mode .line-numbers {
-            background: #f0f0f0;
-            color: #aaa;
-            border-right-color: #ddd;
-        }
-
-        body.light-mode .code-output-wrapper pre {
-            color: #24292e;
-        }
-
+        body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
+        body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
+        body.light-mode .code-output-wrapper pre { color: #24292e; }
         body.light-mode .hl-keyword { color: #d73a49; }
         body.light-mode .hl-string  { color: #032f62; }
         body.light-mode .hl-number  { color: #005cc5; }
@@ -309,18 +280,20 @@
             cursor: pointer;
         }
 
-        @media (min-width: 769px) {
-            .workspace-container {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-            }
-            .content-mid {
-                flex: 1;
-            }
-        }
-
         @media (max-width: 768px) {
+            .app-container {
+                height: auto;
+                min-height: 100vh;
+                overflow: auto;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                overflow: visible;
+            }
             .menu-toggle-btn {
                 display: block;
                 color: #ffffff;
@@ -331,28 +304,15 @@
             .sidebar.active {
                 transform: translateX(0);
             }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-                width: 100%;
-                min-height: 100svh;
-            }
             .workspace-container {
+                display: flex;
+                flex-direction: column;
                 gap: 15px;
+                height: 600px; /* 모바일에서도 고정 높이에서 1:1 유지 */
             }
-            .content-mid {
-                flex: initial;
-            }
-            .code-editor-container {
-                height: 200px;
-                min-height: 200px;
-            }
-            .content-down-wrapper {
-                flex: 1;
-            }
-            .content-down {
-                height: 100%;
-                min-height: 200px;
+            .content-mid, .content-down-wrapper {
+                flex: 1 1 50%;
+                height: 50%;
             }
         }
     </style>
@@ -441,19 +401,15 @@
         } 
     });
 
-    // 구문 강조 함수
-    // 구문 강조 함수 (버그 수정 버전)
-    // 구문 강조 함수 (토큰 분리 방식)
+    // 구문 강조 함수 (단일 정규식 토큰화)
     function highlightSyntax(code) {
-        // 1. 기본 HTML 이스케이프
         const escaped = code
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
-    
-        // 2. 단일 정규식 패턴으로 토큰화 및 하이라이팅
+
         const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;\/?[a-zA-Z0-9]+.*?&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
-    
+
         return escaped.replace(tokenPattern, (match, comment, string, tag, keyword, builtin, number) => {
             if (comment) return `<span class="hl-comment">${comment}</span>`;
             if (string)  return `<span class="hl-string">${string}</span>`;
