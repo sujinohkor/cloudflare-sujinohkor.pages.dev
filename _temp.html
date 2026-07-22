@@ -124,42 +124,39 @@
     let mousePos = { x: 0, y: 0 };
     let charPositions = [];
 
-    // 1. 소스코드 자동 생성 및 업데이트
+// 소스코드 생성 함수 수정 (순수 script 코드만 표출)
     function updateGeneratedCode(text) {
         const template = 
-`<div id="preview-area" style="position:relative; width:100%; height:300px; border:1px solid #ccc; overflow:hidden;">
-  <p>마우스를 올려보세요.</p>
-</div>
-
-<script>
+`<script>
 (function() {
   const text = "${text}";
-  const container = document.getElementById('preview-area');
   const chars = [];
   let pos = { x: 0, y: 0 };
   let history = [];
 
+  // 글자 요소 생성 및 스타일 설정
   text.split('').forEach((ch, i) => {
     const el = document.createElement('span');
-    el.style.cssText = 'position:absolute; pointer-events:none; color:#ff9e40; font-weight:bold; transition:transform 0.1s ease-out;';
-    el.textContent = ch;
-    container.appendChild(el);
+    el.style.cssText = 'position:fixed; pointer-events:none; color:#ff9e40; font-weight:bold; z-index:9999; transition:transform 0.1s ease-out;';
+    el.textContent = ch === ' ' ? '\\u00A0' : ch;
+    document.body.appendChild(el);
     chars.push(el);
     history.push({ x: 0, y: 0 });
   });
 
-  container.addEventListener('mousemove', (e) => {
-    const rect = container.getBoundingClientRect();
-    pos.x = e.clientX - rect.left;
-    pos.y = e.clientY - rect.top;
+  // 마우스 위치 수집
+  window.addEventListener('mousemove', (e) => {
+    pos.x = e.clientX;
+    pos.y = e.clientY;
   });
 
+  // 위치 갱신 애니메이션
   function render() {
     history.unshift({ ...pos });
     history.pop();
     chars.forEach((el, i) => {
       const p = history[Math.min(i * 3, history.length - 1)];
-      el.style.transform = \`translate(\${p.x + (i * 12) + 10}px, \${p.y + 10}px)\`;
+      el.style.transform = \`translate(\${p.x + (i * 12) + 15}px, \${p.y + 15}px)\`;
     });
     requestAnimationFrame(render);
   }
