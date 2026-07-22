@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini 챗봇 테스트</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f7; }
+    
+    .chat-container { width: 100%; max-width: 480px; height: 600px; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header { padding: 16px; background: #2c3e50; color: #ffffff; font-weight: bold; text-align: center; }
+    
+    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .message { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.4; word-break: break-word; }
+    .message.user { align-self: flex-end; background: #007aff; color: #ffffff; border-bottom-right-radius: 2px; }
+    .message.bot { align-self: flex-start; background: #e9e9eb; color: #000000; border-bottom-left-radius: 2px; }
+    .message.system { align-self: center; background: transparent; color: #8e8e93; font-size: 12px; }
+
+    .chat-input-area { display: flex; padding: 12px; border-top: 1px solid #e5e5ea; gap: 8px; background: #ffffff; }
+    .chat-input-area input { flex: 1; padding: 10px 14px; border: 1px solid #c7c7cc; border-radius: 20px; outline: none; font-size: 14px; }
+    .chat-input-area input:focus { border-color: #007aff; }
+    .chat-input-area button { padding: 10px 16px; border: none; background: #007aff; color: #ffffff; font-weight: bold; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+    .chat-input-area button:disabled { background: #b0b0b5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Gemini AI 테스트</div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="message bot">안녕하세요! 질문을 입력해 주세요.</div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="userInput" placeholder="메시지를 입력하세요..." onkeydown="if(event.key === 'Enter') handleSend()">
+    <button id="sendBtn" onclick="handleSend()">전송</button>
+  </div>
+</div>
+
+<script>
+  // 메시지 화면 출력 함수
+  function appendMessage(text, sender) {
+    const chatMessages = document.getElementById('chatMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    msgDiv.innerText = text;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // 스크롤 하단 이동
+    return msgDiv;
+  }
+
+  // 전송 처리 로직
+  async function handleSend() {
+    const inputEl = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const text = inputEl.value.trim();
+
+    if (!text) return;
+
+    // 1. 사용자 메시지 화면에 추가 & 입력창 초기화
+    appendMessage(text, 'user');
+    inputEl.value = '';
+    
+    // UI 비활성화 및 대기 상태 표시
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+    const loadingMsg = appendMessage("답변 생성 중...", 'system');
+
+    // 2. API 호출
+    await sendMessage(text, loadingMsg);
+
+    // UI 다시 활성화
+    inputEl.disabled = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+
+  // Gemini 요청 함수 (제시해주신 엔드포인트 /codes/chat 적용)
+  async function sendMessage(userInput, loadingMsgEl) {
+    try {
+      const response = await fetch('/codes/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userInput })
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 응답 오류 (상태 코드: ${response.status})`);
+      }
+
+      const data = await response.json();
+      
+      // 대기 메시지 삭제 후 실제 답변 출력
+      loadingMsgEl.remove();
+      appendMessage(data.reply || "답변을 가져오지 못했습니다.", 'bot');
+
+    } catch (error) {
+      console.error("Gemini 호출 에러:", error);
+      loadingMsgEl.remove();
+      appendMessage("오류가 발생했습니다: " + error.message, 'bot');
+    }
+  }
+</script>
+
+</body>
+</html>
