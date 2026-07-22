@@ -10,7 +10,7 @@ export async function onRequestPost(context) {
 
     // 최신 @google/genai SDK 표준 모델: gemini-2.5-flash / gemini-2.0-flash
     // v1beta 엔드포인트 + models/ 경로 규격 적용
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(geminiUrl, {
       method: "POST",
