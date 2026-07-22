@@ -124,7 +124,6 @@
             <p id="page-desc">Select a mode from the sidebar to generate custom mouse effects.</p>
         </header>
 
-        <!-- 레이아웃 틀 유지: 문구창 / 코드창 / 프리뷰창 -->
         <div class="content-top">
             <label for="text-input">텍스트 입력</label>
             <input type="text" id="text-input" value="Hello World!" placeholder="글자를 입력하세요...">
@@ -158,12 +157,13 @@
     let mousePos = { x: 0, y: 0 };
     let charPositions = [];
     let trailAnimationId = null;
+    let typeBCharIndex = 0; // Type B 인덱스 변수 추가
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    // 모드 변경 제어 (None / Type A)
+    // 모드 변경 제어 (None / Type A / Type B)
     function switchMode(mode) {
         currentMode = mode;
         document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active'));
@@ -183,6 +183,10 @@
             previewMsg.textContent = "이 영역 위에 마우스를 올리면 효과를 확인할 수 있습니다.";
             updateUI();
             animate();
+        } else if (mode === 'typeB') {
+            document.getElementById('btn-type-b').classList.add('active');
+            previewMsg.textContent = "이 영역 위에 마우스를 올리면 글자가 비처럼 떨어집니다.";
+            updateUI();
         }
     }
 
@@ -191,15 +195,11 @@
         const text = textInput.value;
 
         if (currentMode === 'none') {
-            // None 모드: 효과 미적용 코드 생성
             codeOutput.value = `<!-- No Mouse Effect Applied -->\n<span>${text}</span>`;
-            
-            // 기존 효과 요소 제거
             trailElements.forEach(el => el.remove());
             trailElements = [];
         } 
         else if (currentMode === 'typeA') {
-            // Type A 모드: 스크립트 생성 및 미리보기 노드 세팅
             codeOutput.value = `<script>
 (function() {
   const text = "${text}";
@@ -237,7 +237,6 @@
             setupPreviewText(text);
         }
         else if (currentMode === 'typeB') {
-            // Type B 모드: 비처럼 내리는 스크립트 생성
             codeOutput.value = `<script>
 (function() {
   const text = "${text}";
@@ -245,7 +244,6 @@
   let charIndex = 0;
 
   window.addEventListener('mousemove', (e) => {
-    // 글자 요소 생성
     const el = document.createElement('span');
     const ch = chars[charIndex % chars.length];
     charIndex++;
@@ -264,13 +262,11 @@
     \`;
     document.body.appendChild(el);
 
-    // 다음 프레임에서 떨어진 위치와 투명도 적용
     requestAnimationFrame(() => {
       el.style.transform = 'translateY(80px)';
       el.style.opacity = '0';
     });
 
-    // 애니메이션 종료 후 DOM 제거
     setTimeout(() => {
       el.remove();
     }, 1000);
@@ -278,7 +274,6 @@
 })();
 <\/script>`;
 
-            // Type B는 마우스 이동 시 실시간으로 글자가 떨어지므로 setupPreviewText()를 쓰지 않습니다.
             trailElements.forEach(el => el.remove());
             trailElements = [];
         }
@@ -318,7 +313,6 @@
             const text = textInput.value;
             if (!text) return;
 
-            // 글자 하나씩 순차 생성
             const chars = text.split('');
             const ch = chars[typeBCharIndex % chars.length];
             typeBCharIndex++;
