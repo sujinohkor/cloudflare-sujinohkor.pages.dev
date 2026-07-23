@@ -2,31 +2,52 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>누끼 따기 웹사이트</title>
-  <!-- AI 배경 제거 라이브러리 로드 -->
-  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.js"></script>
+  <title>누끼 따기</title>
 </head>
 <body>
-  <input type="file" id="upload" accept="image/*">
+  <h1>AI 배경 제거</h1>
+  <input type="file" id="imageInput" accept="image/*">
   <br><br>
-  <img id="result" alt="결과 이미지" style="max-width: 500px;">
+  <div id="status"></div>
+  <img id="resultImage" style="max-width: 500px; display: none;">
 
   <script>
-    const uploadInput = document.getElementById('upload');
-    const resultImg = document.getElementById('result');
+    const imageInput = document.getElementById('imageInput');
+    const status = document.getElementById('status');
+    const resultImage = document.getElementById('resultImage');
 
-    uploadInput.addEventListener('change', async (e) => {
+    // 2단계에서 생성된 본인의 Worker URL을 넣으세요.
+    const WORKER_URL = 'https://remove-bg-worker.sujinohkor.workers.dev';
+
+    imageInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      resultImg.alt = "처리 중...";
-      
-      // AI 모델로 배경 제거 실행
-      const blob = await imglyRemoveBackground(file);
-      
-      // 결과를 이미지 태그에 표시
-      resultImg.src = URL.createObjectURL(blob);
-      resultImg.alt = "완료";
+      status.innerText = '누끼 따는 중... (약 1~2초 소요)';
+      resultImage.style.display = 'none';
+
+      // Worker로 보낼 폼 데이터 생성
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        // Worker 서버로 이미지 전송
+        const response = await fetch(WORKER_URL, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('처리 실패');
+
+        // 받아온 이미지(Blob)를 URL로 변환하여 화면에 표시
+        const blob = await response.blob();
+        resultImage.src = URL.createObjectURL(blob);
+        resultImage.style.display = 'block';
+        status.innerText = '완료!';
+      } catch (err) {
+        console.error(err);
+        status.innerText = '에러가 발생했습니다.';
+      }
     });
   </script>
 </body>
