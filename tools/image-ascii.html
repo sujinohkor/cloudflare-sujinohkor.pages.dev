@@ -52,9 +52,14 @@
         .content-down { flex: 3; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; line-height: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
 
+        /* 다크 모드 카드/패널 그림자 */
+        .card, .content-mid, .content-down {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
@@ -63,6 +68,19 @@
         body.light-mode .content-mid { color: #666; }
         body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1 ); border-style: dashed; color: #f38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 데이 모드 카드/패널 그림자 */
+        body.light-mode .card, 
+        body.light-mode .content-mid, 
+        body.light-mode .content-down {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
