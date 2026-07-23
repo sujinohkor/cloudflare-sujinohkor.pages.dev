@@ -19,7 +19,7 @@
         .header-wrapper h1 { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; color: #ff9e40; font-size: 3rem; transition: font-size 0.3s ease; }
         #theme-toggle { z-index: 10; padding: 8px 16px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 20px; }
 
-        /* 💡 Grid 구조를 minmax로 수정하여 카드가 짤리는 현상 방지 */
+        /* Grid 구조 */
         .card-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
@@ -61,6 +61,17 @@
         .websites-list { list-style: none; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .websites-list h4 { font-weight: normal; color: #ccc; }
 
+        /* 방문자 카운터 스타일 */
+        .view-count-container {
+            margin-top: 25px;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+        .view-count-container span {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+
         .tooltip { position: relative; cursor: pointer; display: inline; }
         .tooltip::after { content: attr(data-tooltip); position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; opacity: 0; visibility: hidden; transition: 0.3s; border: 1px solid #ff9e40; pointer-events: none; }
         .tooltip:hover::after { opacity: 1; visibility: visible; top: -40px; }
@@ -75,6 +86,8 @@
         body.light-mode .arrow.guest-book-arrow { color: #F38020; }
         body.light-mode #theme-toggle { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #888; }
+        body.light-mode .view-count-container { color: #666; }
+        body.light-mode .view-count-container span { color: #F38020; }
 
         /* 모바일 최적화 */
         @media (max-width: 600px) {
@@ -205,6 +218,11 @@
                 <li><h4><strong>Dev.</strong> <a href="https://sujinohkor.pages.dev" class="tooltip" data-tooltip="This is my FUN site.">https://sujinohkor.pages.dev</a></h4></li>
                 <li><h4><strong>GitHub.</strong> <a href="https://github.com/sujinohkor" class="tooltip" data-tooltip="This is the CODE for the fun site.">https://github.com/sujinohkor</a></h4></li>
             </ul>
+            
+            <!-- 방문자 수 표시 영역 -->
+            <div class="view-count-container">
+                Total Visits: <span id="visit-count">...</span>
+            </div>
         </div>
     </div>
 
@@ -222,6 +240,20 @@
             });
         }
         document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+
+        // Cloudflare Worker 방문자 카운터 API 호출
+        fetch('https://your-worker.workers.dev') // 실제 Worker URL로 변경
+            .then(res => res.json())
+            .then(data => {
+                const countElement = document.getElementById('visit-count');
+                if (countElement && data.visits) {
+                    countElement.innerText = data.visits.toLocaleString(); // 숫자 천 단위 콤마 적용
+                }
+            })
+            .catch(err => {
+                console.error('Failed to fetch visit count:', err);
+                document.getElementById('visit-count').innerText = '-';
+            });
     </script>
 </body>
 </html>
