@@ -61,9 +61,14 @@
         .content-down { flex: 2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: hidden; }
         textarea { flex: 1; padding: 20px; background: transparent; border: none; color: #fff; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem; resize: none; outline: none; overflow-y: auto; white-space: pre; }
 
+        /* 다크 모드 카드/패널 그림자 (Hash Generator 요소 확장) */
+        .card, .content-top, .content-mid, .content-down {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
@@ -72,6 +77,20 @@
         body.light-mode .content-mid { color: #666; }
         body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1 ); border-style: dashed; color: #f38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 데이 모드 카드/패널 그림자 (Hash Generator 요소 확장) */
+        body.light-mode .card, 
+        body.light-mode .content-top,
+        body.light-mode .content-mid, 
+        body.light-mode .content-down {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -139,10 +158,8 @@
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); } );
-    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    // 사이드바 카운터 초기화 함수
     function clearCounters() {
         document.getElementById('char-count-all').innerText = '0';
         document.getElementById('char-count-no-space').innerText = '0';
@@ -151,11 +168,9 @@
         document.getElementById('byte-count').innerText = '0';
     }
 
-    // 텍스트 타이핑 실시간 감지
     textInput.addEventListener('input', () => {
         const text = textInput.value;
         
-        // 텍스트 창에 타이핑이 시작되면 content-mid 파일 업로드 상태를 초기화
         if (contentMid.classList.contains('has-file')) {
             contentMid.classList.remove('has-file');
             contentMid.innerHTML = `<div style="font-size: 3rem;">📄</div><div>Drag & Drop a file here or click to upload.</div>`;
@@ -173,7 +188,6 @@
         generateHashes(text);
     });
 
-    // 해시 연산 함수 (호출 시 텍스트나 WordArray 객체를 인자로 받음)
     function generateHashes(targetData) {
         if (!targetData) { hashOutput.value = ''; return; }
     
@@ -206,26 +220,20 @@
 
     contentMid.innerHTML = `<div style="font-size: 3rem;">📄</div><div>Drag & Drop a file here or click to upload.</div>`;
     
-    // 💡 변경된 핵심 로직: 파일을 ArrayBuffer(바이너리)로 읽어 직접 해싱
     function handleFile(file) {
         if (!file) return;
     
         const reader = new FileReader();
         reader.onload = (e) => {
             const arrayBuffer = e.target.result;
-            
-            // ArrayBuffer를 CryptoJS가 연산할 수 있는 WordArray 형태로 변환 (바이너리 직접 매핑)
             const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
             
-            // 파일 크기를 기준으로 사이드바 메타데이터 카운터 업데이트
             clearCounters();
             document.getElementById('byte-count').innerText = file.size;
             
-            // text-input 창은 건드리지 않고 비워둔 채 해시값 생성
             textInput.value = ''; 
             generateHashes(wordArray);
             
-            // content-mid 영역 업로드 완료 피드백 표시
             contentMid.classList.add('has-file');
             contentMid.innerHTML = `
                 <div style="font-size: 3rem;">✅</div>
@@ -233,7 +241,6 @@
                 <div style="font-size: 0.8rem; font-weight: normal; opacity: 0.7;">(Click or drag another file to change)</div>
             `;
         };
-        // 텍스트가 아닌 원시 바이너리 배열 구조로 파일을 읽습니다.
         reader.readAsArrayBuffer(file);
     }
     
