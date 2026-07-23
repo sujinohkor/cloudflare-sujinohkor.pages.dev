@@ -3,71 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
+    <title>Weather Dashboard (Open-Meteo)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            background: #101010; 
-            color: #fff; 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-        }
-        .card { 
-            background: #202020; 
-            padding: 30px; 
-            border-radius: 16px; 
-            border: 2px solid #ff9e40; 
-            width: 320px; 
-            text-align: center; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #202020; padding: 30px; border-radius: 16px; border: 2px solid #ff9e40; width: 320px; text-align: center; }
         .city { font-size: 1.5rem; color: #ff9e40; font-weight: bold; margin-bottom: 10px; }
         .temp { font-size: 3rem; font-weight: bold; margin: 15px 0; }
-        .desc { font-size: 1.1rem; color: #ccc; text-transform: capitalize; }
+        .desc { font-size: 1.1rem; color: #ccc; }
         .details { margin-top: 20px; font-size: 0.9rem; color: #888; display: flex; justify-content: space-around; }
-        .loading { color: #888; }
     </style>
 </head>
 <body>
 
     <div class="card" id="weather-card">
-        <div class="loading">날씨 정보를 불러오는 중...</div>
+        <div class="city">Seoul</div>
+        <div class="desc" id="weather-desc">불러오는 중...</div>
+        <div class="temp" id="temp">--°C</div>
+        <div class="details">
+            <span id="humidity">습도 --%</span>
+            <span id="wind">풍속 --m/s</span>
+        </div>
     </div>
 
     <script>
-        // 1. OpenWeatherMap API Key 입력 (https://openweathermap.org 에서 무료 발급)
-        const API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY'; 
-        const CITY = 'Seoul'; // 원하는 도시 이름
+        // 날씨 상태 코드 매핑 (Open-Meteo는 WMO 코드를 반환함)
+        function getWeatherDescription(code) {
+            if (code === 0) return '맑음';
+            if (code >= 1 && code <= 3) return '구름 조금/흐림';
+            if (code >= 45 && code <= 48) return '안개';
+            if (code >= 51 && code <= 67) return '비';
+            if (code >= 71 && code <= 77) return '눈';
+            if (code >= 80 && code <= 82) return '소나기';
+            if (code >= 95) return '뇌우';
+            return '흐림';
+        }
 
         async function getWeather() {
-            const card = document.getElementById('weather-card');
-            
-            try {
-                // OpenWeatherMap API 직접 호출
-                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric&lang=kr`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+            // 서울 좌표: 위도 37.5665, 경도 126.9780
+            const url = 'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current_weather=true&hourly=relativehumidity_2m';
 
+            try {
+                const response = await fetch(url);
                 const data = await response.json();
 
-                // 화면에 데이터 가공해서 렌더링
-                card.innerHTML = `
-                    <div class="city">${data.name}, ${data.sys.country}</div>
-                    <div class="desc">${data.weather[0].description}</div>
-                    <div class="temp">${Math.round(data.main.temp)}°C</div>
-                    <div class="details">
-                        <span>체감 ${Math.round(data.main.feels_like)}°C</span>
-                        <span>습도 ${data.main.humidity}%</span>
-                    </div>
-                `;
+                const currentWeather = data.current_weather;
+                const humidity = data.hourly.relativehumidity_2m[0]; // 현재 시점 습도
+
+                document.getElementById('temp').innerText = `${Math.round(currentWeather.temperature)}°C`;
+                document.getElementById('weather-desc').innerText = getWeatherDescription(currentWeather.weathercode);
+                document.getElementById('humidity').innerText = `습도 ${humidity}%`;
+                document.getElementById('wind').innerText = `풍속 ${currentWeather.windspeed}m/s`;
             } catch (error) {
                 console.error('Failed to fetch weather data:', error);
-                card.innerHTML = `<div style="color: #ff4d4d;">날씨 정보를 불러올 수 없습니다.<br>API Key를 확인해주세요.</div>`;
+                document.getElementById('weather-desc').innerText = '데이터 로드 실패';
             }
         }
 
