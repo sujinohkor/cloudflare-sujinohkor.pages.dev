@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PSD & AI 파일 뷰어</title>
   
-  <!-- AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- 1. PSD 파서 라이브러리 (psd.js UMD) -->
+  <script src="https://unpkg.com/psd/dist/psd.min.js"></script>
+  
+  <!-- 2. AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
   <style>
     body {
@@ -38,11 +41,12 @@
       display: inline-block;
       max-width: 100%;
     }
-    canvas {
+    #resultImg, canvas {
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       background-color: #fff;
       max-width: 100%;
       height: auto;
+      display: none;
     }
   </style>
 </head>
@@ -60,19 +64,18 @@
   <div id="status">파일을 선택해주세요.</div>
 
   <div class="canvas-container">
+    <img id="resultImg" alt="PSD 미리보기">
     <canvas id="viewCanvas"></canvas>
   </div>
 
-  <!-- ES 모듈 방식으로 ag-psd 불러오기 -->
-  <script type="module">
-    import { readPsd } from 'https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle-esm.js';
-
+  <script>
     // PDF.js 워커 세팅
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
     const fileInput = document.getElementById('fileInput');
     const status = document.getElementById('status');
     const canvas = document.getElementById('viewCanvas');
+    const resultImg = document.getElementById('resultImg');
     const ctx = canvas.getContext('2d');
 
     fileInput.addEventListener('change', async (e) => {
@@ -81,14 +84,17 @@
 
       const fileName = file.name.toLowerCase();
       status.innerText = '파일 분석 중...';
+      
+      // 화면 초기화
+      canvas.style.display = 'none';
+      resultImg.style.display = 'none';
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const arrayBuffer = await file.arrayBuffer();
 
       try {
         if (fileName.endsWith('.psd')) {
-          renderPSD(arrayBuffer);
+          await renderPSD(file);
         } else if (fileName.endsWith('.ai')) {
+          const arrayBuffer = await file.arrayBuffer();
           await renderAI(arrayBuffer);
         } else {
           status.innerText = '지원하지 않는 파일 형식입니다.';
@@ -99,25 +105,30 @@
       }
     });
 
-    // 1. PSD 파일 렌더링 함수
-    function renderPSD(buffer) {
-      status.innerText = 'PSD 파싱 중...';
-      
-      // 모듈로 직접 가져온 readPsd 사용
-      const psd = readPsd(buffer);
+    // 1. PSD 파일 렌더링 (psd.js 파서 사용)
+    function renderPSD(file) {
+      return new Promise((resolve, reject) => {
+        status.innerText = 'PSD 파싱 중...';
+        
+        if (typeof PSD === 'undefined') {
+          reject(new Error('PSD 파서 라이브러리(PSD)를 불러오지 못했습니다.'));
+          return;
+        }
 
-      if (!psd.canvas) {
-        throw new Error('PSD 내부 이미지 데이터를 읽을 수 없습니다.');
-      }
-
-      canvas.width = psd.width;
-      canvas.height = psd.height;
-      ctx.drawImage(psd.canvas, 0, 0);
-
-      status.innerText = `PSD 완료 (${psd.width} x ${psd.height} px)`;
+        const url = URL.createObjectURL(file);
+        PSD.fromURL(url).then((psd) => {
+          psd.parse();
+          const image = psd.image.toPng(); // PNG 이미지 추출
+          
+          resultImg.src = image.src;
+          resultImg.style.display = 'inline-block';
+          status.innerText = `PSD 완료 (${psd.header.width} x ${psd.header.height} px)`;
+          resolve();
+        }).catch(reject);
+      });
     }
 
-    // 2. AI 파일 렌더링 함수
+    // 2. AI 파일 렌더링 (PDF.js 사용)
     async function renderAI(buffer) {
       status.innerText = 'AI 데이터 분석 중...';
 
@@ -136,6 +147,7 @@
       };
 
       await page.render(renderContext).promise;
+      canvas.style.display = 'inline-block';
       status.innerText = `AI 완료 (${Math.round(viewport.width)} x ${Math.round(viewport.height)} px)`;
     }
   </script>
