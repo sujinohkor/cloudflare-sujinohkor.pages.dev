@@ -192,17 +192,18 @@
         .code-output-display {
             pointer-events: none;
             z-index: 1;
+            color: #fff; /* 기본 다크모드 일반 텍스트 색상 */
         }
 
         /* Syntax Highlighting Colors (Dark Mode) */
-        .hl-tag     { color: #ff79c6; font-weight: bold; } /* 태그명 (<div, <span 등) */
-        .hl-bracket { color: #888; }                       /* 괄호 (>, />) */
-        .hl-attr    { color: #50fa7b; }                       /* 속성명 (class, id, style 등) */
-        .hl-string  { color: #f1fa8c; }                       /* 속성값 ("...") */
-        .hl-keyword { color: #bd93f9; font-weight: bold; } /* JS 키워드 */
-        .hl-number  { color: #bd93f9; }                       /* 숫자 */
-        .hl-comment { color: #6272a4; font-style: italic; } /* 주석 */
-        .hl-builtin { color: #8be9fd; }                       /* 내장 객체 */
+        .hl-tag     { color: #ff79c6; font-weight: bold; }
+        .hl-bracket { color: #888; }
+        .hl-attr    { color: #50fa7b; }
+        .hl-string  { color: #f1fa8c; }
+        .hl-keyword { color: #bd93f9; font-weight: bold; }
+        .hl-number  { color: #bd93f9; }
+        .hl-comment { color: #6272a4; font-style: italic; }
+        .hl-builtin { color: #8be9fd; }
 
         /* Copy Button */
         .copy-btn {
@@ -268,6 +269,7 @@
         body.light-mode .editor-textarea { caret-color: #000; }
         
         /* Light Mode Syntax Highlighting */
+        body.light-mode .code-output-display { color: #24292e; } /* 일반 텍스트(평문) 색상 변경 */
         body.light-mode .hl-tag     { color: #22863a; font-weight: bold; }
         body.light-mode .hl-bracket { color: #6a737d; }
         body.light-mode .hl-attr    { color: #6f42c1; }
@@ -340,7 +342,7 @@
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
 
-        <div style="margin-top: auto;">
+        <div>
             <button class="menu-btn" onclick="resetCode()">Reset</button>
         </div>
     </aside>
@@ -449,15 +451,14 @@
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
 
-        // HTML 태그명, 괄호, 속성명, 문자열, 주석, 키워드 등을 분리 파싱
         const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;\/?[a-zA-Z0-9\-]+)|(\/&gt;|&gt;)|([a-zA-Z\-]+(?=\s*=))|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
 
         return escaped.replace(tokenPattern, (match, comment, string, tagOpen, tagClose, attrName, keyword, builtin, number) => {
             if (comment)  return `<span class="hl-comment">${comment}</span>`;
             if (string)   return `<span class="hl-string">${string}</span>`;
-            if (tagOpen)  return `<span class="hl-tag">${tagOpen}</span>`;   // <div, </span 등
-            if (tagClose) return `<span class="hl-bracket">${tagClose}</span>`; // >, />
-            if (attrName) return `<span class="hl-attr">${attrName}</span>`;   // class, id, style 등
+            if (tagOpen)  return `<span class="hl-tag">${tagOpen}</span>`;
+            if (tagClose) return `<span class="hl-bracket">${tagClose}</span>`;
+            if (attrName) return `<span class="hl-attr">${attrName}</span>`;
             if (keyword)  return `<span class="hl-keyword">${keyword}</span>`;
             if (builtin)  return `<span class="hl-builtin">${builtin}</span>`;
             if (number)   return `<span class="hl-number">${number}</span>`;
@@ -469,14 +470,11 @@
     function updateEditor() {
         const code = codeTextarea.value;
 
-        // 구문 강조 렌더링
         codeDisplay.innerHTML = highlightSyntax(code) + (code.endsWith('\n') ? ' ' : '');
 
-        // 줄 번호 생성
         const lineCount = code.split('\n').length;
         lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
 
-        // 미리보기 iframe 업데이트
         const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
         frameDoc.open();
         frameDoc.write(code);
