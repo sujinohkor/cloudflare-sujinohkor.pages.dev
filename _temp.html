@@ -2,18 +2,21 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI 배경 제거</title>
-  <!-- 브라우저용 무료 AI 누끼 라이브러리 -->
-  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.js"></script>
 </head>
 <body>
   <h1>AI 배경 제거</h1>
   <input type="file" id="imageInput" accept="image/*">
   <br><br>
   <div id="status"></div>
-  <img id="resultImage" style="max-width: 500px; display: none;">
+  <br>
+  <img id="resultImage" style="max-width: 500px; display: none;" alt="결과 이미지">
 
-  <script>
+  <!-- ES Module 방식으로 라이브러리를 직접 가져옵니다 -->
+  <script type="module">
+    import imglyRemoveBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm';
+
     const imageInput = document.getElementById('imageInput');
     const status = document.getElementById('status');
     const resultImage = document.getElementById('resultImage');
@@ -22,13 +25,14 @@
       const file = e.target.files[0];
       if (!file) return;
 
-      status.innerText = 'AI가 배경 제거 중입니다... (최초 실행 시 모델 다운로드로 5~10초 소요)';
+      status.innerText = 'AI 모델을 불러오고 배경을 제거하는 중입니다... (최초 시도 시 약 5~10초 소요)';
       resultImage.style.display = 'none';
 
       try {
-        // imgly.removeBackground 로 변경되었습니다.
-        const blob = await imgly.removeBackground(file);
+        // 배경 제거 실행
+        const blob = await imglyRemoveBackground(file);
         
+        // 결과를 화면에 표시
         resultImage.src = URL.createObjectURL(blob);
         resultImage.style.display = 'block';
         status.innerText = '완료!';
