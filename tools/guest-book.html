@@ -60,20 +60,43 @@
         .guestbook-item .body { color: #eee; font-size: 0.95rem; white-space: pre-wrap; margin-bottom: 8px; }
         .guestbook-item .meta { color: #aaa; font-size: 0.8rem; }
 
+        /* 다크 모드 카드/패널 그림자 (Guest Book 요소 확장) */
+        .card, .content-mid, .content-down, .content-top {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
         body.light-mode input[type="text"] { color: #000; border-color: #F38020; }
         body.light-mode .content-top, body.light-mode .content-down { border-color: #F38020; }
-        body.light-mode .guestbook-item { background: rgba(243, 128, 32, 0.05); border-color: rgba(243, 128, 32, 0.3); }
+        body.light-mode .guestbook-item { 
+            background: rgba(243, 128, 32, 0.05); 
+            border-color: rgba(243, 128, 32, 0.3); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
         body.light-mode .guestbook-item .author { color: #F38020; }
         body.light-mode .guestbook-item .body { color: #202020; }
         body.light-mode .guestbook-item .meta { color: #666; }
         body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 데이 모드 카드/패널 그림자 (Guest Book 요소 확장) */
+        body.light-mode .card, 
+        body.light-mode .content-mid, 
+        body.light-mode .content-down,
+        body.light-mode .content-top {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
