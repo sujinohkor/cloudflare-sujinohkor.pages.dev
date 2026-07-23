@@ -87,7 +87,7 @@
 
         <div class="bottom-btns">
             <button class="menu-btn" onclick="copyText()">Copy</button>
-            <button class="menu-btn" onclick="saveText()">Save as Text File</button>
+            <button class="menu-btn" onclick="saveText()">Save</button>
             <button class="menu-btn" onclick="resetText()">Reset</button>
         </div>
     </aside>
@@ -109,9 +109,15 @@
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); } );
-    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    
+    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능
+    document.querySelector('.main-content').addEventListener('click', () => { 
+        if (sidebar.classList.contains('active')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
 
+    // 글자 수 및 바이트 수 계산 동기화
     textInput.addEventListener('input', () => {
         const text = textInput.value;
         document.getElementById('char-count-all').innerText = text.length;
@@ -124,9 +130,13 @@
         document.getElementById('byte-count').innerText = bytes;
     });
 
+    // 텍스트 및 로컬 저장소 초기화
     function resetText() {
-        textInput.value = '';
-        textInput.dispatchEvent(new Event('input'));
+        if (confirm('저장된 데이터를 삭제하고 초기화하시겠습니까?')) {
+            localStorage.removeItem('saved_word_counter_text');
+            textInput.value = '';
+            textInput.dispatchEvent(new Event('input'));
+        }
     }
 
     function copyText() {
@@ -136,16 +146,36 @@
         alert('Text copied!');
     }
 
+    // 파일 다운로드 및 브라우저 로컬 저장소 저장
     function saveText() {
         const text = textInput.value;
         if (!text.trim()) return alert("No text to save.");
+
+        // 1. 브라우저 로컬 저장소(localStorage)에 저장
+        localStorage.setItem('saved_word_counter_text', text);
+
+        // 2. 파일(.txt) 다운로드 처리
         const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'WordCounter.txt';
         link.click();
         URL.revokeObjectURL(link.href);
+
+        alert('텍스트가 저장되었습니다.');
     }
+
+    // 로컬 저장소에 저장된 텍스트 불러오기
+    function loadSavedText() {
+        const savedText = localStorage.getItem('saved_word_counter_text');
+        if (savedText !== null) {
+            textInput.value = savedText;
+            textInput.dispatchEvent(new Event('input')); // 글자 수 카운터 업데이트
+        }
+    }
+
+    // 페이지 접속 시 저장된 텍스트 자동으로 가져오기
+    loadSavedText();
 </script>
 </body>
 </html>
