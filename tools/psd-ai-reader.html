@@ -60,13 +60,20 @@
             padding: 10px;
         }
 
-        /* 결과 미리보기 엘리먼트 (이미지 및 캔버스) */
+        /* 결과 미리보기 엘리먼트 (투명 격자 배경 처리) */
         #resultImg, #viewCanvas, .preview-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            /* 투명 레이어가 잘 보이도록 체커보드 패턴 적용 */
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
             background-color: #fff;
             display: none;
         }
@@ -110,6 +117,7 @@
         
         <div class="bottom-btns">
             <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="menu-btn" onclick="savePNG()">Save as PNG</button>
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
     </aside>
@@ -249,6 +257,46 @@
         await page.render(renderContext).promise;
         canvas.style.display = 'inline-block';
         statusDesc.innerText = `AI 완료 (${Math.round(viewport.width)} x ${Math.round(viewport.height)} px)`;
+    }
+
+    // 3. PNG 저장 기능 (투명도 보존 및 PsdAiReader.png로 저장)
+    function savePNG() {
+        if (!loadedFile) {
+            alert('저장할 파일이 없습니다. 먼저 PSD, AI 또는 이미지 파일을 업로드하세요.');
+            return;
+        }
+
+        let downloadUrl = '';
+
+        // AI 파일 및 캔버스 기반 렌더링
+        if (canvas.style.display !== 'none' && canvas.width > 0) {
+            downloadUrl = canvas.toDataURL('image/png');
+        } 
+        // PSD 및 일반 이미지 렌더링 (#resultImg)
+        else if (resultImg.style.display !== 'none' && resultImg.src) {
+            // Base64 데이터면 바로 사용, 아니면 임시 캔버스 그려서 PNG 추출 (투명도 보존)
+            if (resultImg.src.startsWith('data:image/png')) {
+                downloadUrl = resultImg.src;
+            } else {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = resultImg.naturalWidth || resultImg.width;
+                tempCanvas.height = resultImg.naturalHeight || resultImg.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(resultImg, 0, 0);
+                downloadUrl = tempCanvas.toDataURL('image/png');
+            }
+        }
+
+        if (!downloadUrl) {
+            alert('이미지 데이터를 추출할 수 없습니다.');
+            return;
+        }
+
+        // 다운로드 앵커 태그 생성 및 실행
+        const link = document.createElement('a');
+        link.download = 'PsdAiReader.png';
+        link.href = downloadUrl;
+        link.click();
     }
 
     // 드래그 앤 드롭 이벤트
