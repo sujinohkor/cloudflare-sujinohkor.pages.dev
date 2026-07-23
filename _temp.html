@@ -2,7 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>누끼 따기</title>
+  <title>AI 배경 제거</title>
+  <!-- 브라우저용 무료 AI 누끼 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.js"></script>
 </head>
 <body>
   <h1>AI 배경 제거</h1>
@@ -16,39 +18,22 @@
     const status = document.getElementById('status');
     const resultImage = document.getElementById('resultImage');
 
-    // 2단계에서 생성된 본인의 Worker URL을 넣으세요.
-    const WORKER_URL = 'https://remove-bg-worker.sujinohkor.workers.dev';
-
     imageInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      status.innerText = '누끼 따는 중... (약 1~2초 소요)';
+      status.innerText = 'AI가 배경 제거 중입니다... (약 2~3초 소요)';
       resultImage.style.display = 'none';
 
-      // Worker로 보낼 폼 데이터 생성
-      const formData = new FormData();
-      formData.append('image', file);
-
       try {
-        const response = await fetch(WORKER_URL, {
-          method: 'POST',
-          body: formData
-        });
-      
-        if (!response.ok) {
-          // Worker가 보내주는 에러 텍스트 읽어오기
-          const errorText = await response.text();
-          throw new Error(`[서버 에러 ${response.status}] ${errorText}`);
-        }
-      
-        const blob = await response.blob();
+        // 브라우저 내부 AI 로컬 실행 (서버/API 사용 안 함)
+        const blob = await imglyRemoveBackground(file);
+        
         resultImage.src = URL.createObjectURL(blob);
         resultImage.style.display = 'block';
         status.innerText = '완료!';
       } catch (err) {
         console.error(err);
-        // 원인을 화면에 상세히 표시
         status.innerText = `에러 발생: ${err.message}`;
       }
     });
