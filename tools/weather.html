@@ -79,7 +79,7 @@
         }
 
         .forecast-list {
-            overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; flex: 1;
+            overflow-y: auto; overflow-x: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; flex: 1;
         }
         .forecast-list::-webkit-scrollbar { width: 6px; }
         .forecast-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
@@ -94,6 +94,7 @@
             border-radius: 12px;
             font-size: 0.85rem;
             gap: 10px;
+            min-width: 580px;
         }
         .forecast-time { color: #888; font-weight: bold; }
         .forecast-desc { color: #ccc; text-align: left; }
@@ -138,7 +139,28 @@
 
         /* 6. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+
+        /* 2. PC 창을 반으로 줄였을 때 (1100px 이하) 레이아웃 대응 */
+        @media (max-width: 1100px) {
+            .main-content {
+                height: auto;
+                overflow-y: auto; /* 전체 메인 화면 세로 스크롤 허용 */
+            }
+            
+            .workspace-container {
+                flex-direction: column; /* 좌/우 배치를 위/아래 배치로 전환 */
+            }
         
+            .card {
+                width: 100%;
+                height: 300px;
+            }
+        
+            .forecast-panel {
+                width: 100%;
+                min-height: 450px;
+            }
+        }
         @media (max-width: 900px) {
             .forecast-item {
                 grid-template-columns: 80px 1fr 60px;
