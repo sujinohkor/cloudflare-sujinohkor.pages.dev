@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>누끼 따기 웹사이트</title>
+  <!-- AI 배경 제거 라이브러리 로드 -->
+  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.js"></script>
+</head>
+<body>
+  <input type="file" id="upload" accept="image/*">
+  <br><br>
+  <img id="result" alt="결과 이미지" style="max-width: 500px;">
+
+  <script>
+    const uploadInput = document.getElementById('upload');
+    const resultImg = document.getElementById('result');
+
+    uploadInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      resultImg.alt = "처리 중...";
+      
+      // AI 모델로 배경 제거 실행
+      const blob = await imglyRemoveBackground(file);
+      
+      // 결과를 이미지 태그에 표시
+      resultImg.src = URL.createObjectURL(blob);
+      resultImg.alt = "완료";
+    });
+  </script>
+</body>
+</html>
