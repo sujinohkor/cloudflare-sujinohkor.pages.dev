@@ -78,13 +78,13 @@
             border-color: #FDF5E6;
         }
 
-        /* Workspace Structure (고정 비율 및 레이아웃 유지) */
+        /* Workspace Structure */
         .workspace-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             flex: 1;
-            min-height: 0; /* 컨텐츠 확장 방지 필수 속성 */
+            min-height: 0;
         }
 
         .content-top {
@@ -134,7 +134,7 @@
             display: flex;
             width: 100%;
             flex: 1;
-            min-height: 0; /* 컨텐츠가 커져도 부모를 늘리지 않음 */
+            min-height: 0;
             background: #141414;
             border: 2px solid #ff9e40;
             border-radius: 16px;
@@ -244,13 +244,18 @@
             cursor: none;
         }
 
+        /* 다크 모드 카드/패널 그림자 (Mouse Effector 요소 확장) */
+        .card, .content-mid, .content-down, .code-editor-container, .content-top input[type="text"] {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-top input { background: #FDF5E6; color: #000; }
+        body.light-mode .content-top input { background: #FDF5E6; color: #000; border-color: #F38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
         body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
@@ -264,6 +269,21 @@
         body.light-mode .hl-builtin { color: #6f42c1; }
         body.light-mode .copy-btn   { border-color: #F38020; color: #F38020; }
         body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+
+        /* 데이 모드 카드/패널 그림자 (Mouse Effector 요소 확장) */
+        body.light-mode .card, 
+        body.light-mode .content-mid, 
+        body.light-mode .content-down,
+        body.light-mode .code-editor-container,
+        body.light-mode .content-top input[type="text"] {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn {
@@ -308,7 +328,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
-                height: 600px; /* 모바일에서도 고정 높이에서 1:1 유지 */
+                height: 600px;
             }
             .content-mid, .content-down-wrapper {
                 flex: 1 1 50%;
@@ -401,7 +421,6 @@
         } 
     });
 
-    // 구문 강조 함수 (단일 정규식 토큰화)
     function highlightSyntax(code) {
         const escaped = code
             .replace(/&/g, '&amp;')
@@ -421,7 +440,6 @@
         });
     }
 
-    // 코드 갱신 및 줄 번호 생성
     function setCodeOutput(code) {
         rawCodeText = code;
         codeDisplay.innerHTML = highlightSyntax(code);
@@ -439,7 +457,6 @@
         });
     }
 
-    // 모드 변경 제어
     function switchMode(mode) {
         currentMode = mode;
         document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active'));
@@ -479,7 +496,6 @@
         }
     }
 
-    // UI 및 생성 소스코드 갱신
     function updateUI() {
         const text = textInput.value;
 
@@ -573,10 +589,8 @@
             setCodeOutput(
 `<script>(function() {
   const text = "${text}";
-  // 마우스 커서 숨기기
   document.body.style.cursor = 'none';
 
-  // 커서 대체 텍스트 엘리먼트 생성
   const cursorEl = document.createElement('div');
   cursorEl.textContent = text;
   cursorEl.style.cssText = \`
@@ -625,7 +639,6 @@
         previewArea.appendChild(customCursorEl);
     }
 
-    // 이벤트 처리
     textInput.addEventListener('input', updateUI);
 
     previewArea.addEventListener('mousemove', (e) => {
@@ -715,7 +728,6 @@
         trailAnimationId = requestAnimationFrame(animate);
     }
 
-    // 초기 실행
     switchMode('none');
 </script>
 </body>
