@@ -264,15 +264,16 @@
 
         async function fetchOpenMeteo() {
             const coords = await getCoordinates(currentCity);
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,weathercode&forecast_days=3`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,weathercode&forecast_days=3`;
             
             const response = await fetch(url);
             if (!response.ok) throw new Error('Open-Meteo request failed');
             const data = await response.json();
-
+        
             const currentWeather = data.current_weather;
             const hourly = data.hourly;
-
+            const currentHumidity = hourly.relativehumidity_2m[0]; // 현재 습도 값
+        
             const forecastList = [];
             for (let i = 0; i < hourly.time.length; i += 3) {
                 const timeStr = hourly.time[i].replace('T', ' ').slice(5);
@@ -282,13 +283,13 @@
                     temp: `${Math.round(hourly.temperature_2m[i])}°C`
                 });
             }
-
+        
             return {
                 current: {
                     temp: Math.round(currentWeather.temperature),
                     desc: getWeatherDescription(currentWeather.weathercode),
                     detail1: `Wind ${currentWeather.windspeed}m/s`,
-                    detail2: `Code ${currentWeather.weathercode}`
+                    detail2: `Humidity ${currentHumidity}%` // Code 1 대신 습도로 수정
                 },
                 forecast: forecastList
             };
