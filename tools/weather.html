@@ -84,20 +84,30 @@
         .forecast-list::-webkit-scrollbar { width: 6px; }
         .forecast-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 
+        /* Forecast Item Grid Layout */
         .forecast-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; background: #202020; border-radius: 8px; font-size: 0.85rem;
+            display: grid;
+            grid-template-columns: 100px 1fr 90px 90px 80px 60px;
+            align-items: center;
+            padding: 12px 16px;
+            background: #202020;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            gap: 10px;
         }
-        .forecast-time { color: #888; font-weight: bold; width: 110px; }
-        .forecast-desc { color: #ccc; flex-grow: 1; text-align: left; margin: 0 10px; }
-        .forecast-temp { color: #ff9e40; font-weight: bold; }
+        .forecast-time { color: #888; font-weight: bold; }
+        .forecast-desc { color: #ccc; text-align: left; }
+        .forecast-rain { color: #64b5f6; text-align: center; }
+        .forecast-wind { color: #aaa; text-align: center; }
+        .forecast-humidity { color: #81c784; text-align: center; }
+        .forecast-temp { color: #ff9e40; font-weight: bold; text-align: right; }
 
         .city { font-size: 1.8rem; color: #ff9e40; font-weight: bold; margin-bottom: 10px; text-transform: capitalize; }
         .temp { font-size: 3.5rem; font-weight: bold; margin: 15px 0; }
         .desc { font-size: 1.1rem; color: #ccc; }
         .details { margin-top: 20px; font-size: 0.9rem; color: #888; display: flex; justify-content: space-around; width: 100%; }
 
-        /* 5. Theme (Light Mode - 그림자 제거 및 텍스트 검정색 적용) */
+        /* 5. Theme (Light Mode) */
         body.light-mode { background-color: #fff; color: #000; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: none; }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
@@ -111,6 +121,9 @@
         body.light-mode .forecast-item { background: #fff; color: #000; box-shadow: none; border: 1px solid #fce3ce; }
         body.light-mode .forecast-time { color: #202020; }
         body.light-mode .forecast-desc { color: #000; }
+        body.light-mode .forecast-rain { color: #1976d2; }
+        body.light-mode .forecast-wind { color: #424242; }
+        body.light-mode .forecast-humidity { color: #2e7d32; }
         body.light-mode .forecast-temp { color: #F38020; }
         body.light-mode .city { color: #F38020; }
         body.light-mode .temp { color: #000; }
@@ -126,6 +139,13 @@
         /* 6. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
         
+        @media (max-width: 900px) {
+            .forecast-item {
+                grid-template-columns: 80px 1fr 60px;
+            }
+            .forecast-rain, .forecast-wind, .forecast-humidity { display: none; }
+        }
+
         @media (max-width: 680px) {
             .menu-toggle-btn { display: block; }
             .sidebar { transform: translateX(-250px); }
@@ -262,9 +282,14 @@
             day.hourly.forEach(hour => {
                 const timeNum = parseInt(hour.time, 10) / 100;
                 const timeFormatted = `${dateStr} ${String(timeNum).padStart(2, '0')}:00`;
+                const windMs = (parseInt(hour.windspeedKmph, 10) / 3.6).toFixed(1);
+
                 forecastList.push({
                     time: timeFormatted,
                     desc: formatWttrDescription(hour.weatherDesc[0].value),
+                    rainChance: `☔ ${hour.chanceofrain}%`,
+                    wind: `💨 ${windMs}m/s`,
+                    humidity: `💧 ${hour.humidity}%`,
                     temp: `${hour.tempC}°C`
                 });
             });
@@ -283,7 +308,7 @@
 
     async function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,weathercode&forecast_days=3`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode&forecast_days=3`;
         
         const response = await fetch(url);
         if (!response.ok) throw new Error('Open-Meteo request failed');
@@ -296,9 +321,14 @@
         const forecastList = [];
         for (let i = 0; i < hourly.time.length; i += 3) {
             const timeStr = hourly.time[i].replace('T', ' ').slice(5);
+            const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
+
             forecastList.push({
                 time: timeStr,
                 desc: getWeatherDescription(hourly.weathercode[i]),
+                rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
+                wind: `💨 ${windMs}m/s`,
+                humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
                 temp: `${Math.round(hourly.temperature_2m[i])}°C`
             });
         }
@@ -336,6 +366,9 @@
                 el.innerHTML = `
                     <span class="forecast-time">${item.time}</span>
                     <span class="forecast-desc">${item.desc}</span>
+                    <span class="forecast-rain">${item.rainChance}</span>
+                    <span class="forecast-wind">${item.wind}</span>
+                    <span class="forecast-humidity">${item.humidity}</span>
                     <span class="forecast-temp">${item.temp}</span>
                 `;
                 forecastContainer.appendChild(el);
