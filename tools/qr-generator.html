@@ -44,9 +44,14 @@
         #file-name { color: #888; }
         .load-image-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
 
+        /* 다크 모드 카드/패널 그림자 (QR Generator 요소 확장) */
+        .card, .content-top, .content-mid, .content-down {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* Light Mode */
         body.light-mode { background-color: #fff; color: #000; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .top-section { color: #202020; }
         body.light-mode .qr-generator-controls, body.light-mode .qr-decoder-controls { background-color: #FDF5E6; }
         body.light-mode textarea { color: #000; }
@@ -56,6 +61,20 @@
         body.light-mode .menu-list a { color: #202020; }
         body.light-mode #byte-count { color: #F38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 데이 모드 카드/패널 그림자 (QR Generator 요소 확장) */
+        body.light-mode .card, 
+        body.light-mode .content-top,
+        body.light-mode .content-mid, 
+        body.light-mode .content-down {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -147,7 +166,7 @@
 
     document.getElementById('theme-toggle').addEventListener('click', () => document.body.classList.toggle('light-mode'));
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능 추가
+    
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
     
     function updateByteCount() {
