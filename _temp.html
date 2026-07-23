@@ -97,23 +97,31 @@
         .desc { font-size: 1.1rem; color: #ccc; }
         .details { margin-top: 20px; font-size: 0.9rem; color: #888; display: flex; justify-content: space-around; width: 100%; }
 
-        /* 5. Theme (Light Mode) */
+        /* 5. Theme (Light Mode - 그림자 제거 및 텍스트 검정색 적용) */
         body.light-mode { background-color: #fff; color: #000; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: none; }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1 { color: #202020; }
-        body.light-mode .top-section p { color: #666; }
-        body.light-mode .card, body.light-mode .forecast-panel { background-color: #FDF5E6; border-color: #F38020; }
-        body.light-mode .forecast-item { background: #fff; color: #202020; }
-        body.light-mode .city, body.light-mode .forecast-title, body.light-mode .forecast-temp { color: #F38020; }
-        body.light-mode .desc { color: #444; }
+        body.light-mode .top-section h1 { color: #000; }
+        body.light-mode .top-section p { color: #202020; }
+        body.light-mode .card, body.light-mode .forecast-panel { background-color: #FDF5E6; border-color: #F38020; box-shadow: none; }
+        body.light-mode .forecast-panel { border-bottom-color: #F38020; }
+        body.light-mode .forecast-title { color: #F38020; border-bottom-color: #fbd3b1; }
+        body.light-mode .forecast-item { background: #fff; color: #000; box-shadow: none; border: 1px solid #fce3ce; }
+        body.light-mode .forecast-time { color: #202020; }
+        body.light-mode .forecast-desc { color: #000; }
+        body.light-mode .forecast-temp { color: #F38020; }
+        body.light-mode .city { color: #F38020; }
+        body.light-mode .temp { color: #000; }
+        body.light-mode .desc { color: #000; }
+        body.light-mode .details { color: #202020; }
         body.light-mode .search-input { background: #fff; color: #000; border-color: #F38020; }
+        body.light-mode .search-input::placeholder { color: #666; }
         body.light-mode .search-btn { background: #F38020; color: #fff; }
-        body.light-mode .api-btn { background: #fff; border-color: #ccc; color: #666; }
+        body.light-mode .api-btn { background: #fff; border-color: #ccc; color: #202020; }
         body.light-mode .api-btn.active { background: #F38020; color: #fff; border-color: #F38020; }
-        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; box-shadow: none; }
 
         /* 6. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
