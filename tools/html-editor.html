@@ -87,29 +87,6 @@
             min-height: 0;
         }
 
-        .content-top {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .content-top label {
-            color: #ff9e40;
-            font-weight: bold;
-        }
-
-        .content-top input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            background: #101010;
-            border: 2px solid #ff9e40;
-            border-radius: 16px;
-            color: #fff;
-            font-size: 1rem;
-            outline: none;
-        }
-
         /* ===== [Code Editor 영역] ===== */
         .content-mid {
             display: flex;
@@ -196,14 +173,14 @@
         }
 
         /* Syntax Highlighting Colors (Dark Mode) */
-        .hl-tag     { color: #ff79c6; font-weight: bold; }
-        .hl-bracket { color: #888; }
-        .hl-attr    { color: #50fa7b; }
-        .hl-string  { color: #f1fa8c; }
-        .hl-keyword { color: #bd93f9; font-weight: bold; }
-        .hl-number  { color: #bd93f9; }
-        .hl-comment { color: #6272a4; font-style: italic; }
-        .hl-builtin { color: #8be9fd; }
+        .hl-tag     { color: #ff79c6; font-weight: bold; } /* 태그명 (<div, </span 등) */
+        .hl-bracket { color: #ff79c6; font-weight: bold; } /* 닫는 괄호 (>, />) 태그와 색상 통일 */
+        .hl-attr    { color: #50fa7b; }                       /* 속성명 (class, id, style 등) */
+        .hl-string  { color: #f1fa8c; }                       /* 속성값 ("...") */
+        .hl-keyword { color: #bd93f9; font-weight: bold; } /* JS 키워드 */
+        .hl-number  { color: #bd93f9; }                       /* 숫자 */
+        .hl-comment { color: #6272a4; font-style: italic; } /* 주석 */
+        .hl-builtin { color: #8be9fd; }                       /* 내장 객체 */
 
         /* Copy Button */
         .copy-btn {
@@ -261,7 +238,6 @@
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-top input { background: #FDF5E6; color: #000; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
         body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
@@ -271,7 +247,7 @@
         /* Light Mode Syntax Highlighting */
         body.light-mode .code-output-display { color: #24292e; }
         body.light-mode .hl-tag     { color: #22863a; font-weight: bold; }
-        body.light-mode .hl-bracket { color: #6a737d; }
+        body.light-mode .hl-bracket { color: #22863a; font-weight: bold; }
         body.light-mode .hl-attr    { color: #6f42c1; }
         body.light-mode .hl-string  { color: #032f62; }
         body.light-mode .hl-keyword { color: #d73a49; }
@@ -352,11 +328,6 @@
             <h1 id="page-title">HTML Editor</h1>
             <p id="page-desc">Write your HTML code and view the result in real-time.</p>
         </header>
-
-        <div class="content-top">
-            <label for="text-input">File Name</label>
-            <input type="text" id="text-input" value="index.html" placeholder="Type text here...">
-        </div>
 
         <div class="workspace-container">
             <div class="content-mid">
@@ -444,27 +415,45 @@
         } 
     });
 
-    // 구문 강조 함수
-    function highlightSyntax(code) {
-        const escaped = code
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
+// 정확한 구문 강조 함수 (2차 파싱 구조)
+function highlightSyntax(code) {
+    const escaped = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 
-        const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;\/?[a-zA-Z0-9\-]+)|(\/&gt;|&gt;)|([a-zA-Z\-]+(?=\s*=))|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
+    // 1단계 패턴: 주석, 문자열, <!DOCTYPE ...>, HTML 태그 전체(<...>), JS 키워드, 숫자
+    const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;!DOCTYPE\s+([a-zA-Z0-9]+)&gt;)|(&lt;\/?[a-zA-Z0-9\-]+([\s\S]*?)&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
 
-        return escaped.replace(tokenPattern, (match, comment, string, tagOpen, tagClose, attrName, keyword, builtin, number) => {
-            if (comment)  return `<span class="hl-comment">${comment}</span>`;
-            if (string)   return `<span class="hl-string">${string}</span>`;
-            if (tagOpen)  return `<span class="hl-tag">${tagOpen}</span>`;
-            if (tagClose) return `<span class="hl-bracket">${tagClose}</span>`;
-            if (attrName) return `<span class="hl-attr">${attrName}</span>`;
-            if (keyword)  return `<span class="hl-keyword">${keyword}</span>`;
-            if (builtin)  return `<span class="hl-builtin">${builtin}</span>`;
-            if (number)   return `<span class="hl-number">${number}</span>`;
-            return match;
-        });
-    }
+    return escaped.replace(tokenPattern, (match, comment, string, doctypeFull, doctypeType, fullTag, tagInner, keyword, builtin, number) => {
+        if (comment) return `<span class="hl-comment">${comment}</span>`;
+        if (string) return `<span class="hl-string">${string}</span>`;
+
+        // <!DOCTYPE html> 선언 처리
+        if (doctypeFull) {
+            return `<span class="hl-tag">&lt;!DOCTYPE</span> <span class="hl-attr">${doctypeType}</span><span class="hl-tag">&gt;</span>`;
+        }
+
+        // 일반 HTML 태그 안쪽만 속성(Attribute)과 값(String) 2차 파싱
+        if (fullTag) {
+            const parsedTag = fullTag.replace(/(&lt;\/?[a-zA-Z0-9\-]+)|([a-zA-Z\-]+)(?=\s*=\s*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(&gt;|\/&gt;)/g, 
+                (tMatch, tagName, attrName, attrVal, tagClose) => {
+                    if (tagName) return `<span class="hl-tag">${tagName}</span>`;
+                    if (attrName) return `<span class="hl-attr">${attrName}</span>`;
+                    if (attrVal) return `<span class="hl-string">${attrVal}</span>`;
+                    if (tagClose) return `<span class="hl-tag">${tagClose}</span>`;
+                    return tMatch;
+                }
+            );
+            return parsedTag;
+        }
+
+        if (keyword) return `<span class="hl-keyword">${keyword}</span>`;
+        if (builtin) return `<span class="hl-builtin">${builtin}</span>`;
+        if (number) return `<span class="hl-number">${number}</span>`;
+        return match;
+    });
+}
 
     // 에디터 및 미리보기 업데이트
     function updateEditor() {
@@ -516,19 +505,14 @@
     // 저장 기능
     function saveCode() {
         const code = codeTextarea.value;
-        let fileName = document.getElementById('text-input').value.trim();
+        const fileName = 'HtmlEditor.html';
 
         if (!code) {
             alert('저장할 코드가 없습니다.');
             return;
         }
 
-        if (!fileName.endsWith('.html') && !fileName.endsWith('.htm')) {
-            fileName += '.html';
-        }
-
         localStorage.setItem('saved_html_code', code);
-        localStorage.setItem('saved_file_name', fileName);
 
         const blob = new Blob([code], { type: 'text/html;charset=utf-8;' });
         const link = document.createElement('a');
@@ -547,25 +531,18 @@
     function resetCode() {
         if (confirm('초기 상태로 되돌리시겠습니까?')) {
             localStorage.removeItem('saved_html_code');
-            localStorage.removeItem('saved_file_name');
             codeTextarea.value = defaultCode;
-            document.getElementById('text-input').value = 'index.html';
             updateEditor();
         }
     }
 
     function loadSavedCode() {
         const savedCode = localStorage.getItem('saved_html_code');
-        const savedFileName = localStorage.getItem('saved_file_name');
 
         if (savedCode !== null) {
             codeTextarea.value = savedCode;
         } else {
             codeTextarea.value = defaultCode;
-        }
-
-        if (savedFileName !== null) {
-            document.getElementById('text-input').value = savedFileName;
         }
     }
 
