@@ -173,14 +173,14 @@
         }
 
         /* Syntax Highlighting Colors (Dark Mode) */
-        .hl-tag     { color: #ff79c6; font-weight: bold; } /* 태그명 (<div, </span 등) */
-        .hl-bracket { color: #ff79c6; font-weight: bold; } /* 닫는 괄호 (>, />) 태그와 색상 통일 */
-        .hl-attr    { color: #50fa7b; }                       /* 속성명 (class, id, style 등) */
-        .hl-string  { color: #f1fa8c; }                       /* 속성값 ("...") */
-        .hl-keyword { color: #bd93f9; font-weight: bold; } /* JS 키워드 */
-        .hl-number  { color: #bd93f9; }                       /* 숫자 */
-        .hl-comment { color: #6272a4; font-style: italic; } /* 주석 */
-        .hl-builtin { color: #8be9fd; }                       /* 내장 객체 */
+        .hl-tag     { color: #ff79c6; font-weight: bold; }
+        .hl-bracket { color: #ff79c6; font-weight: bold; }
+        .hl-attr    { color: #50fa7b; }
+        .hl-string  { color: #f1fa8c; }
+        .hl-keyword { color: #bd93f9; font-weight: bold; }
+        .hl-number  { color: #bd93f9; }
+        .hl-comment { color: #6272a4; font-style: italic; }
+        .hl-builtin { color: #8be9fd; }
 
         /* Copy Button */
         .copy-btn {
@@ -232,9 +232,14 @@
             background: #fff;
         }
 
+        /* 다크 모드 카드/패널 그림자 (HTML Editor 요소 확장) */
+        .card, .content-mid, .content-down, .code-editor-container {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
@@ -256,6 +261,20 @@
         body.light-mode .hl-builtin { color: #e36209; }
         body.light-mode .copy-btn   { border-color: #F38020; color: #F38020; }
         body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+
+        /* 데이 모드 카드/패널 그림자 (HTML Editor 요소 확장) */
+        body.light-mode .card, 
+        body.light-mode .content-mid, 
+        body.light-mode .content-down,
+        body.light-mode .code-editor-container {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn {
@@ -415,47 +434,42 @@
         } 
     });
 
-// 정확한 구문 강조 함수 (2차 파싱 구조)
-function highlightSyntax(code) {
-    const escaped = code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    function highlightSyntax(code) {
+        const escaped = code
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
 
-    // 1단계 패턴: 주석, 문자열, <!DOCTYPE ...>, HTML 태그 전체(<...>), JS 키워드, 숫자
-    const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;!DOCTYPE\s+([a-zA-Z0-9]+)&gt;)|(&lt;\/?[a-zA-Z0-9\-]+([\s\S]*?)&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
+        const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;!DOCTYPE\s+([a-zA-Z0-9]+)&gt;)|(&lt;\/?[a-zA-Z0-9\-]+([\s\S]*?)&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
 
-    return escaped.replace(tokenPattern, (match, comment, string, doctypeFull, doctypeType, fullTag, tagInner, keyword, builtin, number) => {
-        if (comment) return `<span class="hl-comment">${comment}</span>`;
-        if (string) return `<span class="hl-string">${string}</span>`;
+        return escaped.replace(tokenPattern, (match, comment, string, doctypeFull, doctypeType, fullTag, tagInner, keyword, builtin, number) => {
+            if (comment) return `<span class="hl-comment">${comment}</span>`;
+            if (string) return `<span class="hl-string">${string}</span>`;
 
-        // <!DOCTYPE html> 선언 처리
-        if (doctypeFull) {
-            return `<span class="hl-tag">&lt;!DOCTYPE</span> <span class="hl-attr">${doctypeType}</span><span class="hl-tag">&gt;</span>`;
-        }
+            if (doctypeFull) {
+                return `<span class="hl-tag">&lt;!DOCTYPE</span> <span class="hl-attr">${doctypeType}</span><span class="hl-tag">&gt;</span>`;
+            }
 
-        // 일반 HTML 태그 안쪽만 속성(Attribute)과 값(String) 2차 파싱
-        if (fullTag) {
-            const parsedTag = fullTag.replace(/(&lt;\/?[a-zA-Z0-9\-]+)|([a-zA-Z\-]+)(?=\s*=\s*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(&gt;|\/&gt;)/g, 
-                (tMatch, tagName, attrName, attrVal, tagClose) => {
-                    if (tagName) return `<span class="hl-tag">${tagName}</span>`;
-                    if (attrName) return `<span class="hl-attr">${attrName}</span>`;
-                    if (attrVal) return `<span class="hl-string">${attrVal}</span>`;
-                    if (tagClose) return `<span class="hl-tag">${tagClose}</span>`;
-                    return tMatch;
-                }
-            );
-            return parsedTag;
-        }
+            if (fullTag) {
+                const parsedTag = fullTag.replace(/(&lt;\/?[a-zA-Z0-9\-]+)|([a-zA-Z\-]+)(?=\s*=\s*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(&gt;|\/&gt;)/g, 
+                    (tMatch, tagName, attrName, attrVal, tagClose) => {
+                        if (tagName) return `<span class="hl-tag">${tagName}</span>`;
+                        if (attrName) return `<span class="hl-attr">${attrName}</span>`;
+                        if (attrVal) return `<span class="hl-string">${attrVal}</span>`;
+                        if (tagClose) return `<span class="hl-tag">${tagClose}</span>`;
+                        return tMatch;
+                    }
+                );
+                return parsedTag;
+            }
 
-        if (keyword) return `<span class="hl-keyword">${keyword}</span>`;
-        if (builtin) return `<span class="hl-builtin">${builtin}</span>`;
-        if (number) return `<span class="hl-number">${number}</span>`;
-        return match;
-    });
-}
+            if (keyword) return `<span class="hl-keyword">${keyword}</span>`;
+            if (builtin) return `<span class="hl-builtin">${builtin}</span>`;
+            if (number) return `<span class="hl-number">${number}</span>`;
+            return match;
+        });
+    }
 
-    // 에디터 및 미리보기 업데이트
     function updateEditor() {
         const code = codeTextarea.value;
 
@@ -470,14 +484,12 @@ function highlightSyntax(code) {
         frameDoc.close();
     }
 
-    // 스크롤 위치 동기화
     codeTextarea.addEventListener('scroll', () => {
         codeDisplay.scrollTop = codeTextarea.scrollTop;
         codeDisplay.scrollLeft = codeTextarea.scrollLeft;
         lineNumbers.scrollTop = codeTextarea.scrollTop;
     });
 
-    // Tab 키 지원
     codeTextarea.addEventListener('keydown', (e) => {
         if (e.key === 'Tab') {
             e.preventDefault();
@@ -502,7 +514,6 @@ function highlightSyntax(code) {
         });
     }
 
-    // 저장 기능
     function saveCode() {
         const code = codeTextarea.value;
         const fileName = 'HtmlEditor.html';
@@ -546,7 +557,6 @@ function highlightSyntax(code) {
         }
     }
 
-    // 초기화
     loadSavedCode();
     updateEditor();
 </script>
