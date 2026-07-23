@@ -53,7 +53,6 @@
 
         #map-container { width: 100%; height: 100%; min-height: 250px; background: #151515; z-index: 1; }
         
-        /* info-container 세부 내역 레이아웃 */
         #info-container { 
             padding: 24px; 
             background: transparent; 
@@ -86,9 +85,14 @@
             word-break: break-all;
         }
 
+        /* 다크 모드 카드/패널 그림자 (IP 페이지 요소 확장) */
+        .card, .content-mid, .content-down, .content-top, .half-box {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
@@ -97,6 +101,21 @@
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode .info-value { color: #202020; }
         body.light-mode .info-row { border-bottom-color: rgba(243, 128, 32, 0.2); }
+
+        /* 데이 모드 카드/패널 그림자 (IP 페이지 요소 확장) */
+        body.light-mode .card, 
+        body.light-mode .content-mid, 
+        body.light-mode .content-down,
+        body.light-mode .content-top,
+        body.light-mode .half-box {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
+        body.light-mode .color-card,
+        body.light-mode .list-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -107,9 +126,6 @@
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; width: 100%; overflow-y: auto; }
             .content-down { flex-direction: column; flex: none; height: auto; min-height: 600px; }
-            /*.half-box { min-height: 280px; }
-            /* 💡 1:3 비율 설정을 위한 flex 속성 지정 */
-            /* 첫 번째 상자 (map-container) -> 비율 1 */
             .content-down .half-box:nth-child(1) { flex: 1; min-height: 200px; }
             .content-down .half-box:nth-child(2) { flex: 3; min-height: 0; }
             .ip-address { font-size: 1.3rem; }
@@ -161,7 +177,6 @@
     let marker = null;
     let currentIP = '';
 
-    // 역지오코딩 결과를 보관할 객체
     let gpsLocationData = {
         city: "Requesting...",
         region: "Requesting...",
@@ -235,7 +250,6 @@
                         
                         renderMap(gpsLat, gpsLon, "My Exact Location (GPS)");
 
-                        // GPS 좌표 -> 주소/우편번호 변환 (OpenStreetMap Nominatim API)
                         try {
                             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}`);
                             const geoData = await geoRes.json();
@@ -254,7 +268,6 @@
                             setGpsFailedStatus("Error");
                         }
 
-                        // GPS 데이터 반영하여 UI 재출력
                         renderDetails(data);
                     },
                     (geoError) => {
