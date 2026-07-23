@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PSD & AI 파일 뷰어</title>
   
-  <!-- 1. PSD 파서 라이브러리 (기본 UMD 번들) -->
-  <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle-min.js"></script>
-  
-  <!-- 2. AI(PDF 호환) 파서 라이브러리 -->
+  <!-- AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
@@ -66,7 +63,10 @@
     <canvas id="viewCanvas"></canvas>
   </div>
 
-  <script>
+  <!-- ES 모듈 방식으로 ag-psd 불러오기 -->
+  <script type="module">
+    import { readPsd } from 'https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle-esm.js';
+
     // PDF.js 워커 세팅
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -99,19 +99,15 @@
       }
     });
 
-    // 1. PSD 파일 렌더링
+    // 1. PSD 파일 렌더링 함수
     function renderPSD(buffer) {
       status.innerText = 'PSD 파싱 중...';
       
-      // 번들 스크립트에 포함된 agPsd 객체 접근
-      if (typeof agPsd === 'undefined') {
-        throw new Error('PSD 파서 라이브러리를 불러오지 못했습니다.');
-      }
-
-      const psd = agPsd.readPsd(buffer);
+      // 모듈로 직접 가져온 readPsd 사용
+      const psd = readPsd(buffer);
 
       if (!psd.canvas) {
-        throw new Error('PSD 내부 캔버스 데이터를 읽을 수 없습니다.');
+        throw new Error('PSD 내부 이미지 데이터를 읽을 수 없습니다.');
       }
 
       canvas.width = psd.width;
@@ -121,7 +117,7 @@
       status.innerText = `PSD 완료 (${psd.width} x ${psd.height} px)`;
     }
 
-    // 2. AI 파일 렌더링
+    // 2. AI 파일 렌더링 함수
     async function renderAI(buffer) {
       status.innerText = 'AI 데이터 분석 중...';
 
