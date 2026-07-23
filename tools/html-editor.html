@@ -192,7 +192,7 @@
         .code-output-display {
             pointer-events: none;
             z-index: 1;
-            color: #fff; /* 기본 다크모드 일반 텍스트 색상 */
+            color: #fff;
         }
 
         /* Syntax Highlighting Colors (Dark Mode) */
@@ -269,7 +269,7 @@
         body.light-mode .editor-textarea { caret-color: #000; }
         
         /* Light Mode Syntax Highlighting */
-        body.light-mode .code-output-display { color: #24292e; } /* 일반 텍스트(평문) 색상 변경 */
+        body.light-mode .code-output-display { color: #24292e; }
         body.light-mode .hl-tag     { color: #22863a; font-weight: bold; }
         body.light-mode .hl-bracket { color: #6a737d; }
         body.light-mode .hl-attr    { color: #6f42c1; }
@@ -341,8 +341,8 @@
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-
         <div>
+            <button class="menu-btn" onclick="saveCode()">Save</button>
             <button class="menu-btn" onclick="resetCode()">Reset</button>
         </div>
     </aside>
@@ -513,13 +513,64 @@
         });
     }
 
+    // 저장 기능
+    function saveCode() {
+        const code = codeTextarea.value;
+        let fileName = document.getElementById('text-input').value.trim();
+
+        if (!code) {
+            alert('저장할 코드가 없습니다.');
+            return;
+        }
+
+        if (!fileName.endsWith('.html') && !fileName.endsWith('.htm')) {
+            fileName += '.html';
+        }
+
+        localStorage.setItem('saved_html_code', code);
+        localStorage.setItem('saved_file_name', fileName);
+
+        const blob = new Blob([code], { type: 'text/html;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(link.href);
+    }
+
     function resetCode() {
-        codeTextarea.value = defaultCode;
-        updateEditor();
+        if (confirm('초기 상태로 되돌리시겠습니까?')) {
+            localStorage.removeItem('saved_html_code');
+            localStorage.removeItem('saved_file_name');
+            codeTextarea.value = defaultCode;
+            document.getElementById('text-input').value = 'index.html';
+            updateEditor();
+        }
+    }
+
+    function loadSavedCode() {
+        const savedCode = localStorage.getItem('saved_html_code');
+        const savedFileName = localStorage.getItem('saved_file_name');
+
+        if (savedCode !== null) {
+            codeTextarea.value = savedCode;
+        } else {
+            codeTextarea.value = defaultCode;
+        }
+
+        if (savedFileName !== null) {
+            document.getElementById('text-input').value = savedFileName;
+        }
     }
 
     // 초기화
-    codeTextarea.value = defaultCode;
+    loadSavedCode();
     updateEditor();
 </script>
 </body>
