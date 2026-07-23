@@ -242,7 +242,7 @@
         document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
 
         // Cloudflare Worker 방문자 카운터 API 호출
-        fetch('https://your-worker.workers.dev') // 실제 Worker URL로 변경
+        fetch('https://counter-kv-worker.sujinohkor.workers.dev/') // 실제 Worker URL로 변경
             .then(res => res.json())
             .then(data => {
                 const countElement = document.getElementById('visit-count');
