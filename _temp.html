@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +25,7 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
         
-        /* 도시 검색 영역 스타일 */
+        /* Search Box Style */
         .search-box {
             display: flex;
             gap: 6px;
@@ -55,7 +55,7 @@
             font-size: 0.85rem;
         }
 
-        /* API 선택 버튼 스타일 */
+        /* API Switcher Style */
         .api-switcher {
             display: flex;
             gap: 8px;
@@ -88,122 +88,97 @@
 <body>
 
     <div class="card">
-        <!-- 도시 검색 영역 (콤보박스 형태) -->
+        <!-- Combo Box (Editable Dropdown) -->
         <div class="search-box">
-            <input type="text" id="city-input" list="city-list" class="search-input" placeholder="도시 선택 또는 입력" value="서울" onchange="searchCity()" onkeydown="if(event.key==='Enter') searchCity()">
+            <input type="text" id="city-input" list="city-list" class="search-input" placeholder="Select or type city" value="Seoul" onchange="searchCity()" onkeydown="if(event.key==='Enter') searchCity()">
             <datalist id="city-list">
-                <!-- 국내 주요 도시 -->
-                <option value="서울"></option>
-                <option value="부산"></option>
-                <option value="인천"></option>
-                <option value="대구"></option>
-                <option value="대전"></option>
-                <option value="광주"></option>
-                <option value="울산"></option>
-                <option value="수원"></option>
-                <option value="춘천"></option>
-                <option value="제주"></option>
-                <!-- 해외 주요 도시 -->
-                <option value="도쿄"></option>
-                <option value="오사카"></option>
-                <option value="런던"></option>
-                <option value="파리"></option>
-                <option value="뉴욕"></option>
-                <option value="시드니"></option>
+                <!-- Major Global Cities -->
+                <option value="Seoul"></option>
+                <option value="Tokyo"></option>
+                <option value="New York"></option>
+                <option value="London"></option>
+                <option value="Paris"></option>
+                <option value="Sydney"></option>
+                <option value="Berlin"></option>
+                <option value="Toronto"></option>
+                <option value="Singapore"></option>
+                <option value="Dubai"></option>
+                <option value="Los Angeles"></option>
+                <option value="Rome"></option>
             </datalist>
-            <button class="search-btn" onclick="searchCity()">검색</button>
+            <button class="search-btn" onclick="searchCity()">Search</button>
         </div>
 
-        <!-- API 선택 스위처 -->
+        <!-- API Switcher -->
         <div class="api-switcher">
             <button class="api-btn active" id="btn-wttr" onclick="switchApi('wttr')">wttr.in</button>
             <button class="api-btn" id="btn-meteo" onclick="switchApi('meteo')">Open-Meteo</button>
         </div>
 
-        <div class="city" id="city-name">서울</div>
-        <div class="desc" id="weather-desc">불러오는 중...</div>
+        <div class="city" id="city-name">Seoul</div>
+        <div class="desc" id="weather-desc">Loading...</div>
         <div class="temp" id="temp">--°C</div>
         <div class="details">
-            <span id="detail-1">체감 --°C</span>
-            <span id="detail-2">습도 --%</span>
+            <span id="detail-1">Feels Like --°C</span>
+            <span id="detail-2">Humidity --%</span>
         </div>
     </div>
 
     <script>
         let currentProvider = 'wttr';
-        let currentDisplayCity = '서울';
-        let currentSearchQuery = 'Seoul';
+        let currentCity = 'Seoul';
 
-        // 한글 도시명 -> 영문 도시명 매핑 객체
-        const cityMap = {
-            '서울': 'Seoul',
-            '부산': 'Busan',
-            '인천': 'Incheon',
-            '대구': 'Daegu',
-            '대전': 'Daejeon',
-            '광주': 'Gwangju',
-            '울산': 'Ulsan',
-            '수원': 'Suwon',
-            '춘천': 'Chuncheon',
-            '제주': 'Jeju',
-            '도쿄': 'Tokyo',
-            '오사카': 'Osaka',
-            '런던': 'London',
-            '파리': 'Paris',
-            '뉴욕': 'New York',
-            '시드니': 'Sydney'
-        };
-
-        // Open-Meteo WMO 코드 매핑
+        // Open-Meteo WMO Code Mapping (English)
         function getWeatherDescription(code) {
-            if (code === 0) return '맑음';
-            if (code >= 1 && code <= 3) return '구름 조금/흐림';
-            if (code >= 45 && code <= 48) return '안개';
-            if (code >= 51 && code <= 67) return '비';
-            if (code >= 71 && code <= 77) return '눈';
-            if (code >= 80 && code <= 82) return '소나기';
-            if (code >= 95) return '뇌우';
-            return '흐림';
+            if (code === 0) return 'Clear sky';
+            if (code >= 1 && code <= 3) return 'Partly cloudy';
+            if (code >= 45 && code <= 48) return 'Fog';
+            if (code >= 51 && code <= 67) return 'Drizzle / Rain';
+            if (code >= 71 && code <= 77) return 'Snow fall';
+            if (code >= 80 && code <= 82) return 'Rain showers';
+            if (code >= 95) return 'Thunderstorm';
+            return 'Overcast';
         }
 
-        // 도시 이름으로 위도, 경도 좌표 구하기 (Open-Meteo 지오코딩 API 활용)
+        // Get Latitude & Longitude for Open-Meteo
         async function getCoordinates(city) {
             const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
             const response = await fetch(url);
             const data = await response.json();
 
             if (!data.results || data.results.length === 0) {
-                throw new Error('도시를 찾을 수 없습니다.');
+                throw new Error('City not found');
             }
 
             return {
                 latitude: data.results[0].latitude,
-                longitude: data.results[0].longitude
+                longitude: data.results[0].longitude,
+                name: data.results[0].name
             };
         }
 
-        // wttr.in 데이터 로드
+        // Fetch Data from wttr.in
         async function fetchWttr(city) {
             const response = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1`);
-            if (!response.ok) throw new Error('wttr.in 데이터 조회 실패');
+            if (!response.ok) throw new Error('wttr.in request failed');
             const data = await response.json();
             const current = data.current_condition[0];
 
             return {
                 temp: current.temp_C,
-                desc: current.lang_kr?.[0]?.value || current.weatherDesc[0].value,
-                detail1: `체감 ${current.FeelsLikeC}°C`,
-                detail2: `습도 ${current.humidity}%`
+                desc: current.weatherDesc[0].value,
+                detail1: `Feels Like ${current.FeelsLikeC}°C`,
+                detail2: `Humidity ${current.humidity}%`
             };
         }
 
-        // Open-Meteo 데이터 로드
+        // Fetch Data from Open-Meteo
         async function fetchOpenMeteo(city) {
             const coords = await getCoordinates(city);
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=relativehumidity_2m`;
             
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Open-Meteo 데이터 조회 실패');
+            if (!response.ok) throw new Error('Open-Meteo request failed');
             const data = await response.json();
             const currentWeather = data.current_weather;
             const humidity = data.hourly.relativehumidity_2m[0];
@@ -211,22 +186,22 @@
             return {
                 temp: Math.round(currentWeather.temperature),
                 desc: getWeatherDescription(currentWeather.weathercode),
-                detail1: `습도 ${humidity}%`,
-                detail2: `풍속 ${currentWeather.windspeed}m/s`
+                detail1: `Humidity ${humidity}%`,
+                detail2: `Wind ${currentWeather.windspeed}m/s`
             };
         }
 
-        // 날씨 데이터 업데이트 실행 함수
+        // Update UI
         async function updateWeather() {
-            document.getElementById('weather-desc').innerText = '불러오는 중...';
-            document.getElementById('city-name').innerText = currentDisplayCity;
+            document.getElementById('weather-desc').innerText = 'Loading...';
+            document.getElementById('city-name').innerText = currentCity;
 
             try {
                 let weatherData;
                 if (currentProvider === 'wttr') {
-                    weatherData = await fetchWttr(currentSearchQuery);
+                    weatherData = await fetchWttr(currentCity);
                 } else {
-                    weatherData = await fetchOpenMeteo(currentSearchQuery);
+                    weatherData = await fetchOpenMeteo(currentCity);
                 }
 
                 document.getElementById('temp').innerText = `${weatherData.temp}°C`;
@@ -235,26 +210,23 @@
                 document.getElementById('detail-2').innerText = weatherData.detail2;
             } catch (error) {
                 console.error('Failed to fetch weather data:', error);
-                document.getElementById('weather-desc').innerText = '도시를 찾을 수 없음';
+                document.getElementById('weather-desc').innerText = 'City Not Found';
                 document.getElementById('temp').innerText = '--°C';
-                document.getElementById('detail-1').innerText = '체감 --°C';
-                document.getElementById('detail-2').innerText = '습도 --%';
+                document.getElementById('detail-1').innerText = 'Feels Like --°C';
+                document.getElementById('detail-2').innerText = 'Humidity --%';
             }
         }
 
-        // 도시 검색 처리
+        // Search Action
         function searchCity() {
             const input = document.getElementById('city-input').value.trim();
             if (!input) return;
 
-            currentDisplayCity = input;
-            // 입력값이 한글 매핑 테이블에 있으면 해당 영문명 사용, 없으면 입력값 그대로 검색
-            currentSearchQuery = cityMap[input] || input;
-
+            currentCity = input;
             updateWeather();
         }
 
-        // 버튼 클릭 시 Provider 변경 및 UI 업데이트
+        // Switch Provider
         function switchApi(provider) {
             if (currentProvider === provider) return;
             
@@ -266,7 +238,7 @@
             updateWeather();
         }
 
-        // 최초 실행
+        // Initial Run
         updateWeather();
     </script>
 </body>
