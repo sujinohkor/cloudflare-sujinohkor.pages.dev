@@ -88,9 +88,29 @@
 <body>
 
     <div class="card">
-        <!-- 도시 검색 영역 -->
+        <!-- 도시 검색 영역 (콤보박스 형태) -->
         <div class="search-box">
-            <input type="text" id="city-input" class="search-input" placeholder="도시명 입력 (예: Tokyo, London)" value="Seoul" onkeydown="if(event.key==='Enter') searchCity()">
+            <input type="text" id="city-input" list="city-list" class="search-input" placeholder="도시 선택 또는 입력" value="서울" onchange="searchCity()" onkeydown="if(event.key==='Enter') searchCity()">
+            <datalist id="city-list">
+                <!-- 국내 주요 도시 -->
+                <option value="서울"></option>
+                <option value="부산"></option>
+                <option value="인천"></option>
+                <option value="대구"></option>
+                <option value="대전"></option>
+                <option value="광주"></option>
+                <option value="울산"></option>
+                <option value="수원"></option>
+                <option value="춘천"></option>
+                <option value="제주"></option>
+                <!-- 해외 주요 도시 -->
+                <option value="도쿄"></option>
+                <option value="오사카"></option>
+                <option value="런던"></option>
+                <option value="파리"></option>
+                <option value="뉴욕"></option>
+                <option value="시드니"></option>
+            </datalist>
             <button class="search-btn" onclick="searchCity()">검색</button>
         </div>
 
@@ -100,7 +120,7 @@
             <button class="api-btn" id="btn-meteo" onclick="switchApi('meteo')">Open-Meteo</button>
         </div>
 
-        <div class="city" id="city-name">Seoul</div>
+        <div class="city" id="city-name">서울</div>
         <div class="desc" id="weather-desc">불러오는 중...</div>
         <div class="temp" id="temp">--°C</div>
         <div class="details">
@@ -111,7 +131,28 @@
 
     <script>
         let currentProvider = 'wttr';
-        let currentCity = 'Seoul';
+        let currentDisplayCity = '서울';
+        let currentSearchQuery = 'Seoul';
+
+        // 한글 도시명 -> 영문 도시명 매핑 객체
+        const cityMap = {
+            '서울': 'Seoul',
+            '부산': 'Busan',
+            '인천': 'Incheon',
+            '대구': 'Daegu',
+            '대전': 'Daejeon',
+            '광주': 'Gwangju',
+            '울산': 'Ulsan',
+            '수원': 'Suwon',
+            '춘천': 'Chuncheon',
+            '제주': 'Jeju',
+            '도쿄': 'Tokyo',
+            '오사카': 'Osaka',
+            '런던': 'London',
+            '파리': 'Paris',
+            '뉴욕': 'New York',
+            '시드니': 'Sydney'
+        };
 
         // Open-Meteo WMO 코드 매핑
         function getWeatherDescription(code) {
@@ -137,8 +178,7 @@
 
             return {
                 latitude: data.results[0].latitude,
-                longitude: data.results[0].longitude,
-                name: data.results[0].name
+                longitude: data.results[0].longitude
             };
         }
 
@@ -179,14 +219,14 @@
         // 날씨 데이터 업데이트 실행 함수
         async function updateWeather() {
             document.getElementById('weather-desc').innerText = '불러오는 중...';
-            document.getElementById('city-name').innerText = currentCity;
+            document.getElementById('city-name').innerText = currentDisplayCity;
 
             try {
                 let weatherData;
                 if (currentProvider === 'wttr') {
-                    weatherData = await fetchWttr(currentCity);
+                    weatherData = await fetchWttr(currentSearchQuery);
                 } else {
-                    weatherData = await fetchOpenMeteo(currentCity);
+                    weatherData = await fetchOpenMeteo(currentSearchQuery);
                 }
 
                 document.getElementById('temp').innerText = `${weatherData.temp}°C`;
@@ -206,7 +246,11 @@
         function searchCity() {
             const input = document.getElementById('city-input').value.trim();
             if (!input) return;
-            currentCity = input;
+
+            currentDisplayCity = input;
+            // 입력값이 한글 매핑 테이블에 있으면 해당 영문명 사용, 없으면 입력값 그대로 검색
+            currentSearchQuery = cityMap[input] || input;
+
             updateWeather();
         }
 
