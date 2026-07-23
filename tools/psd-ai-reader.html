@@ -1,1 +1,283 @@
-developing...
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSD AI Reader</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    
+    <!-- 1. PSD 파서 라이브러리 (jsDelivr CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/psd/dist/psd.min.js"></script>
+    
+    <!-- 2. AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <style>
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+        
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s;
+        }
+
+        .workspace-container {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        
+        .content-mid { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: auto; 
+            padding: 20px; color: #888; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem;
+            cursor: pointer; transition: all 0.3s ease; user-select: none;
+            flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
+            position: relative;
+        }
+        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; color: #ff9e40; }
+        .content-mid.has-file {
+            background-color: rgba(255, 158, 64, 0.05);
+            padding: 10px;
+        }
+
+        /* 결과 미리보기 엘리먼트 (이미지 및 캔버스) */
+        #resultImg, #viewCanvas, .preview-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background-color: #fff;
+            display: none;
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-mid { color: #666; }
+        body.light-mode .content-mid.has-file { background-color: rgba(243, 128, 32, 0.05); }
+        body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1); border-style: dashed; color: #f38020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (max-width: 600px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            
+            .workspace-container { flex-direction: column; }
+            .content-mid { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<input type="file" id="file-selector" accept=".psd,.ai,image/*" style="display: none;">
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>PSD AI Reader</h1>
+            <p id="status-desc">Upload a file below to view content.</p>
+        </header>
+        
+        <div class="workspace-container">
+            <section class="content-mid" id="drop-zone">
+                <div id="default-ui">
+                    <div style="font-size: 3rem;">🖼️</div>
+                    <div>Drag & Drop a PSD, AI, or Image file here or click to upload.</div>
+                </div>
+                <img id="resultImg" alt="PSD 미리보기">
+                <canvas id="viewCanvas"></canvas>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    // PDF.js 워커 설정
+    if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+
+    const sidebar = document.getElementById('sidebar');
+    const dropZone = document.getElementById('drop-zone');
+    const defaultUI = document.getElementById('default-ui');
+    const fileSelector = document.getElementById('file-selector');
+    const statusDesc = document.getElementById('status-desc');
+    const canvas = document.getElementById('viewCanvas');
+    const resultImg = document.getElementById('resultImg');
+    const ctx = canvas.getContext('2d');
+    
+    let loadedFile = null;
+
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+
+    // 초기 UI 설정
+    function setInitialUI() {
+        dropZone.classList.remove('has-file');
+        defaultUI.style.display = 'block';
+        resultImg.style.display = 'none';
+        canvas.style.display = 'none';
+        resultImg.src = '';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        statusDesc.innerText = 'Upload a file below to view content.';
+    }
+
+    // 파일 로드 및 분류 핸들러
+    async function handleFile(file) {
+        if (!file) return;
+
+        loadedFile = file;
+        const fileName = file.name.toLowerCase();
+        
+        // 화면 리셋
+        defaultUI.style.display = 'none';
+        resultImg.style.display = 'none';
+        canvas.style.display = 'none';
+        dropZone.classList.add('has-file');
+        statusDesc.innerText = '파일 분석 중...';
+
+        try {
+            if (fileName.endsWith('.psd')) {
+                await renderPSD(file);
+            } else if (fileName.endsWith('.ai')) {
+                const arrayBuffer = await file.arrayBuffer();
+                await renderAI(arrayBuffer);
+            } else if (file.type.startsWith('image/')) {
+                // 일반 이미지 (PNG, JPG 등)
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resultImg.src = e.target.result;
+                    resultImg.style.display = 'inline-block';
+                    statusDesc.innerText = `이미지 완료 (${file.name})`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                statusDesc.innerText = '지원하지 않는 파일 형식입니다.';
+            }
+        } catch (err) {
+            console.error(err);
+            statusDesc.innerText = `에러 발생: ${err.message}`;
+        }
+    }
+
+    // 1. PSD 파일 렌더링
+    function renderPSD(file) {
+        return new Promise((resolve, reject) => {
+            statusDesc.innerText = 'PSD 파싱 중...';
+            
+            const PSDParser = window.PSD || (window.require && window.require('psd'));
+
+            if (!PSDParser) {
+                reject(new Error('PSD 라이브러리를 불러오지 못했습니다. 네트워크 상태나 CDN 접속을 확인하세요.'));
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+            PSDParser.fromURL(url).then((psd) => {
+                psd.parse();
+                const image = psd.image.toPng(); // PNG 추출
+                
+                resultImg.src = image.src;
+                resultImg.style.display = 'inline-block';
+                statusDesc.innerText = `PSD 완료 (${psd.header.width} x ${psd.header.height} px)`;
+                resolve();
+            }).catch(reject);
+        });
+    }
+
+    // 2. AI 파일 렌더링
+    async function renderAI(buffer) {
+        statusDesc.innerText = 'AI 데이터 분석 중...';
+
+        const loadingTask = pdfjsLib.getDocument({ data: buffer });
+        const pdf = await loadingTask.promise;
+        
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1.5 });
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+        };
+
+        await page.render(renderContext).promise;
+        canvas.style.display = 'inline-block';
+        statusDesc.innerText = `AI 완료 (${Math.round(viewport.width)} x ${Math.round(viewport.height)} px)`;
+    }
+
+    // 드래그 앤 드롭 이벤트
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+    dropZone.addEventListener('drop', (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.remove('dragover'); 
+        const file = e.dataTransfer.files[0]; 
+        handleFile(file); 
+    });
+    dropZone.addEventListener('click', () => { fileSelector.click(); });
+
+    function uploadFile() { fileSelector.click(); }
+
+    fileSelector.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFile(file);
+        e.target.value = ''; 
+    });
+
+    // 초기화 기능
+    function resetAll() {
+        loadedFile = null;
+        setInitialUI();
+    }
+
+    // 페이지 진입 시 초기화
+    setInitialUI();
+</script>
+</body>
+</html>
