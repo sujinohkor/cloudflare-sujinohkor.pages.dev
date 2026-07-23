@@ -22,12 +22,12 @@
       const file = e.target.files[0];
       if (!file) return;
 
-      status.innerText = 'AI가 배경 제거 중입니다... (약 2~3초 소요)';
+      status.innerText = 'AI가 배경 제거 중입니다... (최초 실행 시 모델 다운로드로 5~10초 소요)';
       resultImage.style.display = 'none';
 
       try {
-        // 브라우저 내부 AI 로컬 실행 (서버/API 사용 안 함)
-        const blob = await imglyRemoveBackground(file);
+        // imgly.removeBackground 로 변경되었습니다.
+        const blob = await imgly.removeBackground(file);
         
         resultImage.src = URL.createObjectURL(blob);
         resultImage.style.display = 'block';
