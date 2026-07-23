@@ -7,10 +7,26 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     
     <!-- 1. PSD 파서 라이브러리 (jsDelivr CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/psd/dist/psd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/요청하신 `<label>` 스타일을 적용한 코드입니다.
+
+`.workspace-container` 내부의 `label` 스타일 정의를 추가하여, 파일 이름이 노출되는 라벨에 가독성과 포인트를 줄 수 있도록 반영했습니다.
+
+---
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSD AI Reader</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    
+    <!-- 1. PSD 파서 라이브러리 (jsDelivr CDN) -->
+    <script src="[https://cdn.jsdelivr.net/npm/psd/dist/psd.min.js](https://cdn.jsdelivr.net/npm/psd/dist/psd.min.js)"></script>
     
     <!-- 2. AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js](https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js)"></script>
 
     <style>
         /* 1. Reset & Base */
@@ -36,6 +52,12 @@
             flex: 1;
             gap: 10px;
             min-height: 0;
+        }
+
+        /* Label 스타일 추가 */
+        #file-name-label {
+            color: #ff9e40;
+            font-weight: bold;
         }
 
         /* 3. Components */
@@ -88,6 +110,7 @@
         body.light-mode .content-mid.has-file { background-color: rgba(243, 128, 32, 0.05); }
         body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1); border-style: dashed; color: #f38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode #file-name-label { color: #F38020; } /* 라이트 모드 시 어울리는 색상 유지 */
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -143,7 +166,7 @@
 
 <script>
     if (typeof pdfjsLib !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '[https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js](https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js)';
     }
 
     const sidebar = document.getElementById('sidebar');
