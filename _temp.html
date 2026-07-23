@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PSD & AI 파일 뷰어</title>
   
-  <!-- 1. PSD 파서 라이브러리 -->
-  <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle-min.js"></script>
-  
-  <!-- 2. AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
+  <!-- AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
@@ -43,7 +40,7 @@
     }
     canvas {
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      background-color: #fff; /* 투명 배경 확인용 */
+      background-color: #fff;
       max-width: 100%;
       height: auto;
     }
@@ -66,8 +63,11 @@
     <canvas id="viewCanvas"></canvas>
   </div>
 
-  <script>
-    // PDF.js 워커 세팅 (AI 파일 파싱 필수)
+  <!-- ES 모듈 방식으로 ag-psd 불러오기 -->
+  <script type="module">
+    import { readPsd } from 'https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle-esm.js';
+
+    // PDF.js 워커 세팅
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     const fileInput = document.getElementById('fileInput');
@@ -102,7 +102,9 @@
     // 1. PSD 파일 렌더링 함수
     function renderPSD(buffer) {
       status.innerText = 'PSD 파싱 중...';
-      const psd = agPsd.readPsd(buffer);
+      
+      // 모듈로 직접 가져온 readPsd 사용
+      const psd = readPsd(buffer);
 
       if (!psd.canvas) {
         throw new Error('PSD 내부 이미지 데이터를 읽을 수 없습니다.');
@@ -115,17 +117,15 @@
       status.innerText = `PSD 완료 (${psd.width} x ${psd.height} px)`;
     }
 
-    // 2. AI 파일 렌더링 함수 (내장 PDF 스트림 이용)
+    // 2. AI 파일 렌더링 함수
     async function renderAI(buffer) {
       status.innerText = 'AI 데이터 분석 중...';
 
-      // AI 파일 내 내장된 PDF 로드
       const loadingTask = pdfjsLib.getDocument({ data: buffer });
       const pdf = await loadingTask.promise;
       
-      // 첫 번째 페이지 추출
       const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 1.5 }); // 렌더링 해상도 배율
+      const viewport = page.getViewport({ scale: 1.5 });
 
       canvas.width = viewport.width;
       canvas.height = viewport.height;
