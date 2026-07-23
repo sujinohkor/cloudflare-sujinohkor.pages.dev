@@ -85,8 +85,8 @@
             word-break: break-all;
         }
 
-        /* 다크 모드 카드/패널 그림자 (IP 페이지 요소 확장) */
-        .card, .content-mid, .content-down, .content-top, .half-box {
+        /* 다크 모드 카드/패널 그림자 (.content-down 제거) */
+        .card, .content-mid, .content-top, .half-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -102,10 +102,9 @@
         body.light-mode .info-value { color: #202020; }
         body.light-mode .info-row { border-bottom-color: rgba(243, 128, 32, 0.2); }
 
-        /* 데이 모드 카드/패널 그림자 (IP 페이지 요소 확장) */
+        /* 데이 모드 카드/패널 그림자 (.content-down 제거) */
         body.light-mode .card, 
         body.light-mode .content-mid, 
-        body.light-mode .content-down,
         body.light-mode .content-top,
         body.light-mode .half-box {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
