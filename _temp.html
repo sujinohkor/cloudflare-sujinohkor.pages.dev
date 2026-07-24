@@ -15,52 +15,54 @@
             font-family: 'Segoe UI', sans-serif;
             background-color: #202020;
             color: #fff;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 950px;
             background: #101010;
             border: 2px solid #ff9e40;
             border-radius: 20px;
-            padding: 40px;
+            padding: 30px;
             display: flex;
-            gap: 40px;
+            gap: 30px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
         /* 왼쪽: 달력 영역 */
         .calendar-section {
-            flex: 1;
+            flex: 1.1;
             display: flex;
             flex-direction: column;
             background: #1c1c1c;
             border: 1px solid #333;
             border-radius: 16px;
             padding: 20px;
+            min-width: 320px;
         }
 
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .calendar-header h2 {
             color: #ff9e40;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
         }
 
         .nav-btn {
             background: #202020;
             color: #ff9e40;
             border: 1px solid #ff9e40;
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
@@ -79,21 +81,20 @@
             font-weight: bold;
             color: #888;
             font-size: 0.85rem;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 6px;
-            flex: 1;
         }
 
         .day {
             display: flex;
             justify-content: center;
             align-items: center;
-            aspect-ratio: 1;
+            height: 40px;
             background: #252525;
             border-radius: 8px;
             font-size: 0.9rem;
@@ -122,38 +123,39 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            min-width: 320px;
         }
 
         .calculator-section h1 {
             color: #ff9e40;
-            font-size: 1.6rem;
-            margin-bottom: -10px;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
         }
 
         .calc-card {
             background: #1c1c1c;
             border: 1px solid #333;
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .calc-card h3 {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #ff9e40;
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
 
         .input-group label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #aaa;
         }
 
@@ -161,9 +163,10 @@
             background: #252525;
             border: 1px solid #444;
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px 10px;
             color: #fff;
             font-family: inherit;
+            font-size: 0.9rem;
         }
 
         .input-group input:focus {
@@ -174,8 +177,8 @@
         .result-box {
             background: #252525;
             border-radius: 8px;
-            padding: 10px;
-            font-size: 0.95rem;
+            padding: 8px;
+            font-size: 0.9rem;
             color: #fff;
             text-align: center;
             font-weight: bold;
@@ -185,8 +188,6 @@
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
-                max-width: 450px;
-                height: auto;
             }
         }
     </style>
@@ -198,7 +199,7 @@
     <div class="calendar-section">
         <div class="calendar-header">
             <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
-            <h2 id="calendar-title">2026년 6월</h2>
+            <h2 id="calendar-title">2026년 7월</h2>
             <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
         </div>
         <div class="weekdays">
@@ -248,36 +249,28 @@
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        // 타이틀 설정
         document.getElementById('calendar-title').textContent = `${year}년 ${month + 1}월`;
 
         const grid = document.getElementById('days-grid');
         grid.innerHTML = '';
 
-        // 해당 월의 1일 요일 (일:0, 월:1 ... 토:6) -> 월요일 시작(월:0 ~ 일:6)으로 변환
         let firstDayIndex = new Date(year, month, 1).getDay();
         firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
 
-        // 해당 월의 마지막 날짜
         const lastDay = new Date(year, month + 1, 0).getDate();
-
-        // 오늘 날짜 확인용
         const today = new Date();
 
-        // 공백 칸 채우기
         for (let i = 0; i < firstDayIndex; i++) {
             const emptyDiv = document.createElement('div');
             emptyDiv.className = 'day empty';
             grid.appendChild(emptyDiv);
         }
 
-        // 날짜 칸 채우기
         for (let day = 1; day <= lastDay; day++) {
             const dayDiv = document.createElement('div');
             dayDiv.className = 'day';
             dayDiv.textContent = day;
 
-            // 오늘 표시
             if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
                 dayDiv.classList.add('today');
             }
@@ -291,7 +284,6 @@
         renderCalendar();
     }
 
-    // 날짜 간격 계산기 로직
     function calculateInterval() {
         const d1 = document.getElementById('date1').value;
         const d2 = document.getElementById('date2').value;
@@ -316,7 +308,6 @@
         }
     }
 
-    // 날짜 더하기/빼기 계산기 로직
     function calculateAddDays() {
         const bDate = document.getElementById('base-date').value;
         const daysVal = parseInt(document.getElementById('days-input').value);
@@ -337,7 +328,6 @@
         resultBox.textContent = `Result: ${year}-${month}-${day}`;
     }
 
-    // 초기 실행 시 오늘 날짜로 input 기본값 설정 및 달력 렌더링
     window.onload = function() {
         renderCalendar();
         
