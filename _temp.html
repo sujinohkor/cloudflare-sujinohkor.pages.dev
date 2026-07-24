@@ -16,10 +16,10 @@
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
 
-        // 공룡 객체
+        // 공룡 객체 (크기와 물리 값 조정)
         const dino = {
-            x: 50, y: 150, width: 20, height: 20,
-            dy: 0, gravity: 0.6, jumpPower: -10, isGrounded: true
+            x: 50, y: 140, width: 30, height: 30,
+            dy: 0, gravity: 0.4, jumpPower: -8, isGrounded: true
         };
 
         // 장애물(선인장) 배열
@@ -36,8 +36,8 @@
         });
 
         function spawnCactus() {
-            if (Math.random() < 0.015) { // 장애물 생성 확률
-                cactusArray.push({ x: 600, y: 150, width: 15, height: 20 });
+            if (Math.random() < 0.01) { // 장애물 생성 확률 감소
+                cactusArray.push({ x: 600, y: 140, width: 25, height: 30 });
             }
         }
 
@@ -48,8 +48,8 @@
             dino.dy += dino.gravity;
             dino.y += dino.dy;
 
-            if (dino.y >= 150) { // 바닥 착지
-                dino.y = 150;
+            if (dino.y >= 140) { // 바닥 착지 위치
+                dino.y = 140;
                 dino.dy = 0;
                 dino.isGrounded = true;
             }
@@ -58,39 +58,42 @@
             spawnCactus();
             for (let i = cactusArray.length - 1; i >= 0; i--) {
                 let c = cactusArray[i];
-                c.x -= 5; // 장애물 이동 속도
+                c.x -= 3; // 장애물 이동 속도 감소 (5 -> 3)
 
-                // 간단한 사각형 충돌 판정 (AABB)
-                if (dino.x < c.x + c.width &&
-                    dino.x + dino.width > c.x &&
-                    dino.y < c.y + c.height &&
-                    dino.y + dino.height > c.y) {
+                // 이모지 여백 고려, 히트박스 보정 (-5px)
+                const padding = 5;
+                if (dino.x + padding < c.x + c.width - padding &&
+                    dino.x + dino.width - padding > c.x + padding &&
+                    dino.y + padding < c.y + c.height - padding &&
+                    dino.y + dino.height - padding > c.y + padding) {
                     isGameOver = true;
                     alert(`Game Over! Score: ${Math.floor(score)}`);
                     location.reload();
                 }
 
-                if (c.x < -20) cactusArray.splice(i, 1);
+                if (c.x < -30) cactusArray.splice(i, 1);
             }
 
-            score += 0.1;
+            score += 0.05; // 점수 증가 속도 완화
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 공룡 그리기
-            ctx.fillStyle = '#535353';
-            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+            // 공룡 이모지 그리기
+            ctx.font = '30px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+            ctx.textBaseline = 'top';
+            ctx.fillText('🦖', dino.x, dino.y);
 
-            // 장애물 그리기
-            ctx.fillStyle = '#ff4d4d';
-            cactusArray.forEach(c => ctx.fillRect(c.x, c.y, c.width, c.height));
+            // 선인장 이모지 그리기
+            cactusArray.forEach(c => {
+                ctx.fillText('🌵', c.x, c.y);
+            });
 
             // 점수 표시
             ctx.fillStyle = '#000';
             ctx.font = '16px monospace';
-            ctx.fillText(`Score: ${Math.floor(score)}`, 500, 30);
+            ctx.fillText(`Score: ${Math.floor(score)}`, 480, 20);
         }
 
         function gameLoop() {
