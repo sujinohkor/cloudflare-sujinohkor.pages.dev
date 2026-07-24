@@ -189,9 +189,44 @@
             return hex + alphaHex;
         }
 
-        // 바운싱 텍스트 SVG 생성기 객체
-        const generator = {
+       const generator = {
+            // 1. Worker 주소를 여기에 입력하세요 (끝에 슬래시 / 없이)
+            workerUrl: 'https://text-bounce-svg.아이디.workers.dev',
+
+            // 2. 소스 문자열을 짧은 Worker URL 형태로 생성
+            getSourceUrls() {
+                const text = document.getElementById('input-text').value;
+                const fontColor = document.getElementById('font-color').value.replace('#', '');
+                const bgColor = document.getElementById('bg-color').value.replace('#', '');
+                const fontOpacity = document.getElementById('font-opacity').value;
+                const bgOpacity = document.getElementById('bg-opacity').value;
+                const fontSize = document.getElementById('font-size').value;
+                const bounceHeight = document.getElementById('bounce-height').value;
+                const width = document.getElementById('width').value;
+                const height = document.getElementById('height').value;
+
+                // 투명도가 포함된 HEX 코드로 변환 (Worker가 파라미터로 받아 처리할 수 있도록 전달)
+                // 만약 Worker 코드가 기본 color/background를 그대로 받게 하려면 아래처럼 쿼리스트링을 구성합니다.
+                const params = new URLSearchParams({
+                    text: text,
+                    color: fontColor,
+                    background: bgColor,
+                    size: fontSize,
+                    bounce: bounceHeight,
+                    width: width,
+                    height: height
+                });
+
+                const imageUrl = `${this.workerUrl}/?${params.toString()}`;
+
+                const markdown = `[![Bounce Text](${imageUrl})](${this.workerUrl})`;
+                const html = `<a href="${this.workerUrl}"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
+
+                return { markdown, html, imageUrl };
+            },
+
             getSVGString() {
+                // 실시간 미리보기(Preview 박스)용으로는 기존 로직 유지 (브라우저에서 바로 보이도록)
                 const text = document.getElementById('input-text').value;
                 const fontColorHex = getHexWithAlpha('font-color', 'font-opacity');
                 const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
@@ -200,7 +235,6 @@
                 const width = document.getElementById('width').value;
                 const height = document.getElementById('height').value;
 
-                // 색상 정보 UI 실시간 반영 (대문자 Hex 코드 표시)
                 document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
                 document.getElementById('font-hex-text').textContent = fontColorHex;
                 document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
@@ -228,9 +262,7 @@
             30% { transform: translateY(-${bounceHeight}px); }
             50% { transform: translateY(0); }
         }
-        .bg {
-            fill: ${bgColorHex};
-        }
+        .bg { fill: ${bgColorHex}; }
         .bounce-text-svg {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: ${fontSize}px;
@@ -243,24 +275,23 @@
         }
     </style>
     <rect width="100%" height="100%" class="bg" />
-    <g>
-        ${textElements}
-    </g>
+    <g>${textElements}</g>
 </svg>`;
             },
 
             update() {
+                // 1. 프리뷰 박스에는 기존대로 SVG를 렌더링해서 보여줌
                 const svgStr = this.getSVGString();
-                
                 document.getElementById('preview').innerHTML = svgStr;
-                document.getElementById('html-code').querySelector('code').textContent = svgStr;
 
-                const encoded = encodeURIComponent(svgStr);
-                const mdStr = `![Bounce Text SVG](data:image/svg+xml;utf8,${encoded})`;
-                document.getElementById('md-code').querySelector('code').textContent = mdStr;
+                // 2. 하단 코드 박스에는 Worker 주소가 담긴 짧은 소스를 표시
+                const sources = this.getSourceUrls();
+                document.getElementById('html-code').querySelector('code').textContent = sources.html;
+                document.getElementById('md-code').querySelector('code').textContent = sources.markdown;
             },
 
             downloadSVG() {
+                // 다운로드는 기존대로 브라우저에서 직접 파일로 저장
                 const svgStr = this.getSVGString();
                 const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
@@ -274,12 +305,9 @@
             },
 
             copyCode(type) {
-                let text = '';
-                if (type === 'html') {
-                    text = document.getElementById('html-code').querySelector('code').textContent;
-                } else {
-                    text = document.getElementById('md-code').querySelector('code').textContent;
-                }
+                const sources = this.getSourceUrls();
+                const text = (type === 'html') ? sources.html : sources.markdown;
+                
                 navigator.clipboard.writeText(text).then(() => {
                     alert(`${type.toUpperCase()} source copied to clipboard!`);
                 });
