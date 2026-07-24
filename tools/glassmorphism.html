@@ -87,11 +87,11 @@
             min-height: 0;
         }
 
-        /* ===== [Controls / Code Editor 영역] ===== */
+        /* ===== [Controls / Code Editor 영역 (2:1 비율 적용)] ===== */
         .content-mid {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             height: 100%;
             min-height: 0;
             min-width: 0;
@@ -109,15 +109,15 @@
             background: #181818;
             border: 2px solid #ff9e40;
             border-radius: 16px;
-            padding: 15px 20px;
-            flex-shrink: 0;
+            padding: 12px 20px;
+            flex: 2; /* 에디터보다 2배의 공간 할당 */
+            min-height: 0;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
-            max-height: 250px;
+            overflow-y: auto; /* 내용이 많을 때만 스크롤 */
         }
 
         .control-group {
-            margin-bottom: 10px;
+            margin-bottom: 6px; /* 슬라이더 간격 조절 */
         }
         .control-group:last-child {
             margin-bottom: 0;
@@ -125,9 +125,9 @@
 
         .control-group label {
             display: block;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             color: #ff9e40;
         }
 
@@ -150,7 +150,7 @@
             position: relative;
             display: flex;
             width: 100%;
-            flex: 1;
+            flex: 1; /* sliders-wrapper의 절반(1) 크기 할당 */
             min-height: 0;
             background: #141414;
             border: 2px solid #ff9e40;
@@ -158,12 +158,12 @@
             overflow: hidden;
             font-family: 'Consolas', 'Fira Code', Monaco, monospace;
             font-size: 0.85rem;
-            line-height: 1.6;
+            line-height: 1.5;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .line-numbers {
-            padding: 16px 8px 16px 12px;
+            padding: 12px 8px 12px 12px;
             background: #0a0a0a;
             color: #555;
             text-align: right;
@@ -186,7 +186,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 16px;
+            padding: 12px;
             margin: 0;
             border: none;
             outline: none;
