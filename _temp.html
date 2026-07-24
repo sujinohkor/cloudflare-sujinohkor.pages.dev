@@ -49,12 +49,15 @@
         body[data-theme="light"] input, body[data-theme="light"] select { background: #fff; color: #333; border-color: #ccc; }
         input:focus, select:focus { outline: none; border-color: #ff9e40; }
 
+        .dimensions-group { display: flex; align-items: center; gap: 8px; }
+        .dimensions-group input { width: 100px; }
+
         .btn { background: #ff9e40; color: #101010; border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 5px; }
         .btn:hover { background: #e08b35; }
         body[data-theme="light"] .btn { background: #F38020; color: #fff; }
         body[data-theme="light"] .btn:hover { background: #d35400; }
 
-        .preview-box { width: 100%; height: 180px; background: #181818; border: 2px dashed #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; padding: 10px; }
+        .preview-box { width: 100%; height: 200px; background: #181818; border: 2px dashed #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; padding: 10px; }
         body[data-theme="light"] .preview-box { background: #eee; border-color: #bbb; }
 
         .code-container { background: #181818; color: #ff9e40; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; overflow-x: auto; margin-bottom: 8px; max-height: 90px; }
@@ -76,23 +79,37 @@
             <h2>Bounce Options</h2>
             <div class="parameters">
                 <div class="field-group">
-                    <label for="input-text">Enter Text (Textbox)</label>
+                    <label for="input-text">Enter Text</label>
                     <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
                 </div>
 
                 <div class="field-group">
-                    <label for="text-color">Text Color</label>
-                    <input type="color" id="text-color" value="#ff9e40" oninput="generator.update()">
+                    <label for="color">Font color</label>
+                    <input type="color" id="color" value="#36BCF7" oninput="generator.update()">
                 </div>
 
                 <div class="field-group">
-                    <label for="font-size">Font Size</label>
+                    <label for="background">Background color</label>
+                    <input type="color" id="background" value="#000000" oninput="generator.update()">
+                </div>
+
+                <div class="field-group">
+                    <label for="font-size">Font size</label>
                     <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
                 </div>
 
                 <div class="field-group">
                     <label for="bounce-height">Bounce Height (px)</label>
                     <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
+                </div>
+
+                <div class="field-group">
+                    <label>Width ✕ Height (px)</label>
+                    <div class="dimensions-group">
+                        <input type="number" id="width" value="500" min="100" max="1000" oninput="generator.update()">
+                        <span>✕</span>
+                        <input type="number" id="height" value="120" min="50" max="400" oninput="generator.update()">
+                    </div>
                 </div>
             </div>
             <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
@@ -146,13 +163,16 @@
         const generator = {
             getSVGString() {
                 const text = document.getElementById('input-text').value;
-                const color = document.getElementById('text-color').value;
+                const color = document.getElementById('color').value;
+                const background = document.getElementById('background').value;
                 const fontSize = parseInt(document.getElementById('font-size').value);
                 const bounceHeight = parseInt(document.getElementById('bounce-height').value);
+                const width = document.getElementById('width').value;
+                const height = document.getElementById('height').value;
 
                 // 글자별로 간격 계산하여 개별 <g> 태그로 감싸기
                 let textElements = '';
-                let currentX = 25;
+                let currentX = 30;
                 const charWidth = fontSize * 0.6; // 대략적인 글자 가로 폭 추정
 
                 [...text].forEach((char, index) => {
@@ -161,17 +181,20 @@
                     
                     textElements += `
         <g class="bounce-char" style="animation-delay: ${delay}s;">
-            <text x="${currentX}" y="75" class="bounce-text-svg">${escapedChar}</text>
+            <text x="${currentX}" y="${height / 2 + fontSize / 3}" class="bounce-text-svg">${escapedChar}</text>
         </g>`;
                     currentX += (char === ' ' ? charWidth * 0.5 : charWidth);
                 });
 
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%">
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
     <style>
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             30% { transform: translateY(-${bounceHeight}px); }
             50% { transform: translateY(0); }
+        }
+        .bg {
+            fill: ${background};
         }
         .bounce-text-svg {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -184,6 +207,7 @@
             animation: bounce 1.2s infinite ease-in-out;
         }
     </style>
+    <rect width="100%" height="100%" class="bg" />
     <g>
         ${textElements}
     </g>
