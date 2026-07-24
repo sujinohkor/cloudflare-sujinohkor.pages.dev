@@ -115,6 +115,23 @@
             flex-shrink: 0;
         }
 
+        /* 전체화면 버튼 스타일 */
+        .fullscreen-btn {
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .fullscreen-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+
         .editor-container-wrapper {
             position: relative;
             display: flex;
@@ -126,6 +143,21 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* 전체화면 활성화 클래스 */
+        .editor-container-wrapper.fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 20px;
+            background: #202020;
         }
 
         /* @rhwp/editor가 마운트될 DOM 영역 */
@@ -142,6 +174,9 @@
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode .editor-container-wrapper { background: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .editor-container-wrapper.fullscreen { background: #fff !important; }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn {
@@ -203,7 +238,7 @@
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
         
-        <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">Open File</button>
+        <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">📁 Open File</button>
         <input type="file" id="hwp-file-input" accept=".hwp,.hwpx" style="display: none;">
 
         <div>
@@ -222,8 +257,10 @@
                 <div class="controls">
                     <div class="content-mid-header">
                         <span id="file-name-display">File name will be appeared here</span>
+                        <!-- 전체화면 토글 버튼 추가 -->
+                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                     </div>
-                    <div class="editor-container-wrapper">
+                    <div class="editor-container-wrapper" id="editor-wrapper">
                         <div id="editor"></div>
                     </div>
                 </div>
@@ -249,6 +286,18 @@
     let editorInstance = null;
     const fileInput = document.getElementById('hwp-file-input');
     const fileNameDisplay = document.getElementById('file-name-display');
+    const editorWrapper = document.getElementById('editor-wrapper');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+    // 전체화면 토글 함수
+    window.toggleFullscreen = function() {
+        editorWrapper.classList.toggle('fullscreen');
+        if (editorWrapper.classList.contains('fullscreen')) {
+            fullscreenBtn.textContent = 'Minimize 🗗';
+        } else {
+            fullscreenBtn.textContent = 'Maximize ⛶';
+        }
+    };
 
     async function initEditor() {
         try {
