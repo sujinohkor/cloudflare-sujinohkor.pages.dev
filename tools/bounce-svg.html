@@ -40,7 +40,7 @@
         .content-left { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 25px; background: #1c1c1c; flex-direction: column; gap: 15px; 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto; max-height: calc(100vh - 140px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
         }
 
         .content-left h2 { font-size: 1.1rem; color: #ff9e40; margin-bottom: 2px; }
@@ -153,7 +153,6 @@
                         <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
                     </div>
 
-                    <!-- 💡 폰트 선택 콤보박스 추가 -->
                     <div class="field-group">
                         <label for="font-family">Font Family</label>
                         <select id="font-family" onchange="generator.update()">
