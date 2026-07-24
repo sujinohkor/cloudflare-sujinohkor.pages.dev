@@ -133,32 +133,28 @@
 
         /* ===== [커스텀 슬라이더(Range) 스타일] ===== */
         .control-group input[type="range"] {
-            -webkit-appearance: none; /* 브라우저 기본 디자인 제거 */
+            -webkit-appearance: none;
             width: 100%;
             background: transparent;
             cursor: pointer;
-            height: 20px; /* 클릭 영역 확보 */
+            height: 20px;
         }
 
-        /* 슬라이더 막대(Track) 배경 설정 */
         .control-group input[type="range"]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 6px; /* 막대 두께 */
+            height: 6px;
             background: #444; /* 빈 막대 배경색 */
             border-radius: 3px;
-            transition: background 0.3s;
         }
 
-        /* 슬라이더 손잡이(Thumb) 디자인 설정 */
         .control-group input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px; /* 손잡이 크기 */
+            height: 16px;
             width: 16px;
             border-radius: 50%;
-            background: #ff9e40; /* 손잡이 색상 */
-            margin-top: -5px; /* 막대 중앙에 오도록 위로 조정 */
+            background: #ff9e40;
+            margin-top: -5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: background 0.3s;
         }
 
         .content-mid-header {
@@ -321,11 +317,9 @@
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
-        /* 라이트 모드일 때 슬라이더 패널 배경을 화이트/크림톤으로 변경 */
         body.light-mode .sliders-wrapper { background: #FDF5E6; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .control-group label { color: #F38020; }
         
-        /* 라이트 모드에서 슬라이더 트랙과 손잡이 색상 조정 */
         body.light-mode .control-group input[type="range"]::-webkit-slider-runnable-track { background: #ddd; }
         body.light-mode .control-group input[type="range"]::-webkit-slider-thumb { background: #F38020; }
 
@@ -474,7 +468,7 @@
 <script>
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); updateAllSlidersBackground(); });
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
     const blurInput = document.getElementById('blur');
@@ -493,6 +487,33 @@
     const codeTextarea = document.getElementById('code-textarea');
     const codeDisplay = document.getElementById('code-output-display');
     const lineNumbers = document.getElementById('line-numbers');
+
+    const allSliders = [blurInput, opacityInput, radiusInput, borderWidthInput, shadowOpacityInput];
+
+    // 슬라이더 채워짐 효과(그라데이션) 실시간 계산 함수
+    function setSliderBackground(slider) {
+        const min = parseFloat(slider.min) || 0;
+        const max = parseFloat(slider.max) || 100;
+        const val = parseFloat(slider.value) || 0;
+        const percentage = ((val - min) / (max - min)) * 100;
+
+        const isLight = document.body.classList.contains('light-mode');
+        const fillColor = isLight ? '#F38020' : '#ff9e40';
+        const trackColor = isLight ? '#ddd' : '#444';
+
+        slider.style.background = `linear-gradient(to right, ${fillColor} ${percentage}%, ${trackColor} ${percentage}%)`;
+    }
+
+    function updateAllSlidersBackground() {
+        allSliders.forEach(slider => setSliderBackground(slider));
+    }
+
+    allSliders.forEach(slider => {
+        slider.addEventListener('input', () => {
+            setSliderBackground(slider);
+            updateStyle();
+        });
+    });
 
     function highlightCSS(code) {
         const escaped = code
@@ -542,19 +563,8 @@ box-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
         lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
     }
 
-    blurInput.addEventListener('input', updateStyle);
-    opacityInput.addEventListener('input', updateStyle);
-    radiusInput.addEventListener('input', updateStyle);
-    borderWidthInput.addEventListener('input', updateStyle);
-    shadowOpacityInput.addEventListener('input', updateStyle);
-
-    codeTextarea.addEventListener('scroll', () => {
-        codeDisplay.scrollTop = codeTextarea.scrollTop;
-        codeDisplay.scrollLeft = codeTextarea.scrollLeft;
-        lineNumbers.scrollTop = codeTextarea.scrollTop;
-    });
-
     updateStyle();
+    updateAllSlidersBackground();
 
     function copyCode() {
         const code = codeTextarea.value;
@@ -573,6 +583,7 @@ box-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
         borderWidthInput.value = 1;
         shadowOpacityInput.value = 0.1;
         updateStyle();
+        updateAllSlidersBackground();
     }
 </script>
 </body>
