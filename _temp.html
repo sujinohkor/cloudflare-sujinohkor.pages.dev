@@ -4,33 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glassmorphism Generator</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
         
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
-            color: #333;
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow-y: auto; transition: 0.3s;
         }
 
-        .container {
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+
+        /* Generator Container Layout */
+        .generator-wrapper {
             display: flex;
             gap: 30px;
-            max-width: 900px;
-            width: 90%;
+            flex: 1;
             align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            padding: 30px;
         }
 
         .controls {
             flex: 1;
-            background: rgba(255, 255, 255, 0.8);
+            background: #181818;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 158, 64, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .control-group {
@@ -42,10 +61,13 @@
             font-size: 0.9rem;
             font-weight: bold;
             margin-bottom: 5px;
+            color: #ff9e40;
         }
 
         .control-group input {
             width: 100%;
+            accent-color: #ff9e40;
+            cursor: pointer;
         }
 
         .preview-area {
@@ -54,6 +76,10 @@
             justify-content: center;
             align-items: center;
             min-height: 300px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+            border-radius: 12px;
+            border: 2px solid #ff9e40;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
         }
 
         #glass-preview {
@@ -64,60 +90,111 @@
             justify-content: center;
             font-weight: bold;
             color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             transition: all 0.1s ease;
         }
 
         textarea {
             width: 100%;
-            height: 120px;
+            height: 110px;
             margin-top: 15px;
             padding: 10px;
             font-family: monospace;
-            background: #222;
+            background: #111;
             color: #00ff66;
-            border: none;
+            border: 1px solid #444;
             border-radius: 6px;
             resize: none;
+            outline: none;
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #000; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .generator-wrapper { border-color: #F38020; background: rgba(243, 128, 32, 0.02); }
+        body.light-mode .controls { background: #fff; border-color: rgba(243, 128, 32, 0.3); box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .control-group label { color: #F38020; }
+        body.light-mode .control-group input { accent-color: #F38020; }
+        body.light-mode .preview-area { border-color: #F38020; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (max-width: 768px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; }
+            .generator-wrapper { flex-direction: column; padding: 15px; }
+            .preview-area { width: 100%; min-height: 200px; }
+            #glass-preview { width: 180px; height: 180px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="controls">
-        <h2>Glass Generator</h2>
-        <br>
-        <div class="control-group">
-            <label>Blur (블러): <span id="blur-val">10</span>px</label>
-            <input type="range" id="blur" min="0" max="20" value="10">
-        </div>
-        <div class="control-group">
-            <label>Opacity (투명도): <span id="opacity-val">0.2</span></label>
-            <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.2">
-        </div>
-        <div class="control-group">
-            <label>Border Radius (둥글기): <span id="radius-val">16</span>px</label>
-            <input type="range" id="radius" min="0" max="100" value="16">
-        </div>
-        <div class="control-group">
-            <label>Border Width (테두리 두께): <span id="border-val">1</span>px</label>
-            <input type="range" id="border-width" min="0" max="10" value="1">
-        </div>
-        <div class="control-group">
-            <label>Shadow Opacity (그림자): <span id="shadow-val">0.1</span></label>
-            <input type="range" id="shadow-opacity" min="0" max="0.5" step="0.01" value="0.1">
-        </div>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
-        <textarea id="code-output" readonly></textarea>
-    </div>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <div class="bottom-btns">
+            <!-- 하단 여분 버튼 필요시 추가 -->
+        </div>
+    </aside>
 
-    <div class="preview-area">
-        <div id="glass-preview">Glass Box</div>
-    </div>
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Glassmorphism Generator</h1>
+            <p>Customize glass effect style and copy CSS code easily.</p>
+        </header>
+
+        <div class="generator-wrapper">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Blur (블러): <span id="blur-val">10</span>px</label>
+                    <input type="range" id="blur" min="0" max="20" value="10">
+                </div>
+                <div class="control-group">
+                    <label>Opacity (투명도): <span id="opacity-val">0.2</span></label>
+                    <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.2">
+                </div>
+                <div class="control-group">
+                    <label>Border Radius (둥글기): <span id="radius-val">16</span>px</label>
+                    <input type="range" id="radius" min="0" max="100" value="16">
+                </div>
+                <div class="control-group">
+                    <label>Border Width (테두리 두께): <span id="border-val">1</span>px</label>
+                    <input type="range" id="border-width" min="0" max="10" value="1">
+                </div>
+                <div class="control-group">
+                    <label>Shadow Opacity (그림자): <span id="shadow-val">0.1</span></label>
+                    <input type="range" id="shadow-opacity" min="0" max="0.5" step="0.01" value="0.1">
+                </div>
+
+                <textarea id="code-output" readonly></textarea>
+            </div>
+
+            <div class="preview-area">
+                <div id="glass-preview">Glass Box</div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script>
+    const sidebar = document.getElementById('sidebar');
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+
     const blurInput = document.getElementById('blur');
     const opacityInput = document.getElementById('opacity');
     const radiusInput = document.getElementById('radius');
@@ -172,6 +249,5 @@ box-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
 
     updateStyle();
 </script>
-
 </body>
 </html>
