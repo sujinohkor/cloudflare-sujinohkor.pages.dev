@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <title>Mini Dino Game</title>
     <style>
-        body { text-align: center; background: #f7f7f7; padding-top: 50px; }
-        canvas { background: #fff; border-bottom: 2px solid #535353; }
+        body { text-align: center; background: #f7f7f7; padding-top: 50px; user-select: none; }
+        canvas { background: #fff; border-bottom: 2px solid #535353; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h2>Space 바를 눌러 점프하세요!</h2>
+    <h2>Space 바 또는 화면을 클릭하여 점프하세요!</h2>
     <canvas id="game" width="600" height="200"></canvas>
 
     <script>
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
 
-        // 공룡 객체 (크기와 물리 값 조정)
+        // 공룡 객체
         const dino = {
             x: 50, y: 140, width: 30, height: 30,
-            dy: 0, gravity: 0.4, jumpPower: -8, isGrounded: true
+            dy: 0, gravity: 0.45, jumpPower: -9.5, isGrounded: true
         };
 
         // 장애물(선인장) 배열
@@ -27,16 +27,29 @@
         let score = 0;
         let isGameOver = false;
 
-        // 점프 입력 처리
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && dino.isGrounded && !isGameOver) {
+        function jump() {
+            if (dino.isGrounded && !isGameOver) {
                 dino.dy = dino.jumpPower;
                 dino.isGrounded = false;
             }
+        }
+
+        // 키보드 점프 처리 (스크롤 방지 추가)
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        // 마우스 클릭 / 터치 점프 처리
+        window.addEventListener('click', jump);
+        window.addEventListener('touchstart', (e) => {
+            jump();
         });
 
         function spawnCactus() {
-            if (Math.random() < 0.01) { // 장애물 생성 확률 감소
+            if (Math.random() < 0.01) {
                 cactusArray.push({ x: 600, y: 140, width: 25, height: 30 });
             }
         }
@@ -48,7 +61,7 @@
             dino.dy += dino.gravity;
             dino.y += dino.dy;
 
-            if (dino.y >= 140) { // 바닥 착지 위치
+            if (dino.y >= 140) {
                 dino.y = 140;
                 dino.dy = 0;
                 dino.isGrounded = true;
@@ -58,32 +71,39 @@
             spawnCactus();
             for (let i = cactusArray.length - 1; i >= 0; i--) {
                 let c = cactusArray[i];
-                c.x -= 3; // 장애물 이동 속도 감소 (5 -> 3)
+                c.x -= 3;
 
-                // 이모지 여백 고려, 히트박스 보정 (-5px)
-                const padding = 5;
+                const padding = 6;
                 if (dino.x + padding < c.x + c.width - padding &&
                     dino.x + dino.width - padding > c.x + padding &&
                     dino.y + padding < c.y + c.height - padding &&
                     dino.y + dino.height - padding > c.y + padding) {
                     isGameOver = true;
-                    alert(`Game Over! Score: ${Math.floor(score)}`);
-                    location.reload();
+                    setTimeout(() => {
+                        alert(`Game Over! Score: ${Math.floor(score)}`);
+                        location.reload();
+                    }, 10);
                 }
 
                 if (c.x < -30) cactusArray.splice(i, 1);
             }
 
-            score += 0.05; // 점수 증가 속도 완화
+            score += 0.05;
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 공룡 이모지 그리기
+            // 공룡 이모지 좌우 반전하여 그리기 (앞을 보도록 설정)
+            ctx.save(); // 상태 저장
+            ctx.translate(dino.x + dino.width, dino.y); // 공룡 위치로 기준점 이동
+            ctx.scale(-1, 1); // 좌우 반전
+
             ctx.font = '30px Segoe UI Emoji, Apple Color Emoji, sans-serif';
             ctx.textBaseline = 'top';
-            ctx.fillText('🦖', dino.x, dino.y);
+            ctx.fillText('🦖', 0, 0);
+
+            ctx.restore(); // 이전 상태 복원
 
             // 선인장 이모지 그리기
             cactusArray.forEach(c => {
