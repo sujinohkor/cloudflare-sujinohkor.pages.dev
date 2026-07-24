@@ -29,6 +29,7 @@
             flex: 1;
             gap: 20px;
             min-height: 0;
+            position: relative; /* 팝업 좌표 기준점 설정 */
         }
 
         /* 3. Components */
@@ -127,18 +128,10 @@
             font-weight: bold;
         }
 
-        /* 오른쪽 박스: 날짜 계산기 꽉 차게 배치 (스크롤바 다듬기) */
+        /* 오른쪽 박스: overflow를 visible로 두어 팝업이 외부로 튀어나오게 허용 */
         .content-down { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow-y: auto; padding: 20px; background: transparent; gap: 15px;
-        }
-
-        .content-down::-webkit-scrollbar {
-            width: 6px;
-        }
-        .content-down::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
+            overflow: visible; padding: 20px; background: transparent; gap: 15px; position: relative;
         }
 
         .calc-card {
@@ -150,6 +143,7 @@
             flex-direction: column;
             gap: 8px;
             flex-shrink: 0;
+            position: relative;
         }
 
         .calc-card h3 {
@@ -185,20 +179,18 @@
             border-color: #ff9e40;
         }
 
-        /* 커스텀 팝업 캘린더 스타일 */
+        /* 커스텀 팝업 캘린더 스타일 (박스 바깥으로 자유롭게 오버레이) */
         .popup-calendar {
             display: none;
             position: absolute;
-            top: 100%;
             left: 0;
             width: 280px;
             background: #181818;
             border: 2px solid #ff9e40;
             border-radius: 14px;
             padding: 15px;
-            z-index: 100;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            margin-top: 5px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
 
         .popup-calendar.active {
@@ -316,7 +308,7 @@
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; overflow: visible; }
             .workspace-container { flex-direction: column; overflow: visible; }
-            .content-mid, .content-down { height: 450px; }
+            .content-mid, .content-down { height: auto; overflow: visible; }
         }
     </style>
 </head>
@@ -392,7 +384,7 @@
                     <div class="result-box" id="add-result">Result date</div>
                 </div>
 
-                <!-- 요일 계산기 (추가된 기능) -->
+                <!-- 요일 계산기 -->
                 <div class="calc-card">
                     <h3>Day of the Week</h3>
                     <div class="input-group">
@@ -472,18 +464,36 @@
 
     function openPopup(inputId, event) {
         event.stopPropagation();
-        document.querySelectorAll('.popup-calendar').forEach(p => {
-            if (p.id !== 'popup-' + inputId) p.classList.remove('active');
-        });
-
-        activeInputId = inputId;
+        
         const popup = document.getElementById('popup-' + inputId);
-        popup.classList.toggle('active');
+        const isActive = popup.classList.contains('active');
 
-        if (popup.classList.contains('active')) {
+        document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
+
+        if (!isActive) {
+            activeInputId = inputId;
+            popup.classList.add('active');
+
             const val = document.getElementById(inputId).value;
             if (val) popupDates[inputId] = new Date(val);
             renderPopupCalendar(inputId);
+
+            // 아래쪽 공간이 부족할 경우 위쪽으로 팝업 위치 자동 조정
+            const inputGroup = popup.parentElement;
+            const rect = inputGroup.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            
+            if (spaceBelow < 320) {
+                popup.style.bottom = '100%';
+                popup.style.top = 'auto';
+                popup.style.marginBottom = '5px';
+                popup.style.marginTop = '0';
+            } else {
+                popup.style.top = '100%';
+                popup.style.bottom = 'auto';
+                popup.style.marginTop = '5px';
+                popup.style.marginBottom = '0';
+            }
         }
     }
 
