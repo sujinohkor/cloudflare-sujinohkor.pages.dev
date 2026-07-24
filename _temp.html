@@ -1,1 +1,163 @@
-no idea yet
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphism Generator</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* 알록달록한 배경 (글래스모피즘 효과 확인용) */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 900px;
+            width: 90%;
+            align-items: center;
+        }
+
+        /* 컨트롤 패널 */
+        .controls {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .control-group input {
+            width: 100%;
+        }
+
+        /* 미리보기 대상 (Glass Box) */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        #glass-preview {
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+        }
+
+        /* CSS 코드 출력창 */
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 15px;
+            padding: 10px;
+            font-family: monospace;
+            background: #222;
+            color: #00ff66;
+            border: none;
+            border-radius: 6px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="controls">
+        <h2>Glass Generator</h2>
+        <br>
+        <div class="control-group">
+            <label>Blur (블러): <span id="blur-val">10</span>px</label>
+            <input type="range" id="blur" min="0" max="20" value="10">
+        </div>
+        <div class="control-group">
+            <label>Opacity (투명도): <span id="opacity-val">0.2</span></label>
+            <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.2">
+        </div>
+        <div class="control-group">
+            <label>Border Radius (둥글기): <span id="radius-val">16</span>px</label>
+            <input type="range" id="radius" min="0" max="50" value="16">
+        </div>
+
+        <textarea id="code-output" readonly></textarea>
+    </div>
+
+    <div class="preview-area">
+        <div id="glass-preview">Glass Box</div>
+    </div>
+</div>
+
+<script>
+    const blurInput = document.getElementById('blur');
+    const opacityInput = document.getElementById('opacity');
+    const radiusInput = document.getElementById('radius');
+
+    const blurVal = document.getElementById('blur-val');
+    const opacityVal = document.getElementById('opacity-val');
+    const radiusVal = document.getElementById('radius-val');
+
+    const preview = document.getElementById('glass-preview');
+    const codeOutput = document.getElementById('code-output');
+
+    function updateStyle() {
+        const blur = blurInput.value;
+        const opacity = opacityInput.value;
+        const radius = radiusInput.value;
+
+        blurVal.innerText = blur;
+        opacityVal.innerText = opacity;
+        radiusVal.innerText = radius;
+
+        // 스타일 적용
+        preview.style.background = `rgba(255, 255, 255, ${opacity})`;
+        preview.style.backdropFilter = `blur(${blur}px)`;
+        preview.style.webkitBackdropFilter = `blur(${blur}px)`;
+        preview.style.borderRadius = `${radius}px`;
+        preview.style.border = `1px solid rgba(255, 255, 255, 0.3)`;
+        preview.style.boxShadow = `0 8px 32px 0 rgba(0, 0, 0, 0.1)`;
+
+        // CSS 코드 문자열 생성
+        codeOutput.value = 
+`background: rgba(255, 255, 255, ${opacity});
+backdrop-filter: blur(${blur}px);
+-webkit-backdrop-filter: blur(${blur}px);
+border-radius: ${radius}px;
+border: 1px solid rgba(255, 255, 255, 0.3);
+box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);`;
+    }
+
+    blurInput.addEventListener('input', updateStyle);
+    opacityInput.addEventListener('input', updateStyle);
+    radiusInput.addEventListener('input', updateStyle);
+
+    updateStyle(); // 초기 실행
+</script>
+
+</body>
+</html>
