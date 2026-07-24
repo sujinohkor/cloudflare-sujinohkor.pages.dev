@@ -112,6 +112,8 @@
             padding: 15px 20px;
             flex-shrink: 0;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            max-height: 250px;
         }
 
         .control-group {
@@ -156,12 +158,12 @@
             overflow: hidden;
             font-family: 'Consolas', 'Fira Code', Monaco, monospace;
             font-size: 0.85rem;
-            line-height: 1.4;
+            line-height: 1.6;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .line-numbers {
-            padding: 12px 6px 12px 10px;
+            padding: 16px 8px 16px 12px;
             background: #0a0a0a;
             color: #555;
             text-align: right;
@@ -184,7 +186,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 12px;
+            padding: 16px;
             margin: 0;
             border: none;
             outline: none;
@@ -212,8 +214,10 @@
 
         /* Syntax Highlighting Colors (Dark Mode) */
         .hl-property { color: #8be9fd; }
+        .hl-colon    { color: #f8f8f2; }
         .hl-string   { color: #f1fa8c; }
         .hl-number   { color: #bd93f9; }
+        .hl-unit     { color: #ff79c6; }
         .hl-bracket  { color: #ff79c6; }
 
         /* Copy Button */
@@ -302,8 +306,10 @@
         /* Light Mode Syntax Highlighting */
         body.light-mode .code-output-display { color: #24292e; }
         body.light-mode .hl-property { color: #005cc5; }
+        body.light-mode .hl-colon    { color: #24292e; }
         body.light-mode .hl-string   { color: #032f62; }
         body.light-mode .hl-number   { color: #d73a49; }
+        body.light-mode .hl-unit     { color: #6f42c1; }
         body.light-mode .hl-bracket  { color: #22863a; }
 
         body.light-mode .copy-btn { border-color: #F38020; color: #F38020; }
@@ -406,6 +412,14 @@
                             <label>Shadow Opacity (그림자): <span id="shadow-val">0.1</span></label>
                             <input type="range" id="shadow-opacity" min="0" max="0.5" step="0.01" value="0.1">
                         </div>
+                        <div class="control-group">
+                            <label>Width (너비): <span id="width-val">200</span>px</label>
+                            <input type="range" id="box-width" min="200" max="500" step="10" value="200">
+                        </div>
+                        <div class="control-group">
+                            <label>Height (높이): <span id="height-val">200</span>px</label>
+                            <input type="range" id="box-height" min="200" max="500" step="10" value="200">
+                        </div>
                     </div>
 
                     <div class="content-mid-header" style="margin-top: 4px;">
@@ -447,12 +461,16 @@
     const radiusInput = document.getElementById('radius');
     const borderWidthInput = document.getElementById('border-width');
     const shadowOpacityInput = document.getElementById('shadow-opacity');
+    const boxWidthInput = document.getElementById('box-width');
+    const boxHeightInput = document.getElementById('box-height');
 
     const blurVal = document.getElementById('blur-val');
     const opacityVal = document.getElementById('opacity-val');
     const radiusVal = document.getElementById('radius-val');
     const borderVal = document.getElementById('border-val');
     const shadowVal = document.getElementById('shadow-val');
+    const widthVal = document.getElementById('width-val');
+    const heightVal = document.getElementById('height-val');
 
     const preview = document.getElementById('glass-preview');
     const codeTextarea = document.getElementById('code-textarea');
@@ -465,12 +483,17 @@
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
 
-        // CSS 구문 강조 정규식 매핑
-        const tokenPattern = /([a-zA-Z\-]+)(?=\s*:)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\d+(?:\.\d+)?(?:px|%|deg)?)?([(),])/g;
+        return escaped.split('\n').map(line => {
+            return line.replace(/([a-zA-Z\-]+)(\s*:\s*)([^;]+)(;)/g, (match, prop, colon, val, semi) => {
+                const coloredVal = val.replace(/([0-9\.]+)(px|deg|%)?/g, (m, num, unit) => {
+                    let result = `<span class="hl-number">${num}</span>`;
+                    if (unit) result += `<span class="hl-unit">${unit}</span>`;
+                    return result;
+                }).replace(/(rgba|rgb|hsl|hsla)\(/g, '<span class="hl-number">$1</span>(');
 
-        return escaped.replace(/([a-zA-Z\-]+)(\s*:\s*)([^;]+)(;)/g, (match, prop, colon, val, semi) => {
-            return `<span class="hl-property">${prop}</span>${colon}<span class="hl-string">${val}</span><span class="hl-bracket">${semi}</span>`;
-        });
+                return `<span class="hl-property">${prop}</span><span class="hl-colon">${colon}</span>${coloredVal}<span class="hl-bracket">${semi}</span>`;
+            });
+        }).join('\n');
     }
 
     function updateStyle() {
@@ -479,14 +502,19 @@
         const radius = radiusInput.value;
         const borderWidth = borderWidthInput.value;
         const shadowOpacity = shadowOpacityInput.value;
+        const boxWidth = boxWidthInput.value;
+        const boxHeight = boxHeightInput.value;
 
         blurVal.innerText = blur;
         opacityVal.innerText = opacity;
         radiusVal.innerText = radius;
         borderVal.innerText = borderWidth;
         shadowVal.innerText = shadowOpacity;
+        widthVal.innerText = boxWidth;
+        heightVal.innerText = boxHeight;
 
-        // 스타일 적용
+        preview.style.width = `${boxWidth}px`;
+        preview.style.height = `${boxHeight}px`;
         preview.style.background = `rgba(255, 255, 255, ${opacity})`;
         preview.style.backdropFilter = `blur(${blur}px)`;
         preview.style.webkitBackdropFilter = `blur(${blur}px)`;
@@ -494,9 +522,10 @@
         preview.style.border = `${borderWidth}px solid rgba(255, 255, 255, 0.3)`;
         preview.style.boxShadow = `0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity})`;
 
-        // CSS 코드 문자열 생성
         const cssCode = 
-`background: rgba(255, 255, 255, ${opacity});
+`width: ${boxWidth}px;
+height: ${boxHeight}px;
+background: rgba(255, 255, 255, ${opacity});
 backdrop-filter: blur(${blur}px);
 -webkit-backdrop-filter: blur(${blur}px);
 border-radius: ${radius}px;
@@ -515,6 +544,8 @@ box-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
     radiusInput.addEventListener('input', updateStyle);
     borderWidthInput.addEventListener('input', updateStyle);
     shadowOpacityInput.addEventListener('input', updateStyle);
+    boxWidthInput.addEventListener('input', updateStyle);
+    boxHeightInput.addEventListener('input', updateStyle);
 
     codeTextarea.addEventListener('scroll', () => {
         codeDisplay.scrollTop = codeTextarea.scrollTop;
@@ -540,6 +571,8 @@ box-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
         radiusInput.value = 16;
         borderWidthInput.value = 1;
         shadowOpacityInput.value = 0.1;
+        boxWidthInput.value = 200;
+        boxHeightInput.value = 200;
         updateStyle();
     }
 </script>
