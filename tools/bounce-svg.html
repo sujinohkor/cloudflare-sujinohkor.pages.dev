@@ -6,11 +6,9 @@
     <title>Text Bounce SVG Generator</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; }
                 
-        /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
@@ -31,43 +29,44 @@
             min-height: 0;
         }
 
-        /* 3. Components */
         .menu-btn, .theme-btn { 
             width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
             background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
             border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
         }
         .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #F38020; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 좌측 박스: 바운싱 옵션 설정 */
         .content-left { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 25px; background: #1c1c1c; flex-direction: column; gap: 15px; 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto; max-height: calc(100vh - 140px);
         }
 
-        .content-left h2 { font-size: 1.1rem; color: #ff9e40; margin-bottom: 5px; }
+        .content-left h2 { font-size: 1.1rem; color: #ff9e40; margin-bottom: 2px; }
 
-        .parameters { display: flex; flex-direction: column; gap: 12px; }
-        .field-group { display: flex; flex-direction: column; gap: 4px; }
+        .parameters { display: flex; flex-direction: column; gap: 10px; }
+        .field-group { display: flex; flex-direction: column; gap: 3px; }
         .field-group label { font-size: 0.8rem; color: #aaa; font-weight: 600; }
         
         input, select { 
             background: #252525; border: 1px solid #444; border-radius: 8px; 
-            padding: 8px 12px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; 
+            padding: 7px 10px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; 
         }
         input:focus, select:focus { outline: none; border-color: #ff9e40; }
 
         .color-row { display: flex; gap: 10px; align-items: center; }
-        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 35px; }
+        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 32px; }
         .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
         
-        .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 0.8rem; font-family: monospace; color: #aaa; }
+        .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 0.8rem; font-family: monospace; color: #aaa; }
         .color-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
 
         .dimensions-group { display: flex; align-items: center; gap: 8px; }
         .dimensions-group input { width: 100px; }
+
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #ccc; cursor: pointer; margin-top: 2px; }
+        .checkbox-group input { accent-color: #ff9e40; width: 15px; height: 15px; cursor: pointer; width: auto; }
 
         .btn { 
             background: #ff9e40; color: #101010; border: none; border-radius: 8px; 
@@ -75,7 +74,6 @@
         }
         .btn:hover { background: #e08b35; }
 
-        /* 우측 박스: 미리보기 및 소스 복사 영역 */
         .content-right { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
             padding: 25px; background: #1c1c1c; gap: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto;
@@ -92,7 +90,6 @@
             font-family: monospace; font-size: 0.8rem; overflow-x: auto; max-height: 70px; border: 1px solid #333; 
         }
 
-        /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; color: #000; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
@@ -103,14 +100,12 @@
             background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
         body.light-mode input, body.light-mode select { background: #fff; color: #000; border-color: #ccc; }
-        body.light-mode .field-group label { color: #555; }
+        body.light-mode .field-group label, body.light-mode .checkbox-group { color: #555; }
         body.light-mode .preview-box { background: #eee; border-color: #bbb; }
         body.light-mode .code-container { background: #fff; color: #d35400; border-color: #ddd; }
         body.light-mode .btn { background: #F38020; color: #fff; }
         body.light-mode .btn:hover { background: #d35400; }
-        body.light-mode .menu-toggle-btn { color: #ffffff; }
 
-        /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
 
         @media (max-width: 850px) {
@@ -187,6 +182,30 @@
                         <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
                     </div>
 
+                    <!-- 정렬 옵션 추가 -->
+                    <div class="field-group">
+                        <label for="h-align">Horizontally Alignment</label>
+                        <select id="h-align" onchange="generator.update()">
+                            <option value="center" selected>Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="v-align">Vertically Alignment</label>
+                        <select id="v-align" onchange="generator.update()">
+                            <option value="middle" selected>Middle</option>
+                            <option value="top">Top</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+
+                    <!-- 테두리 옵션 추가 -->
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="show-border" onchange="generator.update()"> Show Border
+                    </label>
+
                     <div class="field-group">
                         <label>Width ✕ Height (px)</label>
                         <div class="dimensions-group">
@@ -230,7 +249,6 @@
         if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
     });
 
-    // 색상과 투명도를 결합하여 대문자 Hex 코드 생성 함수
     function getHexWithAlpha(colorId, opacityId) {
         const hex = document.getElementById(colorId).value.toUpperCase();
         const opacity = parseFloat(document.getElementById(opacityId).value);
@@ -238,7 +256,6 @@
         return hex + alphaHex;
     }
 
-    // 바운싱 텍스트 SVG 생성기 객체
     const generator = {
         workerUrl: 'https://text-bounce-svg.sujinohkor.workers.dev',
 
@@ -250,6 +267,9 @@
             const bgOpacity = document.getElementById('bg-opacity').value;
             const fontSize = document.getElementById('font-size').value;
             const bounceHeight = document.getElementById('bounce-height').value;
+            const hAlign = document.getElementById('h-align').value;
+            const vAlign = document.getElementById('v-align').value;
+            const showBorder = document.getElementById('show-border').checked;
             const width = document.getElementById('width').value;
             const height = document.getElementById('height').value;
 
@@ -262,13 +282,16 @@
                 background: bgColor + bgAlpha,
                 size: fontSize,
                 bounce: bounceHeight,
+                hAlign: hAlign,
+                vAlign: vAlign,
+                border: showBorder,
                 width: width,
                 height: height
             });
 
             const imageUrl = `${this.workerUrl}/?${params.toString()}`;
-            const markdown = `[![Bounce Text](${imageUrl})](https://sujinohkor.pages.dev)`;
-            const html = `<a href="https://sujinohkor.pages.dev"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
+            const markdown = `[![Bounce Text](${imageUrl})](${this.workerUrl})`;
+            const html = `<a href="${this.workerUrl}"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
             return { markdown, html, imageUrl };
         },
 
@@ -278,17 +301,35 @@
             const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
             const fontSize = parseInt(document.getElementById('font-size').value);
             const bounceHeight = parseInt(document.getElementById('bounce-height').value);
-            const width = document.getElementById('width').value;
-            const height = document.getElementById('height').value;
+            const hAlign = document.getElementById('h-align').value;
+            const vAlign = document.getElementById('v-align').value;
+            const showBorder = document.getElementById('show-border').checked;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
 
             document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
             document.getElementById('font-hex-text').textContent = fontColorHex;
             document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
             document.getElementById('bg-hex-text').textContent = bgColorHex;
 
+            // 미리보기 실시간 정렬 계산
+            const charWidth = fontSize * 0.55;
+            let totalTextWidth = 0;
+            [...text].forEach(char => {
+                totalTextWidth += (char === ' ' ? charWidth * 0.5 : charWidth);
+            });
+
+            let startX = 30;
+            if (hAlign === 'center') startX = (width - totalTextWidth) / 2;
+            else if (hAlign === 'right') startX = width - totalTextWidth - 30;
+            if (startX < 10) startX = 10;
+
+            let startY = height / 2 + fontSize / 3;
+            if (vAlign === 'top') startY = fontSize + 10;
+            else if (vAlign === 'bottom') startY = height - 15;
+
             let textElements = '';
-            let currentX = 30;
-            const charWidth = fontSize * 0.6; 
+            let currentX = startX;
 
             [...text].forEach((char, index) => {
                 const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
@@ -296,10 +337,12 @@
                 
                 textElements += `
         <g class="bounce-char" style="animation-delay: ${delay}s;">
-            <text x="${currentX}" y="${height / 2 + fontSize / 3}" class="bounce-text-svg">${escapedChar}</text>
+            <text x="${currentX}" y="${startY}" class="bounce-text-svg">${escapedChar}</text>
         </g>`;
                 currentX += (char === ' ' ? charWidth * 0.5 : charWidth);
             });
+
+            const borderCss = showBorder ? `stroke: ${fontColorHex}; stroke-width: 2px;` : `stroke: none;`;
 
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
     <style>
@@ -308,7 +351,7 @@
             30% { transform: translateY(-${bounceHeight}px); }
             50% { transform: translateY(0); }
         }
-        .bg { fill: ${bgColorHex}; }
+        .bg { fill: ${bgColorHex}; ${borderCss} rx: 8px; }
         .bounce-text-svg {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: ${fontSize}px;
@@ -320,7 +363,7 @@
             animation: bounce 1.2s infinite ease-in-out;
         }
     </style>
-    <rect width="100%" height="100%" class="bg" />
+    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" class="bg" />
     <g>${textElements}</g>
 </svg>`;
         },
@@ -364,6 +407,9 @@
             document.getElementById('bg-opacity').value = "1";
             document.getElementById('font-size').value = "28";
             document.getElementById('bounce-height').value = "15";
+            document.getElementById('h-align').value = "center";
+            document.getElementById('v-align').value = "middle";
+            document.getElementById('show-border').checked = false;
             document.getElementById('width').value = "500";
             document.getElementById('height').value = "120";
             this.update();
