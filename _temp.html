@@ -115,16 +115,21 @@
             flex-shrink: 0;
         }
 
-        /* 전체화면 버튼 스타일 */
+        /* 전체화면 버튼 스타일 (에디터 내부 우측 상단 고정) */
         .fullscreen-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
             background: #202020;
             color: #ff9e40;
             border: 1px solid #ff9e40;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.8rem;
             font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             transition: all 0.3s;
         }
         .fullscreen-btn:hover {
@@ -156,7 +161,7 @@
             z-index: 9999 !important;
             border-radius: 0 !important;
             border: none !important;
-            padding: 20px;
+            padding: 0;
             background: #202020;
         }
 
@@ -257,10 +262,10 @@
                 <div class="controls">
                     <div class="content-mid-header">
                         <span id="file-name-display">File name will be appeared here</span>
-                        <!-- 전체화면 토글 버튼 추가 -->
-                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                     </div>
                     <div class="editor-container-wrapper" id="editor-wrapper">
+                        <!-- 전체화면 토글 버튼을 에디터 래퍼 내부 우측 상단으로 이동 -->
+                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                         <div id="editor"></div>
                     </div>
                 </div>
@@ -289,7 +294,6 @@
     const editorWrapper = document.getElementById('editor-wrapper');
     const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-    // 전체화면 토글 함수
     window.toggleFullscreen = function() {
         editorWrapper.classList.toggle('fullscreen');
         if (editorWrapper.classList.contains('fullscreen')) {
