@@ -317,7 +317,7 @@
             });
 
             const imageUrl = `${this.workerUrl}/?${params.toString()}`;
-            const markdown = `[![Bounce Text]${this.workerUrl}](https://sujinohkor.pages.dev)`;
+            const markdown = `[![Bounce Text](${imageUrl})](https://sujinohkor.pages.dev)`;
             const html = `<a href="https://sujinohkor.pages.dev"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
             return { markdown, html, imageUrl };
         },
