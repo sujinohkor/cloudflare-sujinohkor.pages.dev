@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Analytics 스크립트 예시 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-48CYVH0XEF"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -12,23 +11,35 @@
         gtag('js', new Date());
         gtag('config', 'G-48CYVH0XEF');
     </script>
-    <title>SVG Animation Generator - Demo Site</title>
+    <title>SVG Animation Generator</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap">
     <style>
-        /* 기본 테마 및 레이아웃 스타일 (제공해주신 템플릿 기반 통일) */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body[data-theme="dark"] { background-color: #101010; color: #fff; }
         body[data-theme="light"] { background-color: #ffffff; color: #333; }
-        body { font-family: 'Open Sans', sans-serif; padding: 30px 20px; transition: background 0.3s, color 0.3s; min-height: 100vh; }
+        body { font-family: 'Open Sans', 'Segoe UI', sans-serif; padding: 30px 20px; transition: background 0.3s, color 0.3s; min-height: 100vh; }
         
-        h1 { text-align: center; margin-bottom: 25px; color: #ff9e40; font-size: 2rem; }
+        /* 바운싱 타이틀 스타일 */
+        .highlight-text { color: #ff9e40; margin: 10px 0 25px 0; }
+        body[data-theme="light"] .highlight-text { color: #F38020; }
+        
+        .bounce-text { font-size: 2.2rem; font-weight: bold; display: inline-block; text-align: center; width: 100%; }
+        .bounce-text span { display: inline-block; animation: bounce 1.2s infinite ease-in-out; animation-delay: calc(0.08s * var(--i)); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-15px); }
+            50% { transform: translateY(0); }
+        }
+
         h2 { font-size: 1.2rem; margin-bottom: 15px; color: #ff9e40; }
+        body[data-theme="light"] h2 { color: #F38020; }
 
         .container { display: flex; flex-wrap: wrap; gap: 30px; max-width: 1100px; margin: 0 auto; justify-content: center; }
         
         .properties, .output { background: rgba(255, 158, 64, 0.05); border: 1px solid #333; border-radius: 12px; padding: 25px; flex: 1; min-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        body[data-theme="light"] .properties, body[data-theme="light"] .output { background: #fdf5e6; border-color: #f38020; }
+        body[data-theme="light"] .properties, body[data-theme="light"] .output { background: #fdf5e6; border-color: #f38020; box-shadow: 0 4px 15px rgba(243, 128, 32, 0.15); }
 
         .parameters { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; align-items: center; margin-bottom: 20px; }
         label { font-size: 0.9rem; font-weight: 600; }
@@ -38,6 +49,8 @@
 
         .btn { background: #ff9e40; color: #101010; border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 5px; }
         .btn:hover { background: #e08b35; }
+        body[data-theme="light"] .btn { background: #F38020; color: #fff; }
+        body[data-theme="light"] .btn:hover { background: #d35400; }
 
         .preview-box { width: 100%; height: 220px; background: #181818; border: 2px dashed #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
         body[data-theme="light"] .preview-box { background: #eee; border-color: #bbb; }
@@ -45,15 +58,16 @@
         .code-container { background: #181818; color: #ff9e40; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; overflow-x: auto; margin-bottom: 8px; max-height: 90px; }
         body[data-theme="light"] .code-container { background: #fff; color: #d35400; border: 1px solid #ddd; }
 
-        /* 다크모드 토글 버튼 */
-        .darkmode { position: fixed; bottom: 20px; right: 20px; background: #202020; border: 2px solid #ff9e40; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ff9e40; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        /* 다크모드 토글 버튼 스타일 */
+        .darkmode { position: fixed; bottom: 20px; right: 20px; background: #202020; border: 2px solid #ff9e40; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ff9e40; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1000; }
+        body[data-theme="light"] .darkmode { background: #FDF5E6; border-color: #F38020; color: #F38020; }
         body[data-theme="dark"] .icon-sun { display: none; }
         body[data-theme="light"] .icon-moon { display: none; }
     </style>
 </head>
 <body data-theme="dark">
 
-    <h1>✨ SVG Animation Generator</h1>
+    <h1 id="site-title" class="highlight-text bounce-text">SVG Animation Generator</h1>
 
     <div class="container">
         <!-- 좌측: 옵션 설정 영역 -->
@@ -87,7 +101,7 @@
         <div class="output">
             <h2>Preview</h2>
             <div class="preview-box" id="preview">
-                <!-- 동적 SVG가 여기에 렌더링됨 -->
+                <!-- 동적 SVG 렌더링 영역 -->
             </div>
 
             <h2>Markdown Source</h2>
@@ -101,12 +115,25 @@
     </div>
 
     <!-- 다크모드/라이트모드 토글 스위치 -->
-    <a href="javascript:toggleTheme()" class="darkmode" title="Toggle dark mode">
-        <span class="icon-moon">🌙</span>
-        <span class="icon-sun">☀️</span>
+    <a href="javascript:toggleTheme()" class="darkmode" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <span class="icon-moon" aria-hidden="true">🌙</span>
+        <span class="icon-sun" aria-hidden="true">☀️</span>
     </a>
 
     <script>
+        // 바운싱 타이틀 텍스트 분할 처리
+        const title = document.getElementById('site-title');
+        if (title) {
+            const text = title.innerText;
+            title.innerHTML = ''; 
+            [...text].forEach((char, index) => {
+                const span = document.createElement('span');
+                span.innerHTML = char === ' ' ? '&nbsp;' : char;
+                span.style.setProperty('--i', index + 1);
+                title.appendChild(span);
+            });
+        }
+
         // 테마 토글 함수
         function toggleTheme() {
             const body = document.body;
@@ -175,7 +202,7 @@
                 // HTML 소스 표시
                 document.getElementById('html-code').querySelector('code').textContent = svgStr;
 
-                // Markdown 소스 표시 (Data URI 인코딩 방식)
+                // Markdown 소스 표시
                 const encoded = encodeURIComponent(svgStr);
                 const mdStr = `![Animated SVG](data:image/svg+xml;utf8,${encoded})`;
                 document.getElementById('md-code').querySelector('code').textContent = mdStr;
