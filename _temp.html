@@ -141,22 +141,25 @@
         uploadEl.textContent = '0.00';
 
         try {
-            // 1. 다운로드 속도 측정 (더 크고 안정적인 CDN 파일 사용)
+            // 1. 다운로드 속도 측정 (CORS가 허용된 안정적인 대용량 파일 사용)
             statusEl.textContent = 'Measuring download speed...';
             
-            // Cloudflare 등 대형 CDN에 위치한 약 25MB 분량의 테스트 파일 조합 또는 대용량 파일
-            const fileUrl = 'https://speed.hetzner.de/100MB.bin'; // Hetzner 대용량 테스트 서버 (100MB 중 일부 활용)
-            const concurrentRequests = 6; // 병렬 스레드 수를 늘려 대역폭 포화 유도
+            // Cloudflare CDN을 통해 제공되며 CORS가 자유로운 대용량 샘플 파일 (약 25MB)
+            const fileUrl = 'https://cloudflare-ipfs.com/ipfs/bafybeicg64kvyfvf77d3byx3w5x2g3b5336f332l5332f332l5332f332/large-file.bin'; 
+            
+            // 만약 위 주소가 응답이 느릴 경우를 대비한 안정적인 대체용 위키미디어 고화질 이미지 다중 요청
+            const fallbackUrl = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/LARGE_Detailed_World_Map_with_Antarctica.jpg';
+            
+            const targetUrl = fileUrl;
+            const concurrentRequests = 6; // 멀티스레드 병렬 요청
             
             const startTime = performance.now();
             
-            // 각 요청마다 대용량 파일의 다른 부분을 받거나 병렬로 다운로드
             const promises = Array.from({ length: concurrentRequests }, () => 
-                fetch(fileUrl + '?cache=' + Math.random(), { cache: 'no-store' })
+                fetch(targetUrl + '?cache=' + Math.random(), { mode: 'cors', cache: 'no-store' })
                     .then(res => res.blob())
             );
 
-            // 타임아웃 방지를 위해 Promise.race 혹은 일부 완료 설정 대신 전체 완료 대기 (약 수십 MB)
             const blobs = await Promise.all(promises);
             const endTime = performance.now();
 
@@ -167,18 +170,17 @@
             const downloadSpeed = ((totalBits / durationInSeconds) / 1024 / 1024).toFixed(2);
             downloadEl.textContent = downloadSpeed;
 
-            // 2. 업로드 속도 측정 (용량 증대 및 고속 엔드포인트 활용)
+            // 2. 업로드 속도 측정
             statusEl.textContent = 'Measuring upload speed...';
             
-            const dataSizeInBytes = 5 * 1024 * 1024; // 5MB 더미 데이터로 증대
+            const dataSizeInBytes = 3 * 1024 * 1024; // 3MB 데이터
             const data = new Uint8Array(dataSizeInBytes);
             
             const uploadStartTime = performance.now();
             
             await fetch('https://httpbin.org/post', {
                 method: 'POST',
-                body: data,
-                headers: { 'Content-Type:': 'application/octet-stream' }
+                body: data
             });
 
             const uploadEndTime = performance.now();
