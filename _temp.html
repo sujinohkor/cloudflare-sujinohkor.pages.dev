@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -112,7 +113,6 @@
             padding: 15px 20px;
             flex-shrink: 0;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            transition: background 0.3s, border-color 0.3s;
         }
 
         .control-group {
@@ -292,8 +292,7 @@
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
-        /* 라이트 모드에서도 슬라이더 컨트롤 패널을 어두운 톤으로 유지하여 텍스트 가독성 확보 */
-        body.light-mode .sliders-wrapper { background: #181818; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .sliders-wrapper { background: #fff; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .control-group label { color: #F38020; }
         body.light-mode .control-group input { accent-color: #F38020; }
 
@@ -466,6 +465,9 @@
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
+
+        // CSS 구문 강조 정규식 매핑
+        const tokenPattern = /([a-zA-Z\-]+)(?=\s*:)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\d+(?:\.\d+)?(?:px|%|deg)?)?([(),])/g;
 
         return escaped.replace(/([a-zA-Z\-]+)(\s*:\s*)([^;]+)(;)/g, (match, prop, colon, val, semi) => {
             return `<span class="hl-property">${prop}</span>${colon}<span class="hl-string">${val}</span><span class="hl-bracket">${semi}</span>`;
