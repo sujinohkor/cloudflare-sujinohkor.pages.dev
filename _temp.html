@@ -3,345 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HWP Editor</title>
-    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <title>Online Image Editor</title>
     <style>
-        /* 1. Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; height: 100vh; overflow: hidden; display: flex; }
+        
+        .sidebar { width: 250px; background-color: #101010; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .menu-btn { width: 100%; padding: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; text-align: center; text-decoration: none; }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #202020;
-            color: #fff;
-            transition: background 0.3s;
-        }
-
-        /* 2. Layout */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background-color: #101010;
-            padding: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            gap: 20px;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-
-        /* 3. Components */
-        .menu-btn, .theme-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .menu-btn:hover {
-            background: #ff9e40;
-            color: #101010;
-        }
-
-        .theme-btn:hover {
-            background-color: #FDF5E6;
-            color: #F38020;
-            border-color: #FDF5E6;
-        }
-
-        /* Workspace Structure */
-        .workspace-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        /* ===== [HWP 에디터 영역] ===== */
-        .content-mid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            height: 100%;
-            min-height: 0;
-            min-width: 0;
-        }
-
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            height: 100%;
-            min-height: 0;
-        }
-
-        .content-mid-header {
-            color: #ff9e40;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        /* 전체화면 버튼 스타일 (에디터 내부 우측 상단 고정) */
-        .fullscreen-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 10000;
-            background: #202020;
-            color: #ff9e40;
-            border: 1px solid #ff9e40;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s;
-        }
-        .fullscreen-btn:hover {
-            background: #ff9e40;
-            color: #101010;
-        }
-
-        .editor-container-wrapper {
-            position: relative;
-            display: flex;
-            width: 100%;
-            flex: 1;
-            min-height: 0;
-            background: #141414;
-            border: 2px solid #ff9e40;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        /* 전체화면 활성화 클래스 */
-        .editor-container-wrapper.fullscreen {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999 !important;
-            border-radius: 0 !important;
-            border: none !important;
-            padding: 0;
-            background: #202020;
-        }
-
-        /* @rhwp/editor가 마운트될 DOM 영역 */
-        #editor {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
-        body.light-mode .editor-container-wrapper { background: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
-        body.light-mode .editor-container-wrapper.fullscreen { background: #fff !important; }
-        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
-
-        /* 5. Mobile Responsive */
-        .menu-toggle-btn {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 2000;
-            padding: 10px 15px;
-            background: #ff9e40;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .app-container {
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-                width: 100%;
-                height: auto;
-                min-height: 100vh;
-                overflow: visible;
-            }
-            .menu-toggle-btn {
-                display: block;
-                color: #ffffff;
-            }
-            .sidebar {
-                transform: translateX(-250px);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            .workspace-container {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                height: auto;
-            }
-            .content-mid {
-                height: 600px;
-            }
-        }
+        .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; height: 100vh; gap: 10px; }
+        .editor-wrapper { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; overflow: hidden; background: #141414; }
+        
+        /* Photopea <iframe> 스타일 */
+        iframe { width: 100%; height: 100%; border: none; display: block; }
     </style>
 </head>
 <body>
 
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
-        <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">📁 Open File</button>
-        <input type="file" id="hwp-file-input" accept=".hwp,.hwpx" style="display: none;">
-
-        <div>
-            <button class="menu-btn" onclick="resetAll()">Reset</button>
-        </div>
+    <aside class="sidebar">
+        <a href="../index" class="menu-btn">Home</a>
+        <button class="menu-btn" onclick="location.reload()">Reset</button>
     </aside>
 
     <main class="main-content">
-        <header class="top-section">
-            <h1>HWP Editor</h1>
-            <p>Embed full-featured HWP editor directly into your web browser.</p>
-        </header>
-
-        <div class="workspace-container">
-            <div class="content-mid">
-                <div class="controls">
-                    <div class="content-mid-header">
-                        <span id="file-name-display">File name will be appeared here</span>
-                    </div>
-                    <div class="editor-container-wrapper" id="editor-wrapper">
-                        <!-- 전체화면 토글 버튼을 에디터 래퍼 내부 우측 상단으로 이동 -->
-                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
-                        <div id="editor"></div>
-                    </div>
-                </div>
-            </div>
+        <h1>Online Image Editor (Powered by Photopea)</h1>
+        <div class="editor-wrapper">
+            <!-- Photopea 공식 iframe 삽입 -->
+            <iframe src="https://www.photopea.com"></iframe>
         </div>
     </main>
-</div>
 
-<script type="module">
-    import { createEditor } from 'https://cdn.jsdelivr.net/npm/@rhwp/editor/+esm';
-
-    const sidebar = document.getElementById('sidebar');
-    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
-    
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
-    
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } 
-    });
-
-    let editorInstance = null;
-    const fileInput = document.getElementById('hwp-file-input');
-    const fileNameDisplay = document.getElementById('file-name-display');
-    const editorWrapper = document.getElementById('editor-wrapper');
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-
-    window.toggleFullscreen = function() {
-        editorWrapper.classList.toggle('fullscreen');
-        if (editorWrapper.classList.contains('fullscreen')) {
-            fullscreenBtn.textContent = 'Minimize 🗗';
-        } else {
-            fullscreenBtn.textContent = 'Maximize ⛶';
-        }
-    };
-
-    async function initEditor() {
-        try {
-            editorInstance = await createEditor('#editor');
-            console.log('HWP Editor initialized successfully:', editorInstance);
-        } catch (err) {
-            console.error('Failed to initialize HWP editor:', err);
-            document.getElementById('editor').innerHTML = '<div style="padding: 20px; color: #ff6b6b; text-align: center;">Failed to load the editor. Please check package settings.</div>';
-        }
-    }
-
-    initEditor();
-
-    fileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file || !editorInstance) return;
-
-        try {
-            const buffer = await file.arrayBuffer();
-            
-            if (typeof editorInstance.loadFile === 'function') {
-                await editorInstance.loadFile(buffer, file.name);
-            } else if (typeof editorInstance.open === 'function') {
-                await editorInstance.open(buffer);
-            } else {
-                console.warn('Supported file load method not found. Please check the editor object.', editorInstance);
-            }
-
-            fileNameDisplay.textContent = file.name;
-        } catch (err) {
-            console.error('Failed to open the file:', err);
-            fileNameDisplay.textContent = 'Failed to open file';
-        } finally {
-            fileInput.value = ''; 
-        }
-    });
-
-    window.resetAll = function() {
-        location.reload();
-    }
-</script>
 </body>
 </html>
