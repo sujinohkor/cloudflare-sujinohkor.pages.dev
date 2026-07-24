@@ -7,19 +7,22 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; height: 100vh; overflow: hidden; }
                 
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { display: flex; height: 100vh; }
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+            width: 240px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; transition: transform 0.3s ease; 
         }
                 
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; min-height: 100vh; gap: 20px; transition: 0.3s; 
+            margin-left: 240px; padding: 25px 35px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 15px; transition: 0.3s; 
         }
+
+        .top-section h1 { font-size: 1.4rem; color: #fff; margin-bottom: 2px; }
+        .top-section p { font-size: 0.82rem; color: #ff9e40; }
 
         .workspace-container {
             display: flex;
@@ -27,72 +30,73 @@
             flex: 1;
             gap: 20px;
             min-height: 0;
+            overflow: hidden;
         }
 
         .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+            width: 100%; padding: 10px; cursor: pointer;
+            background: #101010; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; font-size: 0.85rem; transition: all 0.3s; text-align: center;
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #F38020; }
+        .menu-btn:hover, .theme-btn:hover { background: #ff9e40; color: #101010; }
+
+        .bottom-btns { margin-top: auto; }
 
         .content-left { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
-            padding: 25px; background: #1c1c1c; flex-direction: column; gap: 15px; 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
+            padding: 20px; background: #1c1c1c; flex-direction: column; gap: 10px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow: hidden;
         }
 
-        .content-left h2 { font-size: 1.1rem; color: #ff9e40; margin-bottom: 2px; }
+        .content-left h2 { font-size: 0.95rem; color: #ff9e40; }
 
-        .parameters { display: flex; flex-direction: column; gap: 10px; }
-        .field-group { display: flex; flex-direction: column; gap: 3px; }
-        .field-group label { font-size: 0.8rem; color: #aaa; font-weight: 600; }
+        .parameters { display: flex; flex-direction: column; gap: 8px; }
+        .field-group { display: flex; flex-direction: column; gap: 2px; }
+        .field-group label { font-size: 0.75rem; color: #aaa; font-weight: 600; }
         
         .row-group { display: flex; gap: 10px; }
         .row-group .field-group { flex: 1; }
         
         input, select { 
             background: #252525; border: 1px solid #444; border-radius: 8px; 
-            padding: 7px 10px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; 
+            padding: 6px 10px; color: #fff; font-family: inherit; font-size: 0.82rem; width: 100%; 
         }
         input:focus, select:focus { outline: none; border-color: #ff9e40; }
 
         .color-row { display: flex; gap: 10px; align-items: center; }
-        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 32px; }
+        .color-row input[type="color"] { width: 45px; padding: 2px; cursor: pointer; height: 28px; }
         .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
         
-        .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 0.8rem; font-family: monospace; color: #aaa; }
-        .color-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
+        .color-preview-box { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-family: monospace; color: #aaa; }
+        .color-swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
 
         .dimensions-group { display: flex; align-items: center; gap: 8px; }
-        .dimensions-group input { width: 100px; }
+        .dimensions-group input { width: 90px; }
 
-        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #ccc; cursor: pointer; margin-top: 2px; }
-        .checkbox-group input { accent-color: #ff9e40; width: 15px; height: 15px; cursor: pointer; width: auto; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #ccc; cursor: pointer; }
+        .checkbox-group input { accent-color: #ff9e40; width: 14px; height: 14px; cursor: pointer; width: auto; }
 
         .btn { 
             background: #ff9e40; color: #101010; border: none; border-radius: 8px; 
-            padding: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; margin-top: 5px;
+            padding: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; margin-top: auto;
         }
         .btn:hover { background: #e08b35; }
 
         .content-right { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            padding: 25px; background: #1c1c1c; gap: 10px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto;
+            padding: 20px; background: #1c1c1c; gap: 8px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow: hidden;
         }
-        .content-right h2 { font-size: 1.0rem; color: #ff9e40; margin-top: 5px; }
+        .content-right h2 { font-size: 0.95rem; color: #ff9e40; }
 
         .preview-box { 
-            width: 100%; height: 160px; background: #181818; border: 2px dashed #444; 
+            width: 100%; height: 105px; background: #181818; border: 2px dashed #444; 
             border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; 
         }
 
         .code-container { 
-            background: #181818; color: #ff9e40; padding: 12px; border-radius: 8px; 
-            font-family: monospace; font-size: 0.8rem; 
-            min-height: 160px; 
-            max-height: 250px; 
+            background: #181818; color: #ff9e40; padding: 8px 10px; border-radius: 8px; 
+            font-family: monospace; font-size: 0.75rem; 
+            height: 52px; 
             overflow-y: auto;  
             overflow-x: hidden; 
             white-space: pre-wrap; 
@@ -103,9 +107,9 @@
         body.light-mode { background-color: #fff; color: #000; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .top-section h1 { color: #202020; }
+        body.light-mode .top-section p { color: #F38020; }
         body.light-mode .content-left, body.light-mode .content-right {
             background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
@@ -119,11 +123,16 @@
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
 
         @media (max-width: 850px) {
+            body { height: auto; overflow: auto; }
+            .app-container { height: auto; }
             .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
+            .sidebar { transform: translateX(-240px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; }
-            .workspace-container { flex-direction: column; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; }
+            .workspace-container { flex-direction: column; overflow: visible; }
+            .content-left, .content-right { overflow: visible; }
+            .code-container { height: auto; min-height: 100px; max-height: 150px; }
+            .preview-box { height: 140px; }
         }
     </style>
 </head>
