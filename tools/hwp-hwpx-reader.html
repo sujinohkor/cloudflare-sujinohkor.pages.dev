@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HWPX Viewer with Table Support</title>
-    <!-- JSZip 라이브러리 (HWPX 압축 해제용) -->
+    <title>HWPX Advanced Viewer (Table Merge & Chart Support)</title>
+    <!-- JSZip 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,16 +22,21 @@
         /* HWPX 렌더링 스타일 */
         .hwp-p { margin-bottom: 12px; word-break: break-all; }
         .hwp-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #1c1c1c; }
-        .hwp-table th, .hwp-table td { border: 1px solid #ff9e40; padding: 8px 12px; font-size: 0.9rem; color: #fff; }
+        .hwp-table th, .hwp-table td { border: 1px solid #ff9e40; padding: 8px 12px; font-size: 0.9rem; color: #fff; vertical-align: middle; }
         .hwp-table th { background: rgba(255, 158, 64, 0.2); }
+        
+        /* 차트 및 이미지 영역 */
+        .hwp-media-container { text-align: center; margin: 20px 0; }
+        .hwp-media-container img { max-width: 100%; height: auto; border: 1px solid #444; border-radius: 8px; background: #fff; padding: 5px; }
+        .media-caption { font-size: 0.8rem; color: #888; margin-top: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>HWPX Document Reader (With Tables)</h1>
+        <h1>HWPX Advanced Reader</h1>
         
         <label class="upload-box">
-            <p style="color: #ff9e40; font-weight: bold; margin-bottom: 5px;">📁 HWPX 파일을 여기에 업로드하세요 (표 및 텍스트 지원)</p>
+            <p style="color: #ff9e40; font-weight: bold; margin-bottom: 5px;">📁 HWPX 파일을 여기에 업로드하세요 (표 병합 및 차트/이미지 포함)</p>
             <p style="font-size: 0.8rem; color: #888;">(브라우저 내부에서 안전하게 파싱됩니다)</p>
             <input type="file" id="hwpx-file" accept=".hwpx">
         </label>
@@ -49,18 +54,37 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            outputBox.innerHTML = '<div class="placeholder">문서를 분석하고 표를 그리는 중입니다...</div>';
+            outputBox.innerHTML = '<div class="placeholder">문서 구조, 셀 병합 및 미디어 파일을 분석하는 중입니다...</div>';
 
             try {
                 const zip = new JSZip();
                 const zipContent = await zip.loadAsync(file);
 
+                // 1. BinData 폴더 내 이미지 및 차트(PNG/JPG/SVG 등) 미리 추출 준비
+                const mediaFiles = {};
+                const binDataKeys = Object.keys(zipContent.files).filter(filename => 
+                    filename.startsWith('BinData/') || filename.startsWith('Contents/BinData/')
+                );
+
+                for (const key of binDataKeys) {
+                    const fileData = await zipContent.files[key].async('base64');
+                    // 확장자에 따른 MIME 타입 추정
+                    let mime = 'image/png';
+                    if (key.endsWith('.jpg') || key.endsWith('.jpeg')) mime = 'image/jpeg';
+                    else if (key.endsWith('.svg')) mime = 'image/svg+xml';
+                    
+                    // 파일명을 키로 하여 base64 데이터 저장
+                    const fileNameOnly = key.split('/').pop();
+                    mediaFiles[fileNameOnly] = `data:${mime};base64,${fileData}`;
+                }
+
+                // 2. 본문 섹션 파일 탐색
                 const sectionFiles = Object.keys(zipContent.files).filter(filename => 
                     filename.startsWith('Contents/section') && filename.endsWith('.xml')
                 );
 
                 if (sectionFiles.length === 0) {
-                    outputBox.innerHTML = '<div class="placeholder">유효한 HWPX 문서 구조를 찾을 수 없습니다. (HWPX 파일만 지원됩니다)</div>';
+                    outputBox.innerHTML = '<div class="placeholder">유효한 HWPX 문서 구조를 찾을 수 없습니다.</div>';
                     return;
                 }
 
@@ -71,62 +95,118 @@
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
                     
-                    // 본문 안의 최상위 블록 요소들(문단, 표 등)을 순회
-                    // HWPX 표준 네임스페이스 대응을 위해 getElementsByTagNameNS 또는 로컬 네임스페이스 무시 검색 활용
-                    const bodyElements = xmlDoc.getElementsByTagName('*');
-
+                    const elements = xmlDoc.getElementsByTagName('*');
                     let currentParagraphText = '';
 
-                    for (let node of bodyElements) {
+                    for (let node of elements) {
                         const localName = node.localName;
 
-                        // 1. 문단 처리 (<hp:p> 또는 유사 태그)
+                        // 문단 처리
                         if (localName === 'p') {
-                            // 이전 문단이 쌓여있다면 출력
                             if (currentParagraphText.trim() !== '') {
                                 renderHTML += `<div class="hwp-p">${escapeHtml(currentParagraphText)}</div>`;
                                 currentParagraphText = '';
                             }
                         }
-                        // 2. 텍스트 조각 처리 (<hp:t>)
+                        // 텍스트 조각 처리
                         else if (localName === 't') {
                             if (node.textContent) {
                                 currentParagraphText += node.textContent;
                             }
                         }
-                        // 3. 표 처리 (<hp:tbl>)
-                        else if (localName === 'tbl') {
-                            // 남은 문단 먼저 출력
+                        // 이미지 / 차트 개체 처리 (HWPX 내 도형/그림 개체 태그 대응)
+                        else if (localName === 'pic' || localName === 'chart' || localName === 'img') {
                             if (currentParagraphText.trim() !== '') {
                                 renderHTML += `<div class="hwp-p">${escapeHtml(currentParagraphText)}</div>`;
                                 currentParagraphText = '';
                             }
 
-                            // 표 HTML 변환 시작
-                            renderHTML += '<table class="hwp-table">';
-                            const rows = node.getElementsByTagName('*');
-                            let inRow = false;
+                            // 이미지 참조 주소나 파일명 탐색
+                            let foundSrc = '';
+                            const attributes = node.attributes;
+                            for (let attr of attributes) {
+                                if (attr.value && (attr.value.includes('.') || attr.value.includes('BinData'))) {
+                                    const matchedKey = Object.keys(mediaFiles).find(k => attr.value.includes(k));
+                                    if (matchedKey) {
+                                        foundSrc = mediaFiles[matchedKey];
+                                        break;
+                                    }
+                                }
+                            }
 
-                            for (let child of node.getElementsByTagName('*')) {
-                                if (child.localName === 'tr') {
+                            // 속성에서 못 찾았을 경우 내부 자식 요소에서 파일명 탐색
+                            if (!foundSrc) {
+                                const subNodes = node.getElementsByTagName('*');
+                                for (let sn of subNodes) {
+                                    for (let attr of sn.attributes) {
+                                        const matchedKey = Object.keys(mediaFiles).find(k => attr.value.includes(k));
+                                        if (matchedKey) {
+                                            foundSrc = mediaFiles[matchedKey];
+                                            break;
+                                        }
+                                    }
+                                    if (foundSrc) break;
+                                }
+                            }
+
+                            if (foundSrc) {
+                                renderHTML += `
+                                    <div class="hwp-media-container">
+                                        <img src="${foundSrc}" alt="추출된 개체/차트 이미지">
+                                        <div class="media-caption">[추출된 이미지 또는 차트 개체]</div>
+                                    </div>
+                                `;
+                            }
+                        }
+                        // 표 처리 (<hp:tbl>) 및 병합 정보 반영
+                        else if (localName === 'tbl') {
+                            if (currentParagraphText.trim() !== '') {
+                                renderHTML += `<div class="hwp-p">${escapeHtml(currentParagraphText)}</div>`;
+                                currentParagraphText = '';
+                            }
+
+                            renderHTML += '<table class="hwp-table">';
+                            
+                            const cells = node.getElementsByTagName('*');
+                            for (let cell of cells) {
+                                if (cell.localName === 'tr') {
                                     renderHTML += '<tr>';
-                                } else if (child.localName === 'tc') {
-                                    // 셀 안의 텍스트 추출
+                                } else if (cell.localName === 'tc') {
+                                    // 셀 병합 정보(colSpan, rowSpan) 추출
+                                    let colSpan = cell.getAttribute('colSpan') || cell.getAttribute('colspan') || '1';
+                                    let rowSpan = cell.getAttribute('rowSpan') || cell.getAttribute('rowspan') || '1';
+                                    
+                                    // HWPX 표준 스펙 속성명 대응 (colSpan/rowSpan 구조 세부 확인)
+                                    const cellAddr = cell.getElementsByTagName('*');
+                                    for (let ca of cellAddr) {
+                                        if (ca.localName === 'cellAddr' || ca.localName === 'cellSpan') {
+                                            const cs = ca.getAttribute('colSpan') || ca.getAttribute('colspan');
+                                            const rs = ca.getAttribute('rowSpan') || ca.getAttribute('rowspan');
+                                            if (cs) colSpan = cs;
+                                            if (rs) rowSpan = rs;
+                                        }
+                                    }
+
+                                    // 셀 내부 텍스트 추출
                                     let cellText = '';
-                                    const tNodes = child.getElementsByTagName('*');
+                                    const tNodes = cell.getElementsByTagName('*');
                                     for (let tn of tNodes) {
                                         if (tn.localName === 't' && tn.textContent) {
                                             cellText += tn.textContent + ' ';
                                         }
                                     }
-                                    renderHTML += `<td>${escapeHtml(cellText.trim())}</td>`;
+
+                                    let spanAttr = '';
+                                    if (parseInt(colSpan) > 1) spanAttr += ` colspan="${colSpan}"`;
+                                    if (parseInt(rowSpan) > 1) spanAttr += ` rowspan="${rowSpan}"`;
+
+                                    renderHTML += `<td${spanAttr}>${escapeHtml(cellText.trim())}</td>`;
                                 }
                             }
                             renderHTML += '</table>';
                         }
                     }
 
-                    // 잔여 텍스트 처리
                     if (currentParagraphText.trim() !== '') {
                         renderHTML += `<div class="hwp-p">${escapeHtml(currentParagraphText)}</div>`;
                     }
@@ -142,7 +222,6 @@
             }
         });
 
-        // HTML 특수문자 이스케이프 함수 (XSS 방지 및 깨짐 방지)
         function escapeHtml(text) {
             return text
                 .replace(/&/g, "&amp;")
