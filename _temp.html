@@ -3,36 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Image Editor</title>
+    <title>Internet Speed Test</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; height: 100vh; overflow: hidden; display: flex; }
-        
-        .sidebar { width: 250px; background-color: #101010; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .menu-btn { width: 100%; padding: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; text-align: center; text-decoration: none; }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; height: 100vh; gap: 10px; }
-        .editor-wrapper { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; overflow: hidden; background: #141414; }
-        
-        /* Photopea <iframe> 스타일 */
-        iframe { width: 100%; height: 100%; border: none; display: block; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #202020;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: #101010;
+            border: 2px solid #ff9e40;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #ff9e40;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        p.desc {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        .speed-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .speed-box {
+            background: #202020;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 15px;
+            width: 45%;
+        }
+
+        .speed-box h3 {
+            font-size: 0.85rem;
+            color: #ff9e40;
+            margin-bottom: 8px;
+        }
+
+        .speed-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .unit {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 12px;
+            background: #ff9e40;
+            color: #101010;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #e08b35;
+        }
+
+        .start-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #ff9e40;
+            min-height: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <a href="../index" class="menu-btn">Home</a>
-        <button class="menu-btn" onclick="location.reload()">Reset</button>
-    </aside>
+<div class="container">
+    <h1>Speed Test</h1>
+    <p class="desc">Check your download and upload speeds.</p>
 
-    <main class="main-content">
-        <h1>Online Image Editor (Powered by Photopea)</h1>
-        <div class="editor-wrapper">
-            <!-- Photopea 공식 iframe 삽입 -->
-            <iframe src="https://www.photopea.com"></iframe>
+    <div class="speed-display">
+        <div class="speed-box">
+            <h3>DOWNLOAD</h3>
+            <div class="speed-value" id="download-speed">0.00</div>
+            <div class="unit">Mbps</div>
         </div>
-    </main>
+        <div class="speed-box">
+            <h3>UPLOAD</h3>
+            <div class="speed-value" id="upload-speed">0.00</div>
+            <div class="unit">Mbps</div>
+        </div>
+    </div>
+
+    <button class="start-btn" id="start-btn" onclick="startTest()">Start Test</button>
+    <div class="status" id="status">Ready to test</div>
+</div>
+
+<script>
+    async function startTest() {
+        const startBtn = document.getElementById('start-btn');
+        const statusEl = document.getElementById('status');
+        const downloadEl = document.getElementById('download-speed');
+        const uploadEl = document.getElementById('upload-speed');
+
+        startBtn.disabled = true;
+        downloadEl.textContent = '0.00';
+        uploadEl.textContent = '0.00';
+
+        try {
+            // 1. 다운로드 속도 측정
+            statusEl.textContent = 'Measuring download speed...';
+            
+            // 안정적인 대용량 파일 링크 사용 (약 5MB 크기의 테스트 파일)
+            const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Snake_River_%285mb%29.jpg';
+            const startTime = performance.now();
+            
+            const response = await fetch(imageUrl + '?cache=' + Math.random());
+            const blob = await response.blob();
+            
+            const endTime = performance.now();
+            const durationInSeconds = (endTime - startTime) / 1000;
+            const fileSizeInBits = blob.size * 8;
+            
+            // Mbps 계산
+            const downloadSpeed = ((fileSizeInBits / durationInSeconds) / 1024 / 1024).toFixed(2);
+            downloadEl.textContent = downloadSpeed;
+
+            // 2. 업로드 속도 측정
+            statusEl.textContent = 'Measuring upload speed...';
+            
+            // 가상의 2MB 데이터 생성 (더미 데이터)
+            const dataSizeInBytes = 2 * 1024 * 1024; 
+            const data = new Uint8Array(dataSizeInBytes);
+            
+            const uploadStartTime = performance.now();
+            
+            // fetch POST 요청을 통해 업로드 시뮬레이션 (echo 서비스 또는 공개 테스트용 엔드포인트)
+            await fetch('https://httpbin.org/post', {
+                method: 'POST',
+                body: data
+            });
+
+            const uploadEndTime = performance.now();
+            const uploadDuration = (uploadEndTime - uploadStartTime) / 1000;
+            const uploadSizeInBits = dataSizeInBytes * 8;
+
+            const uploadSpeed = ((uploadSizeInBits / uploadDuration) / 1024 / 1024).toFixed(2);
+            uploadEl.textContent = uploadSpeed;
+
+            statusEl.textContent = 'Test completed successfully!';
+        } catch (err) {
+            console.error(err);
+            statusEl.textContent = 'Error occurred during the test.';
+        } finally {
+            startBtn.disabled = false;
+        }
+    }
+</script>
 
 </body>
 </html>
