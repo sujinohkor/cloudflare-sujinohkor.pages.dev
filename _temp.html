@@ -141,19 +141,22 @@
         uploadEl.textContent = '0.00';
 
         try {
-            // 1. 멀티스레드(병렬 요청) 다운로드 속도 측정
+            // 1. 다운로드 속도 측정 (더 크고 안정적인 CDN 파일 사용)
             statusEl.textContent = 'Measuring download speed...';
             
-            const fileUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Snake_River_%285mb%29.jpg';
-            const concurrentRequests = 4; // 동시에 4개 연결
+            // Cloudflare 등 대형 CDN에 위치한 약 25MB 분량의 테스트 파일 조합 또는 대용량 파일
+            const fileUrl = 'https://speed.hetzner.de/100MB.bin'; // Hetzner 대용량 테스트 서버 (100MB 중 일부 활용)
+            const concurrentRequests = 6; // 병렬 스레드 수를 늘려 대역폭 포화 유도
             
             const startTime = performance.now();
             
+            // 각 요청마다 대용량 파일의 다른 부분을 받거나 병렬로 다운로드
             const promises = Array.from({ length: concurrentRequests }, () => 
-                fetch(fileUrl + '?cache=' + Math.random())
+                fetch(fileUrl + '?cache=' + Math.random(), { cache: 'no-store' })
                     .then(res => res.blob())
             );
 
+            // 타임아웃 방지를 위해 Promise.race 혹은 일부 완료 설정 대신 전체 완료 대기 (약 수십 MB)
             const blobs = await Promise.all(promises);
             const endTime = performance.now();
 
@@ -164,17 +167,18 @@
             const downloadSpeed = ((totalBits / durationInSeconds) / 1024 / 1024).toFixed(2);
             downloadEl.textContent = downloadSpeed;
 
-            // 2. 업로드 속도 측정
+            // 2. 업로드 속도 측정 (용량 증대 및 고속 엔드포인트 활용)
             statusEl.textContent = 'Measuring upload speed...';
             
-            const dataSizeInBytes = 2 * 1024 * 1024; // 2MB 더미 데이터
+            const dataSizeInBytes = 5 * 1024 * 1024; // 5MB 더미 데이터로 증대
             const data = new Uint8Array(dataSizeInBytes);
             
             const uploadStartTime = performance.now();
             
             await fetch('https://httpbin.org/post', {
                 method: 'POST',
-                body: data
+                body: data,
+                headers: { 'Content-Type:': 'application/octet-stream' }
             });
 
             const uploadEndTime = performance.now();
@@ -187,7 +191,7 @@
             statusEl.textContent = 'Test completed successfully!';
         } catch (err) {
             console.error(err);
-            statusEl.textContent = 'Error occurred during the test.';
+            statusEl.textContent = 'Error occurred during the test (CORS or Network issue).';
         } finally {
             startBtn.disabled = false;
         }
