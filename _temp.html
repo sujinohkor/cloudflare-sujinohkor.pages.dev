@@ -70,7 +70,7 @@
 
         textarea {
             width: 100%;
-            height: 110px;
+            height: 120px;
             margin-top: 15px;
             padding: 10px;
             font-family: monospace;
@@ -104,6 +104,10 @@
             <label>Border Width (테두리 두께): <span id="border-val">1</span>px</label>
             <input type="range" id="border-width" min="0" max="10" value="1">
         </div>
+        <div class="control-group">
+            <label>Shadow Opacity (그림자): <span id="shadow-val">0.1</span></label>
+            <input type="range" id="shadow-opacity" min="0" max="0.5" step="0.01" value="0.1">
+        </div>
 
         <textarea id="code-output" readonly></textarea>
     </div>
@@ -118,11 +122,13 @@
     const opacityInput = document.getElementById('opacity');
     const radiusInput = document.getElementById('radius');
     const borderWidthInput = document.getElementById('border-width');
+    const shadowOpacityInput = document.getElementById('shadow-opacity');
 
     const blurVal = document.getElementById('blur-val');
     const opacityVal = document.getElementById('opacity-val');
     const radiusVal = document.getElementById('radius-val');
     const borderVal = document.getElementById('border-val');
+    const shadowVal = document.getElementById('shadow-val');
 
     const preview = document.getElementById('glass-preview');
     const codeOutput = document.getElementById('code-output');
@@ -132,11 +138,13 @@
         const opacity = opacityInput.value;
         const radius = radiusInput.value;
         const borderWidth = borderWidthInput.value;
+        const shadowOpacity = shadowOpacityInput.value;
 
         blurVal.innerText = blur;
         opacityVal.innerText = opacity;
         radiusVal.innerText = radius;
         borderVal.innerText = borderWidth;
+        shadowVal.innerText = shadowOpacity;
 
         // 스타일 적용
         preview.style.background = `rgba(255, 255, 255, ${opacity})`;
@@ -144,7 +152,7 @@
         preview.style.webkitBackdropFilter = `blur(${blur}px)`;
         preview.style.borderRadius = `${radius}px`;
         preview.style.border = `${borderWidth}px solid rgba(255, 255, 255, 0.3)`;
-        preview.style.boxShadow = `0 8px 32px 0 rgba(0, 0, 0, 0.1)`;
+        preview.style.boxShadow = `0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity})`;
 
         // CSS 코드 문자열 생성
         codeOutput.value = 
@@ -153,13 +161,14 @@ backdrop-filter: blur(${blur}px);
 -webkit-backdrop-filter: blur(${blur}px);
 border-radius: ${radius}px;
 border: ${borderWidth}px solid rgba(255, 255, 255, 0.3);
-box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);`;
+box-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
     }
 
     blurInput.addEventListener('input', updateStyle);
     opacityInput.addEventListener('input', updateStyle);
     radiusInput.addEventListener('input', updateStyle);
     borderWidthInput.addEventListener('input', updateStyle);
+    shadowOpacityInput.addEventListener('input', updateStyle);
 
     updateStyle();
 </script>
