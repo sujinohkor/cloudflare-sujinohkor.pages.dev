@@ -49,6 +49,13 @@
         body[data-theme="light"] input, body[data-theme="light"] select { background: #fff; color: #333; border-color: #ccc; }
         input:focus, select:focus { outline: none; border-color: #ff9e40; }
 
+        /* 색상 입력 및 미리보기 배치용 스타일 */
+        .color-row { display: flex; gap: 10px; align-items: center; }
+        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 38px; }
+        .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
+        .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.85rem; font-family: monospace; color: #aaa; }
+        .color-swatch { width: 18px; height: 18px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
+
         .dimensions-group { display: flex; align-items: center; gap: 8px; }
         .dimensions-group input { width: 100px; }
 
@@ -83,14 +90,30 @@
                     <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
                 </div>
 
+                <!-- Font Color & Opacity -->
                 <div class="field-group">
-                    <label for="color">Font color</label>
-                    <input type="color" id="color" value="#36BCF7" oninput="generator.update()">
+                    <label>Font color & Opacity</label>
+                    <div class="color-row">
+                        <input type="color" id="font-color" value="#36BCF7" oninput="generator.update()">
+                        <input type="range" id="font-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
+                    </div>
+                    <div class="color-preview-box">
+                        <span class="color-swatch" id="font-swatch"></span>
+                        <span id="font-hex-text">#36BCF7FF</span>
+                    </div>
                 </div>
 
+                <!-- Background Color & Opacity -->
                 <div class="field-group">
-                    <label for="background">Background color</label>
-                    <input type="color" id="background" value="#000000" oninput="generator.update()">
+                    <label>Background color & Opacity</label>
+                    <div class="color-row">
+                        <input type="color" id="bg-color" value="#000000" oninput="generator.update()">
+                        <input type="range" id="bg-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
+                    </div>
+                    <div class="color-preview-box">
+                        <span class="color-swatch" id="bg-swatch"></span>
+                        <span id="bg-hex-text">#000000FF</span>
+                    </div>
                 </div>
 
                 <div class="field-group">
@@ -159,21 +182,34 @@
             body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
         }
 
+        // 색상과 투명도를 결합하여 Hex 코드 생성 및 UI 업데이트 함수
+        function getHexWithAlpha(colorId, opacityId) {
+            const hex = document.getElementById(colorId).value;
+            const opacity = parseFloat(document.getElementById(opacityId).value);
+            const alphaHex = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
+            return hex + alphaHex;
+        }
+
         // 바운싱 텍스트 SVG 생성기 객체
         const generator = {
             getSVGString() {
                 const text = document.getElementById('input-text').value;
-                const color = document.getElementById('color').value;
-                const background = document.getElementById('background').value;
+                const fontColorHex = getHexWithAlpha('font-color', 'font-opacity');
+                const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
                 const fontSize = parseInt(document.getElementById('font-size').value);
                 const bounceHeight = parseInt(document.getElementById('bounce-height').value);
                 const width = document.getElementById('width').value;
                 const height = document.getElementById('height').value;
 
-                // 글자별로 간격 계산하여 개별 <g> 태그로 감싸기
+                // 색상 정보 UI 실시간 반영
+                document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
+                document.getElementById('font-hex-text').textContent = fontColorHex;
+                document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
+                document.getElementById('bg-hex-text').textContent = bgColorHex;
+
                 let textElements = '';
                 let currentX = 30;
-                const charWidth = fontSize * 0.6; // 대략적인 글자 가로 폭 추정
+                const charWidth = fontSize * 0.6; 
 
                 [...text].forEach((char, index) => {
                     const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
@@ -194,13 +230,13 @@
             50% { transform: translateY(0); }
         }
         .bg {
-            fill: ${background};
+            fill: ${bgColorHex};
         }
         .bounce-text-svg {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: ${fontSize}px;
             font-weight: bold;
-            fill: ${color};
+            fill: ${fontColorHex};
         }
         .bounce-char {
             display: inline-block;
@@ -217,13 +253,9 @@
             update() {
                 const svgStr = this.getSVGString();
                 
-                // 미리보기 업데이트
                 document.getElementById('preview').innerHTML = svgStr;
-
-                // HTML 소스 표시
                 document.getElementById('html-code').querySelector('code').textContent = svgStr;
 
-                // Markdown 소스 표시
                 const encoded = encodeURIComponent(svgStr);
                 const mdStr = `![Bounce Text SVG](data:image/svg+xml;utf8,${encoded})`;
                 document.getElementById('md-code').querySelector('code').textContent = mdStr;
