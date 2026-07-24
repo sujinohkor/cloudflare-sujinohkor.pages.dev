@@ -420,11 +420,17 @@
                     updateWeather();
                 },
                 () => {
+                    // GPS 허용을 안 했거나 실패한 경우 즉시 Seoul로 설정
+                    currentCoords = null;
+                    currentCity = 'Seoul';
                     document.getElementById('city-input').value = currentCity;
                     updateWeather();
-                }
+                },
+                { timeout: 5000 } // 5초 동안 응답이 없으면 에러로 간주하고 fallback 실행
             );
         } else {
+            currentCoords = null;
+            currentCity = 'Seoul';
             document.getElementById('city-input').value = currentCity;
             updateWeather();
         }
