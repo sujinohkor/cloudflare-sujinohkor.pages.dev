@@ -1,1 +1,273 @@
-idea board
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWP Editor</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #202020;
+            color: #fff;
+            transition: background 0.3s;
+        }
+
+        /* 2. Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: #101010;
+            padding: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            gap: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background: #202020;
+            color: #ff9e40;
+            border: 2px solid #ff9e40;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+
+        .theme-btn:hover {
+            background-color: #FDF5E6;
+            color: #F38020;
+            border-color: #FDF5E6;
+        }
+
+        /* Workspace Structure */
+        .workspace-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ===== [HWP 에디터 영역] ===== */
+        .content-mid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+            min-height: 0;
+            min-width: 0;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .content-mid-header {
+            color: #ff9e40;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .editor-container-wrapper {
+            position: relative;
+            display: flex;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            background: #141414;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        /* @rhwp/editor가 마운트될 DOM 영역 */
+        #editor {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+        
+        /* 데이모드일 때 에디터 외부 래퍼 및 내부 컴포넌트 배경을 밝게 강제 적용 */
+        body.light-mode .editor-container-wrapper { 
+            background: #e2e8f0 !important; 
+            border-color: #F38020; 
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode #editor, 
+        body.light-mode #editor * {
+            background-color: transparent !important;
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2000;
+            padding: 10px 15px;
+            background: #ff9e40;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                height: auto;
+                min-height: 100vh;
+                overflow: auto;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                overflow: visible;
+            }
+            .menu-toggle-btn {
+                display: block;
+                color: #ffffff;
+            }
+            .sidebar {
+                transform: translateX(-250px);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .workspace-container {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+            .content-mid {
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>HWP Editor</h1>
+            <p>Embed full-featured HWP editor directly into your web browser.</p>
+        </header>
+
+        <div class="workspace-container">
+            <div class="content-mid">
+                <div class="controls">
+                    <div class="content-mid-header">
+                        <span>Editor Workspace</span>
+                    </div>
+                    <div class="editor-container-wrapper">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script type="module">
+    import { createEditor } from 'https://cdn.jsdelivr.net/npm/@rhwp/editor/+esm';
+
+    const sidebar = document.getElementById('sidebar');
+    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
+    
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+    
+    document.querySelector('.main-content').addEventListener('click', () => { 
+        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } 
+    });
+
+    // 에디터 초기화 실행
+    async function initEditor() {
+        try {
+            const editor = await createEditor('#editor');
+            console.log('HWP Editor initialized successfully:', editor);
+        } catch (err) {
+            console.error('Failed to initialize HWP editor:', err);
+            document.getElementById('editor').innerHTML = '<div style="padding: 20px; color: #ff6b6b; text-align: center;">에디터 로딩 중 오류가 발생했습니다. 패키지 설정을 확인해주세요.</div>';
+        }
+    }
+
+    initEditor();
+
+    window.resetAll = function() {
+        location.reload();
+    }
+</script>
+</body>
+</html>
