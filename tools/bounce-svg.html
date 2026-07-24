@@ -35,7 +35,7 @@
             border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
         }
         .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #F38020; }
 
         .content-left { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
@@ -85,12 +85,16 @@
             border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px; 
         }
 
-        /* Markdown 및 HTML 소스 영역 높이 확장 (min-height, max-height 증가) */
+        /* 💡 높이를 더 늘리고 가로 스크롤 대신 자동 줄바꿈(word-break, white-space) 적용 */
         .code-container { 
             background: #181818; color: #ff9e40; padding: 12px; border-radius: 8px; 
-            font-family: monospace; font-size: 0.8rem; overflow-x: auto; 
-            min-height: 120px; /* 최소 높이 늘림 */
-            max-height: 200px; /* 최대 높이 늘림 */
+            font-family: monospace; font-size: 0.8rem; 
+            min-height: 160px; /* 최소 높이 더 확장 */
+            max-height: 250px; /* 최대 높이 더 확장 */
+            overflow-y: auto;  /* 세로 스크롤만 허용 */
+            overflow-x: hidden; /* 가로 스크롤 제거 */
+            white-space: pre-wrap; /* 긴 텍스트 자동 줄바꿈 */
+            word-break: break-all; /* 단어 중간에도 줄바꿈 허용 */
             border: 1px solid #333; 
         }
 
