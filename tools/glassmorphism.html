@@ -362,8 +362,18 @@
                 gap: 20px;
                 height: auto;
             }
-            .content-mid, .content-down-wrapper {
-                height: 450px;
+            /* ▼ 여기에 있는 .content-mid 높이를 지우고 아래처럼 변경해 보세요 ▼ */
+            .content-mid {
+                height: auto; 
+            }
+            
+            /* CSS Output 에디터가 모바일에서 최소한으로 확보할 높이 설정 (선택사항) */
+            .code-editor-container {
+                min-height: 220px; 
+            }
+        
+            .content-down-wrapper {
+                height: 450px; /* 프리웨는 기존대로 유지 */
             }
         }
     </style>
