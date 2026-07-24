@@ -105,7 +105,6 @@
             min-height: 0;
         }
 
-        /* sliders-wrapper와 code-editor-container의 세로 공간을 2:1 비율로 분할 */
         .sliders-wrapper {
             background: #181818;
             border: 2px solid #ff9e40;
@@ -114,13 +113,14 @@
             flex: 2; /* 에디터보다 2배의 공간 할당 */
             min-height: 0;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* 내부 슬라이더들 간격 균등 배분 */
+            overflow-y: auto; /* 내용이 많을 때만 스크롤 */
         }
 
         .control-group {
-            margin-bottom: 2px;
+            margin-bottom: 6px; /* 슬라이더 간격 조절 */
+        }
+        .control-group:last-child {
+            margin-bottom: 0;
         }
 
         .control-group label {
