@@ -8,8 +8,6 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=25&pause=1000&color=FF9E40&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice.;I+hope+you+enjoy+it+as+much+as+I+do.)](https://git.io/typing-svg)
 
-[![Bounce Text](https://text-bounce-svg.sujinohkor.workers.dev/?text=SUJIN%27s+FUN+SITE&color=00B3FFFF&background=00000000&size=28&bounce=15&width=500&height=120)](https://sujinohkor.pages.dev)
-
 ## Hi there 👋
 Thank you for visiting here. I am _**Sujin Oh,**_ currently employed as a _**civil servant in South Korea.**_
 
