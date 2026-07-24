@@ -65,6 +65,7 @@
             border-radius: 50px;
             font-weight: bold;
             transition: all 0.3s;
+            text-align: center;
         }
 
         .menu-btn:hover {
@@ -201,6 +202,10 @@
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        
+        <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">Open File</button>
+        <input type="file" id="hwp-file-input" accept=".hwp,.hwpx" style="display: none;">
+
         <div>
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
@@ -216,7 +221,7 @@
             <div class="content-mid">
                 <div class="controls">
                     <div class="content-mid-header">
-                        <span>Editor Workspace</span>
+                        <span id="file-name-display">File name will be appeared here</span>
                     </div>
                     <div class="editor-container-wrapper">
                         <div id="editor"></div>
@@ -241,18 +246,45 @@
         if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } 
     });
 
-    // 에디터 초기화 실행
+    let editorInstance = null;
+    const fileInput = document.getElementById('hwp-file-input');
+    const fileNameDisplay = document.getElementById('file-name-display');
+
     async function initEditor() {
         try {
-            const editor = await createEditor('#editor');
-            console.log('HWP Editor initialized successfully:', editor);
+            editorInstance = await createEditor('#editor');
+            console.log('HWP Editor initialized successfully:', editorInstance);
         } catch (err) {
             console.error('Failed to initialize HWP editor:', err);
-            document.getElementById('editor').innerHTML = '<div style="padding: 20px; color: #ff6b6b; text-align: center;">에디터 로딩 중 오류가 발생했습니다. 패키지 설정을 확인해주세요.</div>';
+            document.getElementById('editor').innerHTML = '<div style="padding: 20px; color: #ff6b6b; text-align: center;">Failed to load the editor. Please check package settings.</div>';
         }
     }
 
     initEditor();
+
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file || !editorInstance) return;
+
+        try {
+            const buffer = await file.arrayBuffer();
+            
+            if (typeof editorInstance.loadFile === 'function') {
+                await editorInstance.loadFile(buffer, file.name);
+            } else if (typeof editorInstance.open === 'function') {
+                await editorInstance.open(buffer);
+            } else {
+                console.warn('Supported file load method not found. Please check the editor object.', editorInstance);
+            }
+
+            fileNameDisplay.textContent = file.name;
+        } catch (err) {
+            console.error('Failed to open the file:', err);
+            fileNameDisplay.textContent = 'Failed to open file';
+        } finally {
+            fileInput.value = ''; 
+        }
+    });
 
     window.resetAll = function() {
         location.reload();
