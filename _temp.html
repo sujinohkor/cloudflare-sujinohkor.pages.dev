@@ -54,7 +54,7 @@
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn, .upload-label {
+        .menu-btn, .theme-btn {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -66,15 +66,6 @@
             font-weight: bold;
             transition: all 0.3s;
             text-align: center;
-            display: inline-block;
-        }
-
-        .upload-label {
-            background: #ff9e40;
-            color: #101010;
-        }
-        .upload-label:hover {
-            background: #e08b35;
         }
 
         .menu-btn:hover {
@@ -148,7 +139,6 @@
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
-        body.light-mode .upload-label { background: #F38020; color: #ffffff; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode .editor-container-wrapper { background: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
@@ -213,8 +203,8 @@
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
         
-        <!-- 파일 열기 버튼 추가 -->
-        <label class="upload-label" for="hwp-file-input">📁 파일 열기</label>
+        <!-- 파일 열기 버튼을 다른 메뉴 버튼들과 동일한 스타일로 적용 -->
+        <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">📁 파일 열기</button>
         <input type="file" id="hwp-file-input" accept=".hwp,.hwpx" style="display: none;">
 
         <div>
@@ -232,7 +222,7 @@
             <div class="content-mid">
                 <div class="controls">
                     <div class="content-mid-header">
-                        <span>Editor Workspace</span>
+                        <span id="file-name-display">File name will be appeared here</span>
                     </div>
                     <div class="editor-container-wrapper">
                         <div id="editor"></div>
@@ -259,6 +249,7 @@
 
     let editorInstance = null;
     const fileInput = document.getElementById('hwp-file-input');
+    const fileNameDisplay = document.getElementById('file-name-display');
 
     // 에디터 초기화 실행
     async function initEditor() {
@@ -273,14 +264,14 @@
 
     initEditor();
 
-    // 파일 열기 이벤트 처리
+    // 파일 열기 이벤트 처리 및 파일명 출력
     fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file || !editorInstance) return;
 
         try {
             const buffer = await file.arrayBuffer();
-            // @rhwp/editor 내부 API 규격에 맞춘 파일 로드 메서드 호출
+            
             if (typeof editorInstance.loadFile === 'function') {
                 await editorInstance.loadFile(buffer, file.name);
             } else if (typeof editorInstance.open === 'function') {
@@ -288,10 +279,14 @@
             } else {
                 console.warn('지원되는 파일 로드 메서드를 찾지 못했습니다. 에디터 객체를 확인해주세요.', editorInstance);
             }
+
+            // 파일명이 변경된 영역에 출력되도록 반영
+            fileNameDisplay.textContent = file.name;
         } catch (err) {
             console.error('파일을 열지 못했습니다:', err);
+            fileNameDisplay.textContent = '파일 열기 실패';
         } finally {
-            fileInput.value = ''; // 동일 파일 재선택 가능하도록 초기화
+            fileInput.value = ''; 
         }
     });
 
