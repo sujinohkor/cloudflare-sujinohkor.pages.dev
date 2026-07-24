@@ -30,7 +30,6 @@
             gap: 20px;
             min-height: 0;
             overflow-y: auto;
-            align-items: flex-start;
         }
 
         /* 3. Components */
@@ -42,40 +41,40 @@
         .menu-btn:hover { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 왼쪽: 달력 영역 (계산기 폭을 줄인 만큼 크게 확장) */
+        /* 왼쪽: 달력 영역 */
         .calendar-section {
-            width: 580px;
+            width: 420px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             background: #1c1c1c;
             border: 2px solid #ff9e40;
             border-radius: 16px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            height: fit-content;
         }
 
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .calendar-header h2 {
             color: #ff9e40;
-            font-size: 1.35rem;
+            font-size: 1.15rem;
         }
 
         .nav-btn {
             background: #202020;
             color: #ff9e40;
             border: 1px solid #ff9e40;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1rem;
             transition: 0.3s;
         }
 
@@ -90,15 +89,15 @@
             text-align: center;
             font-weight: bold;
             color: #888;
-            font-size: 0.95rem;
-            margin-bottom: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
         }
 
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: repeat(6, 68px);
-            gap: 8px;
+            grid-template-rows: repeat(6, 42px);
+            gap: 6px;
         }
 
         .day {
@@ -106,8 +105,8 @@
             justify-content: center;
             align-items: center;
             background: #252525;
-            border-radius: 10px;
-            font-size: 1.15rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -128,20 +127,20 @@
             font-weight: bold;
         }
 
-        /* 오른쪽: 계산기 영역 (아래 코드가 가졌던 전체 폭 내부에서 컴팩트하게 축소) */
+        /* 오른쪽: 계산기 영역 */
         .calculator-section {
-            width: 360px;
-            flex-shrink: 0;
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            min-width: 300px;
         }
 
         .calc-card {
             background: #1c1c1c;
             border: 2px solid #ff9e40;
             border-radius: 16px;
-            padding: 16px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -231,13 +230,13 @@
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
 
-        @media (max-width: 980px) {
+        @media (max-width: 850px) {
             .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; overflow: visible; }
             .workspace-container { flex-direction: column; overflow: visible; }
-            .calendar-section, .calculator-section { width: 100%; }
+            .calendar-section { width: 100%; }
         }
     </style>
 </head>
@@ -261,7 +260,7 @@
         </header>
 
         <div class="workspace-container">
-            <!-- 왼쪽: 달력 영역 (폭과 높이를 넓게 확장) -->
+            <!-- 왼쪽: 달력 영역 -->
             <section class="calendar-section">
                 <div class="calendar-header">
                     <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
@@ -274,7 +273,7 @@
                 <div class="days-grid" id="days-grid"></div>
             </section>
 
-            <!-- 오른쪽: 계산기 영역 (폭을 좁혀서 우측 끝 위치 조정) -->
+            <!-- 오른쪽: 계산기 영역 -->
             <section class="calculator-section">
                 <!-- 날짜 간격 계산 -->
                 <div class="calc-card">
