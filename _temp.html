@@ -141,34 +141,37 @@
         uploadEl.textContent = '0.00';
 
         try {
-            // 1. 다운로드 속도 측정
+            // 1. 멀티스레드(병렬 요청) 다운로드 속도 측정
             statusEl.textContent = 'Measuring download speed...';
             
-            // 안정적인 대용량 파일 링크 사용 (약 5MB 크기의 테스트 파일)
-            const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Snake_River_%285mb%29.jpg';
+            const fileUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Snake_River_%285mb%29.jpg';
+            const concurrentRequests = 4; // 동시에 4개 연결
+            
             const startTime = performance.now();
             
-            const response = await fetch(imageUrl + '?cache=' + Math.random());
-            const blob = await response.blob();
-            
+            const promises = Array.from({ length: concurrentRequests }, () => 
+                fetch(fileUrl + '?cache=' + Math.random())
+                    .then(res => res.blob())
+            );
+
+            const blobs = await Promise.all(promises);
             const endTime = performance.now();
+
             const durationInSeconds = (endTime - startTime) / 1000;
-            const fileSizeInBits = blob.size * 8;
+            const totalBytes = blobs.reduce((sum, blob) => sum + blob.size, 0);
+            const totalBits = totalBytes * 8;
             
-            // Mbps 계산
-            const downloadSpeed = ((fileSizeInBits / durationInSeconds) / 1024 / 1024).toFixed(2);
+            const downloadSpeed = ((totalBits / durationInSeconds) / 1024 / 1024).toFixed(2);
             downloadEl.textContent = downloadSpeed;
 
             // 2. 업로드 속도 측정
             statusEl.textContent = 'Measuring upload speed...';
             
-            // 가상의 2MB 데이터 생성 (더미 데이터)
-            const dataSizeInBytes = 2 * 1024 * 1024; 
+            const dataSizeInBytes = 2 * 1024 * 1024; // 2MB 더미 데이터
             const data = new Uint8Array(dataSizeInBytes);
             
             const uploadStartTime = performance.now();
             
-            // fetch POST 요청을 통해 업로드 시뮬레이션 (echo 서비스 또는 공개 테스트용 엔드포인트)
             await fetch('https://httpbin.org/post', {
                 method: 'POST',
                 body: data
