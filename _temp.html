@@ -20,7 +20,7 @@
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow-y: auto; transition: 0.3s;
-            /* 글래스모피즘 효과가 잘 보이도록 배경에 알록달록한 그라데이션 적용 */
+            /* 글래스 효과가 뒤에서 비치도록 배경에 은은한 그라데이션 적용 */
             background: linear-gradient(135deg, #2c1638 0%, #121c29 100%);
         }
 
@@ -33,31 +33,25 @@
         .menu-btn:hover { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* Generator Container Layout (Glass Box 효과 적용) */
+        /* Generator Container Layout (기본 틀) */
         .generator-wrapper {
             display: flex;
             gap: 30px;
             flex: 1;
             align-items: center;
-            padding: 30px;
-            /* Glassmorphism Style */
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 20px;
         }
 
+        /* 각각의 div 박스(컨트롤 패널)에 글래스모피즘 효과 적용 */
         .controls {
             flex: 1;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 158, 64, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
         .control-group {
@@ -78,16 +72,19 @@
             cursor: pointer;
         }
 
+        /* 각각의 div 박스(미리보기 영역)에 글래스모피즘 효과 적용 */
         .preview-area {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 300px;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
         #glass-preview {
@@ -100,6 +97,8 @@
             color: #fff;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             transition: all 0.1s ease;
+            /* 내부에서 실시간으로 변하는 미리보기 박스 자체의 배경 */
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
         }
 
         textarea {
@@ -108,9 +107,9 @@
             margin-top: 15px;
             padding: 10px;
             font-family: monospace;
-            background: rgba(10, 10, 10, 0.8);
+            background: rgba(10, 10, 10, 0.6);
             color: #00ff66;
-            border: 1px solid #444;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 6px;
             resize: none;
             outline: none;
@@ -125,15 +124,14 @@
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode .main-content { background: linear-gradient(135deg, #fff5f0 0%, #f0f4ff 100%); }
-        body.light-mode .generator-wrapper {
+        body.light-mode .controls, body.light-mode .preview-area {
             background: rgba(255, 255, 255, 0.6);
             border-color: rgba(243, 128, 32, 0.3);
             box-shadow: 0 8px 32px 0 rgba(243, 128, 32, 0.15);
         }
-        body.light-mode .controls { background: rgba(255, 255, 255, 0.8); border-color: rgba(243, 128, 32, 0.3); }
         body.light-mode .control-group label { color: #F38020; }
         body.light-mode .control-group input { accent-color: #F38020; }
-        body.light-mode textarea { background: #f9f9f9; color: #333; border-color: #ddd; }
+        body.light-mode textarea { background: rgba(240, 240, 240, 0.8); color: #333; border-color: #ddd; }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
