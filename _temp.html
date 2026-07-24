@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internet Speed Test</title>
+    <title>Date Calculator</title>
     <style>
         * {
             margin: 0;
@@ -23,181 +23,331 @@
 
         .container {
             width: 100%;
-            max-width: 450px;
+            max-width: 900px;
             background: #101010;
             border: 2px solid #ff9e40;
             border-radius: 20px;
             padding: 40px;
-            text-align: center;
+            display: flex;
+            gap: 40px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
-        h1 {
-            color: #ff9e40;
-            margin-bottom: 10px;
-            font-size: 1.8rem;
-        }
-
-        p.desc {
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-
-        .speed-display {
+        /* 왼쪽: 달력 영역 */
+        .calendar-section {
+            flex: 1;
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
+            flex-direction: column;
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 20px;
         }
 
-        .speed-box {
-            background: #202020;
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 15px;
-            width: 45%;
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .speed-box h3 {
-            font-size: 0.85rem;
+        .calendar-header h2 {
             color: #ff9e40;
-            margin-bottom: 8px;
+            font-size: 1.2rem;
         }
 
-        .speed-value {
-            font-size: 1.4rem;
+        .nav-btn {
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: bold;
-            color: #fff;
+            transition: 0.3s;
         }
 
-        .unit {
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .start-btn {
-            width: 100%;
-            padding: 12px;
+        .nav-btn:hover {
             background: #ff9e40;
             color: #101010;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .start-btn:hover {
-            background: #e08b35;
-        }
-
-        .start-btn:disabled {
-            background: #555;
             color: #888;
-            cursor: not-allowed;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
         }
 
-        .status {
-            margin-top: 20px;
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            flex: 1;
+        }
+
+        .day {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            aspect-ratio: 1;
+            background: #252525;
+            border-radius: 8px;
             font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .day:hover {
+            background: #333;
             color: #ff9e40;
-            min-height: 20px;
+        }
+
+        .day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .day.today {
+            border: 2px solid #ff9e40;
+            color: #ff9e40;
+            font-weight: bold;
+        }
+
+        /* 오른쪽: 계산기 영역 */
+        .calculator-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .calculator-section h1 {
+            color: #ff9e40;
+            font-size: 1.6rem;
+            margin-bottom: -10px;
+        }
+
+        .calc-card {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .calc-card h3 {
+            font-size: 0.95rem;
+            color: #ff9e40;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .input-group input {
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ff9e40;
+        }
+
+        .result-box {
+            background: #252525;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.95rem;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            border: 1px dashed #444;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 450px;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Speed Test</h1>
-    <p class="desc">Check your download and upload speeds.</p>
-
-    <div class="speed-display">
-        <div class="speed-box">
-            <h3>DOWNLOAD</h3>
-            <div class="speed-value" id="download-speed">0.00</div>
-            <div class="unit">Mbps</div>
+    <!-- 왼쪽: 달력 (월요일 시작) -->
+    <div class="calendar-section">
+        <div class="calendar-header">
+            <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
+            <h2 id="calendar-title">2026년 6월</h2>
+            <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
         </div>
-        <div class="speed-box">
-            <h3>UPLOAD</h3>
-            <div class="speed-value" id="upload-speed">0.00</div>
-            <div class="unit">Mbps</div>
+        <div class="weekdays">
+            <div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div>
         </div>
+        <div class="days-grid" id="days-grid"></div>
     </div>
 
-    <button class="start-btn" id="start-btn" onclick="startTest()">Start Test</button>
-    <div class="status" id="status">Ready to test</div>
+    <!-- 오른쪽: 날짜 계산기 -->
+    <div class="calculator-section">
+        <h1>Date Calculator</h1>
+        
+        <!-- 날짜 간격 계산 -->
+        <div class="calc-card">
+            <h3>Date Interval</h3>
+            <div class="input-group">
+                <label>Start Date</label>
+                <input type="date" id="date1" onchange="calculateInterval()">
+            </div>
+            <div class="input-group">
+                <label>End Date</label>
+                <input type="date" id="date2" onchange="calculateInterval()">
+            </div>
+            <div class="result-box" id="interval-result">Select two dates</div>
+        </div>
+
+        <!-- 날짜 더하기/빼기 계산 -->
+        <div class="calc-card">
+            <h3>Add / Subtract Days</h3>
+            <div class="input-group">
+                <label>Base Date</label>
+                <input type="date" id="base-date" onchange="calculateAddDays()">
+            </div>
+            <div class="input-group">
+                <label>Days to Add (+ or -)</label>
+                <input type="number" id="days-input" value="30" oninput="calculateAddDays()">
+            </div>
+            <div class="result-box" id="add-result">Result date</div>
+        </div>
+    </div>
 </div>
 
 <script>
-    async function startTest() {
-        const startBtn = document.getElementById('start-btn');
-        const statusEl = document.getElementById('status');
-        const downloadEl = document.getElementById('download-speed');
-        const uploadEl = document.getElementById('upload-speed');
+    let currentDate = new Date();
 
-        startBtn.disabled = true;
-        downloadEl.textContent = '0.00';
-        uploadEl.textContent = '0.00';
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
 
-        try {
-            // 1. 다운로드 속도 측정 (CORS가 허용된 안정적인 대용량 파일 사용)
-            statusEl.textContent = 'Measuring download speed...';
-            
-            // Cloudflare CDN을 통해 제공되며 CORS가 자유로운 대용량 샘플 파일 (약 25MB)
-            const fileUrl = 'https://cloudflare-ipfs.com/ipfs/bafybeicg64kvyfvf77d3byx3w5x2g3b5336f332l5332f332l5332f332/large-file.bin'; 
-            
-            // 만약 위 주소가 응답이 느릴 경우를 대비한 안정적인 대체용 위키미디어 고화질 이미지 다중 요청
-            const fallbackUrl = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/LARGE_Detailed_World_Map_with_Antarctica.jpg';
-            
-            const targetUrl = fileUrl;
-            const concurrentRequests = 6; // 멀티스레드 병렬 요청
-            
-            const startTime = performance.now();
-            
-            const promises = Array.from({ length: concurrentRequests }, () => 
-                fetch(targetUrl + '?cache=' + Math.random(), { mode: 'cors', cache: 'no-store' })
-                    .then(res => res.blob())
-            );
+        // 타이틀 설정
+        document.getElementById('calendar-title').textContent = `${year}년 ${month + 1}월`;
 
-            const blobs = await Promise.all(promises);
-            const endTime = performance.now();
+        const grid = document.getElementById('days-grid');
+        grid.innerHTML = '';
 
-            const durationInSeconds = (endTime - startTime) / 1000;
-            const totalBytes = blobs.reduce((sum, blob) => sum + blob.size, 0);
-            const totalBits = totalBytes * 8;
-            
-            const downloadSpeed = ((totalBits / durationInSeconds) / 1024 / 1024).toFixed(2);
-            downloadEl.textContent = downloadSpeed;
+        // 해당 월의 1일 요일 (일:0, 월:1 ... 토:6) -> 월요일 시작(월:0 ~ 일:6)으로 변환
+        let firstDayIndex = new Date(year, month, 1).getDay();
+        firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
 
-            // 2. 업로드 속도 측정
-            statusEl.textContent = 'Measuring upload speed...';
-            
-            const dataSizeInBytes = 3 * 1024 * 1024; // 3MB 데이터
-            const data = new Uint8Array(dataSizeInBytes);
-            
-            const uploadStartTime = performance.now();
-            
-            await fetch('https://httpbin.org/post', {
-                method: 'POST',
-                body: data
-            });
+        // 해당 월의 마지막 날짜
+        const lastDay = new Date(year, month + 1, 0).getDate();
 
-            const uploadEndTime = performance.now();
-            const uploadDuration = (uploadEndTime - uploadStartTime) / 1000;
-            const uploadSizeInBits = dataSizeInBytes * 8;
+        // 오늘 날짜 확인용
+        const today = new Date();
 
-            const uploadSpeed = ((uploadSizeInBits / uploadDuration) / 1024 / 1024).toFixed(2);
-            uploadEl.textContent = uploadSpeed;
+        // 공백 칸 채우기
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'day empty';
+            grid.appendChild(emptyDiv);
+        }
 
-            statusEl.textContent = 'Test completed successfully!';
-        } catch (err) {
-            console.error(err);
-            statusEl.textContent = 'Error occurred during the test (CORS or Network issue).';
-        } finally {
-            startBtn.disabled = false;
+        // 날짜 칸 채우기
+        for (let day = 1; day <= lastDay; day++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'day';
+            dayDiv.textContent = day;
+
+            // 오늘 표시
+            if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                dayDiv.classList.add('today');
+            }
+
+            grid.appendChild(dayDiv);
         }
     }
+
+    function changeMonth(direction) {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        renderCalendar();
+    }
+
+    // 날짜 간격 계산기 로직
+    function calculateInterval() {
+        const d1 = document.getElementById('date1').value;
+        const d2 = document.getElementById('date2').value;
+        const resultBox = document.getElementById('interval-result');
+
+        if (!d1 || !d2) {
+            resultBox.textContent = 'Select two dates';
+            return;
+        }
+
+        const date1 = new Date(d1);
+        const date2 = new Date(d2);
+        const diffTime = date2 - date1;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            resultBox.textContent = 'Same day (0 days)';
+        } else if (diffDays > 0) {
+            resultBox.textContent = `Difference: ${diffDays} days`;
+        } else {
+            resultBox.textContent = `Difference: ${Math.abs(diffDays)} days (Inverted)`;
+        }
+    }
+
+    // 날짜 더하기/빼기 계산기 로직
+    function calculateAddDays() {
+        const bDate = document.getElementById('base-date').value;
+        const daysVal = parseInt(document.getElementById('days-input').value);
+        const resultBox = document.getElementById('add-result');
+
+        if (!bDate || isNaN(daysVal)) {
+            resultBox.textContent = 'Result date';
+            return;
+        }
+
+        const date = new Date(bDate);
+        date.setDate(date.getDate() + daysVal);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        resultBox.textContent = `Result: ${year}-${month}-${day}`;
+    }
+
+    // 초기 실행 시 오늘 날짜로 input 기본값 설정 및 달력 렌더링
+    window.onload = function() {
+        renderCalendar();
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('date1').value = todayStr;
+        document.getElementById('date2').value = todayStr;
+        document.getElementById('base-date').value = todayStr;
+        calculateInterval();
+        calculateAddDays();
+    };
 </script>
 
 </body>
