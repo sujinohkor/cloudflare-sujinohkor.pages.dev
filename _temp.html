@@ -2,426 +2,104 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
-    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    
+    <title>Mini Dino Game</title>
     <style>
-        /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
-        .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
-            gap: 15px;
-        }
-        
-        .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s;
-        }
-
-        .workspace-container {
-            display: flex;
-            flex-direction: row;
-            flex: 1;
-            gap: 20px;
-            min-height: 0;
-        }
-
-        /* 3. Components (Sidebar Controls) */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
-        }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-
-        .search-box { display: flex; gap: 6px; }
-        .search-input {
-            flex: 1; padding: 8px 12px; background: #202020; border: 2px solid #ff9e40;
-            border-radius: 16px; color: #fff; font-size: 0.85rem; outline: none; width: 100%;
-        }
-        .search-btn {
-            padding: 8px 12px; background: #ff9e40; color: #101010; border: none;
-            border-radius: 16px; cursor: pointer; font-weight: bold; font-size: 0.85rem;
-        }
-
-        .api-switcher { display: flex; gap: 6px; }
-        .api-btn {
-            flex: 1; padding: 8px 0; background: #202020; color: #888;
-            border: 1px solid #444; border-radius: 16px; cursor: pointer; font-size: 0.8rem; font-weight: bold;
-            transition: all 0.2s;
-        }
-        .api-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; }
-
-        /* 4. Weather Display Components */
-        .card { 
-            background: #101010; padding: 30px; border-radius: 16px; border: 2px solid #ff9e40; 
-            width: 300px; flex-shrink: 0; text-align: center; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-
-        .forecast-panel {
-            background: #101010; padding: 25px; border-radius: 16px; border: 2px solid #ff9e40; 
-            flex-grow: 1; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            min-height: 0;
-        }
-
-        .forecast-title {
-            font-size: 1.1rem; color: #ff9e40; font-weight: bold; margin-bottom: 15px;
-            padding-bottom: 8px; border-bottom: 1px solid #333;
-        }
-
-        .forecast-list {
-            overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; flex: 1;
-        }
-        .forecast-list::-webkit-scrollbar { width: 6px; }
-        .forecast-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
-
-        /* Forecast Item Grid Layout */
-        .forecast-item {
-            display: grid;
-            grid-template-columns: 100px 1fr 90px 90px 80px 60px;
-            align-items: center;
-            padding: 12px 16px;
-            background: #202020;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            gap: 10px;
-        }
-        .forecast-time { color: #888; font-weight: bold; }
-        .forecast-desc { color: #ccc; text-align: left; }
-        .forecast-rain { color: #64b5f6; text-align: center; }
-        .forecast-wind { color: #aaa; text-align: center; }
-        .forecast-humidity { color: #81c784; text-align: center; }
-        .forecast-temp { color: #ff9e40; font-weight: bold; text-align: right; }
-
-        .city { font-size: 1.8rem; color: #ff9e40; font-weight: bold; margin-bottom: 10px; text-transform: capitalize; }
-        .temp { font-size: 3.5rem; font-weight: bold; margin: 15px 0; }
-        .desc { font-size: 1.1rem; color: #ccc; }
-        .details { margin-top: 20px; font-size: 0.9rem; color: #888; display: flex; justify-content: space-around; width: 100%; }
-
-        /* 5. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; color: #000; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: none; }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1 { color: #000; }
-        body.light-mode .top-section p { color: #202020; }
-        body.light-mode .card, body.light-mode .forecast-panel { background-color: #FDF5E6; border-color: #F38020; box-shadow: none; }
-        body.light-mode .forecast-panel { border-bottom-color: #F38020; }
-        body.light-mode .forecast-title { color: #F38020; border-bottom-color: #fbd3b1; }
-        body.light-mode .forecast-item { background: #fff; color: #000; box-shadow: none; border: 1px solid #fce3ce; }
-        body.light-mode .forecast-time { color: #202020; }
-        body.light-mode .forecast-desc { color: #000; }
-        body.light-mode .forecast-rain { color: #1976d2; }
-        body.light-mode .forecast-wind { color: #424242; }
-        body.light-mode .forecast-humidity { color: #2e7d32; }
-        body.light-mode .forecast-temp { color: #F38020; }
-        body.light-mode .city { color: #F38020; }
-        body.light-mode .temp { color: #000; }
-        body.light-mode .desc { color: #000; }
-        body.light-mode .details { color: #202020; }
-        body.light-mode .search-input { background: #fff; color: #000; border-color: #F38020; }
-        body.light-mode .search-input::placeholder { color: #666; }
-        body.light-mode .search-btn { background: #F38020; color: #fff; }
-        body.light-mode .api-btn { background: #fff; border-color: #ccc; color: #202020; }
-        body.light-mode .api-btn.active { background: #F38020; color: #fff; border-color: #F38020; }
-        body.light-mode .menu-toggle-btn { color: #ffffff; box-shadow: none; }
-
-        /* 6. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        
-        @media (max-width: 900px) {
-            .forecast-item {
-                grid-template-columns: 80px 1fr 60px;
-            }
-            .forecast-rain, .forecast-wind, .forecast-humidity { display: none; }
-        }
-
-        @media (max-width: 680px) {
-            .menu-toggle-btn { display: block; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; overflow: visible; }
-            .workspace-container { flex-direction: column; }
-            .card { width: 100%; }
-            .forecast-panel { width: 100%; min-height: 400px; }
-        }
+        body { text-align: center; background: #f7f7f7; padding-top: 50px; }
+        canvas { background: #fff; border-bottom: 2px solid #535353; }
     </style>
 </head>
 <body>
+    <h2>Space 바를 눌러 점프하세요!</h2>
+    <canvas id="game" width="600" height="200"></canvas>
 
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
 
-<div class="app-container">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        // 공룡 객체
+        const dino = {
+            x: 50, y: 150, width: 20, height: 20,
+            dy: 0, gravity: 0.6, jumpPower: -10, isGrounded: true
+        };
 
-        <div class="search-box" style="margin-top: 15px;">
-            <input type="text" id="city-input" list="city-list" class="search-input" placeholder="Select/type city" onchange="searchCity()" onkeydown="if(event.key==='Enter') searchCity()">
-            <datalist id="city-list">
-                <option value="Seoul"></option>
-                <option value="Tokyo"></option>
-                <option value="New York"></option>
-                <option value="London"></option>
-                <option value="Paris"></option>
-                <option value="Sydney"></option>
-                <option value="Berlin"></option>
-                <option value="Toronto"></option>
-                <option value="Singapore"></option>
-                <option value="Dubai"></option>
-            </datalist>
-            <button class="search-btn" onclick="searchCity()">Search</button>
-        </div>
+        // 장애물(선인장) 배열
+        let cactusArray = [];
+        let score = 0;
+        let isGameOver = false;
 
-        <div class="api-switcher">
-            <button class="api-btn active" id="btn-wttr" onclick="switchApi('wttr')">wttr.in</button>
-            <button class="api-btn" id="btn-meteo" onclick="switchApi('meteo')">Open-Meteo</button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <header class="top-section">
-            <h1>Weather</h1>
-            <p>Check the weather now.</p>
-        </header>
-        
-        <div class="workspace-container">
-            <!-- Current Weather Card -->
-            <section class="card">
-                <div class="city" id="city-name">Detecting...</div>
-                <div class="desc" id="weather-desc">Loading...</div>
-                <div class="temp" id="temp">--°C</div>
-                <div class="details">
-                    <span id="detail-1">Feels Like --°C</span>
-                    <span id="detail-2">Humidity --%</span>
-                </div>
-            </section>
-
-            <!-- 3-Day Forecast Panel -->
-            <section class="forecast-panel">
-                <div class="forecast-title">3-Day Forecast (Every 3 Hours)</div>
-                <div class="forecast-list" id="forecast-list">
-                    <div style="color: #888; text-align: center; margin-top: 20px;">Loading forecast...</div>
-                </div>
-            </section>
-        </div>
-    </main>
-</div>
-
-<script>
-    const sidebar = document.getElementById('sidebar');
-    let currentProvider = 'wttr';
-    let currentCity = 'Seoul';
-    let currentCoords = null;
-
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
-
-    // Weather Logic
-    function getWeatherDescription(code) {
-        if (code === 0) return '☀️ Clear sky';
-        if (code >= 1 && code <= 3) return '⛅ Partly cloudy';
-        if (code >= 45 && code <= 48) return '🌫️ Fog';
-        if (code >= 51 && code <= 67) return '🌧️ Drizzle / Rain';
-        if (code >= 71 && code <= 77) return '❄️ Snow fall';
-        if (code >= 80 && code <= 82) return '🌦️ Rain showers';
-        if (code >= 95) return '🌩️ Thunderstorm';
-        return '☁️ Overcast';
-    }
-
-    function formatWttrDescription(desc) {
-        const lower = desc.toLowerCase();
-        if (lower.includes('sun') || lower.includes('clear')) return `☀️ ${desc}`;
-        if (lower.includes('partly')) return `⛅ ${desc}`;
-        if (lower.includes('cloud') || lower.includes('overcast')) return `☁️ ${desc}`;
-        if (lower.includes('rain') || lower.includes('drizzle')) return `🌧️ ${desc}`;
-        if (lower.includes('snow') || lower.includes('ice')) return `❄️ ${desc}`;
-        if (lower.includes('thunder')) return `🌩️ ${desc}`;
-        if (lower.includes('fog') || lower.includes('mist')) return `🌫️ ${desc}`;
-        return `🌡️ ${desc}`;
-    }
-
-    async function getCoordinates(city) {
-        if (currentCoords) return currentCoords;
-        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (!data.results || data.results.length === 0) throw new Error('City not found');
-        return { latitude: data.results[0].latitude, longitude: data.results[0].longitude };
-    }
-
-    async function fetchWttr() {
-        const query = currentCoords ? `${currentCoords.latitude},${currentCoords.longitude}` : encodeURIComponent(currentCity);
-        const response = await fetch(`https://wttr.in/${query}?format=j1`);
-        if (!response.ok) throw new Error('wttr.in request failed');
-        const data = await response.json();
-
-        const current = data.current_condition[0];
-        if (currentCoords && data.nearest_area?.[0]?.areaName?.[0]?.value) {
-            currentCity = data.nearest_area[0].areaName[0].value;
-            document.getElementById('city-input').value = currentCity;
-        }
-
-        const forecastList = [];
-        data.weather.slice(0, 3).forEach(day => {
-            const dateStr = day.date.slice(5);
-            day.hourly.forEach(hour => {
-                const timeNum = parseInt(hour.time, 10) / 100;
-                const timeFormatted = `${dateStr} ${String(timeNum).padStart(2, '0')}:00`;
-                const windMs = (parseInt(hour.windspeedKmph, 10) / 3.6).toFixed(1);
-
-                forecastList.push({
-                    time: timeFormatted,
-                    desc: formatWttrDescription(hour.weatherDesc[0].value),
-                    rainChance: `☔ ${hour.chanceofrain}%`,
-                    wind: `💨 ${windMs}m/s`,
-                    humidity: `💧 ${hour.humidity}%`,
-                    temp: `${hour.tempC}°C`
-                });
-            });
+        // 점프 입력 처리
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && dino.isGrounded && !isGameOver) {
+                dino.dy = dino.jumpPower;
+                dino.isGrounded = false;
+            }
         });
 
-        return {
-            current: {
-                temp: current.temp_C,
-                desc: formatWttrDescription(current.weatherDesc[0].value),
-                detail1: `Feels Like ${current.FeelsLikeC}°C`,
-                detail2: `Humidity ${current.humidity}%`
-            },
-            forecast: forecastList
-        };
-    }
-
-    async function fetchOpenMeteo() {
-        const coords = await getCoordinates(currentCity);
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode&forecast_days=3`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Open-Meteo request failed');
-        const data = await response.json();
-
-        const currentWeather = data.current_weather;
-        const hourly = data.hourly;
-        const currentHumidity = hourly.relativehumidity_2m[0];
-
-        const forecastList = [];
-        for (let i = 0; i < hourly.time.length; i += 3) {
-            const timeStr = hourly.time[i].replace('T', ' ').slice(5);
-            const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
-
-            forecastList.push({
-                time: timeStr,
-                desc: getWeatherDescription(hourly.weathercode[i]),
-                rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
-                wind: `💨 ${windMs}m/s`,
-                humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
-                temp: `${Math.round(hourly.temperature_2m[i])}°C`
-            });
+        function spawnCactus() {
+            if (Math.random() < 0.015) { // 장애물 생성 확률
+                cactusArray.push({ x: 600, y: 150, width: 15, height: 20 });
+            }
         }
 
-        return {
-            current: {
-                temp: Math.round(currentWeather.temperature),
-                desc: getWeatherDescription(currentWeather.weathercode),
-                detail1: `Wind ${currentWeather.windspeed}m/s`,
-                detail2: `Humidity ${currentHumidity}%`
-            },
-            forecast: forecastList
-        };
-    }
+        function update() {
+            if (isGameOver) return;
 
-    async function updateWeather() {
-        document.getElementById('weather-desc').innerText = 'Loading...';
-        document.getElementById('forecast-list').innerHTML = `<div style="color: #888; text-align: center; margin-top: 20px;">Loading forecast...</div>`;
+            // 1. 공룡 물리 계산
+            dino.dy += dino.gravity;
+            dino.y += dino.dy;
 
-        try {
-            const data = currentProvider === 'wttr' ? await fetchWttr() : await fetchOpenMeteo();
+            if (dino.y >= 150) { // 바닥 착지
+                dino.y = 150;
+                dino.dy = 0;
+                dino.isGrounded = true;
+            }
 
-            document.getElementById('city-name').innerText = currentCity;
-            document.getElementById('temp').innerText = `${data.current.temp}°C`;
-            document.getElementById('weather-desc').innerText = data.current.desc;
-            document.getElementById('detail-1').innerText = data.current.detail1;
-            document.getElementById('detail-2').innerText = data.current.detail2;
+            // 2. 장애물 이동 및 충돌 검사
+            spawnCactus();
+            for (let i = cactusArray.length - 1; i >= 0; i--) {
+                let c = cactusArray[i];
+                c.x -= 5; // 장애물 이동 속도
 
-            const forecastContainer = document.getElementById('forecast-list');
-            forecastContainer.innerHTML = '';
-
-            data.forecast.forEach(item => {
-                const el = document.createElement('div');
-                el.className = 'forecast-item';
-                el.innerHTML = `
-                    <span class="forecast-time">${item.time}</span>
-                    <span class="forecast-desc">${item.desc}</span>
-                    <span class="forecast-rain">${item.rainChance}</span>
-                    <span class="forecast-wind">${item.wind}</span>
-                    <span class="forecast-humidity">${item.humidity}</span>
-                    <span class="forecast-temp">${item.temp}</span>
-                `;
-                forecastContainer.appendChild(el);
-            });
-
-        } catch (error) {
-            console.error('Failed to fetch weather data:', error);
-            document.getElementById('weather-desc').innerText = 'Data Load Failed';
-            document.getElementById('forecast-list').innerHTML = `<div style="color: #ff4d4d; text-align: center; margin-top: 20px;">Failed to load forecast</div>`;
-        }
-    }
-
-    function searchCity() {
-        const input = document.getElementById('city-input').value.trim();
-        if (!input) return;
-
-        currentCoords = null;
-        currentCity = input;
-        updateWeather();
-    }
-
-    function switchApi(provider) {
-        if (currentProvider === provider) return;
-        currentProvider = provider;
-
-        document.getElementById('btn-wttr').classList.toggle('active', provider === 'wttr');
-        document.getElementById('btn-meteo').classList.toggle('active', provider === 'meteo');
-
-        updateWeather();
-    }
-
-    function initLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    currentCoords = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    };
-                    updateWeather();
-                },
-                () => {
-                    document.getElementById('city-input').value = currentCity;
-                    updateWeather();
+                // 간단한 사각형 충돌 판정 (AABB)
+                if (dino.x < c.x + c.width &&
+                    dino.x + dino.width > c.x &&
+                    dino.y < c.y + c.height &&
+                    dino.y + dino.height > c.y) {
+                    isGameOver = true;
+                    alert(`Game Over! Score: ${Math.floor(score)}`);
+                    location.reload();
                 }
-            );
-        } else {
-            document.getElementById('city-input').value = currentCity;
-            updateWeather();
-        }
-    }
 
-    initLocation();
-</script>
+                if (c.x < -20) cactusArray.splice(i, 1);
+            }
+
+            score += 0.1;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 공룡 그리기
+            ctx.fillStyle = '#535353';
+            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+
+            // 장애물 그리기
+            ctx.fillStyle = '#ff4d4d';
+            cactusArray.forEach(c => ctx.fillRect(c.x, c.y, c.width, c.height));
+
+            // 점수 표시
+            ctx.fillStyle = '#000';
+            ctx.font = '16px monospace';
+            ctx.fillText(`Score: ${Math.floor(score)}`, 500, 30);
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (!isGameOver) requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
 </body>
 </html>
