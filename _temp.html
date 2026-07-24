@@ -11,7 +11,7 @@
         gtag('js', new Date());
         gtag('config', 'G-48CYVH0XEF');
     </script>
-    <title>Text SVG Animation Generator</title>
+    <title>Text Bounce SVG Generator</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap">
@@ -21,12 +21,13 @@
         body[data-theme="light"] { background-color: #ffffff; color: #333; }
         body { font-family: 'Open Sans', 'Segoe UI', sans-serif; padding: 30px 20px; transition: background 0.3s, color 0.3s; min-height: 100vh; }
         
-        /* 바운싱 타이틀 스타일 */
+        /* 상단 타이틀 바운싱 스타일 */
         .highlight-text { color: #ff9e40; margin: 10px 0 25px 0; }
         body[data-theme="light"] .highlight-text { color: #F38020; }
         
         .bounce-text { font-size: 2.2rem; font-weight: bold; display: inline-block; text-align: center; width: 100%; }
         .bounce-text span { display: inline-block; animation: bounce 1.2s infinite ease-in-out; animation-delay: calc(0.08s * var(--i)); }
+        
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             30% { transform: translateY(-15px); }
@@ -44,9 +45,9 @@
         .parameters { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .field-group { display: flex; flex-direction: column; gap: 5px; }
         label { font-size: 0.9rem; font-weight: 600; }
-        input, select, textarea { background: #202020; color: #fff; border: 1px solid #444; border-radius: 6px; padding: 8px 12px; font-size: 0.9rem; width: 100%; font-family: inherit; }
-        body[data-theme="light"] input, body[data-theme="light"] select, body[data-theme="light"] textarea { background: #fff; color: #333; border-color: #ccc; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #ff9e40; }
+        input, select { background: #202020; color: #fff; border: 1px solid #444; border-radius: 6px; padding: 8px 12px; font-size: 0.9rem; width: 100%; font-family: inherit; }
+        body[data-theme="light"] input, body[data-theme="light"] select { background: #fff; color: #333; border-color: #ccc; }
+        input:focus, select:focus { outline: none; border-color: #ff9e40; }
 
         .btn { background: #ff9e40; color: #101010; border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 5px; }
         .btn:hover { background: #e08b35; }
@@ -61,23 +62,22 @@
 
         .darkmode { position: fixed; bottom: 20px; right: 20px; background: #202020; border: 2px solid #ff9e40; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ff9e40; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1000; }
         body[data-theme="light"] .darkmode { background: #FDF5E6; border-color: #F38020; color: #F38020; }
-        body[data-theme="dark"] .icon-sun { display: none; }
         body[data-theme="light"] .icon-moon { display: none; }
+        body[data-theme="dark"] .icon-sun { display: none; }
     </style>
 </head>
 <body data-theme="dark">
 
-    <h1 id="site-title" class="highlight-text bounce-text">Text SVG Generator</h1>
+    <h1 id="site-title" class="highlight-text bounce-text">Text Bounce SVG</h1>
 
     <div class="container">
-        <!-- 좌측: 텍스트 및 애니메이션 옵션 설정 -->
+        <!-- 좌측: 텍스트 입력 (Textbox) 및 옵션 -->
         <div class="properties">
-            <h2>Text & Animation Options</h2>
+            <h2>Bounce Options</h2>
             <div class="parameters">
                 <div class="field-group">
-                    <label for="input-text">Enter Text (줄바꿈으로 여러 줄 입력 가능)</label>
-                    <textarea id="input-text" rows="3" oninput="generator.update()">Hello, World!
-Welcome to my site.</textarea>
+                    <label for="input-text">Enter Text (Textbox)</label>
+                    <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
                 </div>
 
                 <div class="field-group">
@@ -87,22 +87,17 @@ Welcome to my site.</textarea>
 
                 <div class="field-group">
                     <label for="font-size">Font Size</label>
-                    <input type="number" id="font-size" value="24" min="12" max="60" oninput="generator.update()">
-                </div>
-
-                <div class="field-group">
-                    <label for="anim-speed">Typing/Fade Speed (s)</label>
-                    <input type="number" id="anim-speed" value="3" min="1" max="10" step="0.5" oninput="generator.update()">
+                    <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
                 </div>
             </div>
             <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
         </div>
 
-        <!-- 우측: 미리보기 및 소스 코드 복사 -->
+        <!-- 우측: 미리보기 및 소스 복사 -->
         <div class="output">
             <h2>Preview</h2>
             <div class="preview-box" id="preview">
-                <!-- 실시간 SVG 렌더링 -->
+                <!-- 실시간 SVG 바운싱 렌더링 -->
             </div>
 
             <h2>Markdown Source</h2>
@@ -142,38 +137,40 @@ Welcome to my site.</textarea>
             body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
         }
 
-        // 텍스트 SVG 생성기 객체
+        // 바운싱 텍스트 SVG 생성기 객체
         const generator = {
             getSVGString() {
-                const rawText = document.getElementById('input-text').value;
-                const lines = rawText.split('\n');
+                const text = document.getElementById('input-text').value;
                 const color = document.getElementById('text-color').value;
                 const fontSize = document.getElementById('font-size').value;
-                const speed = document.getElementById('anim-speed').value;
 
+                // 글자별로 각각 개별 <tspan>과 바운싱 애니메이션 딜레이(--i) 부여
                 let tspanElements = '';
-                lines.forEach((line, index) => {
-                    const yOffset = 40 + (index * (parseInt(fontSize) + 10));
-                    tspanElements += `<tspan x="20" y="${yOffset}">${escapeHtml(line)}</tspan>`;
+                [...text].forEach((char, index) => {
+                    const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
+                    const delay = (0.08 * (index + 1)).toFixed(2);
+                    tspanElements += `<tspan class="bounce-char" style="animation-delay: ${delay}s;">${escapedChar}</tspan>`;
                 });
 
-                const totalHeight = Math.max(80, 30 + (lines.length * (parseInt(fontSize) + 10)));
-
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 ${totalHeight}" width="100%">
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%">
     <style>
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; transform: translateY(5px); }
-            50% { opacity: 1; transform: translateY(0); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-15px); }
+            50% { transform: translateY(0); }
         }
-        .animated-text {
+        .bounce-text-svg {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: ${fontSize}px;
             font-weight: bold;
             fill: ${color};
-            animation: fadeInOut ${speed}s infinite ease-in-out;
+        }
+        .bounce-char {
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
         }
     </style>
-    <text class="animated-text">
+    <text x="25" y="75" class="bounce-text-svg">
         ${tspanElements}
     </text>
 </svg>`;
@@ -190,7 +187,7 @@ Welcome to my site.</textarea>
 
                 // Markdown 소스 표시
                 const encoded = encodeURIComponent(svgStr);
-                const mdStr = `![Animated Text SVG](data:image/svg+xml;utf8,${encoded})`;
+                const mdStr = `![Bounce Text SVG](data:image/svg+xml;utf8,${encoded})`;
                 document.getElementById('md-code').querySelector('code').textContent = mdStr;
             },
 
@@ -200,7 +197,7 @@ Welcome to my site.</textarea>
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'animated-text.svg';
+                a.download = 'bounce-text.svg';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
