@@ -127,11 +127,19 @@
             font-weight: bold;
         }
 
-        /* 오른쪽 박스: 날짜 계산기 꽉 차게 배치 */
+        /* 오른쪽 박스: 날짜 계산기 꽉 차게 배치 (스크롤바 다듬기) */
         .content-down { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
             overflow-y: auto; padding: 20px; background: transparent; gap: 15px;
-        }                
+        }
+
+        .content-down::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-down::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
 
         .calc-card {
             background: #1c1c1c;
@@ -141,6 +149,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .calc-card h3 {
@@ -344,7 +353,7 @@
                 <div class="days-grid" id="days-grid"></div>
             </section>
 
-            <!-- 오른쪽 박스: 날짜 계산기 (커스텀 둥근 팝업 달력 적용) -->
+            <!-- 오른쪽 박스: 날짜 계산기 및 요일 계산기 -->
             <section class="content-down">
                 <!-- 날짜 간격 계산 -->
                 <div class="calc-card">
@@ -382,6 +391,17 @@
                     </label>
                     <div class="result-box" id="add-result">Result date</div>
                 </div>
+
+                <!-- 요일 계산기 (추가된 기능) -->
+                <div class="calc-card">
+                    <h3>Day of the Week</h3>
+                    <div class="input-group">
+                        <label>Target Date</label>
+                        <input type="text" id="weekday-date" readonly onclick="openPopup('weekday-date', event)">
+                        <div class="popup-calendar" id="popup-weekday-date"></div>
+                    </div>
+                    <div class="result-box" id="weekday-result">Select a date</div>
+                </div>
             </section>
         </div>
     </main>
@@ -397,18 +417,17 @@
     
     document.querySelector('.main-content').addEventListener('click', (e) => { 
         if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
-        // 바깥 클릭 시 팝업 닫기
         if (!e.target.closest('.input-group')) {
             document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
         }
     });
 
     let currentDate = new Date();
-    // 팝업별 현재 보고 있는 월 데이터 관리
     const popupDates = {
         'date1': new Date(),
         'date2': new Date(),
-        'base-date': new Date()
+        'base-date': new Date(),
+        'weekday-date': new Date()
     };
     let activeInputId = null;
 
@@ -451,7 +470,6 @@
         renderCalendar();
     }
 
-    // 팝업 달력 열기 및 렌더링
     function openPopup(inputId, event) {
         event.stopPropagation();
         document.querySelectorAll('.popup-calendar').forEach(p => {
@@ -527,6 +545,7 @@
         
         if (inputId === 'date1' || inputId === 'date2') calculateInterval();
         if (inputId === 'base-date') calculateAddDays();
+        if (inputId === 'weekday-date') calculateWeekday();
     }
 
     function calculateInterval() {
@@ -584,6 +603,22 @@
         resultBox.textContent = `Result: ${year}-${month}-${day}`;
     }
 
+    function calculateWeekday() {
+        const wDate = document.getElementById('weekday-date').value;
+        const resultBox = document.getElementById('weekday-result');
+
+        if (!wDate) {
+            resultBox.textContent = 'Select a date';
+            return;
+        }
+
+        const date = new Date(wDate);
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayName = days[date.getDay()];
+
+        resultBox.textContent = `Day of the week: ${dayName}`;
+    }
+
     function resetAll() {
         currentDate = new Date();
         renderCalendar();
@@ -591,11 +626,13 @@
         document.getElementById('date1').value = todayStr;
         document.getElementById('date2').value = todayStr;
         document.getElementById('base-date').value = todayStr;
+        document.getElementById('weekday-date').value = todayStr;
         document.getElementById('days-input').value = 30;
         document.getElementById('include-start-interval').checked = false;
         document.getElementById('include-start-add').checked = true;
         calculateInterval();
         calculateAddDays();
+        calculateWeekday();
     }
 
     window.onload = function() {
@@ -604,8 +641,10 @@
         document.getElementById('date1').value = todayStr;
         document.getElementById('date2').value = todayStr;
         document.getElementById('base-date').value = todayStr;
+        document.getElementById('weekday-date').value = todayStr;
         calculateInterval();
         calculateAddDays();
+        calculateWeekday();
     };
 </script>
 
