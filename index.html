@@ -39,6 +39,8 @@
         .card:hover { transform: translateY(-10px); border-color: #ff9e40; box-shadow: 0 10px 20px rgba(255,255,255,0.3); }
         .icon { font-size: 2rem; margin-bottom: 10px; display: inline-block; transition: transform 0.3s; }
         .card:hover .icon { transform: rotate(-15deg) scale(1.1); }
+        .trex-icon { transform: scaleX(-1); }
+        .card:hover .trex-icon { transform: scaleX(-1) rotate(-15deg) scale(1.1); }
         .card h3 { font-size: 1.25rem; margin-bottom: 5px; }
         .card p { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; }
         .arrow { font-weight: bold; color: #ff9e40; transition: transform 0.3s; display: inline-block; }
@@ -210,7 +212,7 @@
                 <span class="arrow">Go to Weather →</span>
             </a>
             <a href="https://sujinohkor.pages.dev/tools/chrome-trex" class="card">
-                <div class="icon" style="transform: scaleX(-1);">🦖</div>
+                <div class="icon trex-icon">🦖</div>
                 <h3>Chrome T-Rex Game</h3>
                 <p>chrome-trex</p>
                 <span class="arrow">Go to Chrome T-Rex Game →</span>
