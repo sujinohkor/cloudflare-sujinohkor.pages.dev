@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Bounce SVG Generator</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; }
+                
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+        }
+                
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; min-height: 100vh; gap: 20px; transition: 0.3s; 
+        }
+
+        .workspace-container {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+        }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #F38020; }
+
+        /* 좌측 박스: 바운싱 옵션 설정 */
+        .content-left { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
+            padding: 25px; background: #1c1c1c; flex-direction: column; gap: 15px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto;
+        }
+
+        .content-left h2 { font-size: 1.1rem; color: #ff9e40; margin-bottom: 5px; }
+
+        .parameters { display: flex; flex-direction: column; gap: 12px; }
+        .field-group { display: flex; flex-direction: column; gap: 4px; }
+        .field-group label { font-size: 0.8rem; color: #aaa; font-weight: 600; }
+        
+        input, select { 
+            background: #252525; border: 1px solid #444; border-radius: 8px; 
+            padding: 8px 12px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; 
+        }
+        input:focus, select:focus { outline: none; border-color: #ff9e40; }
+
+        .color-row { display: flex; gap: 10px; align-items: center; }
+        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 35px; }
+        .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
+        
+        .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 0.8rem; font-family: monospace; color: #aaa; }
+        .color-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
+
+        .dimensions-group { display: flex; align-items: center; gap: 8px; }
+        .dimensions-group input { width: 100px; }
+
+        .btn { 
+            background: #ff9e40; color: #101010; border: none; border-radius: 8px; 
+            padding: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; margin-top: 5px;
+        }
+        .btn:hover { background: #e08b35; }
+
+        /* 우측 박스: 미리보기 및 소스 복사 영역 */
+        .content-right { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            padding: 25px; background: #1c1c1c; gap: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto;
+        }
+        .content-right h2 { font-size: 1.1rem; color: #ff9e40; }
+
+        .preview-box { 
+            width: 100%; height: 160px; background: #181818; border: 2px dashed #444; 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; 
+        }
+
+        .code-container { 
+            background: #181818; color: #ff9e40; padding: 10px; border-radius: 8px; 
+            font-family: monospace; font-size: 0.8rem; overflow-x: auto; max-height: 70px; border: 1px solid #333; 
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #000; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-left, body.light-mode .content-right {
+            background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode input, body.light-mode select { background: #fff; color: #000; border-color: #ccc; }
+        body.light-mode .field-group label { color: #555; }
+        body.light-mode .preview-box { background: #eee; border-color: #bbb; }
+        body.light-mode .code-container { background: #fff; color: #d35400; border-color: #ddd; }
+        body.light-mode .btn { background: #F38020; color: #fff; }
+        body.light-mode .btn:hover { background: #d35400; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+
+        @media (max-width: 850px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; }
+            .workspace-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="generator.resetAll()">Reset</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Text Bounce SVG Generator</h1>
+            <p>Create custom animated text SVGs for your GitHub README and web projects.</p>
+        </header>
+
+        <div class="workspace-container">
+            <!-- 왼쪽 박스: 바운싱 옵션 설정 -->
+            <section class="content-left">
+                <h2>Bounce Options</h2>
+                <div class="parameters">
+                    <div class="field-group">
+                        <label for="input-text">Enter Text</label>
+                        <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
+                    </div>
+
+                    <!-- Font Color & Opacity -->
+                    <div class="field-group">
+                        <label>Font color & Opacity</label>
+                        <div class="color-row">
+                            <input type="color" id="font-color" value="#36BCF7" oninput="generator.update()">
+                            <input type="range" id="font-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
+                        </div>
+                        <div class="color-preview-box">
+                            <span class="color-swatch" id="font-swatch"></span>
+                            <span id="font-hex-text">#36BCF7FF</span>
+                        </div>
+                    </div>
+
+                    <!-- Background Color & Opacity -->
+                    <div class="field-group">
+                        <label>Background color & Opacity</label>
+                        <div class="color-row">
+                            <input type="color" id="bg-color" value="#000000" oninput="generator.update()">
+                            <input type="range" id="bg-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
+                        </div>
+                        <div class="color-preview-box">
+                            <span class="color-swatch" id="bg-swatch"></span>
+                            <span id="bg-hex-text">#000000FF</span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="font-size">Font size</label>
+                        <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
+                    </div>
+
+                    <div class="field-group">
+                        <label for="bounce-height">Bounce Height (px)</label>
+                        <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Width ✕ Height (px)</label>
+                        <div class="dimensions-group">
+                            <input type="number" id="width" value="500" min="100" max="1000" oninput="generator.update()">
+                            <span>✕</span>
+                            <input type="number" id="height" value="120" min="50" max="400" oninput="generator.update()">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
+            </section>
+
+            <!-- 우측 박스: 미리보기 및 소스 복사 -->
+            <section class="content-right">
+                <h2>Preview</h2>
+                <div class="preview-box" id="preview">
+                    <!-- 실시간 바운싱 렌더링 -->
+                </div>
+
+                <h2>Markdown Source</h2>
+                <div class="code-container" id="md-code"><code></code></div>
+                <button class="btn" onclick="generator.copyCode('markdown')">Copy Markdown</button>
+
+                <h2>HTML Source</h2>
+                <div class="code-container" id="html-code"><code></code></div>
+                <button class="btn" onclick="generator.copyCode('html')">Copy HTML</button>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+    
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
+    });
+
+    // 색상과 투명도를 결합하여 대문자 Hex 코드 생성 함수
+    function getHexWithAlpha(colorId, opacityId) {
+        const hex = document.getElementById(colorId).value.toUpperCase();
+        const opacity = parseFloat(document.getElementById(opacityId).value);
+        const alphaHex = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
+        return hex + alphaHex;
+    }
+
+    // 바운싱 텍스트 SVG 생성기 객체
+    const generator = {
+        workerUrl: 'https://text-bounce-svg.sujinohkor.workers.dev',
+
+        getSourceUrls() {
+            const text = document.getElementById('input-text').value;
+            const fontColor = document.getElementById('font-color').value.replace('#', '').toUpperCase();
+            const bgColor = document.getElementById('bg-color').value.replace('#', '').toUpperCase();
+            const fontOpacity = document.getElementById('font-opacity').value;
+            const bgOpacity = document.getElementById('bg-opacity').value;
+            const fontSize = document.getElementById('font-size').value;
+            const bounceHeight = document.getElementById('bounce-height').value;
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+
+            const fontAlpha = Math.round(fontOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
+            const bgAlpha = Math.round(bgOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
+
+            const params = new URLSearchParams({
+                text: text,
+                color: fontColor + fontAlpha,
+                background: bgColor + bgAlpha,
+                size: fontSize,
+                bounce: bounceHeight,
+                width: width,
+                height: height
+            });
+
+            const imageUrl = `${this.workerUrl}/?${params.toString()}`;
+            const markdown = `[![Bounce Text](${imageUrl})](${this.workerUrl})`;
+            const html = `<a href="${this.workerUrl}"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
+            return { markdown, html, imageUrl };
+        },
+
+        getSVGString() {
+            const text = document.getElementById('input-text').value;
+            const fontColorHex = getHexWithAlpha('font-color', 'font-opacity');
+            const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
+            const fontSize = parseInt(document.getElementById('font-size').value);
+            const bounceHeight = parseInt(document.getElementById('bounce-height').value);
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+
+            document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
+            document.getElementById('font-hex-text').textContent = fontColorHex;
+            document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
+            document.getElementById('bg-hex-text').textContent = bgColorHex;
+
+            let textElements = '';
+            let currentX = 30;
+            const charWidth = fontSize * 0.6; 
+
+            [...text].forEach((char, index) => {
+                const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
+                const delay = (0.08 * (index + 1)).toFixed(2);
+                
+                textElements += `
+        <g class="bounce-char" style="animation-delay: ${delay}s;">
+            <text x="${currentX}" y="${height / 2 + fontSize / 3}" class="bounce-text-svg">${escapedChar}</text>
+        </g>`;
+                currentX += (char === ' ' ? charWidth * 0.5 : charWidth);
+            });
+
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+    <style>
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-${bounceHeight}px); }
+            50% { transform: translateY(0); }
+        }
+        .bg { fill: ${bgColorHex}; }
+        .bounce-text-svg {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: ${fontSize}px;
+            font-weight: bold;
+            fill: ${fontColorHex};
+        }
+        .bounce-char {
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+    </style>
+    <rect width="100%" height="100%" class="bg" />
+    <g>${textElements}</g>
+</svg>`;
+        },
+
+        update() {
+            const svgStr = this.getSVGString();
+            document.getElementById('preview').innerHTML = svgStr;
+
+            const sources = this.getSourceUrls();
+            document.getElementById('html-code').querySelector('code').textContent = sources.html;
+            document.getElementById('md-code').querySelector('code').textContent = sources.markdown;
+        },
+
+        downloadSVG() {
+            const svgStr = this.getSVGString();
+            const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bounce-text.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        },
+
+        copyCode(type) {
+            const sources = this.getSourceUrls();
+            const text = (type === 'html') ? sources.html : sources.markdown;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`${type.toUpperCase()} source copied to clipboard!`);
+            });
+        },
+
+        resetAll() {
+            document.getElementById('input-text').value = "SUJIN's FUN SITE";
+            document.getElementById('font-color').value = "#36BCF7";
+            document.getElementById('font-opacity').value = "1";
+            document.getElementById('bg-color').value = "#000000";
+            document.getElementById('bg-opacity').value = "1";
+            document.getElementById('font-size').value = "28";
+            document.getElementById('bounce-height').value = "15";
+            document.getElementById('width').value = "500";
+            document.getElementById('height').value = "120";
+            this.update();
+        }
+    };
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.onload = function() {
+        generator.update();
+    };
+</script>
+
+</body>
+</html>
