@@ -49,7 +49,6 @@
         body[data-theme="light"] input, body[data-theme="light"] select { background: #fff; color: #333; border-color: #ccc; }
         input:focus, select:focus { outline: none; border-color: #ff9e40; }
 
-        /* 색상 입력 및 미리보기 배치용 스타일 */
         .color-row { display: flex; gap: 10px; align-items: center; }
         .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 38px; }
         .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
@@ -182,9 +181,9 @@
             body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
         }
 
-        // 색상과 투명도를 결합하여 Hex 코드 생성 및 UI 업데이트 함수
+        // 색상과 투명도를 결합하여 대문자 Hex 코드 생성 함수
         function getHexWithAlpha(colorId, opacityId) {
-            const hex = document.getElementById(colorId).value;
+            const hex = document.getElementById(colorId).value.toUpperCase();
             const opacity = parseFloat(document.getElementById(opacityId).value);
             const alphaHex = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
             return hex + alphaHex;
@@ -201,7 +200,7 @@
                 const width = document.getElementById('width').value;
                 const height = document.getElementById('height').value;
 
-                // 색상 정보 UI 실시간 반영
+                // 색상 정보 UI 실시간 반영 (대문자 Hex 코드 표시)
                 document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
                 document.getElementById('font-hex-text').textContent = fontColorHex;
                 document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
