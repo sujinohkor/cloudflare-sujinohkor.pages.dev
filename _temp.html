@@ -71,7 +71,7 @@
     <h1 id="site-title" class="highlight-text bounce-text">Text Bounce SVG</h1>
 
     <div class="container">
-        <!-- 좌측: 텍스트 입력 (Textbox) 및 옵션 -->
+        <!-- 좌측: 옵션 설정 -->
         <div class="properties">
             <h2>Bounce Options</h2>
             <div class="parameters">
@@ -89,6 +89,11 @@
                     <label for="font-size">Font Size</label>
                     <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
                 </div>
+
+                <div class="field-group">
+                    <label for="bounce-height">Bounce Height (px)</label>
+                    <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
+                </div>
             </div>
             <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
         </div>
@@ -97,7 +102,7 @@
         <div class="output">
             <h2>Preview</h2>
             <div class="preview-box" id="preview">
-                <!-- 실시간 SVG 바운싱 렌더링 -->
+                <!-- 실시간 바운싱 렌더링 -->
             </div>
 
             <h2>Markdown Source</h2>
@@ -142,21 +147,30 @@
             getSVGString() {
                 const text = document.getElementById('input-text').value;
                 const color = document.getElementById('text-color').value;
-                const fontSize = document.getElementById('font-size').value;
+                const fontSize = parseInt(document.getElementById('font-size').value);
+                const bounceHeight = parseInt(document.getElementById('bounce-height').value);
 
-                // 글자별로 각각 개별 <tspan>과 바운싱 애니메이션 딜레이(--i) 부여
-                let tspanElements = '';
+                // 글자별로 간격 계산하여 개별 <g> 태그로 감싸기
+                let textElements = '';
+                let currentX = 25;
+                const charWidth = fontSize * 0.6; // 대략적인 글자 가로 폭 추정
+
                 [...text].forEach((char, index) => {
                     const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
                     const delay = (0.08 * (index + 1)).toFixed(2);
-                    tspanElements += `<tspan class="bounce-char" style="animation-delay: ${delay}s;">${escapedChar}</tspan>`;
+                    
+                    textElements += `
+        <g class="bounce-char" style="animation-delay: ${delay}s;">
+            <text x="${currentX}" y="75" class="bounce-text-svg">${escapedChar}</text>
+        </g>`;
+                    currentX += (char === ' ' ? charWidth * 0.5 : charWidth);
                 });
 
                 return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%">
     <style>
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-15px); }
+            30% { transform: translateY(-${bounceHeight}px); }
             50% { transform: translateY(0); }
         }
         .bounce-text-svg {
@@ -170,9 +184,9 @@
             animation: bounce 1.2s infinite ease-in-out;
         }
     </style>
-    <text x="25" y="75" class="bounce-text-svg">
-        ${tspanElements}
-    </text>
+    <g>
+        ${textElements}
+    </g>
 </svg>`;
             },
 
