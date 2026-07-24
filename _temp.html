@@ -36,14 +36,14 @@
 
         /* 왼쪽: 달력 영역 */
         .calendar-section {
-            flex: 1.1;
+            width: 420px;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             background: #1c1c1c;
             border: 1px solid #333;
             border-radius: 16px;
             padding: 20px;
-            min-width: 320px;
         }
 
         .calendar-header {
@@ -84,9 +84,11 @@
             margin-bottom: 8px;
         }
 
+        /* 날짜 그리드 높이를 항상 6주 기준으로 고정하여 크기 변동 방지 */
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 42px);
             gap: 6px;
         }
 
@@ -94,7 +96,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 40px;
             background: #252525;
             border-radius: 8px;
             font-size: 0.9rem;
@@ -124,7 +125,6 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            min-width: 320px;
         }
 
         .calculator-section h1 {
@@ -188,6 +188,9 @@
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
+            }
+            .calendar-section {
+                width: 100%;
             }
         }
     </style>
