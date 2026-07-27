@@ -10,7 +10,7 @@
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
+                
         /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
@@ -31,7 +31,7 @@
         }
         .menu-btn:hover { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-        
+                
         .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
         .menu-list a { display: flex; justify-content: space-between; color: #fff; font-size: 0.95rem; }
         .menu-list span { color: #e68a35; font-weight: bold; }
@@ -40,12 +40,43 @@
             border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
             display: flex; overflow: hidden; background: transparent;
         }
+
+        /* Line Numbers & Editor Wrapper */
+        .editor-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .line-numbers {
+            width: 50px;
+            padding: 40px 10px 40px 0;
+            background: rgba(0, 0, 0, 0.2);
+            color: #666;
+            font-family: 'Consolas', sans-serif;
+            font-size: 1rem;
+            text-align: right;
+            user-select: none;
+            overflow: hidden;
+            line-height: 1.5; /* textarea와 line-height 일치 필수 */
+        }
         textarea { 
-            width: 100%; padding: 40px; background: transparent; border: none; 
-            color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; outline: none;
+            flex: 1;
+            height: 100%;
+            padding: 40px; 
+            background: transparent; 
+            border: none; 
+            color: #fff; 
+            font-family: 'Consolas', sans-serif; 
+            font-size: 1rem; 
+            resize: none; 
+            outline: none;
+            line-height: 1.5; /* line-numbers와 일치 필수 */
+            white-space: pre;
+            overflow-y: auto;
         }
 
-        /* 다크 모드 카드/패널 그림자 (Word Counter 요소 확장) */
+        /* 다크 모드 카드/패널 그림자 */
         .card, .content-card, .content-mid, .content-down {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -58,9 +89,9 @@
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
         body.light-mode textarea { color: #000; }
+        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #999; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
-        /* 데이 모드 카드/패널 그림자 (Word Counter 요소 확장) */
         body.light-mode .card, 
         body.light-mode .content-card,
         body.light-mode .content-mid, 
@@ -68,34 +99,25 @@
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
 
-        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
-        body.light-mode .color-card,
-        body.light-mode .list-item {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-        }
-
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        
+                
         @media (max-width: 600px) {
             .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
-            .main-content-section { flex: 1; min-height: 0; }
             .content-card { min-height: 0; height: 100%; }
         }
     </style>
 </head>
 <body>
-
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
+                
         <nav class="menu-list">
             <a>Characters (with spaces) <span id="char-count-all">0</span></a>
             <a>Characters (no spaces) <span id="char-count-no-space">0</span></a>
@@ -117,39 +139,58 @@
             <p>You can count the number of words, etc.</p>
         </header>
         <section class="content-card" style="margin-top: 20px;">
-            <textarea id="text-input" placeholder="Enter text here."></textarea>
+            <div class="editor-wrapper">
+                <div id="line-numbers" class="line-numbers">1</div>
+                <textarea id="text-input" placeholder="Enter text here."></textarea>
+            </div>
         </section>
     </main>
 </div>
 
 <script>
     const textInput = document.getElementById('text-input');
+    const lineNumbers = document.getElementById('line-numbers');
     const sidebar = document.getElementById('sidebar');
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); } );
-    
-    // 메인 콘텐츠 클릭 시 사이드바 닫기 기능
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+
     document.querySelector('.main-content').addEventListener('click', () => { 
         if (sidebar.classList.contains('active')) { 
             sidebar.classList.remove('active'); 
         } 
     });
 
-    // 글자 수 및 바이트 수 계산 동기화
+    // 행 번호 갱신 함수
+    function updateLineNumbers() {
+        const lines = textInput.value.split('\n').length;
+        let result = '';
+        for (let i = 1; i <= lines; i++) {
+            result += i + '<br>';
+        }
+        lineNumbers.innerHTML = result;
+    }
+
+    // 스크롤 동기화
+    textInput.addEventListener('scroll', () => {
+        lineNumbers.scrollTop = textInput.scrollTop;
+    });
+
+    // 글자 수 및 바이트 수 계산 + 행 번호 동기화
     textInput.addEventListener('input', () => {
         const text = textInput.value;
         document.getElementById('char-count-all').innerText = text.length;
         document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
         document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         document.getElementById('para-count').innerText = text.split('\n').filter(p => p.trim().length > 0).length;
-        
+                
         let bytes = 0;
         for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
         document.getElementById('byte-count').innerText = bytes;
+
+        updateLineNumbers();
     });
 
-    // 텍스트 및 로컬 저장소 초기화
     function resetText() {
         if (confirm('Are you sure you want to clear all saved data?')) {
             localStorage.removeItem('saved_word_counter_text');
@@ -165,15 +206,12 @@
         alert('Text copied!');
     }
 
-    // 파일 다운로드 및 브라우저 로컬 저장소 저장
     function saveText() {
         const text = textInput.value;
         if (!text.trim()) return alert("No text to save.");
 
-        // 1. 브라우저 로컬 저장소(localStorage)에 저장
         localStorage.setItem('saved_word_counter_text', text);
 
-        // 2. 파일(.txt) 다운로드 처리
         const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -184,17 +222,16 @@
         alert('Text saved successfully.');
     }
 
-    // 로컬 저장소에 저장된 텍스트 불러오기
     function loadSavedText() {
         const savedText = localStorage.getItem('saved_word_counter_text');
         if (savedText !== null) {
             textInput.value = savedText;
-            textInput.dispatchEvent(new Event('input')); // 글자 수 카운터 업데이트
+            textInput.dispatchEvent(new Event('input')); 
         }
     }
 
-    // 페이지 접속 시 저장된 텍스트 자동으로 가져오기
     loadSavedText();
+    updateLineNumbers();
 </script>
 </body>
 </html>
