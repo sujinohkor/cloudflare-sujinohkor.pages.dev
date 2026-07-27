@@ -14,23 +14,18 @@
     <script src="https://unpkg.com/globe.gl"></script>
 
     <style>
-        /* 1. Reset & Base */
+        /* 1. Reset & Base (일반 문서 스크롤 허용 구조로 변경) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            background-color: #202020;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-            min-height: 100%;
-            transition: background 0.3s;
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #202020; 
+            color: #fff; 
+            transition: background 0.3s; 
+            overflow-x: hidden; /* 가로 스크롤만 방지, 세로 스크롤 허용 */
         }
         
         /* 2. Layout */
-        .app-container { 
-            display: block; 
-            position: relative;
-            min-height: 100vh;
-        }
+        .app-container { display: flex; min-height: 100vh; position: relative; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
@@ -41,13 +36,9 @@
         .sidebar > *:last-child { margin-bottom: 0; }
         
         .main-content { 
-            margin-left: 250px; 
-            padding: 40px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            min-height: 100vh; 
-            transition: 0.3s; 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; gap: 20px; 
+            min-height: 100vh; transition: 0.3s; 
         }
 
         .workspace-container {
@@ -249,7 +240,7 @@
             .menu-toggle-btn { display: block; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; padding: 20px; width: 100%; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; }
         }
     </style>
 </head>
