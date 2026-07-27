@@ -346,9 +346,9 @@
                 totalTextWidth += (char === ' ' ? charWidth * 0.5 : charWidth);
             });
 
-            let startX = 30;
+            let startX = 10;
             if (hAlign === 'center') startX = (width - totalTextWidth) / 2;
-            else if (hAlign === 'right') startX = width - totalTextWidth - 30;
+            else if (hAlign === 'right') startX = width - totalTextWidth - startX;
             if (startX < 10) startX = 10;
 
             let startY = height / 2 + fontSize / 3;
