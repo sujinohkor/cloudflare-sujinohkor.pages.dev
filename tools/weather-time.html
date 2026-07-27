@@ -754,26 +754,17 @@
         }
     }
 
-    function initLocation() {
+    async function initLocation() {
         document.getElementById('city-input').value = '';
         switchView('weather');
 
+        // 1. 권한 필요 없는 IP 위치 조회를 먼저 실행하여 즉시 화면 렌더링 보장
+        await fetchIpLocation();
+
+        // 2. 이후 정밀한 위치(GPS)가 지원되면 백그라운드에서 추가로 갱신 시도
         if ("geolocation" in navigator) {
-            let locationHandled = false;
-
-            const timeoutId = setTimeout(() => {
-                if (!locationHandled) {
-                    locationHandled = true;
-                    fetchIpLocation();
-                }
-            }, 5000);
-
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
-                    if (locationHandled) return;
-                    locationHandled = true;
-                    clearTimeout(timeoutId);
-
                     const gpsLat = position.coords.latitude;
                     const gpsLon = position.coords.longitude;
 
@@ -798,16 +789,10 @@
                     updateWeather();
                 },
                 (error) => {
-                    if (locationHandled) return;
-                    locationHandled = true;
-                    clearTimeout(timeoutId);
-
-                    fetchIpLocation();
+                    console.warn("GPS 거부 또는 타임아웃, IP 위치 유지:", error);
                 },
                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
-        } else {
-            fetchIpLocation();
         }
     }
 
