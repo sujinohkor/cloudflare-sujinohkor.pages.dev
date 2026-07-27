@@ -87,20 +87,21 @@
         /* Forecast Item Grid Layout */
         .forecast-item {
             display: grid;
-            grid-template-columns: 100px 1fr 90px 90px 80px 60px;
+            grid-template-columns: 100px 1fr 80px 80px 80px 70px 60px;
             align-items: center;
             padding: 12px 16px;
             background: #202020;
             border-radius: 12px;
             font-size: 0.85rem;
             gap: 10px;
-            min-width: 580px;
+            min-width: 650px;
         }
         .forecast-time { color: #888; font-weight: bold; }
         .forecast-desc { color: #ccc; text-align: left; }
         .forecast-rain { color: #64b5f6; text-align: center; }
         .forecast-wind { color: #aaa; text-align: center; }
         .forecast-humidity { color: #81c784; text-align: center; }
+        .forecast-uv { color: #ffb74d; text-align: center; }
         .forecast-temp { color: #ff9e40; font-weight: bold; text-align: right; }
 
         .city { font-size: 1.8rem; color: #ff9e40; font-weight: bold; margin-bottom: 10px; text-transform: capitalize; }
@@ -136,6 +137,7 @@
         body.light-mode .forecast-rain { color: #1976d2; }
         body.light-mode .forecast-wind { color: #424242; }
         body.light-mode .forecast-humidity { color: #2e7d32; }
+        body.light-mode .forecast-uv { color: #f57c00; }
         body.light-mode .forecast-temp { color: #F38020; }
         body.light-mode .city { color: #F38020; }
         body.light-mode .temp { color: #000; }
@@ -310,6 +312,7 @@
                         rainChance: `☔ ${hour.chanceofrain}%`,
                         wind: `💨 ${windMs}m/s`,
                         humidity: `💧 ${hour.humidity}%`,
+                        uv: `☀️ UV ${hour.uvIndex}`, // 👈 자외선 추가
                         temp: `${hour.tempC}°C`
                     });
                 }
@@ -329,7 +332,7 @@
 
     async function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode&forecast_days=3`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=3`;
         
         const response = await fetch(url);
         if (!response.ok) throw new Error('Open-Meteo request failed');
@@ -362,6 +365,7 @@
                 rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
                 wind: `💨 ${windMs}m/s`,
                 humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
+                uv: `☀️ UV ${hourly.uv_index[i] !== undefined ? hourly.uv_index[i] : '-'}` , // 👈 자외선 추가
                 temp: `${Math.round(hourly.temperature_2m[i])}°C`
             });
         }
@@ -402,6 +406,7 @@
                     <span class="forecast-rain">${item.rainChance}</span>
                     <span class="forecast-wind">${item.wind}</span>
                     <span class="forecast-humidity">${item.humidity}</span>
+                    <span class="forecast-uv">${item.uv}</span> <!-- 👈 이 줄을 추가 -->
                     <span class="forecast-temp">${item.temp}</span>
                 `;
                 forecastContainer.appendChild(el);
