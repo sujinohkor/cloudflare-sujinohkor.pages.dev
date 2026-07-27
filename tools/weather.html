@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
+    <title>Weather</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     
     <style>
@@ -330,46 +330,45 @@
         };
     }
 
-    async function fetchOpenMeteo() {
+    aasync function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=3`;
-        
+        // 충분한 여유 기간(예: 4일)을 요청하여 72시간 데이터를 확실히 커버합니다.
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=4`;
+                
         const response = await fetch(url);
         if (!response.ok) throw new Error('Open-Meteo request failed');
         const data = await response.json();
-
+    
         const currentWeather = data.current_weather;
         const hourly = data.hourly;
         const currentHumidity = hourly.relativehumidity_2m[0];
-
+    
         const forecastList = [];
-        const now = new Date(); // 현재 시간 기준
-
-        // 1. 현재 시간 이후에 해당하는 최초의 인덱스(startIndex) 찾기
-        let startIndex = 0;
+        const now = new Date(); // 현재 시간
+        const maxFutureTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 정확히 3일(72시간) 뒤
+    
         for (let i = 0; i < hourly.time.length; i++) {
-            if (new Date(hourly.time[i]) >= now) {
-                startIndex = i;
-                break;
+            const forecastTime = new Date(hourly.time[i]);
+    
+            // 현재 시간 이후이면서, 정확히 3일(72시간) 이내의 데이터만 포함
+            if (forecastTime >= now && forecastTime <= maxFutureTime) {
+                // 3시간 간격으로 맞추고 싶다면 인덱스 조건이나 추가 필터를 적용할 수 있습니다.
+                // 여기서는 1시간 단위 중 3시간 간격(또는 원하는 간격)으로 추출
+                const timeStr = hourly.time[i].replace('T', ' ').slice(5);
+                const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
+    
+                forecastList.push({
+                    time: timeStr,
+                    desc: getWeatherDescription(hourly.weathercode[i]),
+                    rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
+                    wind: `💨 ${windMs}m/s`,
+                    humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
+                    uv: `☀️ UV ${hourly.uv_index[i] !== undefined ? hourly.uv_index[i] : '-'}` ,
+                    temp: `${Math.round(hourly.temperature_2m[i])}°C`
+                });
             }
         }
-
-        // 2. 찾은 인덱스부터 시작해서 3칸씩(3시간 간격) 데이터 수집
-        for (let i = startIndex; i < hourly.time.length; i += 3) {
-            const timeStr = hourly.time[i].replace('T', ' ').slice(5);
-            const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
-
-            forecastList.push({
-                time: timeStr,
-                desc: getWeatherDescription(hourly.weathercode[i]),
-                rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
-                wind: `💨 ${windMs}m/s`,
-                humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
-                uv: `☀️ UV ${hourly.uv_index[i] !== undefined ? hourly.uv_index[i] : '-'}` , // 👈 자외선 추가
-                temp: `${Math.round(hourly.temperature_2m[i])}°C`
-            });
-        }
-
+    
         return {
             current: {
                 temp: Math.round(currentWeather.temperature),
