@@ -8,61 +8,164 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #202020; 
+            color: #fff; 
+            transition: background 0.3s; 
+        }
+                        
         /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { 
+            display: flex; 
+            min-height: 100vh; 
+        }
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            width: 250px; 
+            height: 100vh; 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            background-color: #101010; 
+            padding: 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            transition: transform 0.3s ease; 
         }
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            margin-left: 250px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
         }
 
         /* 3. Components */
         .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 10px; 
+            cursor: pointer; 
+            background: #202020; 
+            color: #ff9e40; 
+            border: 2px solid #ff9e40; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            transition: all 0.3s; 
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-                
-        .menu-list { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
-        .menu-list a { display: flex; justify-content: space-between; color: #fff; font-size: 0.95rem; }
-        .menu-list span { color: #e68a35; font-weight: bold; }
+        .menu-btn:hover { 
+            background: #ff9e40; 
+            color: #101010; 
+        }
+        .theme-btn:hover { 
+            background-color: #FDF5E6; 
+            color: #F38020; 
+            border-color: #FDF5E6; 
+        }
+                        
+        .menu-list { 
+            margin: 20px 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+        .menu-list a { 
+            display: flex; 
+            justify-content: space-between; 
+            color: #fff; 
+            font-size: 0.95rem; 
+        }
+        .menu-list span { 
+            color: #e68a35; 
+            font-weight: bold; 
+        }
 
         .content-card { 
-            border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
-            display: flex; overflow: hidden; background: transparent;
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            flex: 1; 
+            display: flex; 
+            overflow: hidden; 
+            background: transparent; 
+            position: relative; 
+        }
+
+        /* 전체화면 버튼 스타일 (에디터 내부 우측 상단 고정) */
+        .fullscreen-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            z-index: 10000; 
+            background: #202020; 
+            color: #ff9e40; 
+            border: 1px solid #ff9e40; 
+            padding: 6px 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+            transition: all 0.3s; 
+        }
+        .fullscreen-btn:hover { 
+            background: #ff9e40; 
+            color: #101010; 
+        }
+
+        /* 전체화면 활성화 클래스 (최상단 빈틈없이 완벽 채우기) */
+        .content-card.fullscreen { 
+            position: fixed !important; 
+            top: 0 !important; 
+            left: 0 !important; 
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important; 
+            height: 100vh !important; 
+            z-index: 9999 !important; 
+            border-radius: 0 !important; 
+            border: none !important; 
+            padding: 0 !important; 
+            margin: 0 !important;
+            background: #202020; 
+        }
+
+        /* 전체화면일 때 내부 래퍼에 패딩 부여 */
+        .content-card.fullscreen .editor-wrapper {
+            padding: 20px;
+            width: 100%;
+            height: 100%;
         }
 
         /* Line Numbers & Editor Wrapper */
-        .editor-wrapper {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        .editor-wrapper { 
+            display: flex; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
         }
-        .line-numbers {
-            width: 50px;
-            padding: 40px 10px 40px 0;
-            background: rgba(0, 0, 0, 0.2);
-            color: #666;
-            font-family: 'Consolas', sans-serif;
-            font-size: 1rem;
-            text-align: right;
-            user-select: none;
-            overflow: hidden;
-            line-height: 1.5;
+        .line-numbers { 
+            width: 50px; 
+            padding: 40px 10px 40px 0; 
+            background: rgba(0, 0, 0, 0.2); 
+            color: #666; 
+            font-family: 'Consolas', sans-serif; 
+            font-size: 1rem; 
+            text-align: right; 
+            user-select: none; 
+            overflow: hidden; 
+            line-height: 1.5; 
         }
         textarea { 
-            flex: 1;
-            height: 100%;
+            flex: 1; 
+            height: 100%; 
             padding: 40px; 
             background: transparent; 
             border: none; 
@@ -70,193 +173,272 @@
             font-family: 'Consolas', sans-serif; 
             font-size: 1rem; 
             resize: none; 
-            outline: none;
-            line-height: 1.5;
-            white-space: pre-wrap; /* 자동 줄바꿈 활성화 */
-            word-break: break-all; /* 긴 단어 줄바꿈 처리 */
-            overflow-y: auto;
+            outline: none; 
+            line-height: 1.5; 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+            overflow-y: auto; 
         }
 
         /* 다크 모드 카드/패널 그림자 */
-        .card, .content-card, .content-mid, .content-down {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        .card, .content-card, .content-mid, .content-down { 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { color: #202020; }
-        body.light-mode textarea { color: #000; }
-        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #999; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
-
+        body.light-mode { 
+            background-color: #fff; 
+        }
+        body.light-mode .sidebar { 
+            background-color: #FDF5E6; 
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { 
+            background: #FDF5E6; 
+            color: #F38020; 
+            border-color: #F38020; 
+        }
+        body.light-mode .menu-btn:hover { 
+            background: #F38020; 
+            color: #ffffff; 
+            border-color: #F38020; 
+        }
+        body.light-mode .theme-btn:hover { 
+            background-color: #202020; 
+            color: #ff9e40; 
+            border-color: #202020; 
+        }
+        body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { 
+            color: #202020; 
+        }
+        body.light-mode textarea { 
+            color: #000; 
+        }
+        body.light-mode .line-numbers { 
+            background: rgba(0, 0, 0, 0.05); 
+            color: #999; 
+        }
+        body.light-mode .menu-toggle-btn { 
+            color: #000000; 
+        }
+        body.light-mode .content-card.fullscreen { 
+            background: #fff !important; 
+            padding: 0 !important;
+        }
+        body.light-mode .content-card.fullscreen .editor-wrapper {
+            padding: 20px;
+        }
+        body.light-mode .fullscreen-btn { 
+            background: #FDF5E6; 
+            color: #F38020; 
+            border-color: #F38020; 
+        }
+        body.light-mode .fullscreen-btn:hover { 
+            background: #F38020; 
+            color: #ffffff; 
+        }
         body.light-mode .card, 
-        body.light-mode .content-card,
+        body.light-mode .content-card, 
         body.light-mode .content-mid, 
-        body.light-mode .content-down {
-            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        body.light-mode .content-down { 
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
         }
 
         /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-                
-        @media (max-width: 600px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
-            .content-card { min-height: 0; height: 100%; }
+        .menu-toggle-btn { 
+            display: none; 
+            position: fixed; 
+            bottom: 20px; 
+            left: 20px; 
+            z-index: 2000; 
+            padding: 10px 15px; 
+            background: #ff9e40; 
+            border: none; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }                        
+        @media (max-width: 600px) { 
+            .menu-toggle-btn { 
+                display: block; 
+                color: #ffffff; 
+            } 
+            .sidebar { 
+                transform: translateX(-250px); 
+            } 
+            .sidebar.active { 
+                transform: translateX(0); 
+            } 
+            .main-content { 
+                margin-left: 0; 
+                padding: 20px; 
+                width: 100%; 
+                max-height: 100svh; 
+                flex: 1; 
+                display: flex; 
+                flex-direction: column; 
+            } 
+            .content-card { 
+                min-height: 0; 
+                height: 100%; 
+            } 
         }
     </style>
 </head>
 <body>
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-                
-        <nav class="menu-list">
-            <a>Characters (with spaces) <span id="char-count-all">0</span></a>
-            <a>Characters (no spaces) <span id="char-count-no-space">0</span></a>
-            <a>Word Count <span id="word-count">0</span></a>
-            <a>Paragraph Count <span id="para-count">0</span></a>
-            <a>Byte Count <span id="byte-count">0</span></a>
-        </nav>
-
-        <div class="bottom-btns">
-            <button class="menu-btn" onclick="copyText()">Copy</button>
-            <button class="menu-btn" onclick="saveText()">Save</button>
-            <button class="menu-btn" onclick="resetText()">Reset</button>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <header class="top-section">
-            <h1>Word Counter</h1>
-            <p>You can count the number of words, etc.</p>
-        </header>
-        <section class="content-card" style="margin-top: 20px;">
-            <div class="editor-wrapper">
-                <div id="line-numbers" class="line-numbers">1</div>
-                <textarea id="text-input" placeholder="Enter text here."></textarea>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+            <nav class="menu-list">
+                <a>Characters (with spaces) <span id="char-count-all">0</span></a>
+                <a>Characters (no spaces) <span id="char-count-no-space">0</span></a>
+                <a>Word Count <span id="word-count">0</span></a>
+                <a>Paragraph Count <span id="para-count">0</span></a>
+                <a>Byte Count <span id="byte-count">0</span></a>
+            </nav>
+            <div class="bottom-btns">
+                <button class="menu-btn" onclick="copyText()">Copy</button>
+                <button class="menu-btn" onclick="saveText()">Save</button>
+                <button class="menu-btn" onclick="resetText()">Reset</button>
             </div>
-        </section>
-    </main>
-</div>
+        </aside>
+        <main class="main-content">
+            <header class="top-section">
+                <h1>Word Counter</h1>
+                <p>You can count the number of words, etc.</p>
+            </header>
+            <section class="content-card" id="content-card" style="margin-top: 20px;">
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
+                <div class="editor-wrapper">
+                    <div id="line-numbers" class="line-numbers">1</div>
+                    <textarea id="text-input" placeholder="Enter text here."></textarea>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        const textInput = document.getElementById('text-input');
+        const lineNumbers = document.getElementById('line-numbers');
+        const sidebar = document.getElementById('sidebar');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-<script>
-    const textInput = document.getElementById('text-input');
-    const lineNumbers = document.getElementById('line-numbers');
-    const sidebar = document.getElementById('sidebar');
-
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { 
-            sidebar.classList.remove('active'); 
-        } 
-    });
-
-    function updateLineNumbers() {
-        const text = textInput.value;
-        const lines = text.split('\n');
-        
-        const measureDiv = document.createElement('div');
-        measureDiv.style.font = window.getComputedStyle(textInput).font;
-        measureDiv.style.width = (textInput.clientWidth - 80) + 'px';
-        measureDiv.style.visibility = 'hidden';
-        measureDiv.style.position = 'absolute';
-        measureDiv.style.whiteSpace = 'pre-wrap';
-        measureDiv.style.wordBreak = 'break-all';
-        document.body.appendChild(measureDiv);
-
-        let simpleResult = '';
-        let currentLine = 1;
-
-        lines.forEach((line) => {
-            measureDiv.textContent = line === '' ? ' ' : line;
-            const lineCount = Math.max(1, Math.round(measureDiv.clientHeight / parseFloat(window.getComputedStyle(textInput).lineHeight)));
-            
-            for (let i = 0; i < lineCount; i++) {
-                // 첫 줄에만 번호 표시, 자동 줄바꿈으로 생긴 하위 줄은 빈칸(&nbsp;) 처리
-                simpleResult += (i === 0 ? currentLine : '&nbsp;') + '<br>';
+        window.toggleFullscreen = function() {
+            contentCard.classList.toggle('fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {
+                fullscreenBtn.textContent = 'Minimize 🗗';
+            } else {
+                fullscreenBtn.textContent = 'Maximize ⛶';
             }
-            currentLine++;
+        };
+
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
         });
 
-        document.body.removeChild(measureDiv);
-        lineNumbers.innerHTML = simpleResult || '1';
-    }
+        document.querySelector('.main-content').addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
 
-    // 스크롤 동기화
-    textInput.addEventListener('scroll', () => {
-        lineNumbers.scrollTop = textInput.scrollTop;
-    });
+        function updateLineNumbers() {
+            const text = textInput.value;
+            const lines = text.split('\n');
+            const measureDiv = document.createElement('div');
+            measureDiv.style.font = window.getComputedStyle(textInput).font;
+            measureDiv.style.width = (textInput.clientWidth - 80) + 'px';
+            measureDiv.style.visibility = 'hidden';
+            measureDiv.style.position = 'absolute';
+            measureDiv.style.whiteSpace = 'pre-wrap';
+            measureDiv.style.wordBreak = 'break-all';
+            document.body.appendChild(measureDiv);
 
-    // 창 크기 변경 시 줄바꿈 재계산
-    window.addEventListener('resize', updateLineNumbers);
+            let simpleResult = '';
+            let currentLine = 1;
 
-    // 글자 수 및 바이트 수 계산 + 행 번호 동기화
-    textInput.addEventListener('input', () => {
-        const text = textInput.value;
-        document.getElementById('char-count-all').innerText = text.length;
-        document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
-        document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-        document.getElementById('para-count').innerText = text.split('\n').filter(p => p.trim().length > 0).length;
-                
-        let bytes = 0;
-        for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
-        document.getElementById('byte-count').innerText = bytes;
+            lines.forEach((line) => {
+                measureDiv.textContent = line === '' ? ' ' : line;
+                const lineCount = Math.max(1, Math.round(measureDiv.clientHeight / parseFloat(window.getComputedStyle(textInput).lineHeight)));
+                for (let i = 0; i < lineCount; i++) {
+                    simpleResult += (i === 0 ? currentLine : '&nbsp;') + '<br>';
+                }
+                currentLine++;
+            });
 
+            document.body.removeChild(measureDiv);
+            lineNumbers.innerHTML = simpleResult || '1';
+        }
+
+        textInput.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = textInput.scrollTop;
+        });
+
+        window.addEventListener('resize', updateLineNumbers);
+
+        textInput.addEventListener('input', () => {
+            const text = textInput.value;
+            document.getElementById('char-count-all').innerText = text.length;
+            document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
+            document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('para-count').innerText = text.split('\n').filter(p => p.trim().length > 0).length;
+            
+            let bytes = 0;
+            for (let i = 0; i < text.length; i++) {
+                bytes += (text.charCodeAt(i) > 127) ? 2 : 1;
+            }
+            document.getElementById('byte-count').innerText = bytes;
+
+            updateLineNumbers();
+        });
+
+        function resetText() {
+            if (confirm('Are you sure you want to clear all saved data?')) {
+                localStorage.removeItem('saved_word_counter_text');
+                textInput.value = '';
+                textInput.dispatchEvent(new Event('input'));
+            }
+        }
+
+        function copyText() {
+            if (!textInput.value) return alert('No text to copy.');
+            textInput.select();
+            document.execCommand('copy');
+            alert('Text copied!');
+        }
+
+        function saveText() {
+            const text = textInput.value;
+            if (!text.trim()) return alert("No text to save.");
+
+            localStorage.setItem('saved_word_counter_text', text);
+
+            const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'WordCounter.txt';
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            alert('Text saved successfully.');
+        }
+
+        function loadSavedText() {
+            const savedText = localStorage.getItem('saved_word_counter_text');
+            if (savedText !== null) {
+                textInput.value = savedText;
+                textInput.dispatchEvent(new Event('input')); 
+            }
+        }
+
+        loadSavedText();
         updateLineNumbers();
-    });
-
-    function resetText() {
-        if (confirm('Are you sure you want to clear all saved data?')) {
-            localStorage.removeItem('saved_word_counter_text');
-            textInput.value = '';
-            textInput.dispatchEvent(new Event('input'));
-        }
-    }
-
-    function copyText() {
-        if (!textInput.value) return alert('No text to copy.');
-        textInput.select();
-        document.execCommand('copy');
-        alert('Text copied!');
-    }
-
-    function saveText() {
-        const text = textInput.value;
-        if (!text.trim()) return alert("No text to save.");
-
-        localStorage.setItem('saved_word_counter_text', text);
-
-        const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'WordCounter.txt';
-        link.click();
-        URL.revokeObjectURL(link.href);
-
-        alert('Text saved successfully.');
-    }
-
-    function loadSavedText() {
-        const savedText = localStorage.getItem('saved_word_counter_text');
-        if (savedText !== null) {
-            textInput.value = savedText;
-            textInput.dispatchEvent(new Event('input')); 
-        }
-    }
-
-    loadSavedText();
-    updateLineNumbers();
-</script>
+    </script>
 </body>
 </html>
