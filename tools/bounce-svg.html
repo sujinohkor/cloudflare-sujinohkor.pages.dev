@@ -346,10 +346,14 @@
                 totalTextWidth += (char === ' ' ? charWidth * 0.5 : charWidth);
             });
 
-            let startX = 10;
-            if (hAlign === 'center') startX = (width - totalTextWidth) / 2;
-            else if (hAlign === 'right') startX = width - totalTextWidth - startX;
-            if (startX < 10) startX = 10;
+            const padding = 20; // 양옆에 줄 기본 여백(px)
+            let startX = padding;
+            
+            if (hAlign === 'center') { startX = (width - totalTextWidth) / 2; }
+            else if (hAlign === 'right') { startX = width - totalTextWidth - padding; }
+            
+            // 만약 글자가 너무 길어서 박스를 벗어나려 하면 최소 여백 보장
+            if (startX < padding) startX = padding;
 
             let startY = height / 2 + fontSize / 3;
             if (vAlign === 'top') startY = fontSize + 10;
