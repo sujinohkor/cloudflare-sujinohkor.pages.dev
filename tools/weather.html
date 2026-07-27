@@ -330,7 +330,7 @@
         };
     }
 
-    aasync function fetchOpenMeteo() {
+    async function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
         // 충분한 여유 기간(예: 4일)을 요청하여 72시간 데이터를 확실히 커버합니다.
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=4`;
