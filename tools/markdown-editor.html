@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <!-- 마크다운 파싱을 위한 Marked.js 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* 1. Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #202020;
+            color: #fff;
+            transition: background 0.3s;
+        }
+        /* 2. Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: #101010;
+            padding: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            gap: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        /* 3. Components */
+        .menu-btn, .theme-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background: #202020;
+            color: #ff9e40;
+            border: 2px solid #ff9e40;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .menu-btn:hover, .menu-btn.active {
+            background: #ff9e40;
+            color: #101010;
+        }
+        .theme-btn:hover {
+            background-color: #FDF5E6;
+            color: #F38020;
+            border-color: #FDF5E6;
+        }
+        /* Workspace Structure */
+        .workspace-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+        /* ===== [Markdown Editor 영역] ===== */
+        .content-mid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+            min-height: 0;
+            min-width: 0;
+        }
+        .content-mid-header {
+            color: #ff9e40;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .code-editor-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            background: #141414;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            overflow: hidden;
+            font-family: 'Consolas', 'Fira Code', Monaco, monospace;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .line-numbers {
+            padding: 12px 8px 12px 12px;
+            background: #0a0a0a;
+            color: #555;
+            text-align: right;
+            user-select: none;
+            border-right: 1px solid #282828;
+            font-family: inherit;
+            overflow-y: hidden;
+        }
+        .code-output-wrapper {
+            position: relative;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+        .editor-textarea {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 12px;
+            margin: 0;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow: auto;
+            tab-size: 2;
+            background: transparent;
+            color: #fff;
+            caret-color: #fff;
+            resize: none;
+            z-index: 2;
+        }
+        /* Copy Button */
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ff9e40;
+            color: #ff9e40;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+        /* ===== [Preview 영역] ===== */
+        .content-down-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+            min-height: 0;
+            min-width: 0;
+        }
+        .content-down-wrapper label {
+            color: #ff9e40;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .content-down {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            background: #1a1a1a;
+            color: #ddd;
+            overflow-y: auto;
+            padding: 20px;
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+        /* 마크다운 렌더링 스타일 (다크 모드 기본) */
+        .content-down h1, .content-down h2, .content-down h3 { color: #ff9e40; margin-bottom: 10px; }
+        .content-down p { margin-bottom: 10px; }
+        .content-down ul, .content-down ol { padding-left: 20px; margin-bottom: 10px; }
+        .content-down code { background: #2d2d2d; color: #ff79c6; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        .content-down pre { background: #111; padding: 15px; border-radius: 8px; overflow-x: auto; margin-bottom: 10px; }
+        .content-down pre code { background: transparent; color: #f8f8f2; padding: 0; }
+        .content-down blockquote { border-left: 4px solid #ff9e40; padding-left: 15px; color: #aaa; margin-bottom: 10px; }
+        .content-down table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+        .content-down th, .content-down td { border: 1px solid #444; padding: 8px; text-align: left; }
+        .content-down th { background: #2a2a2a; }
+
+        /* 카드/패널 그림자 */
+        .card, .content-mid, .content-down, .code-editor-container {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
+        body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
+        body.light-mode .editor-textarea { color: #24292e; caret-color: #000; }
+        body.light-mode .copy-btn { border-color: #F38020; color: #F38020; }
+        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+        
+        /* Light Mode Preview 스타일 */
+        body.light-mode .content-down { background: #ffffff; color: #24292e; }
+        body.light-mode .content-down h1, body.light-mode .content-down h2, body.light-mode .content-down h3 { color: #F38020; }
+        body.light-mode .content-down code { background: #f6f8fa; color: #d73a49; }
+        body.light-mode .content-down pre { background: #f6f8fa; }
+        body.light-mode .content-down pre code { color: #24292e; }
+        body.light-mode .content-down blockquote { border-left-color: #F38020; color: #6a737d; }
+        body.light-mode .content-down th { background: #f6f8fa; }
+        body.light-mode .content-down th, body.light-mode .content-down td { border-color: #dfe2e5; }
+
+        body.light-mode .card, 
+        body.light-mode .content-mid, 
+        body.light-mode .content-down,
+        body.light-mode .code-editor-container {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2000;
+            padding: 10px 15px;
+            background: #ff9e40;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .app-container {
+                height: auto;
+                min-height: 100vh;
+                overflow: auto;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                overflow: visible;
+            }
+            .menu-toggle-btn {
+                display: block;
+                color: #ffffff;
+            }
+            .sidebar {
+                transform: translateX(-250px);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .workspace-container {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                height: 600px;
+            }
+            .content-mid, .content-down-wrapper {
+                flex: 1 1 50%;
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div>
+            <button class="menu-btn" onclick="saveCode()">Save</button>
+            <button class="menu-btn" onclick="resetCode()">Reset</button>
+        </div>
+    </aside>
+    <main class="main-content">
+        <header class="top-section">
+            <h1 id="page-title">Markdown Editor</h1>
+            <p id="page-desc">Type markdown on the left, see rendered HTML on the right.</p>
+        </header>
+        <div class="workspace-container">
+            <div class="content-mid">
+                <div class="content-mid-header">
+                    <span>Markdown Input</span>
+                    <button class="copy-btn" onclick="copyCode()">Copy</button>
+                </div>
+                <div class="code-editor-container">
+                    <div class="line-numbers" id="line-numbers">1</div>
+                    <div class="code-output-wrapper">
+                        <textarea id="code-textarea" class="editor-textarea" spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="content-down-wrapper">
+                <label>Preview</label>
+                <div class="content-down" id="preview-area">
+                    <!-- 마크다운 렌더링 결과가 출력되는 곳 -->
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const codeTextarea = document.getElementById('code-textarea');
+    const lineNumbers = document.getElementById('line-numbers');
+    const previewArea = document.getElementById('preview-area');
+
+    const defaultCode = `# Welcome to Markdown Previewer! ✨\n\nType your markdown text on the left and see it rendered instantly on the right.\n\n## Features\n- Real-time preview\n- Supports **bold**, *italic*, and \`code\`\n- Dark and Light mode integration\n\n> "Simplicity is the soul of efficiency." — Austin Freeman\n\n### Code Example\n\`\`\`javascript\nfunction greet() {\n    console.log("Hello, Markdown!");\n}\n\`\`\``;
+
+    function toggleSidebar() { 
+        sidebar.classList.toggle('active'); 
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    document.querySelector('.main-content').addEventListener('click', () => { 
+        if (sidebar.classList.contains('active')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
+
+    function updateEditor() {
+        const code = codeTextarea.value;
+
+        // 1. 줄 번호 갱신
+        const lineCount = code.split('\n').length;
+        lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
+
+        // 2. 마크다운을 HTML로 변환하여 프리뷰 영역에 반영
+        previewArea.innerHTML = marked.parse(code);
+    }
+
+    codeTextarea.addEventListener('scroll', () => {
+        lineNumbers.scrollTop = codeTextarea.scrollTop;
+    });
+
+    codeTextarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = codeTextarea.selectionStart;
+            const end = codeTextarea.selectionEnd;
+
+            codeTextarea.value = codeTextarea.value.substring(0, start) + "  " + codeTextarea.value.substring(end);
+            codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 2;
+            updateEditor();
+        }
+    });
+
+    codeTextarea.addEventListener('input', updateEditor);
+
+    function copyCode() {
+        const code = codeTextarea.value;
+        if (!code) return;
+        navigator.clipboard.writeText(code).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+        });
+    }
+
+    function saveCode() {
+        const code = codeTextarea.value;
+        const fileName = 'MarkdownNote.md';
+
+        if (!code) {
+            alert('No text to save.');
+            return;
+        }
+
+        localStorage.setItem('saved_markdown_text', code);
+        const blob = new Blob([code], { type: 'text/markdown;charset=utf-8;' });
+        const link = document.createElement('a');
+                
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(link.href);
+    }
+
+    function resetCode() {
+        if (confirm('Are you sure you want to reset?')) {
+            localStorage.removeItem('saved_markdown_text');
+            codeTextarea.value = defaultCode;
+            updateEditor();
+        }
+    }
+
+    function loadSavedCode() {
+        const savedCode = localStorage.getItem('saved_markdown_text');
+
+        if (savedCode !== null) {
+            codeTextarea.value = savedCode;
+        } else {
+            codeTextarea.value = defaultCode;
+        }
+    }
+
+    loadSavedCode();
+    updateEditor();
+</script>
+</body>
+</html>
