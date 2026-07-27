@@ -330,7 +330,7 @@
 
     async function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=4`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=16`;
             
         const response = await fetch(url);
         if (!response.ok) throw new Error('Open-Meteo request failed');
@@ -384,7 +384,7 @@
         if (currentProvider === 'wttr') {
             titleEl.innerText = '3-Day Forecast (Every 3 Hours)';
         } else {
-            titleEl.innerText = '3-Day Forecast (Every 1 Hour)';
+            titleEl.innerText = '16-Day Forecast (Every 1 Hour)';
         }
 
         try {
