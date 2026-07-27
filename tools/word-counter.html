@@ -162,46 +162,31 @@
         } 
     });
 
-    // 자동 줄바꿈 반영 행 번호 계산 함수
     function updateLineNumbers() {
         const text = textInput.value;
         const lines = text.split('\n');
         
-        // 임시 측정용 요소 생성 (textarea의 너비와 폰트 스타일 측정용)
         const measureDiv = document.createElement('div');
         measureDiv.style.font = window.getComputedStyle(textInput).font;
-        measureDiv.style.width = (textInput.clientWidth - 80) + 'px'; // 좌우 padding 40px 제외
+        measureDiv.style.width = (textInput.clientWidth - 80) + 'px';
         measureDiv.style.visibility = 'hidden';
         measureDiv.style.position = 'absolute';
         measureDiv.style.whiteSpace = 'pre-wrap';
         measureDiv.style.wordBreak = 'break-all';
         document.body.appendChild(measureDiv);
 
-        let totalLines = 0;
-        let result = '';
-
-        lines.forEach((line, index) => {
-            measureDiv.textContent = line === '' ? ' ' : line;
-            // 텍스트가 줄바꿈되었을 때 차지하는 높이를 기반으로 실제 라인 수 계산
-            const computedHeight = measureDiv.clientHeight;
-            const lineHeight = parseFloat(window.getComputedStyle(textInput).lineHeight);
-            const lineCount = Math.max(1, Math.round(computedHeight / lineHeight));
-
-            for (let i = 0; i < lineCount; i++) {
-                totalLines++;
-                result += (i === 0 ? totalLines : '&nbsp;') + '<br>'; // 첫 줄에만 번호 표시, 래핑된 줄은 빈 칸 처리하거나 연속 번호 매김 가능
-            }
-        });
-
-        // 심플하게 매 줄마다 순차 번호를 부여하고 싶다면 아래 방식을 사용하세요:
         let simpleResult = '';
         let currentLine = 1;
+
         lines.forEach((line) => {
             measureDiv.textContent = line === '' ? ' ' : line;
             const lineCount = Math.max(1, Math.round(measureDiv.clientHeight / parseFloat(window.getComputedStyle(textInput).lineHeight)));
+            
             for (let i = 0; i < lineCount; i++) {
-                simpleResult += currentLine++ + '<br>';
+                // 첫 줄에만 번호 표시, 자동 줄바꿈으로 생긴 하위 줄은 빈칸(&nbsp;) 처리
+                simpleResult += (i === 0 ? currentLine : '&nbsp;') + '<br>';
             }
+            currentLine++;
         });
 
         document.body.removeChild(measureDiv);
