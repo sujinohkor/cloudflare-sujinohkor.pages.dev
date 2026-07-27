@@ -80,7 +80,100 @@
             gap: 20px;
             flex: 1;
             min-height: 0;
+            position: relative;
         }
+
+        /* ===== Maximize / Minimize 상태별 제어 클래스 ===== */
+        
+        /* 1단계: 왼쪽(마크다운 입력창)이 화면 전체를 채우도록 고정 */
+        .workspace-container.state-left {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: #202020;
+            padding: 20px;
+            margin: 0 !important;
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+        }
+        .workspace-container.state-left .content-down-wrapper {
+            display: none !important;
+        }
+        .workspace-container.state-left .content-mid {
+            display: flex !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* 2단계: 화면 전체에 좌우 분할 Maximize */
+        .workspace-container.state-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: #202020;
+            padding: 20px;
+            margin: 0 !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 20px !important;
+        }
+        .workspace-container.state-fullscreen .content-mid {
+            display: flex !important;
+        }
+        .workspace-container.state-fullscreen .content-down-wrapper {
+            display: flex !important;
+        }
+
+        /* 3단계: 오른쪽(프리뷰)이 화면 전체를 채우도록 고정 */
+        .workspace-container.state-right {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: #202020;
+            padding: 20px;
+            margin: 0 !important;
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+        }
+        .workspace-container.state-right .content-mid {
+            display: none !important;
+        }
+        .workspace-container.state-right .content-down-wrapper {
+            display: flex !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Maximize 버튼 스타일 */
+        .maximize-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+        .maximize-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+
         /* ===== [Markdown Editor 영역] ===== */
         .content-mid {
             display: flex;
@@ -142,7 +235,7 @@
             font-size: inherit;
             line-height: inherit;
             white-space: pre-wrap;
-            work-break: break-all;
+            word-break: break-all;
             overflow: auto;
             tab-size: 2;
             background: transparent;
@@ -192,8 +285,6 @@
             padding: 20px;
             font-family: 'Segoe UI', sans-serif;
             line-height: 1.6;
-
-            /* 이 아래 속성들을 추가하세요 */
             word-wrap: break-word;
             word-break: break-all;
             overflow-wrap: break-word;
@@ -209,7 +300,6 @@
         .content-down table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
         .content-down th, .content-down td { border: 1px solid #444; padding: 8px; text-align: left; }
         .content-down th { background: #2a2a2a; }
-
         /* 카드/패널 그림자 */
         .card, .content-mid, .content-down, .code-editor-container {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
@@ -225,8 +315,15 @@
         body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
         body.light-mode .editor-textarea { color: #24292e; caret-color: #000; }
         body.light-mode .copy-btn { border-color: #F38020; color: #F38020; }
-        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }                
         
+        body.light-mode .workspace-container.state-left,
+        body.light-mode .workspace-container.state-fullscreen,
+        body.light-mode .workspace-container.state-right { background: #fff !important; }
+
+        body.light-mode .maximize-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .maximize-btn:hover { background: #F38020; color: #fff; }
+
         /* Light Mode Preview 스타일 */
         body.light-mode .content-down { background: #ffffff; color: #24292e; }
         body.light-mode .content-down h1, body.light-mode .content-down h2, body.light-mode .content-down h3 { color: #F38020; }
@@ -236,14 +333,9 @@
         body.light-mode .content-down blockquote { border-left-color: #F38020; color: #6a737d; }
         body.light-mode .content-down th { background: #f6f8fa; }
         body.light-mode .content-down th, body.light-mode .content-down td { border-color: #dfe2e5; }
-
-        body.light-mode .card, 
-        body.light-mode .content-mid, 
-        body.light-mode .content-down,
-        body.light-mode .code-editor-container {
+        body.light-mode .card, body.light-mode .content-mid, body.light-mode .content-down, body.light-mode .code-editor-container {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-
         /* 5. Mobile Responsive */
         .menu-toggle-btn {
             display: none;
@@ -311,7 +403,10 @@
             <h1 id="page-title">Markdown Editor</h1>
             <p id="page-desc">Type markdown on the left, see rendered HTML on the right.</p>
         </header>
-        <div class="workspace-container">
+        <div class="workspace-container" id="workspace-container">
+            <!-- 4단계 순환 Maximize/Minimize 버튼 추가 -->
+            <button class="maximize-btn" id="maximize-btn" onclick="toggleMaximize()">Maximize ⛶</button>
+
             <div class="content-mid">
                 <div class="content-mid-header">
                     <span>Markdown Input</span>
@@ -338,9 +433,53 @@
     const codeTextarea = document.getElementById('code-textarea');
     const lineNumbers = document.getElementById('line-numbers');
     const previewArea = document.getElementById('preview-area');
+    const workspaceContainer = document.getElementById('workspace-container');
+    const maximizeBtn = document.getElementById('maximize-btn');
 
-    const defaultCode = `# Welcome to Markdown Editor! ✨\n\nType your markdown text on the left and see it rendered instantly on the right.\n\n## Features\n- Real-time preview\n- Supports **bold**, *italic*, and \`code\`\n- Dark and Light mode integration\n\n> "Simplicity is the soul of efficiency." — Austin Freeman\n\n### Code Example\n\`\`\`javascript\nfunction greet() {\n    console.log("Hello, Markdown!");\n}\n\`\`\``;
+    let maximizeState = 0; // 0: 기본, 1: 왼쪽(마크다운창) Maximize, 2: 전체화면(좌우분할), 3: 오른쪽(프리뷰) Maximize
 
+    function toggleMaximize() {
+        maximizeState = (maximizeState + 1) % 4;
+
+        // 클래스 초기화
+        workspaceContainer.classList.remove('state-left', 'state-right', 'state-fullscreen');
+
+        if (maximizeState === 0) {
+            // 4번째 클릭: Minimize (기본 상태)
+            maximizeBtn.textContent = 'Maximize ⛶';
+        } else if (maximizeState === 1) {
+            // 1번째 클릭: 왼쪽창(마크다운창)이 화면 전체 Maximize
+            workspaceContainer.classList.add('state-left');
+            maximizeBtn.textContent = 'Fullscreen ⛶';
+        } else if (maximizeState === 2) {
+            // 2번째 클릭: 화면 전체에 좌우 분할 Maximize
+            workspaceContainer.classList.add('state-fullscreen');
+            maximizeBtn.textContent = 'Preview Max ⛶';
+        } else if (maximizeState === 3) {
+            // 3번째 클릭: 오른쪽창(프리뷰)이 화면 전체 Maximize
+            workspaceContainer.classList.add('state-right');
+            maximizeBtn.textContent = 'Minimize 🗗';
+        }
+    }
+
+    const defaultCode = `# Welcome to Markdown Editor! ✨
+
+Type your markdown text on the left and see it rendered instantly on the right.
+
+## Features
+- Real-time preview
+- Supports **bold**, *italic*, and \`code\`
+- Dark and Light mode integration
+
+> "Simplicity is the soul of efficiency." — Austin Freeman
+
+### Code Example
+\`\`\`javascript
+function greet() {
+    console.log("Hello, Markdown!");
+}
+\`\`\``;
+    
     function toggleSidebar() { 
         sidebar.classList.toggle('active'); 
     }
@@ -437,7 +576,7 @@
         localStorage.setItem('saved_markdown_text', code);
         const blob = new Blob([code], { type: 'text/markdown;charset=utf-8;' });
         const link = document.createElement('a');
-                
+                        
         link.href = URL.createObjectURL(blob);
         link.download = fileName;
         link.style.display = 'none';
