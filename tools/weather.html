@@ -284,26 +284,7 @@
             currentCity = data.nearest_area[0].areaName[0].value;
             document.getElementById('city-input').value = currentCity;
         }
-
-        /*const forecastList = [];
-        data.weather.slice(0, 3).forEach(day => {
-            const dateStr = day.date.slice(5);
-            day.hourly.forEach(hour => {
-                const timeNum = parseInt(hour.time, 10) / 100;
-                const timeFormatted = `${dateStr} ${String(timeNum).padStart(2, '0')}:00`;
-                const windMs = (parseInt(hour.windspeedKmph, 10) / 3.6).toFixed(1);
-
-                forecastList.push({
-                    time: timeFormatted,
-                    desc: formatWttrDescription(hour.weatherDesc[0].value),
-                    rainChance: `☔ ${hour.chanceofrain}%`,
-                    wind: `💨 ${windMs}m/s`,
-                    humidity: `💧 ${hour.humidity}%`,
-                    temp: `${hour.tempC}°C`
-                });
-            });
-        });*//*오늘날짜부터 3일치*/
-
+        
         const forecastList = [];
         const now = new Date();
 
@@ -333,7 +314,7 @@
                     });
                 }
             });
-        });/*지금시간으로부터 3일치*/
+        });
 
         return {
             current: {
