@@ -358,8 +358,20 @@
         const hourly = data.hourly;
         const currentHumidity = hourly.relativehumidity_2m[0];
 
-        /*const forecastList = [];
-        for (let i = 0; i < hourly.time.length; i += 3) {
+        const forecastList = [];
+        const now = new Date(); // 현재 시간 기준
+
+        // 1. 현재 시간 이후에 해당하는 최초의 인덱스(startIndex) 찾기
+        let startIndex = 0;
+        for (let i = 0; i < hourly.time.length; i++) {
+            if (new Date(hourly.time[i]) >= now) {
+                startIndex = i;
+                break;
+            }
+        }
+
+        // 2. 찾은 인덱스부터 시작해서 3칸씩(3시간 간격) 데이터 수집
+        for (let i = startIndex; i < hourly.time.length; i += 3) {
             const timeStr = hourly.time[i].replace('T', ' ').slice(5);
             const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
 
@@ -371,31 +383,7 @@
                 humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
                 temp: `${Math.round(hourly.temperature_2m[i])}°C`
             });
-        }*//*오늘날짜부터 3일치*/
-        
-        const forecastList = [];
-        const now = new Date(); // 현재 시간 기준
-        
-        for (let i = 0; i < hourly.time.length; i++) {
-            const forecastTime = new Date(hourly.time[i]); // 예보 시각 객체
-            
-            // 현재 시간 이후의 데이터이면서, 3시간 단위(또는 원하는 간격)인 데이터만 선택
-            /*if (forecastTime >= now) {*/
-            for (let i = startIndex; i < hourly.time.length; i += 3) {
-                const timeStr = hourly.time[i].replace('T', ' ').slice(5);
-                const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
-
-                forecastList.push({
-                    time: timeStr,
-                    desc: getWeatherDescription(hourly.weathercode[i]),
-                    rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
-                    wind: `💨 ${windMs}m/s`,
-                    humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
-                    temp: `${Math.round(hourly.temperature_2m[i])}°C`
-                });
-            }
-        }/*지금시간으로부터 3일치*/
-        
+        }
 
         return {
             current: {
