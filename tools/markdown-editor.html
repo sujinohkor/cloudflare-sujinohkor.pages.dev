@@ -352,10 +352,41 @@
 
     function updateEditor() {
         const code = codeTextarea.value;
+        const lines = code.split('\n');
 
-        // 1. 줄 번호 갱신
-        const lineCount = code.split('\n').length;
-        lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
+        // 가상으로 너비를 측정할 임시 div 생성 (textarea와 동일한 스타일 적용)
+        const measureDiv = document.createElement('div');
+        measureDiv.style.font = window.getComputedStyle(codeTextarea).font;
+        measureDiv.style.width = (codeTextarea.clientWidth - 24) + 'px'; // padding 12px * 2 제외
+        measureDiv.style.visibility = 'hidden';
+        measureDiv.style.position = 'absolute';
+        measureDiv.style.whiteSpace = 'pre-wrap';
+        measureDiv.style.wordBreak = 'break-all';
+        measureDiv.style.lineHeight = window.getComputedStyle(codeTextarea).lineHeight;
+        document.body.appendChild(measureDiv);
+
+        let lineNumbersHTML = '';
+        let currentLineNum = 1;
+
+        lines.forEach((line) => {
+            measureDiv.textContent = line === '' ? ' ' : line;
+            const computedHeight = measureDiv.clientHeight;
+            const lineHeight = parseFloat(window.getComputedStyle(codeTextarea).lineHeight);
+            // 해당 물리적 한 줄이 화면에서 자동 줄바꿈으로 인해 몇 줄로 나뉘었는지 계산
+            const subLineCount = Math.max(1, Math.round(computedHeight / lineHeight));
+
+            for (let i = 0; i < subLineCount; i++) {
+                if (i === 0) {
+                    lineNumbersHTML += currentLineNum + '<br>';
+                } else {
+                    lineNumbersHTML += '&nbsp;<br>'; // 줄바꿈으로 꺾인 하위 줄은 번호 대신 빈칸 처리
+                }
+            }
+            currentLineNum++;
+        });
+
+        document.body.removeChild(measureDiv);
+        lineNumbers.innerHTML = lineNumbersHTML || '1';
 
         // 2. 마크다운을 HTML로 변환하여 프리뷰 영역에 반영
         previewArea.innerHTML = marked.parse(code);
