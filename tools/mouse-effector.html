@@ -152,9 +152,14 @@
             user-select: none;
             border-right: 1px solid #282828;
             font-family: inherit;
-            overflow-y: hidden;
+            overflow-y: auto; /* hidden 대신 auto로 변경 */
+            scrollbar-width: none; /* 파이어폭스 스크롤바 숨김 */
         }
-
+        /* 크롬, 사파리, 엣지에서 줄 번호 영역 스크롤바 숨기기 */
+        .line-numbers::-webkit-scrollbar {
+            display: none; 
+        }
+        
         .code-output-wrapper {
             flex: 1;
             overflow: auto;
@@ -407,6 +412,14 @@
     let lastTypeBTime = 0;
     let customCursorEl = null;
 
+    const codeOutputWrapper = document.querySelector('.code-output-wrapper');
+    const lineNumbersEl = document.getElementById('line-numbers');
+
+    // 코드 박스를 스크롤할 때 줄 번호 박스도 함께 스크롤되도록 연동
+    codeOutputWrapper.addEventListener('scroll', () => {
+        lineNumbersEl.scrollTop = codeOutputWrapper.scrollTop;
+    });
+    
     function toggleSidebar() { 
         sidebar.classList.toggle('active'); 
     }
