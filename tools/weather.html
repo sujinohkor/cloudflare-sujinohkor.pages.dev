@@ -222,7 +222,8 @@
 
             <!-- 3-Day Forecast Panel -->
             <section class="forecast-panel">
-                <div class="forecast-title">3-Day Forecast (Every 3 Hours)</div>
+                <!-- 아이디 추가: 동적 타이틀 변경용 -->
+                <div class="forecast-title" id="forecast-title">3-Day Forecast (Every 3 Hours)</div>
                 <div class="forecast-list" id="forecast-list">
                     <div style="color: #888; text-align: center; margin-top: 20px;">Loading forecast...</div>
                 </div>
@@ -291,17 +292,14 @@
         const now = new Date();
 
         data.weather.slice(0, 3).forEach(day => {
-            const dateStr = day.date.slice(5); // 예: "06-28"
+            const dateStr = day.date.slice(5); 
             
             day.hourly.forEach(hour => {
-                const timeNum = parseInt(hour.time, 10) / 100; // 예: 0, 3, 6, ..., 21
+                const timeNum = parseInt(hour.time, 10) / 100; 
                 
-                // wttr.in의 날짜와 시간 조합으로 실제 Date 객체 생성
-                // day.date는 "YYYY-MM-DD" 형식
                 const hoursFormatted = String(timeNum).padStart(2, '0');
                 const forecastTime = new Date(`${day.date}T${hoursFormatted}:00:00`);
 
-                // 현재 시간 이후인 데이터만 추가
                 if (forecastTime >= now) {
                     const timeFormatted = `${dateStr} ${hoursFormatted}:00`;
                     const windMs = (parseInt(hour.windspeedKmph, 10) / 3.6).toFixed(1);
@@ -312,7 +310,7 @@
                         rainChance: `☔ ${hour.chanceofrain}%`,
                         wind: `💨 ${windMs}m/s`,
                         humidity: `💧 ${hour.humidity}%`,
-                        uv: `☀️ UV ${hour.uvIndex}`, // 👈 자외선 추가
+                        uv: `☀️ UV ${hour.uvIndex}`,
                         temp: `${hour.tempC}°C`
                     });
                 }
@@ -332,9 +330,8 @@
 
     async function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
-        // 충분한 여유 기간(예: 4일)을 요청하여 72시간 데이터를 확실히 커버합니다.
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=4`;
-                
+            
         const response = await fetch(url);
         if (!response.ok) throw new Error('Open-Meteo request failed');
         const data = await response.json();
@@ -344,16 +341,14 @@
         const currentHumidity = hourly.relativehumidity_2m[0];
     
         const forecastList = [];
-        const now = new Date(); // 현재 시간
-        const maxFutureTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 정확히 3일(72시간) 뒤
+        const now = new Date();
+        const maxFutureTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
     
+        // 1시간 간격으로 모든 데이터 수집 (i++)
         for (let i = 0; i < hourly.time.length; i++) {
             const forecastTime = new Date(hourly.time[i]);
     
-            // 현재 시간 이후이면서, 정확히 3일(72시간) 이내의 데이터만 포함
             if (forecastTime >= now && forecastTime <= maxFutureTime) {
-                // 3시간 간격으로 맞추고 싶다면 인덱스 조건이나 추가 필터를 적용할 수 있습니다.
-                // 여기서는 1시간 단위 중 3시간 간격(또는 원하는 간격)으로 추출
                 const timeStr = hourly.time[i].replace('T', ' ').slice(5);
                 const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
     
@@ -384,6 +379,14 @@
         document.getElementById('weather-desc').innerText = 'Loading...';
         document.getElementById('forecast-list').innerHTML = `<div style="color: #888; text-align: center; margin-top: 20px;">Loading forecast...</div>`;
 
+        // API 제공자에 따라 타이틀 동적 변경
+        const titleEl = document.getElementById('forecast-title');
+        if (currentProvider === 'wttr') {
+            titleEl.innerText = '3-Day Forecast (Every 3 Hours)';
+        } else {
+            titleEl.innerText = '3-Day Forecast (Every 1 Hour)';
+        }
+
         try {
             const data = currentProvider === 'wttr' ? await fetchWttr() : await fetchOpenMeteo();
 
@@ -405,7 +408,7 @@
                     <span class="forecast-rain">${item.rainChance}</span>
                     <span class="forecast-wind">${item.wind}</span>
                     <span class="forecast-humidity">${item.humidity}</span>
-                    <span class="forecast-uv">${item.uv}</span> <!-- 👈 이 줄을 추가 -->
+                    <span class="forecast-uv">${item.uv}</span>
                     <span class="forecast-temp">${item.temp}</span>
                 `;
                 forecastContainer.appendChild(el);
@@ -448,13 +451,12 @@
                     updateWeather();
                 },
                 () => {
-                    // GPS 허용을 안 했거나 실패한 경우 즉시 Seoul로 설정
                     currentCoords = null;
                     currentCity = 'Seoul';
                     document.getElementById('city-input').value = currentCity;
                     updateWeather();
                 },
-                { timeout: 5000 } // 5초 동안 응답이 없으면 에러로 간주하고 fallback 실행
+                { timeout: 5000 }
             );
         } else {
             currentCoords = null;
