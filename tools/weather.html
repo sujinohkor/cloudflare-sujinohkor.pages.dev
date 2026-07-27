@@ -285,7 +285,7 @@
             document.getElementById('city-input').value = currentCity;
         }
 
-        const forecastList = [];
+        /*const forecastList = [];
         data.weather.slice(0, 3).forEach(day => {
             const dateStr = day.date.slice(5);
             day.hourly.forEach(hour => {
@@ -302,7 +302,38 @@
                     temp: `${hour.tempC}°C`
                 });
             });
-        });
+        });*//*오늘날짜부터 3일치*/
+
+        const forecastList = [];
+        const now = new Date();
+
+        data.weather.slice(0, 3).forEach(day => {
+            const dateStr = day.date.slice(5); // 예: "06-28"
+            
+            day.hourly.forEach(hour => {
+                const timeNum = parseInt(hour.time, 10) / 100; // 예: 0, 3, 6, ..., 21
+                
+                // wttr.in의 날짜와 시간 조합으로 실제 Date 객체 생성
+                // day.date는 "YYYY-MM-DD" 형식
+                const hoursFormatted = String(timeNum).padStart(2, '0');
+                const forecastTime = new Date(`${day.date}T${hoursFormatted}:00:00`);
+
+                // 현재 시간 이후인 데이터만 추가
+                if (forecastTime >= now) {
+                    const timeFormatted = `${dateStr} ${hoursFormatted}:00`;
+                    const windMs = (parseInt(hour.windspeedKmph, 10) / 3.6).toFixed(1);
+
+                    forecastList.push({
+                        time: timeFormatted,
+                        desc: formatWttrDescription(hour.weatherDesc[0].value),
+                        rainChance: `☔ ${hour.chanceofrain}%`,
+                        wind: `💨 ${windMs}m/s`,
+                        humidity: `💧 ${hour.humidity}%`,
+                        temp: `${hour.tempC}°C`
+                    });
+                }
+            });
+        });/*지금시간으로부터 3일치*/
 
         return {
             current: {
@@ -327,7 +358,7 @@
         const hourly = data.hourly;
         const currentHumidity = hourly.relativehumidity_2m[0];
 
-        const forecastList = [];
+        /*const forecastList = [];
         for (let i = 0; i < hourly.time.length; i += 3) {
             const timeStr = hourly.time[i].replace('T', ' ').slice(5);
             const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
@@ -340,7 +371,30 @@
                 humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
                 temp: `${Math.round(hourly.temperature_2m[i])}°C`
             });
-        }
+        }*//*오늘날짜부터 3일치*/
+        
+        const forecastList = [];
+        const now = new Date(); // 현재 시간 기준
+        
+        for (let i = 0; i < hourly.time.length; i++) {
+            const forecastTime = new Date(hourly.time[i]); // 예보 시각 객체
+            
+            // 현재 시간 이후의 데이터이면서, 3시간 단위(또는 원하는 간격)인 데이터만 선택
+            if (forecastTime >= now) {
+                const timeStr = hourly.time[i].replace('T', ' ').slice(5);
+                const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
+
+                forecastList.push({
+                    time: timeStr,
+                    desc: getWeatherDescription(hourly.weathercode[i]),
+                    rainChance: `☔ ${hourly.precipitation_probability[i]}%`,
+                    wind: `💨 ${windMs}m/s`,
+                    humidity: `💧 ${hourly.relativehumidity_2m[i]}%`,
+                    temp: `${Math.round(hourly.temperature_2m[i])}°C`
+                });
+            }
+        }/*지금시간으로부터 3일치*/
+        
 
         return {
             current: {
