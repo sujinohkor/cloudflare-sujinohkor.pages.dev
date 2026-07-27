@@ -85,6 +85,98 @@
             gap: 20px;
             flex: 1;
             min-height: 0;
+            position: relative;
+        }
+
+        /* ===== Maximize / Minimize 상태별 제어 클래스 ===== */
+        
+        /* 1단계: 왼쪽(코드뷰)이 화면 전체를 채우도록 고정 */
+        .workspace-container.state-left {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: #202020;
+            padding: 20px;
+            margin: 0 !important;
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+        }
+        .workspace-container.state-left .content-down-wrapper {
+            display: none !important;
+        }
+        .workspace-container.state-left .content-mid {
+            display: flex !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* 2단계: 화면 전체에 좌우 분할 Maximize */
+        .workspace-container.state-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: #202020;
+            padding: 20px;
+            margin: 0 !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 20px !important;
+        }
+        .workspace-container.state-fullscreen .content-mid {
+            display: flex !important;
+        }
+        .workspace-container.state-fullscreen .content-down-wrapper {
+            display: flex !important;
+        }
+
+        /* 3단계: 오른쪽(프리뷰)이 화면 전체를 채우도록 고정 */
+        .workspace-container.state-right {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: #202020;
+            padding: 20px;
+            margin: 0 !important;
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+        }
+        .workspace-container.state-right .content-mid {
+            display: none !important;
+        }
+        .workspace-container.state-right .content-down-wrapper {
+            display: flex !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Maximize 버튼 스타일 */
+        .maximize-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+        .maximize-btn:hover {
+            background: #ff9e40;
+            color: #101010;
         }
 
         /* ===== [Code Editor 영역] ===== */
@@ -95,6 +187,7 @@
             height: 100%;
             min-height: 0;
             min-width: 0;
+            overflow: hidden;
         }
 
         .content-mid-header {
@@ -173,7 +266,7 @@
         }
 
         /* Syntax Highlighting Colors (Dark Mode) */
-        .hl-tag     { color: #ff79c6; font-weight: bold; }
+        .hl-tag    { color: #ff79c6; font-weight: bold; }
         .hl-bracket { color: #ff79c6; font-weight: bold; }
         .hl-attr    { color: #50fa7b; }
         .hl-string  { color: #f1fa8c; }
@@ -207,6 +300,7 @@
             height: 100%;
             min-height: 0;
             min-width: 0;
+            overflow: hidden;
         }
 
         .content-down-wrapper label {
@@ -232,7 +326,7 @@
             background: #fff;
         }
 
-        /* 다크 모드 카드/패널 그림자 (HTML Editor 요소 확장) */
+        /* 다크 모드 카드/패널 그림자 */
         .card, .content-mid, .content-down, .code-editor-container {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -249,9 +343,8 @@
         body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
         body.light-mode .editor-textarea { caret-color: #000; }
         
-        /* Light Mode Syntax Highlighting */
         body.light-mode .code-output-display { color: #24292e; }
-        body.light-mode .hl-tag     { color: #22863a; font-weight: bold; }
+        body.light-mode .hl-tag    { color: #22863a; font-weight: bold; }
         body.light-mode .hl-bracket { color: #22863a; font-weight: bold; }
         body.light-mode .hl-attr    { color: #6f42c1; }
         body.light-mode .hl-string  { color: #032f62; }
@@ -262,18 +355,18 @@
         body.light-mode .copy-btn   { border-color: #F38020; color: #F38020; }
         body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
 
-        /* 데이 모드 카드/패널 그림자 (HTML Editor 요소 확장) */
+        body.light-mode .workspace-container.state-left,
+        body.light-mode .workspace-container.state-fullscreen,
+        body.light-mode .workspace-container.state-right { background: #fff !important; }
+        
+        body.light-mode .maximize-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .maximize-btn:hover { background: #F38020; color: #fff; }
+
         body.light-mode .card, 
         body.light-mode .content-mid, 
         body.light-mode .content-down,
         body.light-mode .code-editor-container {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
-        }
-
-        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
-        body.light-mode .color-card,
-        body.light-mode .list-item {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
         }
 
         /* 5. Mobile Responsive */
@@ -348,7 +441,10 @@
             <p id="page-desc">Write your HTML code and view the result in real-time.</p>
         </header>
 
-        <div class="workspace-container">
+        <div class="workspace-container" id="workspace-container">
+            <!-- 4단계 순환 Maximize/Minimize 버튼 -->
+            <button class="maximize-btn" id="maximize-btn" onclick="toggleMaximize()">Maximize ⛶</button>
+
             <div class="content-mid">
                 <div class="content-mid-header">
                     <span>HTML / CSS / JS</span>
@@ -379,6 +475,34 @@
     const codeDisplay = document.getElementById('code-output-display');
     const lineNumbers = document.getElementById('line-numbers');
     const previewFrame = document.getElementById('preview-frame');
+    const workspaceContainer = document.getElementById('workspace-container');
+    const maximizeBtn = document.getElementById('maximize-btn');
+
+    let maximizeState = 0; // 0: 기본, 1: 왼쪽(코드뷰) Maximize, 2: 전체화면(좌우분할), 3: 오른쪽(프리뷰) Maximize
+
+    function toggleMaximize() {
+        maximizeState = (maximizeState + 1) % 4;
+
+        // 클래스 초기화
+        workspaceContainer.classList.remove('state-left', 'state-right', 'state-fullscreen');
+
+        if (maximizeState === 0) {
+            // 4번째 클릭: Minimize (기본 상태)
+            maximizeBtn.textContent = 'Maximize ⛶';
+        } else if (maximizeState === 1) {
+            // 1번째 클릭: 왼쪽창(코드뷰)이 화면 전체 Maximize
+            workspaceContainer.classList.add('state-left');
+            maximizeBtn.textContent = 'Fullscreen ⛶';
+        } else if (maximizeState === 2) {
+            // 2번째 클릭: 화면 전체에 좌우 분할 Maximize
+            workspaceContainer.classList.add('state-fullscreen');
+            maximizeBtn.textContent = 'Preview Max ⛶';
+        } else if (maximizeState === 3) {
+            // 3번째 클릭: 오른쪽창(프리뷰)이 화면 전체 Maximize
+            workspaceContainer.classList.add('state-right');
+            maximizeBtn.textContent = 'Minimize 🗗';
+        }
+    }
 
     const defaultCode = `<!DOCTYPE html>
 <html>
