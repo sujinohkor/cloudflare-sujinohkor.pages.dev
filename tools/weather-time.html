@@ -751,6 +751,8 @@
 
     function initLocation() {
         document.getElementById('city-input').value = '';
+        switchView('weather'); // <-- 이 부분 추가
+        
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
