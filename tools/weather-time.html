@@ -747,16 +747,16 @@
         } catch (err) {
             clearTimeout(timeoutId);
             console.error('IP location fallback failed, using default Seoul:', err);
-            document.getElementById('weather-desc').innerText = `Error: ${err.message}`;
             
             currentCoords = null;
             currentCity = 'Seoul';
             document.getElementById('city-input').value = currentCity;
-            //updateWeather(); // 무조건 기본 도시로 날씨 조회 실행
+            updateWeather(); // 무조건 기본 도시로 날씨 조회 실행
         }
     }
 
     function initLocation() {
+        alert("initLocation 실행됨"); // 모바일에서 이 알림창이 뜨는지 확인
         document.getElementById('city-input').value = '';
         switchView('weather');
     
