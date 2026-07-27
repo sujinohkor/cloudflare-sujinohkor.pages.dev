@@ -2,134 +2,226 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Dino Game</title>
+    <!-- 파비콘 설정 추가 -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        body { text-align: center; background: #f7f7f7; padding-top: 50px; user-select: none; }
-        canvas { background: #fff; border-bottom: 2px solid #535353; cursor: pointer; }
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; user-select: none; }
+                
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+
+        .content-card { 
+            border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
+            display: flex; justify-content: center; align-items: center; overflow: hidden; background: transparent;
+            padding: 20px;
+        }
+
+        /* Game Canvas Style (부모 div에 가득 차도록 반응형 설정) */
+        canvas { 
+            /*background: #fff;*/
+            background: linear-gradient(to bottom, #87ceeb 0%, #ffffff 50%, #d2b48c 100%);
+            border-bottom: 2px solid #535353; 
+            border-radius: 8px;
+            cursor: pointer; 
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* 다크 모드 카드/패널 그림자 */
+        .card, .content-card, .content-mid, .content-down {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        body.light-mode .card, 
+        body.light-mode .content-card,
+        body.light-mode .content-mid, 
+        body.light-mode .content-down {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+                
+        @media (max-width: 600px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            .content-card { min-height: 0; height: 100%; }
+        }
     </style>
 </head>
 <body>
-    <h2>Press the spacebar or click the screen to jump!</h2>
-    <canvas id="game" width="600" height="200"></canvas>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+    </aside>
 
-    <script>
-        const canvas = document.getElementById('game');
-        const ctx = canvas.getContext('2d');
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Mini Dino Game</h1>
+            <p>Press the spacebar or click the screen to jump!</p>
+        </header>
+        <section class="content-card" style="margin-top: 20px;">
+            <canvas id="game"></canvas>
+        </section>
+    </main>
+</div>
 
-        // 공룡 객체
-        const dino = {
-            x: 50, y: 140, width: 30, height: 30,
-            dy: 0, gravity: 0.45, jumpPower: -9.5, isGrounded: true
-        };
+<script>
+    const sidebar = document.getElementById('sidebar');
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
 
-        // 장애물(선인장) 배열
-        let cactusArray = [];
-        let score = 0;
-        let isGameOver = false;
-        
-        // 장애물 최소 간격 보장을 위한 타이머 변수
-        let lastCactusTime = 0;
+    document.querySelector('.main-content').addEventListener('click', () => { 
+        if (sidebar.classList.contains('active')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
 
-        function jump() {
-            if (dino.isGrounded && !isGameOver) {
-                dino.dy = dino.jumpPower;
-                dino.isGrounded = false;
-            }
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    // 캔버스 내부 해상도 설정 (고정 비율 유지 기준)
+    const baseWidth = 800;
+    const baseHeight = 250;
+    canvas.width = baseWidth;
+    canvas.height = baseHeight;
+
+    const dino = {
+        x: 50, y: 170, width: 35, height: 35,
+        dy: 0, gravity: 0.45, jumpPower: -9.5, isGrounded: true
+    };
+
+    let cactusArray = [];
+    let score = 0;
+    let isGameOver = false;
+    let lastCactusTime = 0;
+
+    function jump() {
+        if (dino.isGrounded && !isGameOver) {
+            dino.dy = dino.jumpPower;
+            dino.isGrounded = false;
         }
+    }
 
-        // 키보드 점프 처리 (스크롤 방지 추가)
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.key === ' ') {
-                e.preventDefault();
-                jump();
-            }
-        });
-
-        // 마우스 클릭 / 터치 점프 처리
-        window.addEventListener('click', jump);
-        window.addEventListener('touchstart', (e) => {
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.key === ' ') {
+            e.preventDefault();
             jump();
+        }
+    });
+
+    window.addEventListener('click', jump);
+    window.addEventListener('touchstart', (e) => {
+        jump();
+    });
+
+    function spawnCactus() {
+        lastCactusTime++;
+        if (lastCactusTime > 120 && Math.random() < 0.02) {
+            cactusArray.push({ x: baseWidth, y: 170, width: 30, height: 35 });
+            lastCactusTime = 0;
+        }
+    }
+
+    function update() {
+        if (isGameOver) return;
+
+        dino.dy += dino.gravity;
+        dino.y += dino.dy;
+
+        if (dino.y >= 170) {
+            dino.y = 170;
+            dino.dy = 0;
+            dino.isGrounded = true;
+        }
+
+        spawnCactus();
+        for (let i = cactusArray.length - 1; i >= 0; i--) {
+            let c = cactusArray[i];
+            c.x -= 3;
+
+            const padding = 6;
+            if (dino.x + padding < c.x + c.width - padding &&
+                dino.x + dino.width - padding > c.x + padding &&
+                dino.y + padding < c.y + c.height - padding &&
+                dino.y + dino.height - padding > c.y + padding) {
+                isGameOver = true;
+                setTimeout(() => {
+                    alert(`Game Over! Score: ${Math.floor(score)}`);
+                    location.reload();
+                }, 10);
+            }
+
+            if (c.x < -40) cactusArray.splice(i, 1);
+        }
+        score += 0.05;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.translate(dino.x + dino.width, dino.y);
+        ctx.scale(-1, 1);
+        ctx.font = '35px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+        ctx.textBaseline = 'top';
+        ctx.fillText('🦖', 0, 0);
+        ctx.restore();
+
+        cactusArray.forEach(c => {
+            ctx.font = '35px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+            ctx.textBaseline = 'top';
+            ctx.fillText('🌵', c.x, c.y);
         });
 
-        function spawnCactus() {
-            lastCactusTime++; // 매 프레임마다 카운터 증가
+        ctx.fillStyle = '#000';
+        ctx.font = '18px monospace';
+        ctx.fillText(`Score: ${Math.floor(score)}`, baseWidth - 140, 25);
+    }
 
-            // 이전 선인장이 나온 지 최소 120프레임 이상 지났고, 확률 조건 만족 시에만 생성
-            if (lastCactusTime > 120 && Math.random() < 0.02) {
-                cactusArray.push({ x: 600, y: 140, width: 25, height: 30 });
-                lastCactusTime = 0; // 생성 후 타이머 리셋
-            }
-        }
+    function gameLoop() {
+        update();
+        draw();
+        if (!isGameOver) requestAnimationFrame(gameLoop);
+    }
 
-        function update() {
-            if (isGameOver) return;
-
-            // 1. 공룡 물리 계산
-            dino.dy += dino.gravity;
-            dino.y += dino.dy;
-
-            if (dino.y >= 140) {
-                dino.y = 140;
-                dino.dy = 0;
-                dino.isGrounded = true;
-            }
-
-            // 2. 장애물 이동 및 충돌 검사
-            spawnCactus();
-            for (let i = cactusArray.length - 1; i >= 0; i--) {
-                let c = cactusArray[i];
-                c.x -= 2; // 이동 속도
-
-                const padding = 6;
-                if (dino.x + padding < c.x + c.width - padding &&
-                    dino.x + dino.width - padding > c.x + padding &&
-                    dino.y + padding < c.y + c.height - padding &&
-                    dino.y + dino.height - padding > c.y + padding) {
-                    isGameOver = true;
-                    setTimeout(() => {
-                        alert(`Game Over! Score: ${Math.floor(score)}`);
-                        location.reload();
-                    }, 10);
-                }
-
-                if (c.x < -30) cactusArray.splice(i, 1);
-            }
-
-            score += 0.05;
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 공룡 이모지 좌우 반전하여 그리기 (앞을 보도록 설정)
-            ctx.save(); // 상태 저장
-            ctx.translate(dino.x + dino.width, dino.y); // 공룡 위치로 기준점 이동
-            ctx.scale(-1, 1); // 좌우 반전
-
-            ctx.font = '30px Segoe UI Emoji, Apple Color Emoji, sans-serif';
-            ctx.textBaseline = 'top';
-            ctx.fillText('🦖', 0, 0);
-
-            ctx.restore(); // 이전 상태 복원
-
-            // 선인장 이모지 그리기
-            cactusArray.forEach(c => {
-                ctx.fillText('🌵', c.x, c.y);
-            });
-
-            // 점수 표시
-            ctx.fillStyle = '#000';
-            ctx.font = '16px monospace';
-            ctx.fillText(`Score: ${Math.floor(score)}`, 480, 20);
-        }
-
-        function gameLoop() {
-            update();
-            draw();
-            if (!isGameOver) requestAnimationFrame(gameLoop);
-        }
-
-        gameLoop();
-    </script>
+    gameLoop();
+</script>
 </body>
 </html>
