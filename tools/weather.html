@@ -380,7 +380,8 @@
             const forecastTime = new Date(hourly.time[i]); // 예보 시각 객체
             
             // 현재 시간 이후의 데이터이면서, 3시간 단위(또는 원하는 간격)인 데이터만 선택
-            if (forecastTime >= now) {
+            /*if (forecastTime >= now) {*/
+            for (let i = startIndex; i < hourly.time.length; i += 3) {
                 const timeStr = hourly.time[i].replace('T', ' ').slice(5);
                 const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
 
