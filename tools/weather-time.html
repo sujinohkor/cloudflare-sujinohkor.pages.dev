@@ -14,23 +14,18 @@
     <script src="https://unpkg.com/globe.gl"></script>
 
     <style>
-        /* 1. Reset & Base */
+        /* 1. Reset & Base (PC 기준 화면 고정) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            background-color: #202020;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-            min-height: 100%;
-            transition: background 0.3s;
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #202020; 
+            color: #fff; 
+            transition: background 0.3s; 
+            overflow: hidden; 
         }
         
-        /* 2. Layout */
-        .app-container { 
-            display: block; 
-            position: relative;
-            min-height: 100vh;
-        }
+        /* 2. Layout (PC 기본) */
+        .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
@@ -43,17 +38,21 @@
         .main-content { 
             margin-left: 250px; 
             padding: 40px; 
+            flex: 1; 
             display: flex; 
             flex-direction: column; 
+            height: 100vh; 
             gap: 20px; 
-            min-height: 100vh; 
+            overflow: hidden; 
             transition: 0.3s; 
         }
 
         .workspace-container {
             display: flex;
             flex-direction: row;
+            flex: 1;
             gap: 20px;
+            min-height: 0;
         }
 
         /* 3. Components (Sidebar Controls) */
@@ -91,7 +90,7 @@
         }
         .view-btn.active { background: #ff9e40; color: #101010; }
 
-        /* 4. Weather Display Components (고정 높이 제거 및 유연성 확보) */
+        /* 4. Weather Display Components */
         .card { 
             background: #101010; padding: 30px; border-radius: 16px; border: 2px solid #ff9e40; 
             width: 300px; flex-shrink: 0; text-align: center; display: flex; flex-direction: column;
@@ -100,7 +99,8 @@
 
         .forecast-panel {
             background: #101010; padding: 25px; border-radius: 16px; border: 2px solid #ff9e40; 
-            flex-grow: 1; min-height: 450px; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            flex-grow: 1; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            min-height: 0;
         }
 
         .forecast-title {
@@ -109,11 +109,17 @@
         }
 
         .forecast-list {
-            overflow-y: auto; overflow-x: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; flex: 1;
-            max-height: 400px;
+            overflow-y: auto; 
+            overflow-x: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            padding-right: 5px; 
+            flex: 1;
+            min-height: 0;
             -webkit-overflow-scrolling: touch;
         }
-        .forecast-list::-webkit-scrollbar { width: 6px; }
+        .forecast-list::-webkit-scrollbar { width: 6px; height: 6px; }
         .forecast-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 
         .forecast-item {
@@ -143,13 +149,15 @@
         /* Map & Globe Container Views */
         .map-view-container, .globe-view-container {
             display: none;
+            flex: 1;
             width: 100%;
-            height: 500px;
+            height: 100%;
             background: #b5d0d0;
             border: 2px solid #ff9e40;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            min-height: 0;
             position: relative;
         }
         .globe-view-container { background: #101010; }
@@ -236,12 +244,14 @@
         body.light-mode .globe-info-card p { color: #333; }
         body.light-mode .globe-info-btn { background: #F38020; color: #fff; }
 
-        /* 6. 모바일 대응 */
+        /* 6. 모바일 대응 (1100px 이하에서는 화면 고정 해제 및 스크롤 허용) */
         @media (max-width: 1100px) {
-            .workspace-container { flex-direction: column; }
-            .card { width: 100%; height: auto; padding: 25px; }
-            .forecast-panel { width: 100%; min-height: 400px; }
-            .map-view-container, .globe-view-container { height: 450px; }
+            body { overflow: auto; }
+            .main-content { height: auto; overflow-y: auto; }
+            .workspace-container { flex-direction: column; flex: unset; }
+            .card { width: 100%; height: auto; flex-shrink: 0; }
+            .forecast-panel { width: 100%; height: 500px; min-height: unset; flex-grow: unset; }
+            .map-view-container, .globe-view-container { height: 500px; }
         }
 
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -250,7 +260,7 @@
             .menu-toggle-btn { display: block; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; padding: 20px; width: 100%; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; }
         }
     </style>
 </head>
