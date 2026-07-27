@@ -751,21 +751,39 @@
 
     function initLocation() {
         document.getElementById('city-input').value = '';
-        switchView('weather'); // <-- 이 부분 추가
-        
+        switchView('weather');
+    
         if (navigator.geolocation) {
+            let locationHandled = false;
+    
+            // 모바일에서 위치 권한 응답이 무한정 지연될 경우를 대비한 안전 장치 (5초 타임아웃)
+            const timeoutId = setTimeout(() => {
+                if (!locationHandled) {
+                    locationHandled = true;
+                    fetchIpLocation();
+                }
+            }, 5000);
+    
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    if (locationHandled) return;
+                    locationHandled = true;
+                    clearTimeout(timeoutId);
+    
                     currentCoords = {
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude
                     };
                     updateWeather();
                 },
-                () => {
+                (error) => {
+                    if (locationHandled) return;
+                    locationHandled = true;
+                    clearTimeout(timeoutId);
+    
                     fetchIpLocation();
                 },
-                { timeout: 5000 }
+                { timeout: 5000, maximumAge: 0, enableHighAccuracy: false }
             );
         } else {
             fetchIpLocation();
