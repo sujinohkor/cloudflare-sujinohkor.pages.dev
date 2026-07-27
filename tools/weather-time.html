@@ -758,10 +758,10 @@
         document.getElementById('city-input').value = '';
         switchView('weather');
 
-        // 1. 권한 필요 없는 IP 위치 조회를 먼저 실행하여 즉시 화면 렌더링 보장
+        // 1. IP 위치로 먼저 빠르게 기본 날씨 렌더링 (모바일 지연 방지)
         await fetchIpLocation();
 
-        // 2. 이후 정밀한 위치(GPS)가 지원되면 백그라운드에서 추가로 갱신 시도
+        // 2. 이후 GPS 권한이 허용되면 백그라운드에서 정밀 좌표 및 세부 동네 이름 조회
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
@@ -774,24 +774,39 @@
                     };
 
                     try {
-                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}`);
-                        const geoData = await geoRes.json();
-
-                        if (geoData && geoData.address) {
-                            const addr = geoData.address;
-                            currentCity = addr.city || addr.county || addr.district || addr.state || 'Seoul';
-                            document.getElementById('city-input').value = currentCity;
+                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}&accept-language=ko`, {
+                            headers: {
+                                'User-Agent': 'WeatherAndTimeApp/1.0'
+                            }
+                        });
+                        
+                        if (geoRes.ok) {
+                            const geoData = await geoRes.json();
+                            if (geoData && geoData.address) {
+                                const addr = geoData.address;
+                                // 세부 동네 이름(우두동 등)을 우선적으로 추출
+                                const detailedLocation = addr.suburb || addr.neighbourhood || addr.quarter || addr.town || addr.village || addr.city || addr.county || addr.district;
+                                if (detailedLocation) {
+                                    currentCity = detailedLocation;
+                                    document.getElementById('city-input').value = currentCity;
+                                }
+                            }
                         }
                     } catch (geoErr) {
-                        console.warn("역지오코딩 에러:", geoErr);
+                        console.warn("역지오코딩 실패 (GPS 좌표는 정상 유지됨):", geoErr);
                     }
 
-                    updateWeather();
+                    // GPS 좌표 기준으로 날씨 재조회
+                    try {
+                        await updateWeather();
+                    } catch (weatherErr) {
+                        console.warn("GPS 날씨 갱신 중 예외 발생:", weatherErr);
+                    }
                 },
                 (error) => {
                     console.warn("GPS 거부 또는 타임아웃, IP 위치 유지:", error);
                 },
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         }
     }
