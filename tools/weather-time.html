@@ -14,37 +14,37 @@
     <script src="https://unpkg.com/globe.gl"></script>
 
     <style>
-        /* 1. Reset & Base */
+        /* 1. Reset & Base (일반 문서 스크롤 허용 구조로 변경) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; overflow: hidden; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #202020; 
+            color: #fff; 
+            transition: background 0.3s; 
+            overflow-x: hidden; /* 가로 스크롤만 방지, 세로 스크롤 허용 */
+        }
         
         /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { display: flex; min-height: 100vh; position: relative; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease;
         }
         
-        /* 사이드바 내부 직속 자식 요소들의 간격 통일 */
-        .sidebar > * {
-            margin-bottom: 10px;
-        }
-        .sidebar > *:last-child {
-            margin-bottom: 0;
-        }
+        .sidebar > * { margin-bottom: 10px; }
+        .sidebar > *:last-child { margin-bottom: 0; }
         
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s;
+            display: flex; flex-direction: column; gap: 20px; 
+            min-height: 100vh; transition: 0.3s; 
         }
 
         .workspace-container {
             display: flex;
             flex-direction: row;
-            flex: 1;
             gap: 20px;
-            min-height: 0;
         }
 
         /* 3. Components (Sidebar Controls) */
@@ -74,7 +74,6 @@
         }
         .api-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; }
 
-        /* View Mode Switcher 내부 버튼 간격 */
         .view-switcher { display: flex; flex-direction: column; gap: 10px; }
         .view-btn {
             width: 100%; padding: 8px 0; background: #202020; color: #ff9e40;
@@ -86,14 +85,13 @@
         /* 4. Weather Display Components */
         .card { 
             background: #101010; padding: 30px; border-radius: 16px; border: 2px solid #ff9e40; 
-            width: 300px; flex-shrink: 0; text-align: center; display: flex; flex-direction: column;
+            width: 300px; height: 320px; flex-shrink: 0; text-align: center; display: flex; flex-direction: column;
             justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .forecast-panel {
             background: #101010; padding: 25px; border-radius: 16px; border: 2px solid #ff9e40; 
-            flex-grow: 1; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            min-height: 0;
+            flex-grow: 1; height: 500px; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .forecast-title {
@@ -103,7 +101,7 @@
 
         .forecast-list {
             overflow-y: auto; overflow-x: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; flex: 1;
-            -webkit-overflow-scrolling: touch; /* 모바일 터치 스크롤 최적화 */
+            -webkit-overflow-scrolling: touch;
         }
         .forecast-list::-webkit-scrollbar { width: 6px; }
         .forecast-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
@@ -133,45 +131,26 @@
         .details { margin-top: 20px; font-size: 0.9rem; color: #888; display: flex; justify-content: space-around; width: 100%; }
 
         /* Map & Globe Container Views */
-        .map-view-container {
+        .map-view-container, .globe-view-container {
             display: none;
-            flex: 1;
             width: 100%;
-            height: 100%;
+            height: 500px;
             background: #b5d0d0;
             border: 2px solid #ff9e40;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            min-height: 0;
             position: relative;
         }
-        .globe-view-container {
-            display: none;
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            background: #101010;
-            border: 2px solid #ff9e40;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            min-height: 0;
-            position: relative;
-        }
-        #map { 
-            position: absolute !important;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100% !important; 
-            height: 100% !important; 
-            background: #b5d0d0 !important; 
-        }
-        #globeViz { 
+        .globe-view-container { background: #101010; }
+        
+        #map, #globeViz { 
             position: absolute !important;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100% !important; 
             height: 100% !important; 
         }
+        #map { background: #b5d0d0 !important; }
 
         /* 3D Globe 우측 상단 커스텀 정보 패널 스타일 */
         .globe-info-card {
@@ -247,13 +226,12 @@
         body.light-mode .globe-info-card p { color: #333; }
         body.light-mode .globe-info-btn { background: #F38020; color: #fff; }
 
-        /* 6. PC 창 축소 및 모바일 대응 */
+        /* 6. 모바일 대응 */
         @media (max-width: 1100px) {
-            .main-content { height: auto; overflow-y: auto; }
             .workspace-container { flex-direction: column; }
-            .card { width: 100%; height: 300px; }
-            .forecast-panel { width: 100%; height: 450px; min-height: unset; }
-            .map-view-container, .globe-view-container { height: 500px; }
+            .card { width: 100%; height: 260px; }
+            .forecast-panel { width: 100%; height: 450px; }
+            .map-view-container, .globe-view-container { height: 450px; }
         }
 
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -298,7 +276,6 @@
             <button class="api-btn" id="btn-meteo" onclick="switchApi('meteo')">Open-Meteo</button>
         </div>
 
-        <!-- 뷰 전환 및 Reset 버튼 그룹 -->
         <div class="view-switcher">
             <button class="view-btn active" id="btn-weather-view" onclick="switchView('weather')">Weather</button>
             <button class="view-btn" id="btn-leaflet-view" onclick="switchView('leaflet')">Leaflet Map</button>
@@ -339,10 +316,9 @@
             <div id="map"></div>
         </div>
 
-        <!-- 3D 지구본 뷰 (커스텀 정보 카드 포함) -->
+        <!-- 3D 지구본 뷰 -->
         <div class="globe-view-container" id="globe-workspace">
             <div id="globeViz"></div>
-            <!-- 지구본 클릭 시 뜨는 예쁜 안내 카드 -->
             <div class="globe-info-card" id="globe-info-card">
                 <h3 id="card-city-name">City</h3>
                 <p id="card-city-time">Time: --</p>
@@ -370,7 +346,6 @@
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    // 뷰 전환 함수 (Weather / Leaflet / Globe)
     function switchView(viewType) {
         const weatherView = document.getElementById('weather-workspace');
         const leafletView = document.getElementById('leaflet-workspace');
@@ -418,7 +393,6 @@
         }
     }
 
-    // 전 세계 대륙별 주요 도시 데이터 고정 분산 정의
     function getCityData() {
         return [
             { name: 'Seoul', lat: 37.5665, lng: 126.9780, tz: 'Asia/Seoul' },
@@ -452,7 +426,6 @@
         ];
     }
 
-    // Leaflet 지도 초기화
     function initLeafletMap() {
         map = L.map('map', {
             minZoom: 2,
@@ -487,7 +460,6 @@
         }, 100);
     }
 
-    // 3D 지구본 초기화 (Globe.gl)
     function init3DGlobe() {
         const cities = getCityData();
 
@@ -515,7 +487,6 @@
         globeInstance.controls().autoRotateSpeed = 0.8;
     }
 
-    // 타임존 시간 포맷팅 함수
     function getCityTime(timeZone) {
         return new Intl.DateTimeFormat('ko-KR', {
             timeZone: timeZone,
@@ -524,7 +495,6 @@
         }).format(new Date());
     }
 
-    // Leaflet 지도에서 선택 시 날씨 뷰로 전환
     function selectCityFromMap(cityName) {
         currentCoords = null;
         currentCity = cityName;
@@ -533,14 +503,12 @@
         updateWeather();
     }
 
-    // 3D Globe 카드에서 버튼 클릭 시 날씨 뷰로 전환
     function selectCityFromGlobe() {
         if (!selectedGlobeCity) return;
         document.getElementById('globe-info-card').style.display = 'none';
         selectCityFromMap(selectedGlobeCity);
     }
 
-    // Weather Logic
     function getWeatherDescription(code) {
         if (code === 0) return '☀️ Clear sky';
         if (code >= 1 && code <= 3) return '⛅ Partly cloudy';
@@ -735,7 +703,6 @@
         updateWeather();
     }
 
-    // IP 위치 기반 폴백 함수
     async function fetchIpLocation() {
         try {
             const response = await fetch('https://ipapi.co/json/');
@@ -762,7 +729,6 @@
         }
     }
 
-    // Reset 버튼 및 초기 실행 시 호출되는 위치 설정 함수 (GPS -> IP 폴백)
     function initLocation() {
         document.getElementById('city-input').value = '';
         if (navigator.geolocation) {
@@ -784,7 +750,6 @@
         }
     }
 
-    // 최초 로딩 시 위치 탐색 실행
     initLocation();
 </script>
 </body>
