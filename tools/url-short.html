@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener - SUJIN's FUN SITE</title>
+    <title>URL Shortener</title>
     <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
@@ -327,34 +327,34 @@
     <main class="main-content">
         <header class="top-section">
             <h1>URL Shortener</h1>
-            <p>A fast, secure, and personalized link management system.</p>
+            <p>Links are valid for 30 days.</p>
         </header>
 
         <div class="workspace-container">
             <!-- 왼쪽 박스: URL 단축 폼 -->
             <section class="content-mid">
                 <div class="input-group">
-                    <label>축소할 URL 입력 (유니코드/한글 불가)</label>
+                    <label>Enter URL to shorten (Unicode / Korean characters not allowed)</label>
                     <input type="text" id="longUrl" placeholder="https://example.com/long-url...">
                 </div>
 
                 <label class="checkbox-group">
-                    <input type="checkbox" id="customCheck" onchange="toggleCustomInput()"> 원하는 단축 주소 직접 만들기
+                    <input type="checkbox" id="customCheck" onchange="toggleCustomInput()"> Create your own custom short URL
                 </label>
 
                 <div class="input-group" id="customGroup" style="display: none;">
-                    <label>커스텀 주소 (영문/숫자만, 최대 10자)</label>
+                    <label>Custom URL (English letters and numbers only, up to 10 characters)</label>
                     <input type="text" id="customSlug" maxlength="10" placeholder="예: mylink123">
                 </div>
 
-                <button class="action-btn" onclick="shortenUrl()">단축하기</button>
+                <button class="action-btn" onclick="shortenUrl()">Shorten</button>
                 <div id="errorMsg" class="error-msg"></div>
 
                 <div id="resultBox" class="result-box">
-                    <label style="color: #aaa; font-size: 0.75rem; margin-bottom: 4px; display: block;">생성된 단축 주소</label>
+                    <label style="color: #aaa; font-size: 0.75rem; margin-bottom: 4px; display: block;">Generated short URL</label>
                     <div class="result-url" id="resultUrl"></div>
                     <div class="created-at" id="createdAt"></div>
-                    <button class="copy-btn" onclick="copyUrl()">복사하기</button>
+                    <button class="copy-btn" onclick="copyUrl()">Copy</button>
                 </div>
             </section>
 
@@ -413,14 +413,14 @@
         resultBox.classList.remove('active');
 
         if (!longUrl) {
-            errorMsg.innerText = 'URL을 입력해주세요.';
+            errorMsg.innerText = 'Please enter a URL.';
             errorMsg.classList.add('active');
             return;
         }
 
         const nonAsciiRegex = /[^\x00-\x7F]/;
         if (nonAsciiRegex.test(longUrl)) {
-            errorMsg.innerText = 'URL에는 한글 및 유니코드 문자를 포함할 수 없습니다.';
+            errorMsg.innerText = 'URLs cannot contain Korean or Unicode characters.';
             errorMsg.classList.add('active');
             return;
         }
@@ -428,7 +428,7 @@
         if (isCustom && customSlug) {
             const customRegex = /^[a-zA-Z0-9]{1,10}$/;
             if (!customRegex.test(customSlug)) {
-                errorMsg.innerText = '커스텀 주소는 특수기호나 유니코드 없이 영문/숫자 조합 최대 10자리만 가능합니다.';
+                errorMsg.innerText = 'Custom URLs can only be a combination of English letters and numbers up to 10 digits, without special symbols or Unicode.';
                 errorMsg.classList.add('active');
                 return;
             }
@@ -444,7 +444,7 @@
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || '오류가 발생했습니다.');
+                throw new Error(data.error || 'An error has occurred.');
             }
 
             document.getElementById('resultUrl').innerText = data.shortUrl;
@@ -460,7 +460,7 @@
                     hour: '2-digit',
                     minute: '2-digit'
                 });
-                document.getElementById('createdAt').innerText = `생성일시: ${formattedDate} (Links are valid for 30 days)`;
+                document.getElementById('createdAt').innerText = `Creation date & time: ${formattedDate} (Links are valid for 30 days)`;
             }
 
             resultBox.classList.add('active');
@@ -481,7 +481,7 @@
     function copyUrl() {
         const urlText = document.getElementById('resultUrl').innerText;
         navigator.clipboard.writeText(urlText).then(() => {
-            alert('단축 주소가 복사되었습니다!');
+            alert('Shortened URL copied!');
         });
     }
 
@@ -511,14 +511,14 @@
                     <a href="${item.shortUrl}" target="_blank" class="history-url">${item.shortUrl}</a>
                     <div class="history-date">${item.dateStr}</div>
                 </div>
-                <button class="mini-copy-btn" onclick="navigator.clipboard.writeText('${item.shortUrl}').then(() => alert('복사되었습니다!'))">복사</button>
+                <button class="mini-copy-btn" onclick="navigator.clipboard.writeText('${item.shortUrl}').then(() => alert('Shortened URL copied!'))">Copy</button>
             `;
             historyList.appendChild(div);
         });
     }
 
     function clearHistory() {
-        if (confirm('모든 기록을 삭제하시겠습니까?')) {
+        if (confirm('Do you want to delete all history?')) {
             localStorage.removeItem('url_history');
             loadHistory();
             document.getElementById('qrContainer').innerHTML = `<span style="font-size: 0.8rem; color: #888;">Generate a link to view QR code</span>`;
