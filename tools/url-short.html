@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUJIN's URL Shortener</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+        .badge {
+            background: #4f46e5;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        h1 { font-size: 22px; margin-bottom: 8px; color: #1f2937; }
+        p { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: #4f46e5; }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #4b5563;
+            cursor: pointer;
+        }
+        .checkbox-group input { width: 16px; height: 16px; accent-color: #4f46e5; cursor: pointer; }
+        button {
+            width: 100%;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #4338ca; }
+        .result-box {
+            margin-top: 25px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            text-align: left;
+        }
+        .result-box.active { display: block; }
+        .result-url {
+            font-size: 14px;
+            color: #4f46e5;
+            word-break: break-all;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .copy-btn {
+            background: #10b981;
+            padding: 8px;
+            font-size: 13px;
+        }
+        .copy-btn:hover { background: #059669; }
+        .error-msg {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+        .error-msg.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">sjoh.kr</div>
+        <h1>SUJIN's URL Shortener</h1>
+        <p>A fast, secure, and personalized<br>link management system.</p>
+        
+        <div class="form-group">
+            <label>축소할 URL 입력 (유니코드/한글 불가)</label>
+            <input type="text" id="longUrl" placeholder="https://example.com/long-url...">
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="customCheck" onchange="toggleCustomInput()">
+            <label for="customCheck" style="margin-bottom:0; cursor:pointer;">원하는 단축 주소 직접 만들기</label>
+        </div>
+
+        <div class="form-group" id="customGroup" style="display: none;">
+            <label>커스텀 주소 (영문/숫자만, 최대 10자)</label>
+            <input type="text" id="customSlug" maxlength="10" placeholder="예: mylink123">
+        </div>
+
+        <button onclick="shortenUrl()">단축하기</button>
+        <div id="errorMsg" class="error-msg"></div>
+
+        <div id="resultBox" class="result-box">
+            <label>생성된 단축 주소</label>
+            <div class="result-url" id="resultUrl"></div>
+            <button class="copy-btn" onclick="copyUrl()">복사하기</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleCustomInput() {
+            const isChecked = document.getElementById('customCheck').checked;
+            document.getElementById('customGroup').style.display = isChecked ? 'block' : 'none';
+        }
+
+        async function shortenUrl() {
+            const longUrl = document.getElementById('longUrl').value.trim();
+            const isCustom = document.getElementById('customCheck').checked;
+            const customSlug = document.getElementById('customSlug').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const resultBox = document.getElementById('resultBox');
+
+            errorMsg.classList.remove('active');
+            resultBox.classList.remove('active');
+
+            if (!longUrl) {
+                errorMsg.innerText = 'URL을 입력해주세요.';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            // URL 내 유니코드(Non-ASCII, 한글 등) 차단 검증
+            const nonAsciiRegex = /[^\x00-\x7F]/;
+            if (nonAsciiRegex.test(longUrl)) {
+                errorMsg.innerText = 'URL에는 한글 및 유니코드 문자를 포함할 수 없습니다.';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            // 커스텀 주소 유니코드 및 특수기호 차단 검증 (영문/숫자만 허용, 최대 10자)
+            if (isCustom && customSlug) {
+                const customRegex = /^[a-zA-Z0-9]{1,10}$/;
+                if (!customRegex.test(customSlug)) {
+                    errorMsg.innerText = '커스텀 주소는 특수기호나 유니코드 없이 영문/숫자 조합 최대 10자리만 가능합니다.';
+                    errorMsg.classList.add('active');
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch('https://sjoh.kr/api/shorten', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ url: longUrl, isCustom, slug: customSlug })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || '오류가 발생했습니다.');
+                }
+
+                document.getElementById('resultUrl').innerText = data.shortUrl;
+                resultBox.classList.add('active');
+            } catch (err) {
+                errorMsg.innerText = err.message;
+                errorMsg.classList.add('active');
+            }
+        }
+
+        function copyUrl() {
+            const urlText = document.getElementById('resultUrl').innerText;
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert('단축 주소가 복사되었습니다!');
+            });
+        }
+    </script>
+</body>
+</html>
