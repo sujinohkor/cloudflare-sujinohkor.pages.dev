@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUJIN's FUN SITE</title>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
+        .app-container { display: flex; min-height: 100vh; }
+
+        /* 왼쪽 플로팅 사이드바 */
+        .sidebar { 
+            width: 260px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #151515; padding: 30px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 15px; border-right: 1px solid #252525;
+            transition: transform 0.3s ease; 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; text-align: center; }
+        
+        .category-btn { 
+            width: 100%; padding: 12px 15px; cursor: pointer; text-align: left;
+            background: #202020; color: #aaa; border: 2px solid transparent; 
+            border-radius: 12px; font-weight: bold; transition: all 0.3s; font-size: 0.9rem;
+        }
+        .category-btn:hover { background: #252525; color: #ff9e40; }
+        .category-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; }
+
+        .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+        #theme-toggle { width: 100%; padding: 10px; cursor: background; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 260px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; gap: 30px; transition: 0.3s; 
+        }
+
+        .typing-container { display: block; width: 90%; max-width: 600px; margin: 0 auto; }
+        .typing-container img { width: 100%; height: auto; }                
+
+        .header-wrapper { display: flex; align-items: center; justify-content: center; position: relative; min-height: 50px; }
+        .header-wrapper h1 { color: #ff9e40; font-size: 2.5rem; text-align: center; }
+
+        /* Grid 구조 */
+        .card-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+        }
+        .card { 
+            width: 100%; 
+            min-height: 160px; 
+            background: #202020; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 2px solid transparent; 
+            transition: all 0.3s ease; 
+        }
+        .card:hover { transform: translateY(-5px); border-color: #ff9e40; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+        .icon { font-size: 2rem; margin-bottom: 10px; display: inline-block; transition: transform 0.3s; }
+        .card:hover .icon { transform: rotate(-15deg) scale(1.1); }
+        .trex-icon { transform: scaleX(-1); }
+        .card:hover .trex-icon { transform: scaleX(-1) rotate(15deg) scale(1.1); }
+        .card h3 { font-size: 1.15rem; margin-bottom: 5px; }
+        .card p { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; }
+        .arrow { font-weight: bold; color: #ff9e40; font-size: 0.85rem; transition: transform 0.3s; display: inline-block; }
+        .card:hover .arrow { transform: translateX(5px); }                
+
+        /* Guest Book 카드 전용 스타일 */
+        .card.guest-book-card { background: rgba(255, 148, 66, 0.15); }
+        .card.guest-book-card:hover { background: rgba(255, 148, 66, 0.25); border: 2px solid #F38020; }
+
+        .websites-section { margin-top: auto; text-align: center; padding-top: 30px; border-top: 1px solid #222; }
+        .highlight-text { color: #ff9e40; margin-bottom: 15px; }                
+        .websites-list { list-style: none; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .websites-list h4 { font-weight: normal; color: #ccc; }
+
+        /* 방문자 카운터 스타일 */
+        .view-count-container { margin-top: 15px; font-size: 0.9rem; color: #aaa; }
+        .view-count-container span { color: #ff9e40; font-weight: bold; }
+
+        .tooltip { position: relative; cursor: pointer; display: inline; }
+        .tooltip::after { content: attr(data-tooltip); position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; opacity: 0; visibility: hidden; transition: 0.3s; border: 1px solid #ff9e40; pointer-events: none; }
+        .tooltip:hover::after { opacity: 1; visibility: visible; top: -40px; }
+
+        /* Light Mode */
+        body.light-mode { background: #fff; color: #000; }
+        body.light-mode .sidebar { background-color: #FDF5E6; border-right-color: #f0e6d2; }
+        body.light-mode .category-btn { background: #f5eedc; color: #555; }
+        body.light-mode .category-btn:hover { background: #ecdcc2; color: #F38020; }
+        body.light-mode .category-btn.active { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .highlight-text { color: #F38020; }
+        body.light-mode .card { background: #FDF5E6; }
+        body.light-mode .card:hover { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.2); }
+        body.light-mode .card p { color: #666; }
+        body.light-mode .card.guest-book-card { background: #fde8d7; }
+        body.light-mode .card.guest-book-card:hover { background: #fcd2b2; border: 2px solid #F38020; }
+        body.light-mode #theme-toggle { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .websites-section { border-top-color: #eee; }
+        body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #666; }
+        body.light-mode .view-count-container { color: #666; }
+        body.light-mode .view-count-container span { color: #F38020; }
+
+        /* 모바일 반응형 */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 2000; padding: 12px 18px; background: #ff9e40; color: #101010; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { transform: translateX(-260px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+
+<div class="app-container">
+    <!-- 왼쪽 플로팅 사이드바 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">Categories</div>
+        <button class="category-btn active" onclick="filterCategory('all', this)">✨ All Tools</button>
+        <button class="category-btn" onclick="filterCategory('dev', this)">💻 Dev & Text</button>
+        <button class="category-btn" onclick="filterCategory('design', this)">🎨 Image & Design</button>
+        <button class="category-btn" onclick="filterCategory('utility', this)">🛠️ Utility & Web</button>
+        <button class="category-btn" onclick="filterCategory('fun', this)">🎮 Fun & Community</button>
+
+        <div class="sidebar-bottom">
+            <button id="theme-toggle">DAY / NIGHT</button>
+        </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content">
+        <a href="https://git.io/typing-svg" class="typing-container">
+            <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice." alt="Typing SVG" />
+        </a>                
+
+        <div class="header-wrapper">
+            <h1 id="site-title">SUJIN's FUN SITE</h1>
+        </div>
+
+        <!-- 각 카드에 data-category 속성 부여 -->
+        <div class="card-grid" id="card-grid">
+            <!-- Dev & Text Tools -->
+            <a href="https://sujinohkor.pages.dev/tools/word-counter" class="card" data-category="dev">
+                <div class="icon">📝</div>
+                <h3>Word Counter</h3>
+                <p>word-counter</p>
+                <span class="arrow">Go to Word Counter →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/text-ascii" class="card" data-category="dev">
+                <div class="icon">✏️</div>
+                <h3>Text to ASCII</h3>
+                <p>text-ascii</p>
+                <span class="arrow">Go to Text to ASCII →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/hash-generator" class="card" data-category="dev">
+                <div class="icon">🌀</div>
+                <h3>Hash Generator</h3>
+                <p>hash-generator</p>
+                <span class="arrow">Go to Hash Generator →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/html-editor" class="card" data-category="dev">
+                <div class="icon">🖥️</div>
+                <h3>HTML Editor</h3>
+                <p>html-editor</p>
+                <span class="arrow">Go to HTML Editor →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/markdown-editor" class="card" data-category="dev">
+                <div class="icon">🖥️</div>
+                <h3>Markdown Editor</h3>
+                <p>markdown-editor</p>
+                <span class="arrow">Go to Markdown Editor →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/hwp-hwpx-editor" class="card" data-category="dev">
+                <div class="icon">🇰🇷</div>
+                <h3>HWP HWPX Editor</h3>
+                <p>hwp-hwpx-editor</p>
+                <span class="arrow">Go to HWP HWPX Editor →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/psd-ai-reader" class="card" data-category="dev">
+                <div class="icon">🖼️</div>
+                <h3>PSD AI Reader</h3>
+                <p>psd-ai-reader</p>
+                <span class="arrow">Go to PSD AI Reader →</span>
+            </a>
+
+            <!-- Image & Design Tools -->
+            <a href="https://sujinohkor.pages.dev/tools/image-ascii" class="card" data-category="design">
+                <div class="icon">✏️</div>
+                <h3>Image to ASCII</h3>
+                <p>image-ascii</p>
+                <span class="arrow">Go to Image to ASCII →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/color-picker" class="card" data-category="design">
+                <div class="icon">🎨</div>
+                <h3>Color Picker</h3>
+                <p>color-picker</p>
+                <span class="arrow">Go to Color Picker →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/image-color-picker" class="card" data-category="design">
+                <div class="icon">🎨</div>
+                <h3>Image Color Picker</h3>
+                <p>image-color-picker</p>
+                <span class="arrow">Go to Image Color Picker →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/bongsuk-nukki" class="card" data-category="design">
+                <div class="icon">✨</div>
+                <h3>AI Background Remover</h3>
+                <p>bongsuk-nukki</p>
+                <span class="arrow">Go to AI Background Remover →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/bounce-svg" class="card" data-category="design">
+                <div class="icon">📽️</div>
+                <h3>Bounce SVG Generator</h3>
+                <p>bounce-svg</p>
+                <span class="arrow">Go to Bounce SVG Generator →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/glassmorphism" class="card" data-category="design">
+                <div class="icon">🫧</div>
+                <h3>Glassmorphism</h3>
+                <p>glassmorphism</p>
+                <span class="arrow">Go to Glassmorphism →</span>
+            </a>
+
+            <!-- Utility & Web Tools -->
+            <a href="https://sujinohkor.pages.dev/tools/qr-generator" class="card" data-category="utility">
+                <div class="icon">🏷️</div>
+                <h3>QR Generator</h3>
+                <p>qr-generator</p>
+                <span class="arrow">Go to QR Code Generator →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/url-short" class="card" data-category="utility">
+                <div class="icon">🏷️</div>
+                <h3>URL Shortener</h3>
+                <p>url-short</p>
+                <span class="arrow">Go to URL Shortener →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/date-calculator" class="card" data-category="utility">
+                <div class="icon">📆</div>
+                <h3>Date Calculator</h3>
+                <p>date-calculator</p>
+                <span class="arrow">Go to Date Calculator →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/weather-time" class="card" data-category="utility">
+                <div class="icon">☀️</div>
+                <h3>Weather and Time</h3>
+                <p>weather-time</p>
+                <span class="arrow">Go to Weather and Time →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/get-my-ip" class="card" data-category="utility">
+                <div class="icon">🏡</div>
+                <h3>Get My IP</h3>
+                <p>get-my-ip</p>
+                <span class="arrow">Go to Get My IP →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/mouse-effector" class="card" data-category="utility">
+                <div class="icon">✨</div>
+                <h3>Mouse Effector</h3>
+                <p>mouse-effector</p>
+                <span class="arrow">Go to Mouse Effector →</span>
+            </a>
+
+            <!-- Fun & Community -->
+            <a href="https://sujinohkor.pages.dev/tools/chrome-trex" class="card" data-category="fun">
+                <div class="icon trex-icon">🦖</div>
+                <h3>Chrome Dino Game</h3>
+                <p>chrome-trex</p>
+                <span class="arrow">Go to Chrome Dino Game →</span>
+            </a>
+            <a href="https://sujinohkor.pages.dev/tools/guest-book" class="card guest-book-card" data-category="fun">
+                <div class="icon">📑</div>
+                <h3>Guest Book</h3>
+                <p>guest-book</p>
+                <span class="arrow guest-book-arrow">Go to Guest Book →</span>
+            </a>
+        </div>
+
+        <div class="websites-section">
+            <h3 class="highlight-text">SUJIN's WEBSITES</h3>
+            <ul class="websites-list">
+                <li><h4><strong>Web.</strong> <a href="https://www.sujinohkor.kr" class="tooltip" data-tooltip="This is my CV site.">https://www.sujinohkor.kr</a></h4></li>
+                <li><h4><strong>Dev.</strong> <a href="https://sujinohkor.pages.dev" class="tooltip" data-tooltip="This is my FUN site.">https://sujinohkor.pages.dev</a></h4></li>
+                <li><h4><strong>URL Short.</strong> <a href="https://sjoh.kr" class="tooltip" data-tooltip="This is my URL SHORTENER site.">https://sjoh.kr</a></h4></li>
+                <li><h4><strong>GitHub.</strong> <a href="https://github.com/sujinohkor" class="tooltip" data-tooltip="This is the CODE for the fun site.">https://github.com/sujinohkor</a></h4></li>
+            </ul>                        
+            <!-- 방문자 수 표시 영역 -->
+            <div class="view-count-container">
+                Total Visits: <span id="visit-count">...</span>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // 모바일 사이드바 토글
+    function toggleSidebar() { 
+        document.getElementById('sidebar').classList.toggle('active'); 
+    }
+
+    // 테마 토글
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    // 카테고리 필터링 기능
+    function filterCategory(category, btnElement) {
+        // 버튼 active 상태 변경
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        // 카드 필터링
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            if (category === 'all' || card.getAttribute('data-category') === category) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // 모바일 화면일 경우 카테고리 선택 시 사이드바 자동 닫기
+        if (window.innerWidth <= 900) {
+            document.getElementById('sidebar').classList.remove('active');
+        }
+    }
+
+    // 방문자 카운터 API 호출
+    fetch('https://counter-kv-worker.sujinohkor.workers.dev/')
+        .then(res => res.json())
+        .then(data => {
+            const countElement = document.getElementById('visit-count');
+            if (countElement && data.visits) {
+                countElement.innerText = data.visits.toLocaleString();
+            }
+        })
+        .catch(err => {
+            console.error('Failed to fetch visit count:', err);
+            document.getElementById('visit-count').innerText = '-';
+        });
+</script>
+</body>
+</html>
