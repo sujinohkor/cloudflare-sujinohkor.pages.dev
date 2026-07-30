@@ -200,15 +200,15 @@
                 box-sizing: border-box;
             }
             
-            /* 모바일에서 카드 터치/호버 시 아이콘이 우측 상향으로 움직이도록 설정 */
+            /* 모바일에서 카드 터치/호버 시 일반 아이콘은 우측 상향으로 이동 */
             .card:hover { transform: none; }
             .card:hover .icon { 
                 transform: translate(3px, -3px) scale(1.1) !important; 
                 transition: transform 0.2s ease;
             }
-            /* 렉스(공룡) 아이콘은 좌우반전(-scaleX)이 유지된 채 우측 상향으로 움직이도록 예외 처리 */
-            .card.trex-icon:hover .icon, .card:hover .trex-icon { 
-                transform: scaleX(-1) translate(-3px, -3px) scale(1.1) !important; 
+            /* 렉스(공룡) 아이콘은 좌우 반전과 회전값을 유지한 채 우측 상향으로 이동하도록 수정 */
+            .card.trex-icon:hover .icon { 
+                transform: scaleX(-1) rotate(-15deg) translate(-3px, -3px) scale(1.1) !important; 
             }
             .card:hover .arrow { transform: translateX(5px) !important; }
             
