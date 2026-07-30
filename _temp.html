@@ -1,326 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-48CYVH0XEF"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-48CYVH0XEF');
-    </script>
-    <title>Text Bounce SVG Generator</title>
-    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap">
+    <title>봉숙이 AI 누끼 사이트</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body[data-theme="dark"] { background-color: #101010; color: #fff; }
-        body[data-theme="light"] { background-color: #ffffff; color: #333; }
-        body { font-family: 'Open Sans', 'Segoe UI', sans-serif; padding: 30px 20px; transition: background 0.3s, color 0.3s; min-height: 100vh; }
-        
-        /* 상단 타이틀 바운싱 스타일 */
-        .highlight-text { color: #ff9e40; margin: 10px 0 25px 0; }
-        body[data-theme="light"] .highlight-text { color: #F38020; }
-        
-        .bounce-text { font-size: 2.2rem; font-weight: bold; display: inline-block; text-align: center; width: 100%; }
-        .bounce-text span { display: inline-block; animation: bounce 1.2s infinite ease-in-out; animation-delay: calc(0.08s * var(--i)); }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-15px); }
-            50% { transform: translateY(0); }
-        }
-
-        h2 { font-size: 1.2rem; margin-bottom: 15px; color: #ff9e40; }
-        body[data-theme="light"] h2 { color: #F38020; }
-
-        .container { display: flex; flex-wrap: wrap; gap: 30px; max-width: 1100px; margin: 0 auto; justify-content: center; }
-        
-        .properties, .output { background: rgba(255, 158, 64, 0.05); border: 1px solid #333; border-radius: 12px; padding: 25px; flex: 1; min-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        body[data-theme="light"] .properties, body[data-theme="light"] .output { background: #fdf5e6; border-color: #f38020; box-shadow: 0 4px 15px rgba(243, 128, 32, 0.15); }
-
-        .parameters { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .field-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 0.9rem; font-weight: 600; }
-        input, select { background: #202020; color: #fff; border: 1px solid #444; border-radius: 6px; padding: 8px 12px; font-size: 0.9rem; width: 100%; font-family: inherit; }
-        body[data-theme="light"] input, body[data-theme="light"] select { background: #fff; color: #333; border-color: #ccc; }
-        input:focus, select:focus { outline: none; border-color: #ff9e40; }
-
-        .color-row { display: flex; gap: 10px; align-items: center; }
-        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 38px; }
-        .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
-        .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.85rem; font-family: monospace; color: #aaa; }
-        .color-swatch { width: 18px; height: 18px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
-
-        .dimensions-group { display: flex; align-items: center; gap: 8px; }
-        .dimensions-group input { width: 100px; }
-
-        .btn { background: #ff9e40; color: #101010; border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 5px; }
-        .btn:hover { background: #e08b35; }
-        body[data-theme="light"] .btn { background: #F38020; color: #fff; }
-        body[data-theme="light"] .btn:hover { background: #d35400; }
-
-        .preview-box { width: 100%; height: 200px; background: #181818; border: 2px dashed #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; padding: 10px; }
-        body[data-theme="light"] .preview-box { background: #eee; border-color: #bbb; }
-
-        .code-container { background: #181818; color: #ff9e40; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; overflow-x: auto; margin-bottom: 8px; max-height: 90px; }
-        body[data-theme="light"] .code-container { background: #fff; color: #d35400; border: 1px solid #ddd; }
-
-        .darkmode { position: fixed; bottom: 20px; right: 20px; background: #202020; border: 2px solid #ff9e40; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ff9e40; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1000; }
-        body[data-theme="light"] .darkmode { background: #FDF5E6; border-color: #F38020; color: #F38020; }
-        body[data-theme="light"] .icon-moon { display: none; }
-        body[data-theme="dark"] .icon-sun { display: none; }
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; background: #f4f4f9; }
+        .box { background: white; display: inline-block; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #loading { display: none; color: #0066ff; font-weight: bold; margin-top: 15px; }
+        #result { max-width: 350px; margin-top: 20px; display: block; margin-left: auto; margin-right: auto; }
     </style>
 </head>
-<body data-theme="dark">
-
-    <h1 id="site-title" class="highlight-text bounce-text">Text Bounce SVG</h1>
-
-    <div class="container">
-        <!-- 좌측: 옵션 설정 -->
-        <div class="properties">
-            <h2>Bounce Options</h2>
-            <div class="parameters">
-                <div class="field-group">
-                    <label for="input-text">Enter Text</label>
-                    <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
-                </div>
-
-                <!-- Font Color & Opacity -->
-                <div class="field-group">
-                    <label>Font color & Opacity</label>
-                    <div class="color-row">
-                        <input type="color" id="font-color" value="#36BCF7" oninput="generator.update()">
-                        <input type="range" id="font-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
-                    </div>
-                    <div class="color-preview-box">
-                        <span class="color-swatch" id="font-swatch"></span>
-                        <span id="font-hex-text">#36BCF7FF</span>
-                    </div>
-                </div>
-
-                <!-- Background Color & Opacity -->
-                <div class="field-group">
-                    <label>Background color & Opacity</label>
-                    <div class="color-row">
-                        <input type="color" id="bg-color" value="#000000" oninput="generator.update()">
-                        <input type="range" id="bg-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
-                    </div>
-                    <div class="color-preview-box">
-                        <span class="color-swatch" id="bg-swatch"></span>
-                        <span id="bg-hex-text">#000000FF</span>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label for="font-size">Font size</label>
-                    <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
-                </div>
-
-                <div class="field-group">
-                    <label for="bounce-height">Bounce Height (px)</label>
-                    <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
-                </div>
-
-                <div class="field-group">
-                    <label>Width ✕ Height (px)</label>
-                    <div class="dimensions-group">
-                        <input type="number" id="width" value="500" min="100" max="1000" oninput="generator.update()">
-                        <span>✕</span>
-                        <input type="number" id="height" value="120" min="50" max="400" oninput="generator.update()">
-                    </div>
-                </div>
-            </div>
-            <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
-        </div>
-
-        <!-- 우측: 미리보기 및 소스 복사 -->
-        <div class="output">
-            <h2>Preview</h2>
-            <div class="preview-box" id="preview">
-                <!-- 실시간 바운싱 렌더링 -->
-            </div>
-
-            <h2>Markdown Source</h2>
-            <div class="code-container" id="md-code"><code></code></div>
-            <button class="btn" onclick="generator.copyCode('markdown')">Copy Markdown</button>
-
-            <h2 style="margin-top: 15px;">HTML Source</h2>
-            <div class="code-container" id="html-code"><code></code></div>
-            <button class="btn" onclick="generator.copyCode('html')">Copy HTML</button>
-        </div>
+<body>
+    <div class="box">
+        <h1>🐶 봉숙이 배경 제거</h1>
+        <p>봉숙이 사진을 선택하면 서버 AI가 빠르게 배경을 지워줍니다!</p>
+        <input type="file" id="upload" accept="image/*">
+        <div id="loading">✨ 서버에서 봉숙이 누끼를 따는 중입니다...</div>
+        <br>
+        <img id="result" alt="결과 이미지가 여기에 나타납니다.">
     </div>
 
-    <!-- 다크/라이트 토글 버튼 -->
-    <a href="javascript:toggleTheme()" class="darkmode" title="Toggle dark mode" aria-label="Toggle dark mode">
-        <span class="icon-moon" aria-hidden="true">🌙</span>
-        <span class="icon-sun" aria-hidden="true">☀️</span>
-    </a>
-
     <script>
-        // 상단 타이틀 바운싱 효과 적용
-        const title = document.getElementById('site-title');
-        if (title) {
-            const text = title.innerText;
-            title.innerHTML = ''; 
-            [...text].forEach((char, index) => {
-                const span = document.createElement('span');
-                span.innerHTML = char === ' ' ? '&nbsp;' : char;
-                span.style.setProperty('--i', index + 1);
-                title.appendChild(span);
-            });
-        }
+        const uploadInput = document.getElementById('upload');
+        const loadingDiv = document.getElementById('loading');
+        const resultImg = document.getElementById('result');
 
-        // 테마 토글
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
-        }
+        uploadInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        // 색상과 투명도를 결합하여 대문자 Hex 코드 생성 함수
-        function getHexWithAlpha(colorId, opacityId) {
-            const hex = document.getElementById(colorId).value.toUpperCase();
-            const opacity = parseFloat(document.getElementById(opacityId).value);
-            const alphaHex = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
-            return hex + alphaHex;
-        }
+            loadingDiv.style.display = 'block';
+            resultImg.src = '';
 
-       const generator = {
-            // 1. Worker 주소를 여기에 입력하세요 (끝에 슬래시 / 없이)
-            workerUrl: 'https://text-bounce-svg.sujinohkor.workers.dev',
+            try {
+                // 1단계에서 만든 본인의 Cloudflare Worker URL 입력
+                const workerUrl = 'https://bongsuk-nukki.아이디.workers.dev'; 
 
-            // 2. 소스 문자열을 짧은 Worker URL 형태로 생성
-            getSourceUrls() {
-                const text = document.getElementById('input-text').value;
-                const fontColor = document.getElementById('font-color').value.replace('#', '');
-                const bgColor = document.getElementById('bg-color').value.replace('#', '');
-                const fontOpacity = document.getElementById('font-opacity').value;
-                const bgOpacity = document.getElementById('bg-opacity').value;
-                const fontSize = document.getElementById('font-size').value;
-                const bounceHeight = document.getElementById('bounce-height').value;
-                const width = document.getElementById('width').value;
-                const height = document.getElementById('height').value;
-
-                // 투명도가 포함된 HEX 코드로 변환 (Worker가 파라미터로 받아 처리할 수 있도록 전달)
-                // 만약 Worker 코드가 기본 color/background를 그대로 받게 하려면 아래처럼 쿼리스트링을 구성합니다.
-                const params = new URLSearchParams({
-                    text: text,
-                    color: fontColor,
-                    background: bgColor,
-                    size: fontSize,
-                    bounce: bounceHeight,
-                    width: width,
-                    height: height
+                const response = await fetch(workerUrl, {
+                    method: 'POST',
+                    body: file, // 사진 파일을 통째로 서버로 전송
                 });
 
-                const imageUrl = `${this.workerUrl}/?${params.toString()}`;
+                if (!response.ok) throw new Error('서버 처리 실패');
 
-                const markdown = `[![Bounce Text](${imageUrl})](${this.workerUrl})`;
-                const html = `<a href="${this.workerUrl}"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
-
-                return { markdown, html, imageUrl };
-            },
-
-            getSVGString() {
-                // 실시간 미리보기(Preview 박스)용으로는 기존 로직 유지 (브라우저에서 바로 보이도록)
-                const text = document.getElementById('input-text').value;
-                const fontColorHex = getHexWithAlpha('font-color', 'font-opacity');
-                const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
-                const fontSize = parseInt(document.getElementById('font-size').value);
-                const bounceHeight = parseInt(document.getElementById('bounce-height').value);
-                const width = document.getElementById('width').value;
-                const height = document.getElementById('height').value;
-
-                document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
-                document.getElementById('font-hex-text').textContent = fontColorHex;
-                document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
-                document.getElementById('bg-hex-text').textContent = bgColorHex;
-
-                let textElements = '';
-                let currentX = 30;
-                const charWidth = fontSize * 0.6; 
-
-                [...text].forEach((char, index) => {
-                    const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
-                    const delay = (0.08 * (index + 1)).toFixed(2);
-                    
-                    textElements += `
-        <g class="bounce-char" style="animation-delay: ${delay}s;">
-            <text x="${currentX}" y="${height / 2 + fontSize / 3}" class="bounce-text-svg">${escapedChar}</text>
-        </g>`;
-                    currentX += (char === ' ' ? charWidth * 0.5 : charWidth);
-                });
-
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-    <style>
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-${bounceHeight}px); }
-            50% { transform: translateY(0); }
-        }
-        .bg { fill: ${bgColorHex}; }
-        .bounce-text-svg {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: ${fontSize}px;
-            font-weight: bold;
-            fill: ${fontColorHex};
-        }
-        .bounce-char {
-            display: inline-block;
-            animation: bounce 1.2s infinite ease-in-out;
-        }
-    </style>
-    <rect width="100%" height="100%" class="bg" />
-    <g>${textElements}</g>
-</svg>`;
-            },
-
-            update() {
-                // 1. 프리뷰 박스에는 기존대로 SVG를 렌더링해서 보여줌
-                const svgStr = this.getSVGString();
-                document.getElementById('preview').innerHTML = svgStr;
-
-                // 2. 하단 코드 박스에는 Worker 주소가 담긴 짧은 소스를 표시
-                const sources = this.getSourceUrls();
-                document.getElementById('html-code').querySelector('code').textContent = sources.html;
-                document.getElementById('md-code').querySelector('code').textContent = sources.markdown;
-            },
-
-            downloadSVG() {
-                // 다운로드는 기존대로 브라우저에서 직접 파일로 저장
-                const svgStr = this.getSVGString();
-                const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'bounce-text.svg';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            },
-
-            copyCode(type) {
-                const sources = this.getSourceUrls();
-                const text = (type === 'html') ? sources.html : sources.markdown;
-                
-                navigator.clipboard.writeText(text).then(() => {
-                    alert(`${type.toUpperCase()} source copied to clipboard!`);
-                });
+                const blob = await response.blob();
+                resultImg.src = URL.createObjectURL(blob);
+            } catch (err) {
+                alert('오류가 발생했습니다: ' + err.message);
+            } finally {
+                loadingDiv.style.display = 'none';
             }
-        };
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        window.onload = function() {
-            generator.update();
-        };
+        });
     </script>
 </body>
 </html>
