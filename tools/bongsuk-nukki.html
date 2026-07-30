@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Color Picker</title>
+    <title>봉숙이 AI 누끼 생성기</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
+                
         /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
@@ -17,7 +17,7 @@
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
-        
+                
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
@@ -59,6 +59,7 @@
             justify-content: center;
             overflow: hidden;
             border-radius: 8px;
+            position: relative;
         }
 
         .preview-img {
@@ -72,6 +73,15 @@
             color: #888;
             font-family: 'Consolas', monospace;
             font-size: 1rem;
+        }
+
+        /* 로딩 표시 스타일 */
+        #loading-msg {
+            display: none;
+            color: #ff9e40;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-top: 10px;
         }
 
         /* 다크 모드 그림자 */
@@ -120,34 +130,39 @@
 
     <main class="main-content">
         <header class="top-section">
-            <h1>Image Viewer</h1>
-            <p>Upload an image to view original and result.</p>
+            <h1>🐶 봉숙이 AI 누끼 생성기</h1>
+            <p>Upload an image to remove background instantly.</p>
         </header>
 
         <div class="workspace-container">
-            <!-- 왼쪽 박스: 초기 사진 영역 -->
+            <!-- 왼쪽 박스: 초기/원본 사진 영역 -->
             <section class="content-box content-mid" id="drop-zone">
                 <div class="image-preview-container" id="original-container">
                     <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
                 </div>
             </section>
 
-            <!-- 오른쪽 박스: 결과 사진 영역 -->
+            <!-- 오른쪽 박스: 누끼 결과 사진 영역 -->
             <section class="content-box content-down" id="result-zone">
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
+                <div id="loading-msg">✨ AI가 배경을 지우는 중입니다...</div>
             </section>
         </div>
     </main>
 </div>
 
-<script>
+<!-- 브라우저 AI 누끼 라이브러리 연동 -->
+<script type="module">
+    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
+
     const sidebar = document.getElementById('sidebar');
     const dropZone = document.getElementById('drop-zone');
     const originalContainer = document.getElementById('original-container');
     const resultContainer = document.getElementById('result-container');
     const fileSelector = document.getElementById('file-selector');
+    const loadingMsg = document.getElementById('loading-msg');
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
@@ -157,11 +172,12 @@
     function setInitialUI() {
         originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
         resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
+        loadingMsg.style.display = 'none';
     }
     setInitialUI();
 
-    // 파일 로드 및 좌우 양쪽에 동일/결과 이미지 세팅 핸들러
-    function handleFile(file) {
+    // 파일 처리 및 AI 누끼 실행 함수
+    async function handleFile(file) {
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
@@ -169,17 +185,32 @@
             return;
         }
 
+        // 1. 왼쪽 박스에 원본 사진 출력
         const reader = new FileReader();
         reader.onload = (e) => {
             const imageUrl = e.target.result;
-
-            // 1. 왼쪽 박스에 원본 사진 출력
             originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
-
-            // 2. 오른쪽 박스에 결과 사진 출력 (현재는 동일 사진 예시, 필요 시 변환 로직 연결 가능)
-            resultContainer.innerHTML = `<img src="${imageUrl}" alt="Result Preview" class="preview-img">`;
         };
         reader.readAsDataURL(file);
+
+        // 2. 오른쪽 박스 로딩 상태 표시
+        resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
+        loadingMsg.style.display = 'block';
+
+        try {
+            // 3. 브라우저 내부 AI 모델로 배경 제거 수행
+            const blob = await removeBackground(file);
+            const resultUrl = URL.createObjectURL(blob);
+
+            // 4. 오른쪽 박스에 결과 사진 출력
+            resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
+        } catch (error) {
+            console.error(error);
+            alert('배경 제거 중 오류가 발생했습니다.');
+            resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
+        } finally {
+            loadingMsg.style.display = 'none';
+        }
     }
 
     // 드래그 앤 드롭 이벤트
