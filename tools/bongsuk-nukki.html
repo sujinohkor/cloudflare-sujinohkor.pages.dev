@@ -46,9 +46,9 @@
             padding: 20px; background: transparent; flex-direction: column; 
             align-items: center; justify-content: center; gap: 10px; text-align: center;
             overflow: hidden; position: relative;
+            cursor: pointer;
         }
 
-        /* 왼쪽 (업로드/원본 영역) 드래그앤드롭 스타일 */
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
 
         .image-preview-container {
@@ -75,7 +75,6 @@
             font-size: 1rem;
         }
 
-        /* 로딩 표시 스타일 */
         #loading-msg {
             display: none;
             color: #ff9e40;
@@ -164,15 +163,20 @@
     const fileSelector = document.getElementById('file-selector');
     const loadingMsg = document.getElementById('loading-msg');
 
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
 
     // 초기 UI 설정
     function setInitialUI() {
         originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
         resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
         loadingMsg.style.display = 'none';
+        fileSelector.value = '';
     }
     setInitialUI();
 
@@ -224,16 +228,18 @@
     });
     dropZone.addEventListener('click', () => { fileSelector.click(); });
 
-    function uploadFile() { fileSelector.click(); }
+    // 사이드바 Upload 버튼 연결
+    window.uploadFile = function() {
+        fileSelector.click();
+    };
 
     fileSelector.addEventListener('change', (e) => {
         const file = e.target.files[0];
         handleFile(file);
-        e.target.value = ''; 
     });
 
-    // 초기화 기능
-    function resetAll() {
+    // 사이드바 Reset 버튼 연결
+    window.resetAll = function() {
         setInitialUI();
     }
 </script>
