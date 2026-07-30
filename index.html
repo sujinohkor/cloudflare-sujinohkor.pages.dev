@@ -200,16 +200,17 @@
                 box-sizing: border-box;
             }
             
-            /* 모바일에서 카드 터치/호버 시 일반 아이콘은 우측 상향으로 이동 */
+            /* 일반 아이콘 호버 시 우측 상향 이동 */
             .card:hover { transform: none; }
             .card:hover .icon { 
                 transform: translate(3px, -3px) scale(1.1) !important; 
                 transition: transform 0.2s ease;
-            }
-            /* 렉스(공룡) 아이콘은 좌우 반전과 회전값을 유지한 채 우측 상향으로 이동하도록 수정 */
+            }            
+            /* 공룡(trex-icon)은 좌우 반전(scaleX(-1))을 유지한 채 우측 상향으로 이동하도록 좌표 보정 */
             .card.trex-icon:hover .icon { 
-                transform: scaleX(-1) rotate(-15deg) translate(-3px, -3px) scale(1.1) !important; 
-            }
+                transform: scaleX(-1) translate(-3px, -3px) scale(1.1) !important; 
+                transition: transform 0.2s ease;
+            }            
             .card:hover .arrow { transform: translateX(5px) !important; }
             
             .icon { font-size: 1.5rem; margin-bottom: 6px; }
