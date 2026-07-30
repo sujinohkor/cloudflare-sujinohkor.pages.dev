@@ -405,7 +405,7 @@
     async function shortenUrl() {
         const longUrl = document.getElementById('longUrl').value.trim();
         const isCustom = document.getElementById('customCheck').checked;
-        const customSlug = document.getElementById('customSlug').value.trim();
+        const customSlug = document.getElementById('customSlug').value.trim().toLowerCase();
         const errorMsg = document.getElementById('errorMsg');
         const resultBox = document.getElementById('resultBox');
 
