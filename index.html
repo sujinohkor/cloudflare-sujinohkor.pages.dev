@@ -199,23 +199,36 @@
                 box-sizing: border-box;
             }
             
-            /* 아이콘 크기 및 애니메이션 정돈 */
+            .card { 
+                width: 100%;
+                min-height: auto; 
+                padding: 10px; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: flex-start; /* 아이콘이 왼쪽 정렬 기준을 잡도록 추가 */
+                justify-content: space-between;
+                word-break: break-all;
+                box-sizing: border-box;
+            }
+            
+            /* 일반 아이콘 중심축 고정 및 회전 애니메이션 안정화 */
             .icon { 
                 font-size: 1.5rem; 
                 margin-bottom: 6px; 
                 display: inline-block;
-                transition: transform 0.3s;
+                transform-origin: center center; /* 중심축을 한가운데로 고정 */
+                transition: transform 0.3s ease;
             }
             .card:hover .icon { 
                 transform: rotate(-15deg) scale(1.1); 
             }
             
-            /* 공룡 아이콘 좌우 반전 및 회전 충돌 해결 */
+            /* 공룡 아이콘은 좌우 반전 축 유지 */
             .icon.trex-icon { 
                 transform: scaleX(-1); 
-                display: inline-block; 
+                transform-origin: center center;
             }
-            .card:hover .trex-icon { 
+            .card:hover .icon.trex-icon { 
                 transform: scaleX(-1) rotate(15deg) scale(1.1); 
             }
 
