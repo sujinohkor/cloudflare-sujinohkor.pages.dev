@@ -13,15 +13,15 @@
                 
         .app-container { display: flex; min-height: 100vh; }
 
-        /* 완전 투명한 플로팅 사이드바 (뒤가 비치는 글래스모피즘) */
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
             width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
-            background: rgba(16, 16, 16, 0.25); /* 극도로 투명한 배경 */
-            backdrop-filter: blur(16px); /* 뒤 배경을 강력하게 흐리게 처리 */
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
             padding: 25px 20px; z-index: 1000; 
             display: flex; flex-direction: column; gap: 12px; 
-            border: 1px solid rgba(255, 158, 64, 0.35); /* 은은한 주황빛 테두리 */
+            border: 1px solid rgba(255, 158, 64, 0.35); 
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, background 0.3s, border 0.3s; 
@@ -32,6 +32,7 @@
             width: 100%; padding: 11px 14px; cursor: pointer; text-align: left;
             background: rgba(255, 255, 255, 0.03); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: 12px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            white-space: nowrap;
         }
         .category-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.4); }
         .category-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; box-shadow: 0 4px 15px rgba(255, 158, 64, 0.5); }
@@ -40,7 +41,11 @@
         #theme-toggle { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         #theme-toggle:hover { background: #ff9e40; color: #101010; }
 
-        /* 메인 콘텐츠 영역 (사이드바 공간 확보) */
+        /* 모바일용 상단 카테고리 스크롤 탭 (기본은 숨김) */
+        .mobile-category-bar { display: none; overflow-x: auto; gap: 8px; padding-bottom: 5px; margin-bottom: 10px; scrollbar-width: none; }
+        .mobile-category-bar::-webkit-scrollbar { display: none; }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
             margin-left: 300px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; gap: 30px; transition: 0.3s; 
@@ -97,7 +102,7 @@
         /* Light Mode */
         body.light-mode { background: #f4f4f4; color: #000; }
         body.light-mode .sidebar { 
-            background: rgba(255, 255, 255, 0.3); /* 라이트모드에서도 완전히 투명한 유리 질감 */
+            background: rgba(255, 255, 255, 0.3); 
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
@@ -117,23 +122,37 @@
         body.light-mode .view-count-container { color: #666; }
         body.light-mode .view-count-container span { color: #F38020; }
 
-        /* 모바일 반응형 */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 2000; padding: 12px 18px; background: #ff9e40; color: #101010; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        /* 모바일 반응형 최적화 */
         @media (max-width: 900px) {
-            .menu-toggle-btn { display: block; }
-            .sidebar { transform: translateX(-320px); left: 0; top: 0; height: 100vh; border-radius: 0; background: rgba(16, 16, 16, 0.85); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; }
-            .card-grid { grid-template-columns: 1fr; }
+            .sidebar { display: none; } /* 모바일에서는 고정 사이드바 숨김 */
+            .mobile-category-bar { display: flex; } /* 모바일 상단 탭 표시 */
+            .main-content { margin-left: 0; padding: 15px; gap: 20px; }
+            .header-wrapper h1 { font-size: 1.8rem; }
+            
+            /* 모바일에서 카드를 2열(Grid)로 가독성 있게 배치 */
+            .card-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px; 
+            }
+            .card { 
+                min-height: auto; 
+                padding: 12px; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: space-between;
+            }
+            .icon { font-size: 1.5rem; margin-bottom: 6px; }
+            .card h3 { font-size: 0.95rem; margin-bottom: 2px; }
+            .card p { font-size: 0.75rem; margin-bottom: 6px; }
+            .arrow { font-size: 0.75rem; }
+            .websites-list { flex-direction: column; gap: 8px; }
         }
     </style>
 </head>
 <body>
 
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
-    <!-- 왼쪽 공중부양형 투명 사이드바 -->
+    <!-- 데스크톱용 플로팅 사이드바 -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-title">Categories</div>
         <button class="category-btn active" onclick="filterCategory('all', this)">✨ All Tools</button>
@@ -155,6 +174,15 @@
 
         <div class="header-wrapper">
             <h1 id="site-title">SUJIN's FUN SITE</h1>
+        </div>
+
+        <!-- 모바일 전용 가로 스크롤 카테고리 탭 -->
+        <div class="mobile-category-bar">
+            <button class="category-btn active" onclick="filterCategory('all', this)">✨ All</button>
+            <button class="category-btn" onclick="filterCategory('dev', this)">💻 Dev</button>
+            <button class="category-btn" onclick="filterCategory('utility', this)">🛠️ Utility</button>
+            <button class="category-btn" onclick="filterCategory('design', this)">🎨 Design</button>
+            <button class="category-btn" onclick="filterCategory('fun', this)">🎮 Fun</button>
         </div>
 
         <!-- 각 카드에 data-category 속성 부여 -->
@@ -304,20 +332,24 @@
 </div>
 
 <script>
-    // 모바일 사이드바 토글
-    function toggleSidebar() { 
-        document.getElementById('sidebar').classList.toggle('active'); 
-    }
-
-    // 테마 토글
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
+    // 테마 토글 (데스크톱/모바일 공통 연동을 위해 양쪽 버튼 모두 제어)
+    document.querySelectorAll('#theme-toggle').forEach(btn => {
+        btn.addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
     });
 
-    // 카테고리 필터링 기능
+    // 카테고리 필터링 기능 (데스크톱/모바일 버튼 모두 동기화)
     function filterCategory(category, btnElement) {
-        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
+        // 모든 버튼에서 active 제거 후 클릭한 항목들과 일치하는 버튼들에 active 부여
+        const text = btnElement.textContent;
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            if (btn.textContent === text) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
 
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
@@ -327,10 +359,6 @@
                 card.style.display = 'none';
             }
         });
-
-        if (window.innerWidth <= 900) {
-            document.getElementById('sidebar').classList.remove('active');
-        }
     }
 
     // 방문자 카운터 API 호출
