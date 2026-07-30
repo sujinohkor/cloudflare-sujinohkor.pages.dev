@@ -77,10 +77,11 @@
         const preview = document.getElementById('preview');
         const resultDiv = document.getElementById('result');
 
-        const WORKER_URL = 'https://bongsuk-checker.sujinohkor.workers.dev/';
+        // 본인의 워커 주소 확인 (끝에 슬래시 / 포함)
+        const WORKER_URL = 'https://여기에-본인-워커주소.workers.dev/';
 
-        // 이미지를 캔버스를 이용해 작게 압축(리사이즈)하는 함수
-        function resizeImage(file, maxDimension = 800) {
+        // 🔥 최대 크기를 400픽셀로 대폭 줄여서 토큰 초과 방지
+        function resizeImage(file, maxDimension = 400) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -109,7 +110,7 @@
 
                         canvas.toBlob((blob) => {
                             resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-                        }, 'image/jpeg', 0.8); // 화질 80%로 압축
+                        }, 'image/jpeg', 0.7); // 화질 70%로 가볍게 압축
                     };
                     img.src = e.target.result;
                 };
@@ -122,11 +123,11 @@
             if (!file) return;
 
             resultDiv.className = 'loading';
-            resultDiv.innerText = '사진을 압축하고 분석 중입니다... 🔄';
+            resultDiv.innerText = '사진을 가볍게 압축하고 분석 중입니다... 🔄';
 
             try {
-                // 1. 거대한 사진을 AI가 소화할 수 있게 가볍게 압축
-                const resizedFile = await resizeImage(file, 800);
+                // 1. 400픽셀 이하로 강력 리사이즈
+                const resizedFile = await resizeImage(file, 400);
 
                 // 2. 미리보기 표시
                 const reader = new FileReader();
@@ -136,7 +137,7 @@
                 };
                 reader.readAsDataURL(resizedFile);
 
-                // 3. 서버로 보낼 FormData 생성
+                // 3. 서버로 전송할 FormData 생성
                 const formData = new FormData();
                 formData.append('image', resizedFile);
 
