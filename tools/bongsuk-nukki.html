@@ -40,7 +40,6 @@
         .menu-btn:hover { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 공통 이미지 컨테이너 (좌우 동일한 틀) */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
@@ -146,7 +145,7 @@
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading-msg">✨ AI가 배경을 지우는 중입니다...</div>
+                <div id="loading-msg">✨ AI가 배경을 지우는 중입니다... (0%)</div>
             </section>
         </div>
     </main>
@@ -171,7 +170,6 @@
         } 
     });
 
-    // 초기 UI 설정
     function setInitialUI() {
         originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
         resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
@@ -180,7 +178,6 @@
     }
     setInitialUI();
 
-    // 파일 처리 및 AI 누끼 실행 함수
     async function handleFile(file) {
         if (!file) return;
 
@@ -189,7 +186,7 @@
             return;
         }
 
-        // 1. 왼쪽 박스에 원본 사진 출력
+        // 1. 원본 이미지 미리보기 표시
         const reader = new FileReader();
         reader.onload = (e) => {
             const imageUrl = e.target.result;
@@ -197,16 +194,27 @@
         };
         reader.readAsDataURL(file);
 
-        // 2. 오른쪽 박스 로딩 상태 표시
+        // 2. 오른쪽 박스 로딩 상태 및 진행률 표시 시작
         resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
         loadingMsg.style.display = 'block';
+        loadingMsg.textContent = `✨ AI 모델 로딩 및 처리 중... (0%)`;
 
         try {
-            // 3. 브라우저 내부 AI 모델로 배경 제거 수행
-            const blob = await removeBackground(file);
-            const resultUrl = URL.createObjectURL(blob);
+            // 3. progress 콜백 함수 추가
+            const blob = await removeBackground(file, {
+                progress: (key, current, total) => {
+                    // key: 작업 단계 (ex: 'compute:inference', 'fetch:model' 등)
+                    // current: 현재 진행량, total: 전체량
+                    if (total && total > 0) {
+                        const percent = Math.round((current / total) * 100);
+                        loadingMsg.textContent = `✨ 처리 중... (${percent}%)`;
+                    } else {
+                        loadingMsg.textContent = `✨ AI가 열심히 배경을 지우는 중입니다...`;
+                    }
+                }
+            });
 
-            // 4. 오른쪽 박스에 결과 사진 출력
+            const resultUrl = URL.createObjectURL(blob);
             resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
         } catch (error) {
             console.error(error);
@@ -217,7 +225,6 @@
         }
     }
 
-    // 드래그 앤 드롭 이벤트
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', (e) => { 
@@ -228,7 +235,6 @@
     });
     dropZone.addEventListener('click', () => { fileSelector.click(); });
 
-    // 사이드바 Upload 버튼 연결
     window.uploadFile = function() {
         fileSelector.click();
     };
@@ -238,7 +244,6 @@
         handleFile(file);
     });
 
-    // 사이드바 Reset 버튼 연결
     window.resetAll = function() {
         setInitialUI();
     }
