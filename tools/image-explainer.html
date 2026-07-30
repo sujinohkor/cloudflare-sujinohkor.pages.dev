@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 이미지 설명기</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+                
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+        }
+                
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
+        }
+
+        .workspace-container {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        /* 3. Components */
+        .menu-btn, .theme-btn, .action-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+        }
+        .menu-btn:hover, .action-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        
+        /* 공통 이미지/결과 컨테이너 (좌우 동일한 틀) */
+        .content-box { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
+            padding: 20px; background: transparent; flex-direction: column; 
+            align-items: center; justify-content: center; gap: 10px; text-align: center;
+            overflow: hidden; position: relative;
+            cursor: pointer;
+        }
+        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
+        
+        .image-preview-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+            position: relative;
+        }
+        .preview-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .empty-msg {
+            color: #888;
+            font-family: 'Consolas', monospace;
+            font-size: 1rem;
+        }
+
+        /* 오른쪽 결과 박스 내부 스타일 */
+        .result-content {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            text-align: left;
+            padding: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        #loading-msg {
+            display: none;
+            color: #ff9e40;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        /* 다크 모드 그림자 */
+        .card, .content-box {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #000; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover, body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .card, body.light-mode .content-box {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode .empty-msg { color: #666; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; height: 100vh; overflow-y: auto; }
+            .workspace-container { flex-direction: column; min-height: auto; }
+            .content-box { min-height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+<input type="file" id="file-selector" accept="image/*" style="display: none;">
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="action-btn" id="submit-btn" style="display: none;">Ask AI</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>AI Image Explainer</h1>
+            <p>Upload an image to get a detailed explanation in English and Korean.</p>
+        </header>
+
+        <div class="workspace-container">
+            <!-- 왼쪽 박스: 원본 사진 영역 -->
+            <section class="content-box content-mid" id="drop-zone">
+                <div class="image-preview-container" id="original-container">
+                    <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
+                </div>
+            </section>
+
+            <!-- 오른쪽 박스: AI 설명 결과 영역 -->
+            <section class="content-box" id="result-zone">
+                <div class="image-preview-container" style="flex-direction: column; justify-content: flex-start;">
+                    <div class="empty-msg" id="result-placeholder">AI explanation will appear here.</div>
+                    <div class="result-content" id="result-box"></div>
+                </div>
+                <div id="loading-msg">✨ AI is analyzing the image in English & Korean... ⏳</div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const dropZone = document.getElementById('drop-zone');
+    const originalContainer = document.getElementById('original-container');
+    const resultBox = document.getElementById('result-box');
+    const resultPlaceholder = document.getElementById('result-placeholder');
+    const fileSelector = document.getElementById('file-selector');
+    const submitBtn = document.getElementById('submit-btn');
+    const loadingMsg = document.getElementById('loading-msg');
+
+    let selectedFile = null;
+
+    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
+
+    function setInitialUI() {
+        originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
+        resultPlaceholder.style.display = 'block';
+        resultBox.style.display = 'none';
+        resultBox.innerText = '';
+        loadingMsg.style.display = 'none';
+        submitBtn.style.display = 'none';
+        fileSelector.value = '';
+        selectedFile = null;
+    }
+    setInitialUI();
+
+    function handleFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file.');
+            return;
+        }
+
+        selectedFile = file;
+
+        // 1. 원본 이미지 미리보기 표시
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+            originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+            submitBtn.style.display = 'block'; // 업로드 완료되면 'Ask AI' 버튼 활성화
+        };
+        reader.readAsDataURL(file);
+
+        // 결과 초기화
+        resultPlaceholder.style.display = 'block';
+        resultBox.style.display = 'none';
+        resultBox.innerText = '';
+    }
+
+    // 파일 드래그 앤 드롭 및 클릭 이벤트
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+    dropZone.addEventListener('drop', (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.remove('dragover'); 
+        const file = e.dataTransfer.files[0]; 
+        handleFile(file); 
+    });
+    dropZone.addEventListener('click', () => { fileSelector.click(); });
+
+    window.uploadFile = function() {
+        fileSelector.click();
+    };
+
+    fileSelector.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFile(file);
+    });
+
+    window.resetAll = function() {
+        setInitialUI();
+    };
+
+    // AI에게 물어보기 버튼 클릭 이벤트
+    submitBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+
+        submitBtn.style.display = 'none';
+        loadingMsg.style.display = 'block';
+        resultPlaceholder.style.display = 'none';
+        resultBox.style.display = 'none';
+
+        try {
+            // 본인의 Cloudflare Worker 엔드포인트 URL
+            const workerUrl = 'https://image-explainer.sujinohkor.workers.dev';
+            
+            const response = await fetch(workerUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.response) {
+                resultBox.innerText = data.response;
+            } else if (data.error) {
+                resultBox.innerText = `Error: ${data.error}`;
+            } else {
+                resultBox.innerText = '설명을 불러오지 못했습니다.';
+            }
+            resultBox.style.display = 'block';
+        } catch (err) {
+            console.error(err);
+            resultBox.innerText = '오류가 발생했습니다. 다시 시도해주세요.';
+            resultBox.style.display = 'block';
+        } finally {
+            loadingMsg.style.display = 'none';
+            submitBtn.style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>
