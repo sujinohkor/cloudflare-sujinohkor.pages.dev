@@ -9,14 +9,14 @@
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; }
-                
+                        
         /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease; 
-        }                
+        }                        
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
@@ -60,7 +60,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 1;
+            flex: 1; /* 1:1 세로 공간 균등 분할 */
             min-height: 0;
             position: relative;
         }
@@ -70,6 +70,7 @@
             flex-shrink: 0;
         }
 
+        /* 텍스트박스와 라벨 배치 구조 개선 (라벨 위, 입력창 아래) */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -152,6 +153,7 @@
             margin-bottom: 10px;
         }
         
+        /* 복사 버튼 색상 주황색 계열로 변경 */
         .copy-btn {
             background: #202020;
             color: #ff9e40;
@@ -173,6 +175,7 @@
         }
         .error-msg.active { display: block; }
 
+        /* 히스토리 및 QR 세부 스타일 (QR 이미지 크기 확대) */
         .qr-wrapper {
             display: flex;
             justify-content: center;
@@ -221,6 +224,7 @@
         .history-url:hover { text-decoration: underline; }
         .history-date { color: #888; font-size: 0.7rem; }
         
+        /* 미니 복사 버튼 색상 주황색 계열로 변경 */
         .mini-copy-btn {
             background: #202020;
             color: #ff9e40;
@@ -234,6 +238,7 @@
         }
         .mini-copy-btn:hover { background: #ff9e40; color: #101010; }
         
+        /* 마크다운 에디터 스타일을 가져온 Clear All 버튼 디자인 */
         .clear-history-btn {
             background: transparent;
             border: 1px solid #ff9e40;
@@ -249,6 +254,7 @@
             color: #101010;
         }
 
+        /* 그림자 설정 */
         .calc-card, .content-mid, .content-down {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -272,10 +278,23 @@
         body.light-mode .checkbox-group { color: #555; }
         body.light-mode .action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        
+        /* 라이트모드 복사 버튼 색상 맞춤 */
         body.light-mode .copy-btn, body.light-mode .mini-copy-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .copy-btn:hover, body.light-mode .mini-copy-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
-        body.light-mode .clear-history-btn { background: transparent; border-color: #e68a35; color: #e68a35; }
-        body.light-mode .clear-history-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        
+        /* 라이트모드 Clear All 버튼 색상 맞춤 */
+        body.light-mode .clear-history-btn {
+            background: transparent;
+            border-color: #e68a35;
+            color: #e68a35;
+        }
+        body.light-mode .clear-history-btn:hover {
+            background: #F38020;
+            color: #fff;
+            border-color: #F38020;
+        }
+        
         body.light-mode .menu-toggle-btn { color: #ffffff; }
 
         /* 5. Mobile Responsive */
@@ -325,7 +344,6 @@
 
                 <div class="input-group" id="customGroup" style="display: none;">
                     <label>Custom URL (English letters and numbers only, up to 10 characters)</label>
-                    <!-- [수정완료] 입력할 때는 대문자가 자유롭게 써지도록 oninput 속성을 제거했습니다 -->
                     <input type="text" id="customSlug" maxlength="10" placeholder="예: mylink123">
                 </div>
 
@@ -387,10 +405,7 @@
     async function shortenUrl() {
         const longUrl = document.getElementById('longUrl').value.trim();
         const isCustom = document.getElementById('customCheck').checked;
-        
-        // [핵심] 사용자가 대문자로 입력했더라도, 버튼을 눌러 서버로 보내는 순간에만 소문자로 변환
-        const customSlug = document.getElementById('customSlug').value.trim().toLowerCase();
-        
+        const customSlug = document.getElementById('customSlug').value.trim();
         const errorMsg = document.getElementById('errorMsg');
         const resultBox = document.getElementById('resultBox');
 
@@ -411,7 +426,7 @@
         }
 
         if (isCustom && customSlug) {
-            const customRegex = /^[a-z0-9]{1,10}$/; 
+            const customRegex = /^[a-zA-Z0-9]{1,10}$/;
             if (!customRegex.test(customSlug)) {
                 errorMsg.innerText = 'Custom URLs can only be a combination of English letters and numbers up to 10 digits, without special symbols or Unicode.';
                 errorMsg.classList.add('active');
@@ -450,9 +465,11 @@
 
             resultBox.classList.add('active');
 
+            // 오른쪽 패널 QR 코드 자동 생성
             const qrContainer = document.getElementById('qrContainer');
             qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.shortUrl)}" alt="QR Code">`;
 
+            // 로컬 스토리지에 히스토리 저장
             saveHistory(data.shortUrl, longUrl, formattedDate);
 
         } catch (err) {
