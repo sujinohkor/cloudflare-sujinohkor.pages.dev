@@ -8,10 +8,10 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
                 
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
 
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
@@ -43,8 +43,8 @@
         .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
 
         /* 모바일용 상단 카테고리 스크롤 탭 및 컨트롤 영역 */
-        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .mobile-category-bar { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
+        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .mobile-category-bar { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; width: 100%; }
         .mobile-category-bar::-webkit-scrollbar { display: none; }
 
         /* 모바일 전용 타이틀 아래 우측 정렬 버튼 영역 (기본은 숨김) */
@@ -65,19 +65,30 @@
         .main-content { 
             margin-left: 300px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; gap: 30px; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         .typing-container { display: block; width: 90%; max-width: 600px; margin: 0 auto; }
         .typing-container img { width: 100%; height: auto; }                
 
         .header-wrapper { display: flex; align-items: center; justify-content: center; position: relative; min-height: 50px; }
-        .header-wrapper h1 { color: #ff9e40; font-size: 2.5rem; text-align: center; }
+        
+        /* 바운스 텍스트 스타일 */
+        .highlight-text { color: #ff9e40; margin: 20px 0; }
+        .bounce-text { font-size: 2.5rem; font-weight: bold; color: #ff9e40; display: inline-block; text-align: center; width: 100%; }
+        .bounce-text span { display: inline-block; animation: bounce 1.2s infinite ease-in-out; animation-delay: calc(0.08s * var(--i)); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-15px); }
+            50% { transform: translateY(0); }
+        }
 
         /* Grid 구조 */
         .card-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 20px; 
+            width: 100%;
         }
         .card { 
             width: 100%; 
@@ -102,9 +113,9 @@
         .card.guest-book-card { background: rgba(255, 148, 66, 0.15); }
         .card.guest-book-card:hover { background: rgba(255, 148, 66, 0.25); border: 2px solid #F38020; }
 
-        .websites-section { margin-top: auto; text-align: center; padding-top: 30px; border-top: 1px solid #222; }
+        .websites-section { margin-top: auto; text-align: center; padding-top: 30px; border-top: 1px solid #222; width: 100%; }
         .highlight-text { color: #ff9e40; margin-bottom: 15px; }                
-        .websites-list { list-style: none; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .websites-list { list-style: none; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; width: 100%; }
         .websites-list h4 { font-weight: normal; color: #ccc; }
 
         /* 방문자 카운터 스타일 */
@@ -126,6 +137,7 @@
         body.light-mode .category-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .category-btn.active { background: #F38020; color: #fff; border-color: #F38020; box-shadow: 0 4px 15px rgba(243, 128, 32, 0.4); }
         body.light-mode .highlight-text { color: #F38020; }
+        body.light-mode .bounce-text { color: #F38020; }
         body.light-mode .card { background: #FDF5E6; }
         body.light-mode .card:hover { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.2); }
         body.light-mode .card p { color: #666; }
@@ -141,7 +153,7 @@
         /* 모바일 반응형 최적화 */
         @media (max-width: 900px) {
             * { max-width: 100%; box-sizing: border-box; }
-            body { overflow-x: hidden; }
+            body { overflow-x: hidden; width: 100vw; }
             .sidebar { display: none; } /* 모바일에서는 고정 사이드바 숨김 */
             .mobile-top-bar { display: flex; } /* 모바일 상단 바 표시 */
             .mobile-theme-row { display: flex; } /* 타이틀 아래 우측 정렬 버튼 행 표시 */
@@ -152,6 +164,7 @@
                 padding: 10px; 
                 gap: 15px; 
                 width: 100vw;
+                max-width: 100vw;
                 box-sizing: border-box;
             }
             
@@ -166,7 +179,7 @@
                 height: auto !important;
             }
 
-            .header-wrapper h1 { font-size: 1.5rem; }
+            .bounce-text { font-size: 1.6rem; }
             
             /* 모바일에서 카드를 2열(Grid)로 가독성 있게 배치하고 화면에 딱 맞춤 */
             .card-grid { 
@@ -218,8 +231,11 @@
             <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&pause=1000&color=FF9E40&center=true&vCenter=true&width=600&lines=Hi%2C+I+am+Sujin+Oh.;Thank+you+for+visiting+here.;This+is+my+FUN+site+for+coding+practice." alt="Typing SVG" />
         </a>                
 
+        <!-- PC용 바운스 타이틀 -->
         <div class="header-wrapper">
-            <h1 id="site-title">SUJIN's FUN SITE</h1>
+            <h1 id="site-title" class="bounce-text">
+                <span style="--i:1;">S</span><span style="--i:2;">U</span><span style="--i:3;">J</span><span style="--i:4;">I</span><span style="--i:5;">N</span><span style="--i:6;">'</span><span style="--i:7;">s</span>&nbsp;<span style="--i:8;">F</span><span style="--i:9;">U</span><span style="--i:10;">N</span>&nbsp;<span style="--i:11;">S</span><span style="--i:12;">I</span><span style="--i:13;">T</span><span style="--i:14;">E</span>
+            </h1>
         </div>
 
         <!-- 모바일 전용: 타이틀 아래 우측 정렬된 작은 DAY/NIGHT 버튼 행 -->
