@@ -247,12 +247,12 @@
             } else if (data.error) {
                 resultBox.innerText = `Error: ${data.error}`;
             } else {
-                resultBox.innerText = '설명을 불러오지 못했습니다.';
+                resultBox.innerText = 'Failed to load the explanation.';
             }
             resultBox.style.display = 'block';
         } catch (err) {
             console.error(err);
-            resultBox.innerText = '오류가 발생했습니다. 다시 시도해주세요.';
+            resultBox.innerText = 'An error occurred. Please try again.';
             resultBox.style.display = 'block';
         } finally {
             loadingMsg.style.display = 'none';
