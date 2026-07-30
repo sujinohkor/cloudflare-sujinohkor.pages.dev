@@ -37,14 +37,14 @@
         .category-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.4); }
         .category-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; box-shadow: 0 4px 15px rgba(255, 158, 64, 0.5); }
 
-        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        /* DAY/NIGHT 버튼 스타일 (기본 PC용) */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 모바일용 상단 카테고리 스크롤 탭 및 컨트롤 영역 */
-        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .mobile-category-bar { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
+        /* 모바일용 상단 영역 */
+        .mobile-top-bar { display: none; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+        .mobile-category-bar { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; flex: 1; }
         .mobile-category-bar::-webkit-scrollbar { display: none; }
 
         /* 메인 콘텐츠 영역 */
@@ -131,6 +131,16 @@
             .main-content { margin-left: 0; padding: 15px; gap: 20px; }
             .header-wrapper h1 { font-size: 1.8rem; }
             
+            /* 모바일 전용 작고 컴팩트한 DAY/NIGHT 버튼 디자인 */
+            #theme-toggle-mobile {
+                width: auto;
+                padding: 8px 12px;
+                font-size: 0.75rem;
+                border-radius: 10px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            
             /* 모바일에서 카드를 2열(Grid)로 가독성 있게 배치 */
             .card-grid { 
                 grid-template-columns: repeat(2, 1fr); 
@@ -154,7 +164,7 @@
 <body>
 
 <div class="app-container">
-    <!-- 데스크톱용 플로팅 사이드바 (DAY/NIGHT 버튼 최상단 배치) -->
+    <!-- 데스크톱용 플로팅 사이드바 -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-title">Categories</div>
         <div class="sidebar-top">
@@ -177,7 +187,7 @@
             <h1 id="site-title">SUJIN's FUN SITE</h1>
         </div>
 
-        <!-- 모바일 전용 상단 영역 (DAY/NIGHT 버튼 + 가로 스크롤 카테고리 탭) -->
+        <!-- 모바일 전용 상단 영역 (작아진 테마 버튼 + 가로 스크롤 카테고리 탭 나란히 배치) -->
         <div class="mobile-top-bar">
             <button class="theme-toggle-btn" id="theme-toggle-mobile">DAY / NIGHT</button>
             <div class="mobile-category-bar">
