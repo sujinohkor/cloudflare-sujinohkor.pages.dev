@@ -140,29 +140,59 @@
 
         /* 모바일 반응형 최적화 */
         @media (max-width: 900px) {
+            * { max-width: 100%; box-sizing: border-box; }
+            body { overflow-x: hidden; }
             .sidebar { display: none; } /* 모바일에서는 고정 사이드바 숨김 */
             .mobile-top-bar { display: flex; } /* 모바일 상단 바 표시 */
             .mobile-theme-row { display: flex; } /* 타이틀 아래 우측 정렬 버튼 행 표시 */
-            .main-content { margin-left: 0; padding: 15px; gap: 20px; }
-            .header-wrapper h1 { font-size: 1.8rem; }
             
-            /* 모바일에서 카드를 2열(Grid)로 가독성 있게 배치 */
+            /* 메인 컨텐츠 영역이 화면 밖으로 넘치지 않도록 강제 제한 */
+            .main-content { 
+                margin-left: 0; 
+                padding: 10px; 
+                gap: 15px; 
+                width: 100vw;
+                box-sizing: border-box;
+            }
+            
+            /* 타이핑 SVG 배너가 모바일 화면을 밀어내지 않도록 반응형 처리 */
+            .typing-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+            .typing-container img {
+                width: 100% !important;
+                height: auto !important;
+            }
+
+            .header-wrapper h1 { font-size: 1.5rem; }
+            
+            /* 모바일에서 카드를 2열(Grid)로 가독성 있게 배치하고 화면에 딱 맞춤 */
             .card-grid { 
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 10px; 
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr)); 
+                gap: 8px; 
+                width: 100%;
+                box-sizing: border-box;
             }
             .card { 
+                width: 100%;
                 min-height: auto; 
-                padding: 12px; 
+                padding: 10px; 
                 display: flex; 
                 flex-direction: column; 
                 justify-content: space-between;
+                word-break: break-all;
+                box-sizing: border-box;
             }
             .icon { font-size: 1.5rem; margin-bottom: 6px; }
-            .card h3 { font-size: 0.95rem; margin-bottom: 2px; }
-            .card p { font-size: 0.75rem; margin-bottom: 6px; }
-            .arrow { font-size: 0.75rem; }
-            .websites-list { flex-direction: column; gap: 8px; }
+            .card h3 { font-size: 0.9rem; margin-bottom: 2px; }
+            .card p { font-size: 0.7rem; margin-bottom: 6px; }
+            .arrow { font-size: 0.7rem; }
+            
+            .websites-section { width: 100%; box-sizing: border-box; }
+            .websites-list { flex-direction: column; gap: 8px; width: 100%; }
         }
     </style>
 </head>
