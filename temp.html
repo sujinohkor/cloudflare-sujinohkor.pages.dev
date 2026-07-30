@@ -37,7 +37,7 @@
         .category-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.4); }
         .category-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; box-shadow: 0 4px 15px rgba(255, 158, 64, 0.5); }
 
-        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
@@ -46,6 +46,20 @@
         .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .mobile-category-bar { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
         .mobile-category-bar::-webkit-scrollbar { display: none; }
+
+        /* 모바일 전용 타이틀 아래 우측 정렬 버튼 영역 (기본은 숨김) */
+        .mobile-theme-row { display: none; width: 100%; justify-content: flex-end; margin-bottom: 10px; }
+        #theme-toggle-mobile {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 10px;
+            width: auto;
+            background: rgba(255, 255, 255, 0.03);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.5);
+            font-weight: bold;
+            cursor: pointer;
+        }
 
         /* 메인 콘텐츠 영역 */
         .main-content { 
@@ -117,8 +131,8 @@
         body.light-mode .card p { color: #666; }
         body.light-mode .card.guest-book-card { background: #fde8d7; }
         body.light-mode .card.guest-book-card:hover { background: #fcd2b2; border: 2px solid #F38020; }
-        body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
-        body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #fff; }
+        body.light-mode .theme-toggle-btn, body.light-mode #theme-toggle-mobile { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .theme-toggle-btn:hover, body.light-mode #theme-toggle-mobile:hover { background: #F38020; color: #fff; }
         body.light-mode .websites-section { border-top-color: #e0e0e0; }
         body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #666; }
         body.light-mode .view-count-container { color: #666; }
@@ -128,6 +142,7 @@
         @media (max-width: 900px) {
             .sidebar { display: none; } /* 모바일에서는 고정 사이드바 숨김 */
             .mobile-top-bar { display: flex; } /* 모바일 상단 바 표시 */
+            .mobile-theme-row { display: flex; } /* 타이틀 아래 우측 정렬 버튼 행 표시 */
             .main-content { margin-left: 0; padding: 15px; gap: 20px; }
             .header-wrapper h1 { font-size: 1.8rem; }
             
@@ -177,9 +192,13 @@
             <h1 id="site-title">SUJIN's FUN SITE</h1>
         </div>
 
-        <!-- 모바일 전용 상단 영역 (DAY/NIGHT 버튼 + 가로 스크롤 카테고리 탭) -->
-        <div class="mobile-top-bar">
+        <!-- 모바일 전용: 타이틀 아래 우측 정렬된 작은 DAY/NIGHT 버튼 행 -->
+        <div class="mobile-theme-row">
             <button class="theme-toggle-btn" id="theme-toggle-mobile">DAY / NIGHT</button>
+        </div>
+
+        <!-- 모바일 전용 상단 카테고리 스크롤 탭 -->
+        <div class="mobile-top-bar">
             <div class="mobile-category-bar">
                 <button class="category-btn active" onclick="filterCategory('all', this)">✨ All</button>
                 <button class="category-btn" onclick="filterCategory('dev', this)">💻 Dev</button>
