@@ -22,28 +22,35 @@
 
     <!-- 브라우저에서 직접 AI를 돌려주는 가벼운 라이브러리 CDN 연동 -->
     <script type="module">
-        import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-
+        import { removeBackground, Config } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
+    
         const uploadInput = document.getElementById('upload');
-        const loadingDiv = document.getElementById('loading');
         const resultImg = document.getElementById('result');
-
+        const loadingDiv = document.getElementById('loading');
+    
+        // [최적화] 모델 파일을 브라우저 캐시에 저장하도록 설정
+        // 이렇게 하면 첫 다운로드 후, 다음부터는 로컬에서 불러와 훨씬 빠릅니다.
+        const config: Config = {
+            publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/dist/', // 모델 파일 경로 고정
+        };
+    
         uploadInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
+    
             loadingDiv.style.display = 'block';
+            loadingDiv.textContent = "✨ AI 모델을 불러오는 중... (첫 실행 시 시간이 걸릴 수 있습니다)";
             resultImg.src = '';
-
+    
             try {
-                // 브라우저 내부에서 AI 모델이 직접 배경을 제거합니다.
-                const blob = await removeBackground(file);
+                // [최적화] config를 두 번째 인자로 전달합니다.
+                const blob = await removeBackground(file, config);
                 const url = URL.createObjectURL(blob);
                 resultImg.src = url;
+                loadingDiv.style.display = 'none';
             } catch (error) {
                 console.error(error);
                 alert('배경 제거 중 오류가 발생했습니다.');
-            } finally {
                 loadingDiv.style.display = 'none';
             }
         });
