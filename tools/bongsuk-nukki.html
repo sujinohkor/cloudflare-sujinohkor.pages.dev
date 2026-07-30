@@ -3,31 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>봉숙이 AI 누끼 생성기</title>
+    <title>Image Color Picker</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                                
+        
         /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
-        }                                
+        }
+        
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
         }
+
         .workspace-container {
             display: flex;
             flex-direction: row;
             flex: 1;
             gap: 20px;
             min-height: 0;
-            position: relative;
         }
 
         /* 3. Components */
@@ -39,91 +40,44 @@
         .menu-btn:hover { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 왼쪽 박스: 원본 이미지 및 업로드 영역 */
-        .content-mid { 
+        /* 공통 이미지 컨테이너 (좌우 동일한 틀) */
+        .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
-            align-items: center; justify-content: center; gap: 15px; overflow: hidden;
+            align-items: center; justify-content: center; gap: 10px; text-align: center;
+            overflow: hidden; position: relative;
         }
 
-        /* 오른쪽 박스: 결과 이미지 영역 */
-        .content-down { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center;
-            overflow: visible; padding: 20px; background: transparent; gap: 15px; position: relative;
-        }
+        /* 왼쪽 (업로드/원본 영역) 드래그앤드롭 스타일 */
+        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
 
         .image-preview-container {
             width: 100%;
             height: 100%;
-            max-height: 400px;
-            background: #1c1c1c;
-            border: 2px dashed #444;
-            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            position: relative;
+            border-radius: 8px;
         }
 
-        /* 결과 영역 전용 체커보드 패턴 (다크모드 기본: #222) */
-        .result-preview-container {
-            background-image: 
-                linear-gradient(45deg, #222 25%, transparent 25%), 
-                linear-gradient(-45deg, #222 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #222 75%), 
-                linear-gradient(-45deg, transparent 75%, #222 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
-
-        .image-preview-container img {
+        .preview-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            display: none;
+            border-radius: 8px;
         }
 
-        .placeholder-text {
+        .empty-msg {
             color: #888;
-            font-size: 0.9rem;
-            text-align: center;
-            padding: 20px;
+            font-family: 'Consolas', monospace;
+            font-size: 1rem;
         }
 
-        .upload-btn-label {
-            background: #ff9e40;
-            color: #101010;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-block;
+        /* 다크 모드 그림자 */
+        .card, .content-box {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-        .upload-btn-label:hover {
-            background: #fff;
-            color: #101010;
-        }
-        input[type="file"] { display: none; }
-
-        #loading { 
-            display: none; 
-            color: #ff9e40; 
-            font-weight: bold; 
-            font-size: 0.95rem; 
-            text-align: center;
-        }
-
-        .section-title {
-            color: #ff9e40;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        /* 그림자 설정 */
-        .content-mid, .content-down {            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);        }
 
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
@@ -133,145 +87,124 @@
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
-        body.light-mode .content-mid, body.light-mode .content-down {            background-color: #fafafa;            border-color: #F38020;            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);        }
-        body.light-mode .image-preview-container { background: #fff; border-color: #ccc; }
         
-        /* 라이트모드일 때 결과 영역 체커보드 패턴 색상을 #eee로 변경 */
-        body.light-mode .result-preview-container {
-            background-image: 
-                linear-gradient(45deg, #eee 25%, transparent 25%), 
-                linear-gradient(-45deg, #eee 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #eee 75%), 
-                linear-gradient(-45deg, transparent 75%, #eee 75%);
+        body.light-mode .card, body.light-mode .content-box {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-
-        body.light-mode .upload-btn-label { background: #F38020; color: #fff; }
-        body.light-mode .upload-btn-label:hover { background: #202020; color: #ff9e40; }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        @media (max-width: 768px) {            
-            .menu-toggle-btn { display: block; color: #ffffff; }            
-            .sidebar { transform: translateX(-250px); }            
-            .sidebar.active { transform: translateX(0); }            
-            .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; overflow: visible; }            
-            .workspace-container { flex-direction: column; overflow: visible; }            
-            .content-mid, .content-down { height: 400px; overflow: visible; }        }
+        
+        @media (max-width: 600px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            .workspace-container { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<div class="app-container">    
-    <aside class="sidebar" id="sidebar">        
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>        
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>        
-        <div class="bottom-btns">            
-            <button class="menu-btn" onclick="resetAll()">Reset</button>        
-        </div>    
+<input type="file" id="file-selector" accept="image/*" style="display: none;">
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </div>
     </aside>
-    
-    <main class="main-content">        
-        <header class="top-section">            
-            <h1>🐶 봉숙이 AI 누끼 생성기</h1>            
-            <p>사진을 업로드하면 브라우저 AI가 즉시 배경을 제거해 줍니다.</p>        
+
+    <main class="main-content">
+        <header class="top-section">
+            <h1>Image Viewer</h1>
+            <p>Upload an image to view original and result.</p>
         </header>
-        
-        <div class="workspace-container">            
-            <!-- 왼쪽 박스: 원본 이미지 영역 -->            
-            <section class="content-mid">                
-                <div class="section-title">Original Image</div>
-                <div class="image-preview-container">
-                    <span class="placeholder-text" id="original-placeholder">원본 이미지가 없습니다.</span>
-                    <img id="original-img" alt="Original">
+
+        <div class="workspace-container">
+            <!-- 왼쪽 박스: 초기 사진 영역 -->
+            <section class="content-box content-mid" id="drop-zone">
+                <div class="image-preview-container" id="original-container">
+                    <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
                 </div>
-                <label class="upload-btn-label" for="upload">사진 선택하기</label>
-                <input type="file" id="upload" accept="image/*">
             </section>
-            
-            <!-- 오른쪽 박스: 결과 이미지 영역 -->            
-            <section class="content-down">                
-                <div class="section-title">Background Removed (Result)</div>
-                <!-- result-preview-container 클래스를 적용하여 모드별 격자 색상 자동 전환 -->
-                <div class="image-preview-container result-preview-container">
-                    <span class="placeholder-text" id="result-placeholder">결과가 여기에 표시됩니다.</span>
-                    <img id="result-img" alt="Result">
+
+            <!-- 오른쪽 박스: 결과 사진 영역 -->
+            <section class="content-box content-down" id="result-zone">
+                <div class="image-preview-container" id="result-container">
+                    <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading">✨ AI가 봉숙이 배경을 지우는 중입니다... (잠시만 기다려주세요)</div>
-            </section>        
-        </div>    
+            </section>
+        </div>
     </main>
 </div>
 
-<!-- 브라우저에서 직접 AI를 돌려주는 가벼운 라이브러리 CDN 연동 -->
-<script type="module">
-    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-
+<script>
     const sidebar = document.getElementById('sidebar');
-    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
+    const dropZone = document.getElementById('drop-zone');
+    const originalContainer = document.getElementById('original-container');
+    const resultContainer = document.getElementById('result-container');
+    const fileSelector = document.getElementById('file-selector');
 
-    document.getElementById('theme-toggle').addEventListener('click', () => {         
-        document.body.classList.toggle('light-mode');     
-    });        
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
-    document.querySelector('.main-content').addEventListener('click', (e) => {         
-        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
-    });
+    // 초기 UI 설정
+    function setInitialUI() {
+        originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
+        resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
+    }
+    setInitialUI();
 
-    const uploadInput = document.getElementById('upload');
-    const originalImg = document.getElementById('original-img');
-    const originalPlaceholder = document.getElementById('original-placeholder');
-    const resultImg = document.getElementById('result-img');
-    const resultPlaceholder = document.getElementById('result-placeholder');
-    const loadingDiv = document.getElementById('loading');
-
-    uploadInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
+    // 파일 로드 및 좌우 양쪽에 동일/결과 이미지 세팅 핸들러
+    function handleFile(file) {
         if (!file) return;
 
-        // 1. 원본 이미지 미리보기 표시
-        const originalUrl = URL.createObjectURL(file);
-        originalImg.src = originalUrl;
-        originalImg.style.display = 'block';
-        originalPlaceholder.style.display = 'none';
-
-        // 2. 결과 영역 초기화 및 로딩 시작
-        resultImg.src = '';
-        resultImg.style.display = 'none';
-        resultPlaceholder.style.display = 'block';
-        resultPlaceholder.textContent = '배경 제거 중...';
-        loadingDiv.style.display = 'block';
-
-        try {
-            // 3. 브라우저 내부 AI 모델로 배경 제거 실행
-            const blob = await removeBackground(file);
-            const resultUrl = URL.createObjectURL(blob);
-            
-            resultImg.src = resultUrl;
-            resultImg.style.display = 'block';
-            resultPlaceholder.style.display = 'none';
-        } catch (error) {
-            console.error(error);
-            alert('배경 제거 중 오류가 발생했습니다.');
-            resultPlaceholder.textContent = '오류 발생';
-        } finally {
-            loadingDiv.style.display = 'none';
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file.');
+            return;
         }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+
+            // 1. 왼쪽 박스에 원본 사진 출력
+            originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+
+            // 2. 오른쪽 박스에 결과 사진 출력 (현재는 동일 사진 예시, 필요 시 변환 로직 연결 가능)
+            resultContainer.innerHTML = `<img src="${imageUrl}" alt="Result Preview" class="preview-img">`;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 드래그 앤 드롭 이벤트
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+    dropZone.addEventListener('drop', (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.remove('dragover'); 
+        const file = e.dataTransfer.files[0]; 
+        handleFile(file); 
+    });
+    dropZone.addEventListener('click', () => { fileSelector.click(); });
+
+    function uploadFile() { fileSelector.click(); }
+
+    fileSelector.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFile(file);
+        e.target.value = ''; 
     });
 
-    window.resetAll = function() {
-        uploadInput.value = '';
-        originalImg.src = '';
-        originalImg.style.display = 'none';
-        originalPlaceholder.style.display = 'block';
-        
-        resultImg.src = '';
-        resultImg.style.display = 'none';
-        resultPlaceholder.style.display = 'block';
-        resultPlaceholder.textContent = '결과가 여기에 표시됩니다.';
-        loadingDiv.style.display = 'none';
+    // 초기화 기능
+    function resetAll() {
+        setInitialUI();
     }
 </script>
-
 </body>
 </html>
