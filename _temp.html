@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>봉숙이 AI 누끼 사이트</title>
+    <title>봉숙이 AI 누끼 생성기</title>
     <style>
         body { font-family: sans-serif; text-align: center; margin-top: 50px; background: #f4f4f9; }
         .box { background: white; display: inline-block; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -13,14 +13,17 @@
 <body>
     <div class="box">
         <h1>🐶 봉숙이 배경 제거</h1>
-        <p>봉숙이 사진을 선택하면 서버 AI가 배경을 지워줍니다!</p>
+        <p>봉숙이 사진을 선택하면 브라우저 AI가 즉시 배경을 지워줍니다!</p>
         <input type="file" id="upload" accept="image/*">
-        <div id="loading">✨ 서버에서 봉숙이 누끼를 따는 중입니다...</div>
+        <div id="loading">✨ AI가 봉숙이 누끼를 따는 중입니다... (잠시만 기다려주세요)</div>
         <br>
         <img id="result" alt="결과 이미지가 여기에 나타납니다.">
     </div>
 
-    <script>
+    <!-- 브라우저에서 직접 AI를 돌려주는 가벼운 라이브러리 CDN 연동 -->
+    <script type="module">
+        import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
+
         const uploadInput = document.getElementById('upload');
         const loadingDiv = document.getElementById('loading');
         const resultImg = document.getElementById('result');
@@ -33,23 +36,13 @@
             resultImg.src = '';
 
             try {
-                // 본인의 Cloudflare Worker URL로 변경하세요
-                const workerUrl = 'https://bongsuk-nukki.sujinohkor.workers.dev'; 
-
-                const response = await fetch(workerUrl, {
-                    method: 'POST',
-                    body: file,
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || '서버 처리 실패');
-                }
-
-                const blob = await response.blob();
-                resultImg.src = URL.createObjectURL(blob);
-            } catch (err) {
-                alert('오류가 발생했습니다: ' + err.message);
+                // 브라우저 내부에서 AI 모델이 직접 배경을 제거합니다.
+                const blob = await removeBackground(file);
+                const url = URL.createObjectURL(blob);
+                resultImg.src = url;
+            } catch (error) {
+                console.error(error);
+                alert('배경 제거 중 오류가 발생했습니다.');
             } finally {
                 loadingDiv.style.display = 'none';
             }
