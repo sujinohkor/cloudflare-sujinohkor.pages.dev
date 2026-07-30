@@ -101,7 +101,7 @@
         }
         .card:hover { transform: translateY(-5px); border-color: #ff9e40; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
         .icon { font-size: 2rem; margin-bottom: 10px; display: inline-block; transition: transform 0.3s; }
-        /*.card:hover .icon { transform: rotate(-15deg) scale(1.1); }*/
+        .card:hover .icon { transform: rotate(-15deg) scale(1.1); }
         .icon.trex-icon { transform: scaleX(-1); display: inline-block; align-self: flex-start; }
         .card:hover .trex-icon { transform: scaleX(-1) rotate(15deg) scale(1.1); }
         .card h3 { font-size: 1.15rem; margin-bottom: 5px; }
@@ -201,17 +201,17 @@
             }
             
             /* 모바일 카드 터치/호버 시 아이콘 애니메이션 */
-            .card:hover { transform: none; }
+            /*.card:hover { transform: none; }
             .card:hover .icon { 
                 transform: rotate(-15deg) scale(1.1);
                 transition: transform 0.2s ease;
-            }            
+            }*/           
             /* 공룡(trex-icon)은 좌우 반전(scaleX(-1))을 유지한 채 우측 상향 이동 */
-            .card:hover .trex-icon { 
+            /*.card:hover .trex-icon { 
                 transform: scaleX(-1) rotate(15deg) scale(1.1); 
                 transition: transform 0.2s ease;
             }
-            .card:hover .arrow { transform: translateX(5px); }
+            .card:hover .arrow { transform: translateX(5px); }*/
             
             .icon { font-size: 1.5rem; margin-bottom: 6px; }
             .card h3 { font-size: 0.9rem; margin-bottom: 2px; }
