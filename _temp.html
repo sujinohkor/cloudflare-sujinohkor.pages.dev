@@ -13,7 +13,7 @@
 <body>
     <div class="box">
         <h1>🐶 봉숙이 배경 제거</h1>
-        <p>봉숙이 사진을 선택하면 서버 AI가 빠르게 배경을 지워줍니다!</p>
+        <p>봉숙이 사진을 선택하면 서버 AI가 배경을 지워줍니다!</p>
         <input type="file" id="upload" accept="image/*">
         <div id="loading">✨ 서버에서 봉숙이 누끼를 따는 중입니다...</div>
         <br>
@@ -33,15 +33,18 @@
             resultImg.src = '';
 
             try {
-                // 1단계에서 만든 본인의 Cloudflare Worker URL 입력
+                // 본인의 Cloudflare Worker URL로 변경하세요
                 const workerUrl = 'https://bongsuk-nukki.sujinohkor.workers.dev'; 
 
                 const response = await fetch(workerUrl, {
                     method: 'POST',
-                    body: file, // 사진 파일을 통째로 서버로 전송
+                    body: file,
                 });
 
-                if (!response.ok) throw new Error('서버 처리 실패');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || '서버 처리 실패');
+                }
 
                 const blob = await response.blob();
                 resultImg.src = URL.createObjectURL(blob);
