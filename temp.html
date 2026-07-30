@@ -37,12 +37,14 @@
         .category-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.4); }
         .category-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; box-shadow: 0 4px 15px rgba(255, 158, 64, 0.5); }
 
-        .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
-        #theme-toggle { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        #theme-toggle:hover { background: #ff9e40; color: #101010; }
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 모바일용 상단 카테고리 스크롤 탭 (기본은 숨김) */
-        .mobile-category-bar { display: none; overflow-x: auto; gap: 8px; padding-bottom: 5px; margin-bottom: 10px; scrollbar-width: none; }
+        /* 모바일용 상단 카테고리 스크롤 탭 및 컨트롤 영역 */
+        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .mobile-category-bar { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
         .mobile-category-bar::-webkit-scrollbar { display: none; }
 
         /* 메인 콘텐츠 영역 */
@@ -115,8 +117,8 @@
         body.light-mode .card p { color: #666; }
         body.light-mode .card.guest-book-card { background: #fde8d7; }
         body.light-mode .card.guest-book-card:hover { background: #fcd2b2; border: 2px solid #F38020; }
-        body.light-mode #theme-toggle { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
-        body.light-mode #theme-toggle:hover { background: #F38020; color: #fff; }
+        body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #fff; }
         body.light-mode .websites-section { border-top-color: #e0e0e0; }
         body.light-mode .websites-list h4, body.light-mode .websites-list a { color: #666; }
         body.light-mode .view-count-container { color: #666; }
@@ -125,7 +127,7 @@
         /* 모바일 반응형 최적화 */
         @media (max-width: 900px) {
             .sidebar { display: none; } /* 모바일에서는 고정 사이드바 숨김 */
-            .mobile-category-bar { display: flex; } /* 모바일 상단 탭 표시 */
+            .mobile-top-bar { display: flex; } /* 모바일 상단 바 표시 */
             .main-content { margin-left: 0; padding: 15px; gap: 20px; }
             .header-wrapper h1 { font-size: 1.8rem; }
             
@@ -152,18 +154,17 @@
 <body>
 
 <div class="app-container">
-    <!-- 데스크톱용 플로팅 사이드바 -->
+    <!-- 데스크톱용 플로팅 사이드바 (DAY/NIGHT 버튼 최상단 배치) -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-title">Categories</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
         <button class="category-btn active" onclick="filterCategory('all', this)">✨ All Tools</button>
         <button class="category-btn" onclick="filterCategory('dev', this)">💻 Dev & Web</button>
         <button class="category-btn" onclick="filterCategory('utility', this)">🛠️ Text & Utility</button>
         <button class="category-btn" onclick="filterCategory('design', this)">🎨 Image & Design</button>
         <button class="category-btn" onclick="filterCategory('fun', this)">🎮 Fun & Community</button>
-
-        <div class="sidebar-bottom">
-            <button id="theme-toggle">DAY / NIGHT</button>
-        </div>
     </aside>
 
     <!-- 메인 콘텐츠 -->
@@ -176,13 +177,16 @@
             <h1 id="site-title">SUJIN's FUN SITE</h1>
         </div>
 
-        <!-- 모바일 전용 가로 스크롤 카테고리 탭 -->
-        <div class="mobile-category-bar">
-            <button class="category-btn active" onclick="filterCategory('all', this)">✨ All</button>
-            <button class="category-btn" onclick="filterCategory('dev', this)">💻 Dev</button>
-            <button class="category-btn" onclick="filterCategory('utility', this)">🛠️ Utility</button>
-            <button class="category-btn" onclick="filterCategory('design', this)">🎨 Design</button>
-            <button class="category-btn" onclick="filterCategory('fun', this)">🎮 Fun</button>
+        <!-- 모바일 전용 상단 영역 (DAY/NIGHT 버튼 + 가로 스크롤 카테고리 탭) -->
+        <div class="mobile-top-bar">
+            <button class="theme-toggle-btn" id="theme-toggle-mobile">DAY / NIGHT</button>
+            <div class="mobile-category-bar">
+                <button class="category-btn active" onclick="filterCategory('all', this)">✨ All</button>
+                <button class="category-btn" onclick="filterCategory('dev', this)">💻 Dev</button>
+                <button class="category-btn" onclick="filterCategory('utility', this)">🛠️ Utility</button>
+                <button class="category-btn" onclick="filterCategory('design', this)">🎨 Design</button>
+                <button class="category-btn" onclick="filterCategory('fun', this)">🎮 Fun</button>
+            </div>
         </div>
 
         <!-- 각 카드에 data-category 속성 부여 -->
@@ -332,16 +336,15 @@
 </div>
 
 <script>
-    // 테마 토글 (데스크톱/모바일 공통 연동을 위해 양쪽 버튼 모두 제어)
-    document.querySelectorAll('#theme-toggle').forEach(btn => {
+    // 테마 토글 (데스크톱/모바일 버튼 공통 연동)
+    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
         });
     });
 
-    // 카테고리 필터링 기능 (데스크톱/모바일 버튼 모두 동기화)
+    // 카테고리 필터링 기능
     function filterCategory(category, btnElement) {
-        // 모든 버튼에서 active 제거 후 클릭한 항목들과 일치하는 버튼들에 active 부여
         const text = btnElement.textContent;
         document.querySelectorAll('.category-btn').forEach(btn => {
             if (btn.textContent === text) {
