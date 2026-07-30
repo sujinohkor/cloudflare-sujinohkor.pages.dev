@@ -325,8 +325,8 @@
 
                 <div class="input-group" id="customGroup" style="display: none;">
                     <label>Custom URL (English letters and numbers only, up to 10 characters)</label>
-                    <!-- 입력할 때 자동으로 소문자로 변환되도록 이벤트를 추가했습니다 -->
-                    <input type="text" id="customSlug" maxlength="10" placeholder="예: mylink123" oninput="this.value = this.value.toLowerCase()">
+                    <!-- [수정완료] 입력할 때는 대문자가 자유롭게 써지도록 oninput 속성을 제거했습니다 -->
+                    <input type="text" id="customSlug" maxlength="10" placeholder="예: mylink123">
                 </div>
 
                 <button class="action-btn" onclick="shortenUrl()">Shorten</button>
@@ -388,7 +388,7 @@
         const longUrl = document.getElementById('longUrl').value.trim();
         const isCustom = document.getElementById('customCheck').checked;
         
-        // 전송하기 전에도 한 번 더 .toLowerCase()로 소문자 변환 안전장치 적용
+        // [핵심] 사용자가 대문자로 입력했더라도, 버튼을 눌러 서버로 보내는 순간에만 소문자로 변환
         const customSlug = document.getElementById('customSlug').value.trim().toLowerCase();
         
         const errorMsg = document.getElementById('errorMsg');
@@ -411,9 +411,9 @@
         }
 
         if (isCustom && customSlug) {
-            const customRegex = /^[a-z0-9]{1,10}$/; // 대문자를 제외하고 소문자 및 숫자로만 검증
+            const customRegex = /^[a-z0-9]{1,10}$/; 
             if (!customRegex.test(customSlug)) {
-                errorMsg.innerText = 'Custom URLs can only be a combination of English lowercase letters and numbers up to 10 digits, without special symbols or Unicode.';
+                errorMsg.innerText = 'Custom URLs can only be a combination of English letters and numbers up to 10 digits, without special symbols or Unicode.';
                 errorMsg.classList.add('active');
                 return;
             }
