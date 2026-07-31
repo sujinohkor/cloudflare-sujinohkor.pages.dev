@@ -3,156 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이것은 봉숙이인가?</title>
+    <title>봉숙이 판별기</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        body {
-            font-family: 'Apple SD Gothic Neo', sans-serif;
-            background-color: #f4f7f6;
-            text-align: center;
-            padding: 50px;
-            color: #333;
+        /* 1. Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
+                
+        /* 2. Layout */
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { 
+            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background-color: #101010; padding: 20px; z-index: 1000; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                
+        .main-content { 
+            margin-left: 250px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
         }
-        h1 { color: #ff6b6b; margin-bottom: 10px; }
-        p { color: #666; margin-bottom: 20px; }
-        input[type="file"] {
-            display: none;
+
+        .workspace-container {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
         }
-        .upload-btn {
-            background-color: #ff6b6b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
+
+        /* 3. Components */
+        .menu-btn, .theme-btn { 
+            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+        }
+        .menu-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+                
+        /* 공통 이미지/결과 컨테이너 (좌우 동일한 틀) */
+        .content-box { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
+            padding: 20px; background: transparent; flex-direction: column; 
+            align-items: center; justify-content: center; gap: 10px; text-align: center;
+            overflow: hidden; position: relative;
             cursor: pointer;
-            display: inline-block;
-            font-weight: bold;
-            transition: background 0.3s;
         }
-        .upload-btn:hover { background-color: #ff5252; }
-        #preview {
+        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
+                
+        .image-preview-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+            position: relative;
+        }
+        .preview-img {
             max-width: 100%;
-            max-height: 300px;
-            margin-top: 20px;
-            border-radius: 10px;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .empty-msg {
+            color: #888;
+            font-family: 'Consolas', monospace;
+            font-size: 1rem;
+        }
+
+        /* 오른쪽 결과 박스 내부 스타일 */
+        .result-content {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            text-align: left;
+            padding: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 0.95rem;
             display: none;
         }
-        #result {
-            margin-top: 25px;
-            font-size: 1.2rem;
+        #loading-msg {
+            display: none;
+            color: #ff9e40;
             font-weight: bold;
-            white-space: pre-wrap;
-            line-height: 1.5;
+            font-size: 0.95rem;
+            margin-top: 10px;
         }
-        .loading {
-            color: #888;
-            font-style: italic;
+
+        /* 다크 모드 그림자 */
+        .card, .content-box {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #000; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .card, body.light-mode .content-box {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode .empty-msg { color: #666; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+                
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { transform: translateX(-250px); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; width: 100%; height: 100vh; overflow: hidden; }
+            
+            .workspace-container { 
+                flex-direction: column; 
+                flex: 1;
+                min-height: 0;
+                gap: 15px;
+            }
+            
+            .content-box { 
+                flex: 1; 
+                min-height: 0;
+                height: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🐾 봉숙이 판별기 🐾</h1>
-        <p>사진을 업로드하면 이 사진이 '봉숙이'인지 판별해 드립니다!</p>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+<input type="file" id="file-selector" accept="image/*" style="display: none;">
 
-        <!-- 파일 업로드 버튼 -->
-        <label for="imageInput" class="upload-btn">사진 선택하기</label>
-        <input type="file" id="imageInput" accept="image/*">
-
-        <div>
-            <img id="preview" alt="미리보기">
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div class="bottom-btns">
+            <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
+    </aside>
 
-        <div id="result"></div>
-    </div>
+    <main class="main-content">
+        <header class="top-section">
+            <h1>🐾 봉숙이 판별기 🐾</h1>
+            <p>사진을 업로드하면 이 사진이 '봉숙이'인지 판별해 드립니다!</p>
+        </header>
 
-    <script>
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        const resultDiv = document.getElementById('result');
+        <div class="workspace-container">
+            <!-- 왼쪽 박스: 원본 사진 영역 -->
+            <section class="content-box content-mid" id="drop-zone">
+                <div class="image-preview-container" id="original-container">
+                    <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
+                </div>
+            </section>
 
-        // 🔥 본인의 워커 주소로 정확히 입력해주세요 (끝에 슬래시 / 포함)
-        const WORKER_URL = 'https://bongsuk-checker.sujinohkor.workers.dev/';
+            <!-- 오른쪽 박스: AI 판별 결과 영역 -->
+            <section class="content-box" id="result-zone">
+                <div class="image-preview-container" style="flex-direction: column; justify-content: center;">
+                    <div class="empty-msg" id="result-placeholder">판별 결과가 여기에 표시됩니다.</div>
+                    <div class="result-content" id="result-box"></div>
+                </div>
+                <div id="loading-msg">🔄 사진을 압축하고 분석 중입니다...</div>
+            </section>
+        </div>
+    </main>
+</div>
 
-        imageInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const dropZone = document.getElementById('drop-zone');
+    const originalContainer = document.getElementById('original-container');
+    const resultBox = document.getElementById('result-box');
+    const resultPlaceholder = document.getElementById('result-placeholder');
+    const fileSelector = document.getElementById('file-selector');
+    const loadingMsg = document.getElementById('loading-msg');
 
-            resultDiv.className = 'loading';
-            resultDiv.innerText = '사진을 압축하고 분석 중입니다... 🔄';
+    const WORKER_URL = 'https://bongsuk-checker.sujinohkor.workers.dev/';
+    let selectedFile = null;
 
-            try {
-                // 1. 이미지를 로드해서 확실하게 300픽셀 크기로 줄이기 (토큰 폭탄 원천 차단)
-                const compressedFile = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            const max = 300; // 크기를 300px로 고정하여 용량을 수십 KB 수준으로 압축
-                            let w = img.width;
-                            let h = img.height;
-                            
-                            if (w > h) {
-                                if (w > max) { h *= max / w; w = max; }
-                            } else {
-                                if (h > max) { w *= max / h; h = max; }
-                            }
+    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
+    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
 
-                            canvas.width = w;
-                            canvas.height = h;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, w, h);
+    function setInitialUI() {
+        originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
+        resultPlaceholder.style.display = 'block';
+        resultBox.style.display = 'none';
+        resultBox.innerText = '';
+        loadingMsg.style.display = 'none';
+        fileSelector.value = '';
+        selectedFile = null;
+    }
+    setInitialUI();
 
-                            canvas.toBlob((blob) => {
-                                resolve(new File([blob], "compressed.jpg", { type: 'image/jpeg' }));
-                            }, 'image/jpeg', 0.6);
-                        };
-                        img.src = e.target.result;
+    async function processImage(file) {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file.');
+            return;
+        }
+
+        selectedFile = file;
+
+        // 1. 이미지 압축 로직 (300px 제한)
+        try {
+            const compressedFile = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const max = 300; 
+                        let w = img.width;
+                        let h = img.height;
+                        
+                        if (w > h) {
+                            if (w > max) { h *= max / w; w = max; }
+                        } else {
+                            if (h > max) { w *= max / h; h = max; }
+                        }
+
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        canvas.toBlob((blob) => {
+                            resolve(new File([blob], "compressed.jpg", { type: 'image/jpeg' }));
+                        }, 'image/jpeg', 0.6);
                     };
-                    reader.readAsDataURL(file);
-                });
-
-                // 2. 미리보기 표시
-                const previewReader = new FileReader();
-                previewReader.onload = (e) => {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
+                    img.src = e.target.result;
                 };
-                previewReader.readAsDataURL(compressedFile);
+                reader.readAsDataURL(file);
+            });
 
-                // 3. 서버로 전송할 FormData 생성
-                const formData = new FormData();
-                formData.append('image', compressedFile);
+            // 2. 미리보기 표시
+            const previewReader = new FileReader();
+            previewReader.onload = (e) => {
+                const imageUrl = e.target.result;
+                originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+            };
+            previewReader.readAsDataURL(compressedFile);
 
-                // 4. 워커로 전송
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+            resultPlaceholder.style.display = 'none';
+            resultBox.style.display = 'none';
+            resultBox.innerText = '';
+            loadingMsg.style.display = 'block';
 
-                const data = await response.json();
+            // 3. 서버로 전송할 FormData 생성
+            const formData = new FormData();
+            formData.append('image', compressedFile);
 
-                if (response.ok) {
-                    resultDiv.className = '';
-                    resultDiv.innerText = data.response || JSON.stringify(data);
-                } else {
-                    resultDiv.className = '';
-                    resultDiv.innerText = `에러 발생: ${data.error || '알 수 없는 오류'}`;
-                }
-            } catch (error) {
-                resultDiv.className = '';
-                resultDiv.innerText = `처리 실패: ${error.message}`;
+            // 4. 워커로 전송
+            const response = await fetch(WORKER_URL, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resultBox.innerText = data.response || JSON.stringify(data);
+            } else {
+                resultBox.innerText = `에러 발생: ${data.error || '알 수 없는 오류'}`;
             }
-        });
-    </script>
+            resultBox.style.display = 'block';
+
+        } catch (err) {
+            console.error(err);
+            resultBox.innerText = 'An error occurred. Please try again.';
+            resultBox.style.display = 'block';
+        } finally {
+            loadingMsg.style.display = 'none';
+        }
+    }
+
+    // 드래그 앤 드롭 이벤트
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+    dropZone.addEventListener('drop', (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.remove('dragover'); 
+        const file = e.dataTransfer.files[0]; 
+        processImage(file); 
+    });
+
+    dropZone.addEventListener('click', () => { fileSelector.click(); });
+
+    window.uploadFile = function() {
+        fileSelector.click();
+    };
+
+    fileSelector.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        processImage(file);
+    });
+
+    window.resetAll = function() {
+        setInitialUI();
+    };
+</script>
 
 </body>
 </html>
