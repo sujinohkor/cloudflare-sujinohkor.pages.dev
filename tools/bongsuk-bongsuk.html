@@ -63,7 +63,9 @@
         .preview-img {
             max-width: 100%;
             max-height: 100%;
-            object-fit: contain;
+            width: 100%;     /* 추가 */
+            height: 100%;    /* 추가 */
+            object-fit: cover; /* contain에서 cover로 변경 */
             border-radius: 8px;
         }
         .empty-msg {
