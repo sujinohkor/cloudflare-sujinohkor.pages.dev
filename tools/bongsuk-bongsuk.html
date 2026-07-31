@@ -63,9 +63,9 @@
         .preview-img {
             max-width: 100%;
             max-height: 100%;
-            width: 100%;     /* 추가 */
-            height: 100%;    /* 추가 */
-            object-fit: cover; /* contain에서 cover로 변경 */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 비율을 유지하며 맞추려면 contain, 꽉 채우려면 cover */
             border-radius: 8px;
         }
         .empty-msg {
@@ -217,8 +217,21 @@
 
         selectedFile = file;
 
-        // 1. 이미지 압축 로직 (300px 제한)
+        // 1. 화면 미리보기는 원본 파일로 선명하게 표시 (여기에 원본 file 사용)
+        const previewReader = new FileReader();
+        previewReader.onload = (e) => {
+            const imageUrl = e.target.result;
+            originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+        };
+        previewReader.readAsDataURL(file);
+
+        resultPlaceholder.style.display = 'none';
+        resultBox.style.display = 'none';
+        resultBox.innerText = '';
+        loadingMsg.style.display = 'block';
+
         try {
+            // 2. 서버 전송용만 300px로 압축
             const compressedFile = await new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -249,20 +262,7 @@
                 reader.readAsDataURL(file);
             });
 
-            // 2. 미리보기 표시
-            const previewReader = new FileReader();
-            previewReader.onload = (e) => {
-                const imageUrl = e.target.result;
-                originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
-            };
-            previewReader.readAsDataURL(compressedFile);
-
-            resultPlaceholder.style.display = 'none';
-            resultBox.style.display = 'none';
-            resultBox.innerText = '';
-            loadingMsg.style.display = 'block';
-
-            // 3. 서버로 전송할 FormData 생성
+            // 3. 서버로 전송할 FormData 생성 (압축된 파일 전송)
             const formData = new FormData();
             formData.append('image', compressedFile);
 
