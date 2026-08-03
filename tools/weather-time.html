@@ -391,7 +391,7 @@
         } else if (viewType === 'leaflet') {
             leafletView.style.display = 'flex';
             btnLeaflet.classList.add('active');
-            title.innerText = 'Leaflet World Map';
+            title.innerText = 'Leaflet World Map and Time';
             desc.innerText = 'Explore 2D global map and time zones.';
 
             if (!isLeafletInitialized) {
@@ -403,7 +403,7 @@
         } else if (viewType === 'globe') {
             globeView.style.display = 'flex';
             btnGlobe.classList.add('active');
-            title.innerText = '3D Globe & Time';
+            title.innerText = '3D Globe and Time';
             desc.innerText = 'Drag to spin the 3D globe, click markers to check time.';
 
             if (!isGlobeInitialized) {
