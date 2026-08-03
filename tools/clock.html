@@ -173,36 +173,17 @@
             .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            
-            /* 모바일 세로 레이아웃 및 1:1:1 비율 적용 */
-            .main-content { 
-                margin-left: 0; padding: 8px; width: 100vw; height: 100vh; overflow: hidden; gap: 8px; 
-            }
-            .top-section { display: none; } /* 세로 공간 균등 분할을 위해 상단 텍스트 영역 숨김 */
-            
-            /* 하단 묶음 태그 구조 해제 후 개별 블록으로 처리하여 세로 1:1:1 배치 */
-            .content-down { 
-                display: contents; 
-            }
-            
-            .content-top, .half-box { 
-                flex: 1; width: 100%; min-height: 0; padding: 8px; overflow: hidden; justify-content: center;
-            }
-            
-            .time-display { font-size: 1.8rem; }
-            .tool-display { font-size: 1.8rem; margin-bottom: 6px; }
-            .box-title { font-size: 0.8rem; margin-bottom: 4px; }
-            .time-title { font-size: 0.8rem; margin-bottom: 2px; }
-            .time-sub { font-size: 0.75rem; }
-            .time-zone-sub { font-size: 0.75rem; }
-            
-            .timer-inputs input { width: 38px; height: 34px; font-size: 1.1rem; border-radius: 6px; }
-            .timer-inputs span { font-size: 1.1rem; }
-            
-            .control-btn { padding: 3px 8px; font-size: 0.65rem; border-radius: 10px; border-width: 1px; }
-            .btn-group { gap: 3px; }
-            .fullscreen-btn { padding: 2px 6px; font-size: 0.6rem; top: 6px; right: 6px; }
-            .laps-container { max-height: 30px; margin-top: 2px; font-size: 0.7rem; }
+            .main-content { margin-left: 0; padding: 15px; width: 100%; overflow-y: auto; height: auto; }
+            .content-top { min-height: 120px; padding: 10px; }
+            .time-display { font-size: 2.3rem; }
+            .content-down { flex-direction: column; flex: none; height: auto; min-height: auto; gap: 15px; }
+            .half-box { padding: 15px 10px; }
+            .tool-display { font-size: 2.5rem; margin-bottom: 15px; }
+            .timer-inputs input { width: 55px; height: 50px; font-size: 1.6rem; border-radius: 8px; }
+            .timer-inputs span { font-size: 1.6rem; }
+            .control-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 15px; border-width: 1.5px; }
+            .btn-group { gap: 5px; }
+            .fullscreen-btn { padding: 4px 10px; font-size: 0.7rem; top: 10px; right: 10px; }
         }
     </style>
 </head>
@@ -233,7 +214,6 @@
             </div>
         </section>
 
-        <!-- content-down 영역 내부 요소들이 모바일에서 개별 1:1:1로 분할됨 -->
         <section class="content-down">
             <!-- 왼쪽 박스: 타이머 (99:59:59 지원) -->
             <div class="half-box" id="timer-box">
