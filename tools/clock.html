@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -30,7 +29,7 @@
             border-radius: 50px; font-weight: bold; transition: all 0.3s;
         }
         .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #F38020; }
+        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
         .content-top { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; 
@@ -108,7 +107,7 @@
         }
         .timer-inputs span { font-size: 3rem; font-weight: bold; color: #ff9e40; }
 
-        .btn-group { display: flex; gap: 10px; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 100%; }
         .control-btn {
             padding: 10px 24px; background: #202020; color: #ff9e40; border: 2px solid #ff9e40;
             border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem;
@@ -174,13 +173,17 @@
             .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; overflow-y: auto; height: auto; }
-            .content-top { min-height: 140px; }
-            .time-display { font-size: 2.8rem; }
-            .content-down { flex-direction: column; flex: none; height: auto; min-height: 500px; }
-            .tool-display { font-size: 3rem; }
-            .timer-inputs input { width: 65px; height: 60px; font-size: 2rem; }
-            .timer-inputs span { font-size: 2rem; }
+            .main-content { margin-left: 0; padding: 15px; width: 100%; overflow-y: auto; height: auto; }
+            .content-top { min-height: 120px; padding: 10px; }
+            .time-display { font-size: 2.3rem; }
+            .content-down { flex-direction: column; flex: none; height: auto; min-height: auto; gap: 15px; }
+            .half-box { padding: 15px 10px; }
+            .tool-display { font-size: 2.5rem; margin-bottom: 15px; }
+            .timer-inputs input { width: 55px; height: 50px; font-size: 1.6rem; border-radius: 8px; }
+            .timer-inputs span { font-size: 1.6rem; }
+            .control-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 15px; border-width: 1.5px; }
+            .btn-group { gap: 5px; }
+            .fullscreen-btn { padding: 4px 10px; font-size: 0.7rem; top: 10px; right: 10px; }
         }
     </style>
 </head>
