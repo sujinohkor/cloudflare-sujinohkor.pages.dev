@@ -231,7 +231,8 @@
 
         try {
             // 2. [속도 개선] AI 전송용 이미지 압축 (최대 너비 800px, JPEG 화질 0.8)
-            const compressedBlob = await resizeImage(file, 800, 0.8);
+            //const compressedBlob = await resizeImage(file, 800, 0.8);
+            const compressedBlob = await resizeImage(file, 500, 0.7);
 
             const formData = new FormData();
             formData.append('image', compressedBlob, 'image.jpg');
