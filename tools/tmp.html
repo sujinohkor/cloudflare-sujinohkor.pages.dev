@@ -73,7 +73,6 @@
         }
 
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
-
         .image-preview-container {
             width: 100%;
             height: 100%;
@@ -84,20 +83,17 @@
             border-radius: 8px;
             position: relative;
         }
-
         .preview-img, .preview-canvas {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
         }
-
         .empty-msg {
             color: #888;
             font-family: 'Consolas', monospace;
             font-size: 1rem;
         }
-
         #loading-msg {
             display: none;
             color: #ff9e40;
@@ -105,12 +101,10 @@
             font-size: 0.95rem;
             margin-top: 10px;
         }
-
         /* 다크 모드 그림자 */
         .card, .content-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
@@ -120,14 +114,11 @@
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode .control-group { background: #fff5e6; border-color: #f38020; }
-        
         body.light-mode .card, body.light-mode .content-box {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        
         @media (max-width: 600px) {
             .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
@@ -145,12 +136,12 @@
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
+                
         <!-- 모드 전환 버튼 -->
         <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
         <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
 
-        <!-- Signature 모드 전용 강도 조절 옵션을 Upload 버튼 위로 이동 -->
+        <!-- Signature 모드 전용 강도 조절 옵션 -->
         <div class="control-group" id="signature-controls" style="display: none;">
             <label for="thresholdRange">
                 <span>제거 강도</span>
@@ -163,13 +154,13 @@
         <button class="menu-btn" onclick="uploadFile()">Upload</button>
         <button class="menu-btn" onclick="resetAll()">Reset</button>
     </aside>
-
+    
     <main class="main-content">
         <header class="top-section" id="header-section">
             <h1 id="page-title">AI Background Remover</h1>
             <p id="page-desc">Upload an image to remove background instantly.</p>
         </header>
-
+        
         <div class="workspace-container">
             <!-- 왼쪽 박스: 초기/원본 사진 영역 -->
             <section class="content-box content-mid" id="drop-zone">
@@ -177,7 +168,7 @@
                     <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
                 </div>
             </section>
-
+            
             <!-- 오른쪽 박스: 누끼 결과 사진 영역 -->
             <section class="content-box content-down" id="result-zone">
                 <div class="image-preview-container" id="result-container">
@@ -189,33 +180,15 @@
     </main>
 </div>
 
-<!-- 브라우저 AI 누끼 라이브러리 연동 -->
-<script type="module">
-    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-    import { qf, Hf } from '/codes/nukki-signature.js';
-
+<!-- 기본 UI 인터랙션 및 버튼 동작을 보장하는 일반 스크립트 -->
+<script>
     const sidebar = document.getElementById('sidebar');
-    const dropZone = document.getElementById('drop-zone');
-    const originalContainer = document.getElementById('original-container');
-    const resultContainer = document.getElementById('result-container');
-    const fileSelector = document.getElementById('file-selector');
-    const loadingMsg = document.getElementById('loading-msg');
-    
-    const btnAiBg = document.getElementById('btn-ai-bg');
-    const btnSig = document.getElementById('btn-sig');
-    const signatureControls = document.getElementById('signature-controls');
-    const pageTitle = document.getElementById('page-title');
-    const pageDesc = document.getElementById('page-desc');
-    
-    const thresholdRange = document.getElementById('thresholdRange');
-    const thresholdVal = document.getElementById('thresholdVal');
-
-    let currentMode = 'ai'; // 'ai' 또는 'signature'
-    let currentFile = null;
+    window.currentMode = 'ai';
+    window.currentFile = null;
 
     window.toggleSidebar = function() { 
         sidebar.classList.toggle('active'); 
-    }
+    };
 
     document.getElementById('theme-toggle').addEventListener('click', () => { 
         document.body.classList.toggle('light-mode'); 
@@ -227,10 +200,15 @@
         } 
     });
 
-    // 모드 전환 함수
     window.switchMode = function(mode) {
-        currentMode = mode;
+        window.currentMode = mode;
         setInitialUI();
+
+        const btnAiBg = document.getElementById('btn-ai-bg');
+        const btnSig = document.getElementById('btn-sig');
+        const signatureControls = document.getElementById('signature-controls');
+        const pageTitle = document.getElementById('page-title');
+        const pageDesc = document.getElementById('page-desc');
 
         if (mode === 'ai') {
             btnAiBg.classList.add('active');
@@ -247,21 +225,41 @@
         }
     };
 
+    function setInitialUI() {
+        document.getElementById('original-container').innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
+        document.getElementById('result-container').innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('file-selector').value = '';
+        window.currentFile = null;
+    }
+
+    window.uploadFile = function() {
+        document.getElementById('file-selector').click();
+    };
+
+    window.resetAll = function() {
+        setInitialUI();
+    };
+</script>
+
+<!-- 브라우저 AI 누끼 및 nukki-signature.js 연동 모듈 스크립트 -->
+<script type="module">
+    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
+    import { qf, Hf } from './codes/nukki-signature.js';
+
+    const originalContainer = document.getElementById('original-container');
+    const resultContainer = document.getElementById('result-container');
+    const fileSelector = document.getElementById('file-selector');
+    const loadingMsg = document.getElementById('loading-msg');
+    const thresholdRange = document.getElementById('thresholdRange');
+    const thresholdVal = document.getElementById('thresholdVal');
+
     thresholdRange.addEventListener('input', (e) => {
         thresholdVal.textContent = e.target.value;
-        if (currentFile && currentMode === 'signature') {
-            processSignatureImage(currentFile);
+        if (window.currentFile && window.currentMode === 'signature') {
+            processSignatureImage(window.currentFile);
         }
     });
-
-    function setInitialUI() {
-        originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
-        resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
-        loadingMsg.style.display = 'none';
-        fileSelector.value = '';
-        currentFile = null;
-    }
-    setInitialUI();
 
     // AI 배경 제거 처리
     async function handleAiFile(file) {
@@ -274,6 +272,7 @@
 
         resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
         loadingMsg.style.display = 'block';
+        
         const steps = [
             "✨ Loading AI engine...",
             "🔍 Analyzing image and detecting objects...",
@@ -291,7 +290,6 @@
         try {
             const blob = await removeBackground(file);
             const resultUrl = URL.createObjectURL(blob);
-
             clearInterval(stepInterval);
             resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
         } catch (error) {
@@ -304,7 +302,7 @@
         }
     }
 
-    // 도장/서명 픽셀 처리 (nukki-signature.js의 qf, Hf 함수 연동)
+    // nukki-signature.js의 qf, Hf 함수를 활용한 도장/서명 정밀 처리
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
         loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
@@ -326,6 +324,7 @@
                 const data = imgData.data;
                 const sensitivity = parseInt(thresholdRange.value);
 
+                // nukki-signature.js에 정의된 배경 분석 및 매팅 함수 호출
                 const analysis = qf(data, canvas.width, canvas.height);
                 Hf(data, analysis.background, sensitivity);
 
@@ -355,14 +354,15 @@
             return;
         }
 
-        currentFile = file;
-        if (currentMode === 'ai') {
+        window.currentFile = file;
+        if (window.currentMode === 'ai') {
             handleAiFile(file);
         } else {
             processSignatureImage(file);
         }
     }
 
+    const dropZone = document.getElementById('drop-zone');
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', (e) => { 
@@ -373,18 +373,10 @@
     });
     dropZone.addEventListener('click', () => { fileSelector.click(); });
 
-    window.uploadFile = function() {
-        fileSelector.click();
-    };
-
     fileSelector.addEventListener('change', (e) => {
         const file = e.target.files[0];
         handleFile(file);
     });
-
-    window.resetAll = function() {
-        setInitialUI();
-    }
 </script>
 </body>
 </html>
