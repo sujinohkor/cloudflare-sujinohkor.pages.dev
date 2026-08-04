@@ -5,36 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="이미지를 서버에 올리지 않고 브라우저에서 바로 배경을 제거하고 투명 PNG로 저장합니다."
+      content="서명 및 도장 이미지를 서버에 올리지 않고 브라우저에서 바로 흰 배경을 제거하고 투명 PNG로 저장합니다."
     />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:site_name" content="교행노트" />
-    <meta property="og:title" content="이미지 배경 제거 - 교행노트" />
+    <meta property="og:title" content="도장·서명 배경 제거 - 교행노트" />
     <meta
       property="og:description"
-      content="사진 한 장, 클릭 한 번. 브라우저에서 배경을 제거하고 투명 PNG로 저장하세요."
-    />
-    <meta
-      property="og:url"
-      content="https://gyohaeng.pages.dev/tools/common/background-remover-app/dist/index.html"
-    />
-    <meta
-      property="og:image"
-      content="https://gyohaeng.pages.dev/tools/common/background-remover-app/dist/og.png"
-    />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="이미지 배경 제거 - 교행노트" />
-    <meta
-      name="twitter:description"
-      content="사진 한 장, 클릭 한 번. 브라우저에서 배경을 제거하고 투명 PNG로 저장하세요."
-    />
-    <meta
-      name="twitter:image"
-      content="https://gyohaeng.pages.dev/tools/common/background-remover-app/dist/og.png"
+      content="서명이나 도장 사진 한 장, 클릭 한 번. 브라우저에서 흰 배경을 제거하고 투명 PNG로 저장하세요."
     />
     <meta name="theme-color" content="#f4f7fb" />
-    <title>이미지 배경 제거 - 교행노트</title>
+    <title>도장·서명 배경 제거 - 교행노트</title>
     <link
       rel="stylesheet"
       as="style"
@@ -66,7 +48,6 @@
       gtag('js', new Date());
       gtag('config', 'G-5W1N19W83C');
     </script>
-    <script type="module" crossorigin src="/codes/nukki-signature.js"></script>
   </head>
   <body>
     <div class="page-shell">
@@ -97,22 +78,21 @@
         <section class="hero" aria-labelledby="pageTitle">
           <div class="eyebrow">
             <span aria-hidden="true">✦</span>
-            기기 안에서 실행되는 Web ML
+            서명 및 도장 배경 제거
           </div>
-          <h1 id="pageTitle">사진 한 장, 클릭 한 번.<br />배경은 투명하게.</h1>
+          <h1 id="pageTitle">서명과 도장만 톡.<br />흰 배경은 투명하게.</h1>
           <p>
-            빠른 AI와 인물 전용 정밀 AI 중에서 고를 수 있고, 흰 배경의
-            도장·서명은 배경색 분석으로 처리합니다. 이미지는 기기 밖으로
-            보내지 않고 투명 PNG로 바로 저장할 수 있습니다.
+            문서에 찍은 도장이나 자필 서명 이미지의 흰 배경을 깔끔하게 지우고
+            투명 PNG로 바로 저장할 수 있습니다. 이미지는 기기 밖으로 전송되지 않습니다.
           </p>
           <ul class="benefit-list" aria-label="도구 특징">
             <li><span aria-hidden="true">✓</span> 회원가입 없음</li>
             <li><span aria-hidden="true">✓</span> 서버 업로드 없음</li>
-            <li><span aria-hidden="true">✓</span> JPG·PNG·WEBP 지원</li>
+            <li><span aria-hidden="true">✓</span> 강도 조절 가능</li>
           </ul>
         </section>
 
-        <section class="tool-card" aria-label="이미지 배경 제거 도구">
+        <section class="tool-card" aria-label="도장 서명 배경 제거 도구">
           <div id="uploadView">
             <label id="dropZone" class="drop-zone" for="fileInput" tabindex="0">
               <input
@@ -122,7 +102,7 @@
                 hidden
               />
               <span class="upload-symbol" aria-hidden="true">↑</span>
-              <strong>이미지를 끌어놓거나 눌러서 선택하세요</strong>
+              <strong>도장·서명 이미지를 끌어놓거나 눌러서 선택하세요</strong>
               <span class="upload-help">JPG, PNG, WEBP · 최대 30MB</span>
               <span class="select-pill">이미지 선택</span>
               <span class="paste-help">클립보드의 이미지는 Ctrl+V로 붙여넣을 수 있어요.</span>
@@ -146,49 +126,12 @@
             <section class="processing-options" aria-labelledby="processingModeTitle">
               <div class="mode-head">
                 <div>
-                  <h2 id="processingModeTitle">처리 방식</h2>
-                  <p id="modeHint">자동으로 이미지에 맞는 방식을 선택합니다.</p>
+                  <h2 id="processingModeTitle">제거 옵션</h2>
+                  <p id="modeHint">흰색에 가까운 단색 배경을 찾아 도장·서명의 색과 가장자리를 살립니다.</p>
                 </div>
               </div>
 
-              <fieldset class="mode-choice-grid">
-                <legend class="visually-hidden">배경 제거 처리 방식 선택</legend>
-                <label class="mode-choice">
-                  <input
-                    type="radio"
-                    name="processingMode"
-                    value="auto"
-                    checked
-                  />
-                  <span class="mode-choice-copy">
-                    <strong>자동</strong>
-                    <small>이미지에 맞춰 선택</small>
-                  </span>
-                </label>
-                <label class="mode-choice">
-                  <input type="radio" name="processingMode" value="subject" />
-                  <span class="mode-choice-copy">
-                    <strong>빠른 처리</strong>
-                    <small>사람·물건 범용 AI</small>
-                  </span>
-                </label>
-                <label class="mode-choice">
-                  <input type="radio" name="processingMode" value="portrait" />
-                  <span class="mode-choice-copy">
-                    <strong>인물 정밀</strong>
-                    <small>MODNet · 사람 전용</small>
-                  </span>
-                </label>
-                <label class="mode-choice">
-                  <input type="radio" name="processingMode" value="stamp" />
-                  <span class="mode-choice-copy">
-                    <strong>도장·서명</strong>
-                    <small>흰 단색 배경 제거</small>
-                  </span>
-                </label>
-              </fieldset>
-
-              <div id="sensitivityControl" class="sensitivity-control" hidden>
+              <div id="sensitivityControl" class="sensitivity-control">
                 <label class="range-head" for="sensitivityRange">
                   <span>배경 제거 강도</span>
                   <output id="sensitivityValue" for="sensitivityRange">50 · 보통</output>
@@ -220,44 +163,16 @@
               <figure class="preview-panel">
                 <figcaption>
                   <span>배경 제거</span>
-                  <span id="runtimeBadge" class="runtime-badge">처리 대기</span>
+                  <span id="runtimeBadge" class="runtime-badge">처리 완료</span>
                 </figcaption>
                 <div class="preview-stage result-stage">
                   <canvas id="resultCanvas" aria-label="배경이 제거된 이미지 결과"></canvas>
-                  <div id="resultPlaceholder" class="result-placeholder">
+                  <div id="resultPlaceholder" class="result-placeholder" hidden>
                     <span class="placeholder-orbit" aria-hidden="true"></span>
                     <span>결과를 만들고 있어요</span>
                   </div>
                 </div>
               </figure>
-            </div>
-
-            <div
-              id="statusPanel"
-              class="status-panel"
-              data-tone="working"
-              role="status"
-              aria-live="polite"
-            >
-              <span id="statusSpinner" class="status-spinner" aria-hidden="true"></span>
-              <div class="status-copy">
-                <strong id="statusTitle">이미지를 준비하고 있어요</strong>
-                <span id="statusDetail">잠시만 기다려 주세요.</span>
-                <div
-                  id="progressTrack"
-                  class="progress-track"
-                  role="progressbar"
-                  aria-label="처리 진행률"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  aria-valuenow="4"
-                >
-                  <span id="progressBar"></span>
-                </div>
-              </div>
-              <button id="retryButton" class="retry-button" type="button" hidden>
-                다시 시도
-              </button>
             </div>
 
             <div class="action-bar">
@@ -276,54 +191,30 @@
           <article>
             <span class="step-number">01</span>
             <div>
-              <strong>이미지 선택</strong>
-              <p>사진은 물론 흰 배경의 도장·서명도 사용할 수 있어요.</p>
+              <strong>도장·서명 촬영 또는 스캔</strong>
+              <p>종이에 적힌 서명이나 도장을 스마트폰 등으로 찍어 준비하세요.</p>
             </div>
           </article>
           <article>
             <span class="step-number">02</span>
             <div>
-              <strong>기기에서 자동 처리</strong>
-              <p>인물 정밀은 처음에만 약 13MB 모델을 추가로 준비해요.</p>
+              <strong>강도 조절하기</strong>
+              <p>슬라이더를 움직여 흰 종이 배경만 깔끔하게 지워지도록 맞추세요.</p>
             </div>
           </article>
           <article>
             <span class="step-number">03</span>
             <div>
               <strong>투명 PNG 저장</strong>
-              <p>문서나 안내 자료에 바로 활용하세요.</p>
+              <p>각종 문서 파일이나 서식에 곧바로 얹어서 사용하세요.</p>
             </div>
           </article>
         </section>
-
-        <aside class="quality-note">
-          <strong>더 좋은 결과를 위한 팁</strong>
-          <p>
-            배경과 피사체의 색이 뚜렷하게 다르고 피사체 전체가 화면 안에 들어온
-            이미지를 사용해 주세요. 머리카락, 털, 유리처럼 미세하거나 투명한
-            경계는 일부 남거나 지워질 수 있습니다. 자동 결과가 아쉬우면 처리
-            방식을 직접 고르세요. 사람 사진은 인물 정밀, 도장·서명은 제거
-            강도 조절이 효과적입니다.
-          </p>
-        </aside>
       </main>
 
       <footer class="footer">
         <span>선택한 이미지는 이 기기 안에서만 처리됩니다.</span>
         <span>
-          Powered by
-          <a href="https://github.com/xuebinqin/U-2-Net" target="_blank" rel="noreferrer">
-            U²-NetP
-          </a>
-          ·
-          <a href="https://github.com/ZHKKKe/MODNet" target="_blank" rel="noreferrer">
-            MODNet
-          </a>
-          ·
-          <a href="https://onnxruntime.ai/" target="_blank" rel="noreferrer">
-            ONNX Runtime Web
-          </a>
-          ·
           <a href="./licenses/THIRD-PARTY-NOTICES.txt">라이선스</a>
         </span>
       </footer>
