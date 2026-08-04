@@ -157,7 +157,7 @@
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading-msg">✨ Fast processing original resolution...</div>
+                <div id="loading-msg">✨ Instant background removal...</div>
             </section>
         </div>
     </main>
@@ -226,9 +226,82 @@
     }
     setInitialUI();
 
+    function processFastRemoval(file) {
+        loadingMsg.style.display = 'block';
+        loadingMsg.textContent = "✨ Fast background removal executing...";
+
+        createImageBitmap(file).then(bitmap => {
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+
+            const originalUrl = URL.createObjectURL(file);
+            originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original Preview" class="preview-img">`;
+
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // 모서리(배경) 기준 색상 샘플링 (상하좌우 구역의 평균 배경색 추정)
+            let bgR = 0, bgG = 0, bgB = 0, count = 0;
+            const samplePoints = [
+                [0, 0], [width - 1, 0], [0, height - 1], [width - 1, height - 1],
+                [Math.floor(width / 2), 0], [Math.floor(width / 2), height - 1]
+            ];
+
+            samplePoints.forEach(([x, y]) => {
+                const idx = (y * width + x) * 4;
+                bgR += data[idx];
+                bgG += data[idx + 1];
+                bgB += data[idx + 2];
+                count++;
+            });
+
+            bgR /= count; bgG /= count; bgB /= count;
+
+            // 배경색과 차이가 적은 영역(배경)을 투명하게 처리하는 고속 마스킹
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // 배경과의 색상 유클리드 거리 계산
+                const diff = Math.sqrt(
+                    (r - bgR) * (r - bgR) +
+                    (g - bgG) * (g - bgG) +
+                    (b - bgB) * (b - bgB)
+                );
+
+                // 차이가 임계값 이내면 배경으로 판단하여 투명화
+                if (diff < 45) {
+                    data[i + 3] = 0;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+
+            const resultCanvas = document.createElement('canvas');
+            resultCanvas.width = width;
+            resultCanvas.height = height;
+            resultCanvas.className = 'preview-canvas';
+            const resCtx = resultCanvas.getContext('2d');
+            resCtx.drawImage(canvas, 0, 0);
+
+            resultContainer.innerHTML = '';
+            resultContainer.appendChild(resultCanvas);
+            loadingMsg.style.display = 'none';
+        }).catch((err) => {
+            console.error(err);
+            loadingMsg.style.display = 'none';
+        });
+    }
+
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Fast processing original resolution...";
+        loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
 
         createImageBitmap(file).then(bitmap => {
             const canvas = document.createElement('canvas');
@@ -255,20 +328,13 @@
                 const lightness = (max + min) / 2;
                 const saturation = max === 0 ? 0 : (max - min) / max;
 
-                if (currentMode === 'signature') {
-                    if (lightness > whiteLimit && saturation < 0.2) {
-                        data[i + 3] = 0; 
-                    } else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
-                        const alphaRatio = (whiteLimit - lightness) / 30;
-                        data[i + 3] = Math.floor(data[i + 3] * alphaRatio * alphaRatio);
-                    } else {
-                        data[i + 3] = 255;
-                    }
+                if (lightness > whiteLimit && saturation < 0.2) {
+                    data[i + 3] = 0; 
+                } else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
+                    const alphaRatio = (whiteLimit - lightness) / 30;
+                    data[i + 3] = Math.floor(data[i + 3] * alphaRatio * alphaRatio);
                 } else {
-                    // AI 모드 대체: 고속 픽셀 필터링 (책상 배경 등 비대상 영역 분리 최적화)
-                    if (r > 100 && g > 70 && b > 50 && r > g && g > b) {
-                        // 필요에 따른 배경 필터 조건 적용
-                    }
+                    data[i + 3] = 255;
                 }
             }
 
@@ -284,8 +350,7 @@
             resultContainer.innerHTML = '';
             resultContainer.appendChild(resultCanvas);
             loadingMsg.style.display = 'none';
-        }).catch((err) => {
-            console.error(err);
+        }).catch(() => {
             loadingMsg.style.display = 'none';
         });
     }
@@ -298,7 +363,11 @@
         }
 
         currentFile = file;
-        processSignatureImage(file);
+        if (currentMode === 'ai') {
+            processFastRemoval(file);
+        } else {
+            processSignatureImage(file);
+        }
     }
 
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
