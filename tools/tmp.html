@@ -1,5 +1,4 @@
 <!DOCTYPE html><html lang="ko"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>AI Background & Signature Remover</title>    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">    <style>        /* 1. Reset & Base */        * { margin: 0; padding: 0; box-sizing: border-box; }        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }                        /* 2. Layout */        .app-container { display: flex; min-height: 100vh; }        .sidebar {             width: 250px; height: 100vh; position: fixed; left: 0; top: 0;             background-color: #101010; padding: 20px; z-index: 1000;             display: flex; flex-direction: column; transition: transform 0.3s ease;         }                        .main-content {             margin-left: 250px; padding: 40px; flex: 1;             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s;         }
-
         .workspace-container {            display: flex;            flex-direction: row;            flex: 1;            gap: 20px;            min-height: 0;        }
         /* 3. Components */        .menu-btn, .theme-btn {             width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;            background: #202020; color: #ff9e40; border: 2px solid #ff9e40;             border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;        }
         .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
@@ -96,25 +95,6 @@
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 <input type="file" id="file-selector" accept="image/*" style="display: none;">
 
-<!-- nukki-signature.js 엔진 연동을 위한 가상 엘리먼트 맵핑 (화면 레이아웃 유지용 숨김 처리) -->
-<div style="display:none;" aria-hidden="true">
-    <input type="radio" name="processingMode" value="auto" checked id="modeAuto">
-    <input id="originalPreview">
-    <canvas id="resultCanvas"></canvas>
-    <div id="resultPlaceholder"></div>
-    <div id="runtimeBadge"></div>
-    <div id="statusPanel">
-        <span id="statusSpinner"></span>
-        <span id="statusTitle"></span>
-        <span id="statusDetail"></span>
-        <div id="progressTrack"><span id="progressBar"></span></div>
-        <button id="retryButton"></button>
-    </div>
-    <button id="replaceButton"></button>
-    <button id="resetButton" onclick="resetAll()"></button>
-    <button id="downloadButton"></button>
-</div>
-
 <div class="app-container">    
     <aside class="sidebar" id="sidebar">        
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
@@ -132,7 +112,8 @@
         </div>
 
         <!-- Upload, Reset 버튼 -->        
-        <button class="menu-btn" onclick="uploadFile()">Upload</button>        <button class="menu-btn" onclick="resetAll()">Reset</button>    
+        <button class="menu-btn" onclick="uploadFile()">Upload</button>        
+        <button class="menu-btn" onclick="resetAll()">Reset</button>    
     </aside>
     
     <main class="main-content">        
@@ -156,13 +137,13 @@
                 </div>                
                 <div id="loading-msg">✨ AI is removing the background...</div>            
             </section>        
-        </div>    
     </main>
 </div>
 
-<!-- 통합 기능 스크립트 -->
+<!-- 순수 자체 실행 스크립트 (외부 파일 오류 원천 차단) -->
 <script type="module">
-    // 번들 파일 내부의 인라인 코드 구조를 그대로 반영하여 온넥스/모듈 충돌 방지
+    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
+
     const sidebar = document.getElementById('sidebar');    
     const dropZone = document.getElementById('drop-zone');    
     const originalContainer = document.getElementById('original-container');    
@@ -177,7 +158,7 @@
     const thresholdRange = document.getElementById('thresholdRange');    
     const thresholdVal = document.getElementById('thresholdVal');
 
-    let currentMode = 'ai'; // 'ai' 또는 'signature'    
+    let currentMode = 'ai';    
     let currentFile = null;
 
     window.toggleSidebar = function() { sidebar.classList.toggle('active'); }    
@@ -188,7 +169,6 @@
         }     
     });
 
-    // 모드 전환 함수    
     window.switchMode = function(mode) {        
         currentMode = mode;        
         setInitialUI();
@@ -205,7 +185,8 @@
             signatureControls.style.display = 'block';            
             pageTitle.textContent = "Stamp & Signature Remover";            
             pageDesc.textContent = "Upload a document image to remove white background instantly.";        
-    }    };
+        }    
+    };
 
     thresholdRange.addEventListener('input', (e) => {        
         thresholdVal.textContent = e.target.value;        
@@ -221,7 +202,6 @@
         currentFile = null;    }    
     setInitialUI();
 
-    // AI 배경 제거 처리 (nukki-signature.js 번들 엔진 또는 CDN 연동 호환 처리)
     async function handleAiFile(file) {        
         const reader = new FileReader();        
         reader.onload = (e) => {            
@@ -247,8 +227,6 @@
         }, 1500);
 
         try {            
-            // @imgly/background-removal 안정적 동적 호출
-            const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm');
             const blob = await removeBackground(file);            
             const resultUrl = URL.createObjectURL(blob);
 
@@ -262,7 +240,6 @@
         } finally {            
             loadingMsg.style.display = 'none';        }    }
 
-    // 도장/서명 픽셀 처리    
     function processSignatureImage(file) {        
         loadingMsg.style.display = 'block';        
         loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
@@ -353,7 +330,4 @@
     window.resetAll = function() {        
         setInitialUI();    };
 </script>
-
-<!-- 원본 nukki-signature.js 모듈 번들 로드 -->
-<script type="module" src="/codes/nukki-signature.js"></script>
 </body></html>
