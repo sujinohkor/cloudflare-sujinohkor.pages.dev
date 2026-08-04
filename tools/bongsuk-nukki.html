@@ -298,10 +298,10 @@
         }
     }
 
-// 도장/서명 픽셀 처리 (컬러 잉크 보존 버전)
+// 도장/서명 픽셀 처리
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Extracting signature & stamp cleanly...";
+        loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -320,21 +320,32 @@
                 const data = imgData.data;
                 const threshold = parseInt(thresholdRange.value); // 슬라이더 값 (150~250)
 
+                // 슬라이더 값을 0~100 범위가 아닌 150~250 기준으로 매핑하기 위한 보정
+                const whiteLimit = 200 + (threshold - 200) * 0.5;
+
                 for (let i = 0; i < data.length; i += 4) {
                     const r = data[i];
                     const g = data[i + 1];
                     const b = data[i + 2];
 
-                    // 평균 밝기 계산
-                    const avg = (r + g + b) / 3;
+                    // 밝기 및 채도 계산
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    const lightness = (max + min) / 2;
+                    const saturation = max === 0 ? 0 : (max - min) / max;
 
-                    // 1. 임계값보다 밝은 영역(하얀 종이 배경)은 완전히 투명하게 처리
-                    if (avg > threshold) {
-                        data[i + 3] = 0; // 투명도 0 (배경 제거)
-                    } else {
-                        // 2. 글자나 도장 잉크 영역: 색상을 강제로 검정으로 바꾸지 않고 원래 색상(RGB)을 그대로 유지
-                        // 투명도만 255(불투명)로 확실하게 줘서 테두리가 까끌하지 않고 선명하게 밀착되도록 함
-                        data[i + 3] = 255; 
+                    // 1. 하얀색/회색 종이 배경 영역: 완벽하게 투명 처리
+                    if (lightness > whiteLimit && saturation < 0.2) {
+                        data[i + 3] = 0; 
+                    } 
+                    // 2. 경계면(안티앨리어싱 픽셀): 하얀 테두리 잔상을 없애기 위해 투명도를 부드럽게 감쇠
+                    else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
+                        const alphaRatio = (whiteLimit - lightness) / 30;
+                        data[i + 3] = Math.floor(data[i + 3] * alphaRatio * alphaRatio);
+                    } 
+                    // 3. 글자 및 잉크 본체 영역: 컬러 잉크는 살리고 진하게 밀착
+                    else {
+                        data[i + 3] = 255;
                     }
                 }
 
