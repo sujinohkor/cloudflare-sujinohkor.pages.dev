@@ -190,7 +190,7 @@
         let aiSession = null;
 
         const localBaseUrl = new URL("./", window.location.href);
-        const modelU2NetpUrl = new URL("models/u2netp.onnx", localBaseUrl);
+        const modelU2NetpUrl = new URL("/models/u2netp.onnx", localBaseUrl);
 
         const C = {
             get resultCanvas() {
