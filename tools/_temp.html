@@ -167,8 +167,9 @@
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script>
         // WASM 경로 설정 (CDN 기반 바이너리 로드 오류 방지)
+        // WASM 설정을 싱글스레드로 고정하여 충돌 방지
         ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
-        ort.env.wasm.numThreads = Math.max(1, Math.min(4, navigator.hardwareConcurrency || 2));
+        ort.env.wasm.numThreads = 1; // 4 대신 1로 고정
         ort.env.logLevel = "warning";
 
         const sidebar = document.getElementById('sidebar');    
