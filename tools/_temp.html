@@ -190,7 +190,21 @@
         let aiSession = null;
 
         const localBaseUrl = new URL("./", window.location.href);
-        const modelU2NetpUrl = new URL("../models/u2netp.onnx", localBaseUrl);
+        const modelU2NetpUrl = new URL("../models/u2netp.onnx", localBaseUrl).href; // .href를 붙여 확실한 문자열 주소로 변형
+
+        async function getAiSession() {
+            if (aiSession) return aiSession;
+            loadingMsg.style.display = 'block';
+            loadingMsg.textContent = "✨ Loading Fast AI Model...";
+            
+            // 문자열 주소(modelU2NetpUrl)와 WASM 모드 강제 적용
+            aiSession = await ort.InferenceSession.create(modelU2NetpUrl, { 
+                executionProviders: ['wasm'], 
+                graphOptimizationLevel: "all" 
+            });
+            
+            return aiSession;
+        }
 
         const C = {
             get resultCanvas() {
@@ -317,20 +331,6 @@
         // 2. 빠른 AI 배경 제거 방식 (U²-NetP ONNX 직접 연동)
         const de = 320;
         
-        async function getAiSession() {
-            if (aiSession) return aiSession;
-            loadingMsg.style.display = 'block';
-            loadingMsg.textContent = "✨ Loading AI Model (WASM Mode)...";
-            
-            // WebGPU를 거치지 않고 호환성이 완벽한 WASM 모드로 세션 생성
-            aiSession = await ort.InferenceSession.create(modelU2NetpUrl, { 
-                executionProviders: ['wasm'], 
-                graphOptimizationLevel: "all" 
-            });
-            
-            return aiSession;
-        }
-
         function gc(e) {
             const r = document.createElement("canvas");
             r.width = de, r.height = de;
