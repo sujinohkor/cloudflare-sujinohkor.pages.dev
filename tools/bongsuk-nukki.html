@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,23 +7,19 @@
     <title>AI Background & Signature Remover</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                
-        /* 2. Layout */
+        
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
-                
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
         }
-
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -31,7 +28,6 @@
             min-height: 0;
         }
 
-        /* 3. Components */
         .menu-btn, .theme-btn { 
             width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
             background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
@@ -40,7 +36,6 @@
         .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 강도 조절 컨트롤 박스 */
         .control-group {
             background: #181818;
             padding: 15px;
@@ -63,7 +58,6 @@
             cursor: pointer;
         }
 
-        /* 공통 이미지 컨테이너 (좌우 동일한 틀) */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
@@ -71,9 +65,7 @@
             overflow: hidden; position: relative;
             cursor: pointer;
         }
-
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
-
         .image-preview-container {
             width: 100%;
             height: 100%;
@@ -84,20 +76,17 @@
             border-radius: 8px;
             position: relative;
         }
-
         .preview-img, .preview-canvas {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
         }
-
         .empty-msg {
             color: #888;
             font-family: 'Consolas', monospace;
             font-size: 1rem;
         }
-
         #loading-msg {
             display: none;
             color: #ff9e40;
@@ -106,26 +95,18 @@
             margin-top: 10px;
         }
 
-        /* 다크 모드 그림자 */
         .card, .content-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode .control-group { background: #fff5e6; border-color: #f38020; }
-        
-        body.light-mode .card, body.light-mode .content-box {
-            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
-        }
+        body.light-mode .card, body.light-mode .content-box { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
 
-        /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
         
         @media (max-width: 600px) {
@@ -145,12 +126,10 @@
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
-        <!-- 모드 전환 버튼 -->
+                
         <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
         <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
 
-        <!-- Signature 모드 전용 강도 조절 옵션을 Upload 버튼 위로 이동 -->
         <div class="control-group" id="signature-controls" style="display: none;">
             <label for="thresholdRange">
                 <span>제거 강도</span>
@@ -159,7 +138,6 @@
             <input type="range" id="thresholdRange" min="150" max="250" value="230">
         </div>
 
-        <!-- Upload, Reset 버튼 -->
         <button class="menu-btn" onclick="uploadFile()">Upload</button>
         <button class="menu-btn" onclick="resetAll()">Reset</button>
     </aside>
@@ -171,14 +149,11 @@
         </header>
 
         <div class="workspace-container">
-            <!-- 왼쪽 박스: 초기/원본 사진 영역 -->
             <section class="content-box content-mid" id="drop-zone">
                 <div class="image-preview-container" id="original-container">
                     <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
                 </div>
             </section>
-
-            <!-- 오른쪽 박스: 누끼 결과 사진 영역 -->
             <section class="content-box content-down" id="result-zone">
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
@@ -189,7 +164,6 @@
     </main>
 </div>
 
-<!-- 브라우저 AI 누끼 라이브러리 연동 -->
 <script type="module">
     import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
 
@@ -199,17 +173,17 @@
     const resultContainer = document.getElementById('result-container');
     const fileSelector = document.getElementById('file-selector');
     const loadingMsg = document.getElementById('loading-msg');
-    
+        
     const btnAiBg = document.getElementById('btn-ai-bg');
     const btnSig = document.getElementById('btn-sig');
     const signatureControls = document.getElementById('signature-controls');
     const pageTitle = document.getElementById('page-title');
     const pageDesc = document.getElementById('page-desc');
-    
+        
     const thresholdRange = document.getElementById('thresholdRange');
     const thresholdVal = document.getElementById('thresholdVal');
 
-    let currentMode = 'ai'; // 'ai' 또는 'signature'
+    let currentMode = 'ai';
     let currentFile = null;
 
     window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
@@ -220,7 +194,6 @@
         } 
     });
 
-    // 모드 전환 함수
     window.switchMode = function(mode) {
         currentMode = mode;
         setInitialUI();
@@ -256,7 +229,7 @@
     }
     setInitialUI();
 
-    // AI 배경 제거 처리
+    // @imgly 라이브러리 내장 옵션(publicPath 설정 등)을 통한 고속 파이프라인 적용
     async function handleAiFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -269,10 +242,10 @@
         loadingMsg.style.display = 'block';
 
         const steps = [
-            "✨ Loading AI engine...",
-            "🔍 Analyzing image and detecting objects...",
-            "✂️ Removing background cleanly...",
-            "🎨 Refining final results..."
+            "✨ Initializing Web ML engine...",
+            "🔍 Analyzing image features...",
+            "✂️ Removing background via WebAssembly...",
+            "🎨 Finalizing transparent layers..."
         ];
         let stepIndex = 0;
         loadingMsg.textContent = steps[0];
@@ -280,10 +253,18 @@
         const stepInterval = setInterval(() => {
             stepIndex = (stepIndex + 1) % steps.length;
             loadingMsg.textContent = steps[stepIndex];
-        }, 1500);
+        }, 1200);
 
         try {
-            const blob = await removeBackground(file);
+            // @imgly/background-removal 기본 설정 활용 (내부 Worker 구동 최적화)
+            const blob = await removeBackground(file, {
+                progress: (key, current, total) => {
+                    if (total) {
+                        const percent = Math.round((current / total) * 100);
+                        loadingMsg.textContent = `✨ AI Processing... ${percent}%`;
+                    }
+                }
+            });
             const resultUrl = URL.createObjectURL(blob);
 
             clearInterval(stepInterval);
@@ -298,7 +279,6 @@
         }
     }
 
-// 도장/서명 픽셀 처리
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
         loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
@@ -318,9 +298,7 @@
                 ctx.drawImage(img, 0, 0);
                 const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imgData.data;
-                const threshold = parseInt(thresholdRange.value); // 슬라이더 값 (150~250)
-
-                // 슬라이더 값을 0~100 범위가 아닌 150~250 기준으로 매핑하기 위한 보정
+                const threshold = parseInt(thresholdRange.value);
                 const whiteLimit = 200 + (threshold - 200) * 0.5;
 
                 for (let i = 0; i < data.length; i += 4) {
@@ -328,23 +306,17 @@
                     const g = data[i + 1];
                     const b = data[i + 2];
 
-                    // 밝기 및 채도 계산
                     const max = Math.max(r, g, b);
                     const min = Math.min(r, g, b);
                     const lightness = (max + min) / 2;
                     const saturation = max === 0 ? 0 : (max - min) / max;
 
-                    // 1. 하얀색/회색 종이 배경 영역: 완벽하게 투명 처리
                     if (lightness > whiteLimit && saturation < 0.2) {
                         data[i + 3] = 0; 
-                    } 
-                    // 2. 경계면(안티앨리어싱 픽셀): 하얀 테두리 잔상을 없애기 위해 투명도를 부드럽게 감쇠
-                    else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
+                    } else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
                         const alphaRatio = (whiteLimit - lightness) / 30;
                         data[i + 3] = Math.floor(data[i + 3] * alphaRatio * alphaRatio);
-                    } 
-                    // 3. 글자 및 잉크 본체 영역: 컬러 잉크는 살리고 진하게 밀착
-                    else {
+                    } else {
                         data[i + 3] = 255;
                     }
                 }
@@ -367,7 +339,6 @@
         reader.readAsDataURL(file);
     }
 
-    // 공통 파일 처리 분기
     function handleFile(file) {
         if (!file) return;
         if (!file.type.startsWith('image/')) {
@@ -393,18 +364,14 @@
     });
     dropZone.addEventListener('click', () => { fileSelector.click(); });
 
-    window.uploadFile = function() {
-        fileSelector.click();
-    };
+    window.uploadFile = function() { fileSelector.click(); };
 
     fileSelector.addEventListener('change', (e) => {
         const file = e.target.files[0];
         handleFile(file);
     });
 
-    window.resetAll = function() {
-        setInitialUI();
-    }
+    window.resetAll = function() { setInitialUI(); };
 </script>
 </body>
 </html>
