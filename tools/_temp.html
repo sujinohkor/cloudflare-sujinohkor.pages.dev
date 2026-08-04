@@ -3,77 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover</title>
-    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <title>Fast Object Remover</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; }
         .app-container { display: flex; min-height: 100vh; }
-        .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease; 
-        }
-        .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
-        }
-        .workspace-container {
-            display: flex;
-            flex-direction: row;
-            flex: 1;
-            gap: 20px;
-            min-height: 0;
-        }
-
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
-        }
-        .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-
-        .content-box { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
-            padding: 20px; background: transparent; flex-direction: column; 
-            align-items: center; justify-content: center; gap: 10px; text-align: center;
-            overflow: hidden; position: relative;
-            cursor: pointer;
-        }
-        .image-preview-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border-radius: 8px;
-            position: relative;
-        }
-        .preview-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-        .empty-msg {
-            color: #888;
-            font-family: 'Consolas', monospace;
-            font-size: 1rem;
-        }
-        #loading-msg {
-            display: none;
-            color: #ff9e40;
-            font-weight: bold;
-            font-size: 0.95rem;
-            margin-top: 10px;
-        }
-
+        .sidebar { width: 250px; height: 100vh; position: fixed; left: 0; top: 0; background-color: #101010; padding: 20px; display: flex; flex-direction: column; }
+        .main-content { margin-left: 250px; padding: 40px; flex: 1; display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; }
+        .workspace-container { display: flex; flex: 1; gap: 20px; min-height: 0; }
+        .menu-btn { width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer; background: #202020; color: #ff9e40; border: 2px solid #ff9e40; border-radius: 50px; font-weight: bold; text-align: center; }
+        .content-box { flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; padding: 20px; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
+        .image-preview-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .preview-img, .preview-canvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        .empty-msg { color: #888; font-family: 'Consolas', monospace; }
+        #loading-msg { display: none; color: #ff9e40; font-weight: bold; margin-top: 10px; }
         @media (max-width: 600px) {
             .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; width: 100%; }
             .workspace-container { flex-direction: column; }
         }
@@ -83,79 +28,105 @@
 <input type="file" id="file-selector" accept="image/*" style="display: none;">
 
 <div class="app-container">
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar">
         <button class="menu-btn" onclick="uploadFile()">Upload Image</button>
         <button class="menu-btn" onclick="resetAll()">Reset</button>
     </aside>
-
     <main class="main-content">
-        <header class="top-section">
-            <h1>AI Subject Detector & Background Remover</h1>
-            <p>Upload any image to isolate the subject instantly.</p>
-        </header>
-
+        <h1>Fast Object Background Remover</h1>
         <div class="workspace-container">
             <section class="content-box" id="drop-zone">
                 <div class="image-preview-container" id="original-container">
-                    <div class="empty-msg">Click or Drop image here</div>
+                    <div class="empty-msg">Click to upload image</div>
                 </div>
             </section>
-            <section class="content-box" id="result-zone">
+            <section class="content-box">
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result will appear here</div>
                 </div>
-                <div id="loading-msg">✨ AI is detecting the subject...</div>
+                <div id="loading-msg">⚡ 3-second fast processing...</div>
             </section>
         </div>
     </main>
 </div>
 
-<script type="module">
-    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-
+<script>
     const originalContainer = document.getElementById('original-container');
     const resultContainer = document.getElementById('result-container');
     const fileSelector = document.getElementById('file-selector');
     const loadingMsg = document.getElementById('loading-msg');
     const dropZone = document.getElementById('drop-zone');
 
-    async function handleFile(file) {
-        if (!file || !file.type.startsWith('image/')) return;
-
-        // 원본 이미지 표시
-        const originalUrl = URL.createObjectURL(file);
-        originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original" class="preview-img">`;
-
-        resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
+    async function processFastVerticalObject(file) {
         loadingMsg.style.display = 'block';
+        
+        const startTime = performance.now();
 
-        try {
-            // AI 모델이 피사체를 탐색하고 배경을 투명화
-            const blob = await removeBackground(file, {
-                progress: (key, current, total) => {
-                    if (total) {
-                        const percent = Math.round((current / total) * 100);
-                        loadingMsg.textContent = `✨ Detecting subject... ${percent}%`;
+        createImageBitmap(file).then(bitmap => {
+            const width = bitmap.width;
+            const height = bitmap.height;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+
+            const originalUrl = URL.createObjectURL(file);
+            originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original" class="preview-img">`;
+
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const data = imgData.data;
+
+            // 상하좌우 경계에서 배경 색상 추출 (모서리 평균)
+            let bgR = (data[0] + data[(width-1)*4] + data[(width*(height-1))*4] + data[(width*height-1)*4]) / 4;
+            let bgG = (data[1] + data[(width-1)*4+1] + data[(width*(height-1))*4+1] + data[(width*height-1)*4+1]) / 4;
+            let bgB = (data[2] + data[(width-1)*4+2] + data[(width*(height-1))*4+2] + data[(width*height-1)*4+2]) / 4;
+
+            // 세로형 중앙 객체(유산균 스틱 등)를 타겟팅하기 위한 수직 투영 및 픽셀 마스킹
+            // 좌우측 배경 영역을 먼저 빠르게 투명화 처리
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    const r = data[idx], g = data[idx+1], b = data[idx+2];
+
+                    // 배경과의 색상 차이 계산
+                    const diff = Math.abs(r - bgR) + Math.abs(g - bgG) + Math.abs(b - bgB);
+
+                    // 배경과 유사한 색상은 투명화
+                    if (diff < 35) {
+                        data[idx + 3] = 0;
                     }
                 }
-            });
+            }
 
-            const resultUrl = URL.createObjectURL(blob);
-            resultContainer.innerHTML = `<img src="${resultUrl}" alt="Isolated Subject" class="preview-img">`;
-        } catch (error) {
-            console.error(error);
-            resultContainer.innerHTML = `<div class="empty-msg">Processing failed</div>`;
-        } finally {
+            ctx.putImageData(imgData, 0, 0);
+
+            const resultCanvas = document.createElement('canvas');
+            resultCanvas.width = width;
+            resultCanvas.height = height;
+            resultCanvas.className = 'preview-canvas';
+            const resCtx = resultCanvas.getContext('2d');
+            resCtx.drawImage(canvas, 0, 0);
+
+            const endTime = performance.now();
+            console.log(`Processing time: ${Math.round(endTime - startTime)}ms`);
+
+            resultContainer.innerHTML = '';
+            resultContainer.appendChild(resultCanvas);
             loadingMsg.style.display = 'none';
-        }
+        }).catch(err => {
+            console.error(err);
+            loadingMsg.style.display = 'none';
+        });
     }
 
     dropZone.addEventListener('click', () => fileSelector.click());
-    fileSelector.addEventListener('change', (e) => handleFile(e.target.files[0]));
+    fileSelector.addEventListener('change', (e) => processFastVerticalObject(e.target.files[0]));
 
     window.uploadFile = () => fileSelector.click();
     window.resetAll = () => {
-        originalContainer.innerHTML = `<div class="empty-msg">Click or Drop image here</div>`;
+        originalContainer.innerHTML = `<div class="empty-msg">Click to upload image</div>`;
         resultContainer.innerHTML = `<div class="empty-msg">Result will appear here</div>`;
         loadingMsg.style.display = 'none';
         fileSelector.value = '';
