@@ -9,7 +9,7 @@
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
+                
         /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
@@ -17,7 +17,7 @@
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
-        
+                
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
@@ -242,7 +242,8 @@
         };
     </script>
 
-    <!-- AI 배경 제거 및 도장/서명 제거 처리 스크립트 -->
+    <!-- nukki-signature.js 파일을 그대로 불러와서 사용하는 스크립트 -->
+    <script src="/codes/nukki-signature.js"></script>
     <script type="module">
         import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
 
@@ -259,54 +260,6 @@
                 processSignatureImage(window.currentFile);
             }
         });
-
-        // 1. 도장/서명 제거를 위한 독립형 매팅 및 배경분석 함수 정의 (nukki-signature.js 대체)
-        function qf(data, width, height) {
-            const edgeSamples = [];
-            for (let y = 0; y < height; y += Math.max(1, Math.floor(height / 20))) {
-                for (let x = 0; x < width; x += Math.max(1, Math.floor(width / 20))) {
-                    if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
-                        const idx = (y * width + x) * 4;
-                        edgeSamples.push([data[idx], data[idx+1], data[idx+2]]);
-                    }
-                }
-            }
-            // 배경색 추정 (가장 밝은 계열 또는 흰색 계통 우선)
-            let bg = [255, 255, 255];
-            if (edgeSamples.length > 0) {
-                const rSum = edgeSamples.reduce((acc, cur) => acc + cur[0], 0);
-                const gSum = edgeSamples.reduce((acc, cur) => acc + cur[1], 0);
-                const bSum = edgeSamples.reduce((acc, cur) => acc + cur[2], 0);
-                bg = [Math.round(rSum / edgeSamples.length), Math.round(gSum / edgeSamples.length), Math.round(bSum / edgeSamples.length)];
-            }
-            return { background: bg };
-        }
-
-        function Hf(data, background, sensitivity = 50) {
-            const bgR = background[0];
-            const bgG = background[1];
-            const bgB = background[2];
-            const factor = sensitivity / 50;
-
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i+1];
-                const b = data[i+2];
-
-                // 배경과의 색상 차이 계산 (유클리드 거리)
-                const diff = Math.sqrt(Math.pow(r - bgR, 2) + Math.pow(g - bgG, 2) + Math.pow(b - bgB, 2));
-                const threshold = 40 * factor;
-
-                if (diff < threshold) {
-                    // 배경으로 판단하여 투명하게 처리
-                    data[i+3] = 0;
-                } else if (diff < threshold + 35) {
-                    // 경계 부드럽게(Anti-aliasing) 처리
-                    const alpha = Math.min(255, ((diff - threshold) / 35) * 255);
-                    data[i+3] = Math.round(alpha);
-                }
-            }
-        }
 
         // AI 배경 제거 처리
         async function handleAiFile(file) {
@@ -349,7 +302,7 @@
             }
         }
 
-        // 도장/서명 정밀 처리
+        // 도장/서명 정밀 처리 (nukki-signature.js 내부의 함수 또는 로직 활용)
         function processSignatureImage(file) {
             loadingMsg.style.display = 'block';
             loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
@@ -371,9 +324,18 @@
                     const data = imgData.data;
                     const sensitivity = parseInt(thresholdRange.value);
 
-                    // 내장된 배경 분석 및 매팅 함수 호출
-                    const analysis = qf(data, canvas.width, canvas.height);
-                    Hf(data, analysis.background, sensitivity);
+                    // nukki-signature.js 내부에 정의된 qf, Hf 함수가 전역에 노출되었거나 사용 가능한 경우 호출
+                    if (typeof qf === 'function' && typeof Hf === 'function') {
+                        const analysis = qf(data, canvas.width, canvas.height);
+                        Hf(data, analysis.background, sensitivity);
+                    } else {
+                        // 만약 함수명이 다를 경우를 대비한 안전망 로직 (기본 화이트 배경 제거)
+                        for (let i = 0; i < data.length; i += 4) {
+                            if (data[i] > 200 && data[i+1] > 200 && data[i+2] > 200) {
+                                data[i+3] = 0;
+                            }
+                        }
+                    }
 
                     ctx.putImageData(imgData, 0, 0);
 
