@@ -3,34 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background & Signature Remover</title>
+    <title>이미지 배경 제거 - 교행노트 스타일</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                
-        /* 2. Layout */
+        
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
-                
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
         }
         .workspace-container {
-            display: flex;
-            flex-direction: row;
-            flex: 1;
-            gap: 20px;
-            min-height: 0;
+            display: flex; flex-direction: row; flex: 1; gap: 20px; min-height: 0;
         }
 
-        /* 3. Components */
         .menu-btn, .theme-btn { 
             width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
             background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
@@ -39,210 +31,148 @@
         .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 강도 조절 컨트롤 박스 */
+        /* 교행노트 호환 모드 선택 및 강도 조절 스타일 */
         .control-group {
-            background: #181818;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            margin-bottom: 10px;
-            text-align: left;
+            background: #181818; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 10px; text-align: left;
         }
         .control-group label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            color: #ff9e40;
-            font-weight: bold;
+            display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: #ff9e40; font-weight: bold;
         }
-        .control-group input[type="range"] {
-            width: 100%;
-            accent-color: #ff9e40;
-            cursor: pointer;
-        }
+        .control-group input[type="range"] { width: 100%; accent-color: #ff9e40; cursor: pointer; }
 
-        /* 공통 이미지 컨테이너 (좌우 동일한 틀) */
+        /* 드롭존 및 콘텐츠 박스 */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
             align-items: center; justify-content: center; gap: 10px; text-align: center;
-            overflow: hidden; position: relative;
-            cursor: pointer;
+            overflow: hidden; position: relative; cursor: pointer;
         }
-        .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
+        .content-box.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
         .image-preview-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border-radius: 8px;
-            position: relative;
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; position: relative;
         }
-        .preview-img, .preview-canvas {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-        .empty-msg {
-            color: #888;
-            font-family: 'Consolas', monospace;
-            font-size: 1rem;
-        }
-        #loading-msg {
-            display: none;
-            color: #ff9e40;
-            font-weight: bold;
-            font-size: 0.95rem;
-            margin-top: 10px;
-        }
-        /* 다크 모드 그림자 */
-        .card, .content-box {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-        }
+        .preview-img, canvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        .empty-msg { color: #888; font-family: 'Consolas', monospace; font-size: 1rem; }
+        
+        #statusPanel { display: flex; align-items: center; gap: 15px; background: #181818; padding: 12px 20px; border-radius: 12px; border: 1px solid #333; }
+        .status-spinner { width: 20px; height: 20px; border: 3px solid #333; border-top-color: #ff9e40; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background-color: #FDF5E6; }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
-        body.light-mode .control-group { background: #fff5e6; border-color: #f38020; }
-        body.light-mode .card, body.light-mode .content-box {
-            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
-        }
-
-        /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #fff; }
+        
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #fff; }
         @media (max-width: 600px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
+            .menu-toggle-btn { display: block; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; }
             .workspace-container { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-    <input type="file" id="file-selector" accept="image/*" style="display: none;">
+    <button class="menu-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('active')">MENU</button>
 
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+            <button id="themeToggle" class="theme-btn">DAY / NIGHT</button>
             
-            <!-- 모드 전환 버튼 -->
-            <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
-            <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
+            <!-- 처리 방식 선택 버튼 (라디오 혹은 버튼 형태 - 스크립트 호환용) -->
+            <button class="menu-btn active" onclick="setMode('auto')">자동 모드</button>
+            <button class="menu-btn" onclick="setMode('subject')">빠른 처리 (일반)</button>
+            <button class="menu-btn" onclick="setMode('portrait')">인물 정밀 (MODNet)</button>
+            <button class="menu-btn" onclick="setMode('stamp')">도장·서명 모드</button>
 
-            <!-- Signature 모드 전용 강도 조절 옵션 -->
-            <div class="control-group" id="signature-controls" style="display: none;">
-                <label for="thresholdRange">
-                    <span>제거 강도</span>
-                    <span id="thresholdVal">50</span>
+            <!-- 강도 조절 컨트롤 -->
+            <div id="sensitivityControl" class="control-group">
+                <label for="sensitivityRange">
+                    <span>배경 제거 강도</span>
+                    <span id="sensitivityValue">50 · 보통</span>
                 </label>
-                <input type="range" id="thresholdRange" min="1" max="100" value="50">
+                <input id="sensitivityRange" type="range" min="0" max="100" value="50">
             </div>
 
-            <!-- Upload, Reset 버튼 -->
-            <button class="menu-btn" onclick="uploadFile()">Upload</button>
-            <button class="menu-btn" onclick="resetAll()">Reset</button>
+            <!-- 교행노트 원본 ID 맞춤 버튼들 -->
+            <button id="replaceButton" class="menu-btn" style="display:none;">다른 이미지</button>
+            <button id="resetButton" class="menu-btn">처음부터 (Reset)</button>
+            <button id="downloadButton" class="menu-btn" style="background:#ff9e40; color:#101010;" disabled>투명 PNG 다운로드</button>
         </aside>
 
         <main class="main-content">
-            <header class="top-section" id="header-section">
-                <h1 id="page-title">AI Background Remover</h1>
-                <p id="page-desc">Upload an image to remove background instantly.</p>
+            <header>
+                <h1 id="pageTitle">이미지 배경 제거</h1>
+                <p id="modeHint">자동으로 이미지에 맞는 방식을 선택합니다.</p>
             </header>
 
-            <div class="workspace-container">
-                <!-- 왼쪽 박스: 초기/원본 사진 영역 -->
-                <section class="content-box content-mid" id="drop-zone">
-                    <div class="image-preview-container" id="original-container">
-                        <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
+            <!-- 교행노트 원본 UI 구조 (업로드 뷰 / 워크스페이스 뷰) -->
+            <div id="uploadView">
+                <div id="dropZone" class="content-box content-mid" style="height: 400px;">
+                    <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+                    <strong>이미지를 끌어놓거나 눌러서 선택하세요</strong>
+                    <span style="color: #888; font-size: 0.85rem;">JPG, PNG, WEBP · 최대 30MB</span>
+                </div>
+            </div>
+
+            <div id="workspaceView" hidden class="workspace-container">
+                <!-- 원본 영역 -->
+                <section class="content-box">
+                    <div class="image-preview-container">
+                        <img id="originalPreview" alt="원본 이미지" />
                     </div>
                 </section>
 
-                <!-- 오른쪽 박스: 누끼 결과 사진 영역 -->
-                <section class="content-box content-down" id="result-zone">
-                    <div class="image-preview-container" id="result-container">
-                        <div class="empty-msg">Result image will appear here.</div>
+                <!-- 결과 영역 -->
+                <section class="content-box">
+                    <div class="image-preview-container" style="position: relative; width: 100%; height: 100%;">
+                        <canvas id="resultCanvas" hidden></canvas>
+                        <div id="resultPlaceholder" class="empty-msg">결과를 만들고 있어요</div>
                     </div>
-                    <div id="loading-msg">✨ AI is removing the background...</div>
+                    <span id="runtimeBadge" style="font-size: 0.8rem; color: #ff9e40;">처리 대기</span>
                 </section>
+            </div>
+
+            <!-- 상태바 및 진행률 요소 -->
+            <div id="statusPanel" style="display:none;">
+                <span id="statusSpinner" class="status-spinner"></span>
+                <div>
+                    <strong id="statusTitle">준비 중</strong>
+                    <div id="statusDetail">잠시만 기다려 주세요.</div>
+                    <div id="progressTrack" style="width: 200px; height: 4px; background: #333; margin-top: 5px; border-radius: 2px;">
+                        <div id="progressBar" style="width: 0%; height: 100%; background: #ff9e40; border-radius: 2px; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                <button id="retryButton" hidden>다시 시도</button>
             </div>
         </main>
     </div>
 
-    <!-- 기본 UI 인터랙션 및 버튼 동작 스크립트 -->
+    <!-- 테마 토글 및 모드 선택 보조 스크립트 -->
     <script>
-        const sidebar = document.getElementById('sidebar');
-        window.currentMode = 'ai';
-        window.currentFile = null;
-
-        window.toggleSidebar = function() { 
-            sidebar.classList.toggle('active'); 
-        };
-
-        document.getElementById('theme-toggle').addEventListener('click', () => { 
-            document.body.classList.toggle('light-mode'); 
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isDark = document.documentElement.classList.toggle('dark');
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+            document.getElementById('themeIcon').textContent = isDark ? '☀' : '☾';
         });
 
-        document.querySelector('.main-content').addEventListener('click', (e) => { 
-            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
-                sidebar.classList.remove('active'); 
-            } 
-        });
-
-        window.switchMode = function(mode) {
-            window.currentMode = mode;
-            setInitialUI();
-
-            const btnAiBg = document.getElementById('btn-ai-bg');
-            const btnSig = document.getElementById('btn-sig');
-            const signatureControls = document.getElementById('signature-controls');
-            const pageTitle = document.getElementById('page-title');
-            const pageDesc = document.getElementById('page-desc');
-
-            if (mode === 'ai') {
-                btnAiBg.classList.add('active');
-                btnSig.classList.remove('active');
-                signatureControls.style.display = 'none';
-                pageTitle.textContent = "AI Background Remover";
-                pageDesc.textContent = "Upload an image to remove background instantly.";
-            } else {
-                btnSig.classList.add('active');
-                btnAiBg.classList.remove('active');
-                signatureControls.style.display = 'block';
-                pageTitle.textContent = "Stamp & Signature Remover";
-                pageDesc.textContent = "Upload a document image to remove white background instantly.";
-            }
-        };
-
-        function setInitialUI() {
-            document.getElementById('original-container').innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
-            document.getElementById('result-container').innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
-            document.getElementById('loading-msg').style.display = 'none';
-            document.getElementById('file-selector').value = '';
-            window.currentFile = null;
+        function setMode(modeValue) {
+            // nukki-signature 내부 라디오 버튼들과 연동
+            const radios = document.querySelectorAll('input[name="processingMode"]');
+            radios.forEach(r => {
+                if (r.value === modeValue) {
+                    r.checked = true;
+                    r.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
         }
-
-        window.uploadFile = function() {
-            document.getElementById('file-selector').click();
-        };
-
-        window.resetAll = function() {
-            setInitialUI();
-        };
     </script>
 
-    <!-- 교행노트 원본 번들 파일을 그대로 로드 (nukki-signature.js) -->
+    <!-- 교행노트 원본 번들 스크립트 로드 (모든 ID와 요소가 일치하여 에러 해결) -->
     <script type="module" src="/codes/nukki-signature.js"></script>
 </body>
 </html>
