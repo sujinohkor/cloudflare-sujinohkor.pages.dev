@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover</title>
-    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <title>배경 제거</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
@@ -28,7 +27,7 @@
         }
 
         .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            width: 100%; padding: 12px; margin-bottom: 10px; cursor: pointer;
             background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
             border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
         }
@@ -69,13 +68,35 @@
             font-family: 'Consolas', monospace;
             font-size: 1rem;
         }
-        #loading-msg {
-            display: none;
-            color: #ff9e40;
+        
+        .status-box {
+            background: #18281d;
+            border: 1px solid #2e7d32;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: #a5d6a7;
             font-weight: bold;
             font-size: 0.95rem;
-            margin-top: 10px;
+            display: none;
+            text-align: left;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 100%;
         }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s;
+        }
+        .action-btn:hover { background: #1d4ed8; }
 
         body.light-mode { background-color: #fff; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
@@ -89,7 +110,7 @@
             .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; display: flex; flex-direction: column; }
             .workspace-container { flex-direction: column; }
         }
     </style>
@@ -102,98 +123,135 @@
     <aside class="sidebar" id="sidebar">
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        <button class="menu-btn active">AI Background Remover</button>
-        <button class="menu-btn" onclick="uploadFile()">Upload</button>
-        <button class="menu-btn" onclick="resetAll()">Reset</button>
+        <button class="menu-btn active">배경 제거</button>
+        <button class="menu-btn" onclick="uploadFile()">이미지 선택</button>
+        <button class="menu-btn" onclick="resetAll()">처음부터</button>
     </aside>
 
     <main class="main-content">
         <header class="top-section">
-            <h1>AI Background Remover</h1>
-            <p>Upload any image to isolate the subject regardless of the background color.</p>
+            <h1>배경 제거</h1>
+            <p>사진을 업로드하면 엣지 클라우드 AI가 자동으로 피사체를 감지하여 배경을 제거합니다.</p>
         </header>
 
         <div class="workspace-container">
-            <section class="content-box" id="drop-zone">
+            <section class="content-box content-mid" id="drop-zone">
                 <div class="image-preview-container" id="original-container">
-                    <div class="empty-msg">Drag & Drop an image here</div>
+                    <div class="empty-msg">여기에 이미지를 드래그하거나 클릭하여 업로드</div>
                 </div>
             </section>
-            <section class="content-box">
+            <section class="content-box" id="result-zone" style="gap: 15px;">
                 <div class="image-preview-container" id="result-container">
-                    <div class="empty-msg">Result will appear here</div>
+                    <div class="empty-msg">결과 이미지가 여기에 표시됩니다.</div>
                 </div>
-                <div id="loading-msg">✨ AI is detecting the subject...</div>
+                <div id="status-box" class="status-box">
+                    배경 제거가 완료되었어요<br>
+                    <span id="metrics-txt" style="font-size: 0.85rem; font-weight: normal; color: #a5d6a7;"></span>
+                </div>
+                <button id="download-btn" class="action-btn" onclick="downloadResult()">투명 PNG 다운로드 ↓</button>
             </section>
         </div>
     </main>
 </div>
 
-<script type="module">
-    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-
+<script>
     const sidebar = document.getElementById('sidebar');
     const dropZone = document.getElementById('drop-zone');
     const originalContainer = document.getElementById('original-container');
     const resultContainer = document.getElementById('result-container');
     const fileSelector = document.getElementById('file-selector');
-    const loadingMsg = document.getElementById('loading-msg');
+    const statusBox = document.getElementById('status-box');
+    const metricsTxt = document.getElementById('metrics-txt');
+    const downloadBtn = document.getElementById('download-btn');
 
-    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    let lastResultBlob = null;
+    const WORKER_URL = "https://bg-remover-worker.sujinohkor.workers.dev"; // 본인의 클라우드플레어 워커 배포 주소로 변경
 
-    async function handleFile(file) {
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+    window.toggleSidebar = toggleSidebar;
+
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    function uploadFile() { fileSelector.click(); }
+    window.uploadFile = uploadFile;
+
+    function resetAll() {
+        originalContainer.innerHTML = `<div class="empty-msg">여기에 이미지를 드래그하거나 클릭하여 업로드</div>`;
+        resultContainer.innerHTML = `<div class="empty-msg">결과 이미지가 여기에 표시됩니다.</div>`;
+        statusBox.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        fileSelector.value = '';
+        lastResultBlob = null;
+    }
+    window.resetAll = resetAll;
+
+    async function processImage(file) {
         if (!file || !file.type.startsWith('image/')) return;
 
         const originalUrl = URL.createObjectURL(file);
         originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original" class="preview-img">`;
 
-        resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
-        loadingMsg.style.display = 'block';
+        resultContainer.innerHTML = `<div class="empty-msg">⚡ 클라우드 AI 처리 중...</div>`;
+        statusBox.style.display = 'none';
+        downloadBtn.style.display = 'none';
+
+        const startTime = performance.now();
 
         try {
-            const blob = await removeBackground(file, {
-                model: 'small',
-                progress: (key, current, total) => {
-                    if (total) {
-                        const percent = Math.round((current / total) * 100);
-                        loadingMsg.textContent = `✨ AI Detecting subject... ${percent}%`;
-                    }
-                }
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const response = await fetch(WORKER_URL, {
+                method: "POST",
+                body: formData
             });
 
+            if (!response.ok) throw new Error("Cloudflare Worker processing failed");
+
+            const blob = await response.blob();
+            lastResultBlob = blob;
             const resultUrl = URL.createObjectURL(blob);
-            resultContainer.innerHTML = `<img src="${resultUrl}" alt="Isolated Subject" class="preview-img">`;
-        } catch (error) {
-            console.error(error);
-            resultContainer.innerHTML = `<div class="empty-msg">Processing failed</div>`;
-        } finally {
-            loadingMsg.style.display = 'none';
+
+            resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result" class="preview-img">`;
+
+            const duration = ((performance.now() - startTime) / 1000).toFixed(1);
+            metricsTxt.textContent = `${duration}초 · 자동 감지 · 엣지 AI · 원본 크기 유지`;
+            statusBox.style.display = 'block';
+            downloadBtn.style.display = 'block';
+
+        } catch (err) {
+            console.error(err);
+            resultContainer.innerHTML = `<div class="empty-msg">처리 중 오류가 발생했습니다.</div>`;
         }
     }
 
+    function downloadResult() {
+        if (!lastResultBlob) return;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(lastResultBlob);
+        a.download = 'removed_background.png';
+        a.click();
+    }
+    window.downloadResult = downloadResult;
+
     dropZone.addEventListener('click', () => fileSelector.click());
-    dropZone.addEventListener('dragover', (e) => e.preventDefault());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
+        dropZone.classList.remove('dragover');
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0]);
+            processImage(e.dataTransfer.files[0]);
         }
     });
 
     fileSelector.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
-            handleFile(e.target.files[0]);
+            processImage(e.target.files[0]);
         }
     });
-
-    window.uploadFile = () => fileSelector.click();
-    window.resetAll = () => {
-        originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image here</div>`;
-        resultContainer.innerHTML = `<div class="empty-msg">Result will appear here</div>`;
-        loadingMsg.style.display = 'none';
-        fileSelector.value = '';
-    };
 </script>
 </body>
 </html>
