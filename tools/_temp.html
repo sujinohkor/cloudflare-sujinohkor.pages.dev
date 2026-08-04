@@ -112,7 +112,7 @@
         body.light-mode .control-group { background: #fff5e6; border-color: #f38020; }
         body.light-mode .card, body.light-mode .content-box { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
 
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }                
 
         @media (max-width: 600px) {
             .menu-toggle-btn { display: block; color: #ffffff; }
@@ -150,7 +150,7 @@
     <main class="main-content">
         <header class="top-section" id="header-section">
             <h1 id="page-title">AI Background Remover</h1>
-            <p id="page-desc">Upload an image to remove background instantly via Cloudflare Edge.</p>
+            <p id="page-desc">Upload an image to remove background instantly.</p>
         </header>
 
         <div class="workspace-container">
@@ -163,13 +163,15 @@
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading-msg">⚡ Cloudflare AI is removing the background...</div>
+                <div id="loading-msg">✨ AI is removing the background...</div>
             </section>
         </div>
     </main>
 </div>
 
-<script>
+<script type="module">
+    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
+
     const sidebar = document.getElementById('sidebar');
     const dropZone = document.getElementById('drop-zone');
     const originalContainer = document.getElementById('original-container');
@@ -189,9 +191,6 @@
     let currentMode = 'ai';
     let currentFile = null;
 
-    // 본인의 클라우드플레어 워커 배포 주소 입력
-    const WORKER_URL = "https://bg-remover-worker.sujinohkor.workers.dev";
-
     window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
     document.querySelector('.main-content').addEventListener('click', (e) => { 
@@ -209,7 +208,7 @@
             btnSig.classList.remove('active');
             signatureControls.style.display = 'none';
             pageTitle.textContent = "AI Background Remover";
-            pageDesc.textContent = "Upload an image to remove background instantly via Cloudflare Edge.";
+            pageDesc.textContent = "Upload an image to remove background instantly.";
         } else {
             btnSig.classList.add('active');
             btnAiBg.classList.remove('active');
@@ -235,31 +234,46 @@
     }
     setInitialUI();
 
-    // 클라우드플레어 워커를 통한 고속 배경 제거 처리 함수
     async function handleAiFile(file) {
-        const originalUrl = URL.createObjectURL(file);
-        originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original Preview" class="preview-img">`;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+            originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+        };
+        reader.readAsDataURL(file);
 
         resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "⚡ Cloudflare Edge AI processing...";
+
+        const steps = [
+            "✨ Initializing Web ML engine...",
+            "🔍 Analyzing image features...",
+            "✂️ Removing background via WebAssembly...",
+            "🎨 Finalizing transparent layers..."
+        ];
+        let stepIndex = 0;
+        loadingMsg.textContent = steps[0];
+
+        const stepInterval = setInterval(() => {
+            stepIndex = (stepIndex + 1) % steps.length;
+            loadingMsg.textContent = steps[stepIndex];
+        }, 1200);
 
         try {
-            const formData = new FormData();
-            formData.append("image", file);
-
-            const response = await fetch(WORKER_URL, {
-                method: "POST",
-                body: formData
+            const blob = await removeBackground(file, {
+                progress: (key, current, total) => {
+                    if (total) {
+                        const percent = Math.round((current / total) * 100);
+                        loadingMsg.textContent = `✨ AI Processing... ${percent}%`;
+                    }
+                }
             });
-
-            if (!response.ok) throw new Error("Worker request failed");
-
-            const blob = await response.blob();
             const resultUrl = URL.createObjectURL(blob);
 
+            clearInterval(stepInterval);
             resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
         } catch (error) {
+            clearInterval(stepInterval);
             console.error(error);
             alert('Error occurred while removing background.');
             resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
