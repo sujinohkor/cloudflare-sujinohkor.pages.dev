@@ -31,7 +31,7 @@
         .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        /* 교행노트 호환 모드 선택 및 강도 조절 스타일 */
+        /* 강도 조절 컨트롤 박스 */
         .control-group {
             background: #181818; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 10px; text-align: left;
         }
@@ -40,7 +40,7 @@
         }
         .control-group input[type="range"] { width: 100%; accent-color: #ff9e40; cursor: pointer; }
 
-        /* 드롭존 및 콘텐츠 박스 */
+        /* 이미지 컨테이너 */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
@@ -51,17 +51,13 @@
         .image-preview-container {
             width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; position: relative;
         }
-        .preview-img, canvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        #originalPreview, #resultCanvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
         .empty-msg { color: #888; font-family: 'Consolas', monospace; font-size: 1rem; }
-        
-        #statusPanel { display: flex; align-items: center; gap: 15px; background: #181818; padding: 12px 20px; border-radius: 12px; border: 1px solid #333; }
-        .status-spinner { width: 20px; height: 20px; border: 3px solid #333; border-top-color: #ff9e40; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         body.light-mode { background-color: #fff; color: #202020; }
         body.light-mode .sidebar { background-color: #FDF5E6; }
         body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #fff; }
+        body.light-mode .menu-btn:hover { background: #F38020; color: #fff; }
         
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #fff; }
         @media (max-width: 600px) {
@@ -77,18 +73,27 @@
     <button class="menu-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('active')">MENU</button>
 
     <div class="app-container">
+        <!-- 사이드바 메뉴 및 옵션 -->
         <aside class="sidebar" id="sidebar">
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="themeToggle" class="theme-btn">DAY / NIGHT</button>
+            <button id="themeToggle" class="theme-btn">
+                <span id="themeIcon">☾</span> DAY / NIGHT
+            </button>
             
-            <!-- 처리 방식 선택 버튼 (라디오 혹은 버튼 형태 - 스크립트 호환용) -->
-            <button class="menu-btn active" onclick="setMode('auto')">자동 모드</button>
-            <button class="menu-btn" onclick="setMode('subject')">빠른 처리 (일반)</button>
-            <button class="menu-btn" onclick="setMode('portrait')">인물 정밀 (MODNet)</button>
-            <button class="menu-btn" onclick="setMode('stamp')">도장·서명 모드</button>
+            <!-- 처리 방식 라디오를 자바스크립트로 연동하기 위한 숨김 처리 영역 -->
+            <div style="display:none;">
+                <input type="radio" name="processingMode" value="auto" checked>
+                <input type="radio" name="processingMode" value="subject">
+                <input type="radio" name="processingMode" value="portrait">
+                <input type="radio" name="processingMode" value="stamp" id="modeStamp">
+            </div>
 
-            <!-- 강도 조절 컨트롤 -->
-            <div id="sensitivityControl" class="control-group">
+            <!-- 모드 전환 버튼 -->
+            <button class="menu-btn active" id="btnAi" onclick="switchUI('ai')">AI 배경 제거</button>
+            <button class="menu-btn" id="btnStamp" onclick="switchUI('stamp')">도장·서명 제거</button>
+
+            <!-- 강도 조절 (도장 모드 전용) -->
+            <div id="sensitivityControl" class="control-group" style="display: none;">
                 <label for="sensitivityRange">
                     <span>배경 제거 강도</span>
                     <span id="sensitivityValue">50 · 보통</span>
@@ -96,53 +101,56 @@
                 <input id="sensitivityRange" type="range" min="0" max="100" value="50">
             </div>
 
-            <!-- 교행노트 원본 ID 맞춤 버튼들 -->
-            <button id="replaceButton" class="menu-btn" style="display:none;">다른 이미지</button>
-            <button id="resetButton" class="menu-btn">처음부터 (Reset)</button>
+            <button id="replaceButton" class="menu-btn">다른 이미지</button>
+            <button id="resetButton" class="menu-btn">처음부터</button>
             <button id="downloadButton" class="menu-btn" style="background:#ff9e40; color:#101010;" disabled>투명 PNG 다운로드</button>
         </aside>
 
+        <!-- 메인 작업 공간 -->
         <main class="main-content">
             <header>
                 <h1 id="pageTitle">이미지 배경 제거</h1>
                 <p id="modeHint">자동으로 이미지에 맞는 방식을 선택합니다.</p>
             </header>
 
-            <!-- 교행노트 원본 UI 구조 (업로드 뷰 / 워크스페이스 뷰) -->
-            <div id="uploadView">
-                <div id="dropZone" class="content-box content-mid" style="height: 400px;">
+            <!-- 업로드 전 화면 (uploadView) -->
+            <div id="uploadView" style="flex: 1; display: flex;">
+                <label id="dropZone" class="content-box content-mid" style="width: 100%; cursor: pointer;">
                     <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+                    <span style="font-size: 2rem; color: #ff9e40;">↑</span>
                     <strong>이미지를 끌어놓거나 눌러서 선택하세요</strong>
-                    <span style="color: #888; font-size: 0.85rem;">JPG, PNG, WEBP · 최대 30MB</span>
-                </div>
+                    <span class="empty-msg">JPG, PNG, WEBP · 최대 30MB</span>
+                </label>
             </div>
 
+            <!-- 업로드 후 작업 화면 (workspaceView) -->
             <div id="workspaceView" hidden class="workspace-container">
-                <!-- 원본 영역 -->
+                <!-- 원본 이미지 보기 -->
                 <section class="content-box">
                     <div class="image-preview-container">
                         <img id="originalPreview" alt="원본 이미지" />
                     </div>
+                    <span style="font-size: 0.85rem; color: #888;">원본</span>
                 </section>
 
-                <!-- 결과 영역 -->
+                <!-- 결과 이미지 보기 -->
                 <section class="content-box">
-                    <div class="image-preview-container" style="position: relative; width: 100%; height: 100%;">
+                    <div class="image-preview-container" style="position: relative;">
                         <canvas id="resultCanvas" hidden></canvas>
                         <div id="resultPlaceholder" class="empty-msg">결과를 만들고 있어요</div>
                     </div>
-                    <span id="runtimeBadge" style="font-size: 0.8rem; color: #ff9e40;">처리 대기</span>
+                    <span id="runtimeBadge" style="font-size: 0.85rem; color: #ff9e40;">처리 대기</span>
                 </section>
             </div>
 
-            <!-- 상태바 및 진행률 요소 -->
-            <div id="statusPanel" style="display:none;">
+            <!-- 상태바 및 진행률 (스크립트 필수 연동 요소) -->
+            <div id="statusPanel" style="display:none; background:#181818; padding:10px 15px; border-radius:8px; border:1px solid #333; align-items:center; gap:10px;">
                 <span id="statusSpinner" class="status-spinner"></span>
                 <div>
-                    <strong id="statusTitle">준비 중</strong>
-                    <div id="statusDetail">잠시만 기다려 주세요.</div>
-                    <div id="progressTrack" style="width: 200px; height: 4px; background: #333; margin-top: 5px; border-radius: 2px;">
-                        <div id="progressBar" style="width: 0%; height: 100%; background: #ff9e40; border-radius: 2px; transition: width 0.3s;"></div>
+                    <strong id="statusTitle" style="font-size:0.9rem;">준비 중</strong>
+                    <div id="statusDetail" style="font-size:0.8rem; color:#aaa;">잠시만 기다려 주세요.</div>
+                    <div id="progressTrack" style="width:100%; height:4px; background:#333; margin-top:5px; border-radius:2px; overflow:hidden;">
+                        <span id="progressBar" style="display:block; width:0%; height:100%; background:#ff9e40; transition:width 0.3s;"></span>
                     </div>
                 </div>
                 <button id="retryButton" hidden>다시 시도</button>
@@ -150,29 +158,31 @@
         </main>
     </div>
 
-    <!-- 테마 토글 및 모드 선택 보조 스크립트 -->
+    <!-- UI 전환 및 스크립트 연동 제어 -->
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            const isDark = document.documentElement.classList.toggle('dark');
-            themeToggle.setAttribute('aria-pressed', String(isDark));
-            document.getElementById('themeIcon').textContent = isDark ? '☀' : '☾';
-        });
+        function switchUI(mode) {
+            const btnAi = document.getElementById('btnAi');
+            const btnStamp = document.getElementById('btnStamp');
+            const modeStamp = document.getElementById('modeStamp');
+            const sensitivityControl = document.getElementById('sensitivityControl');
 
-        function setMode(modeValue) {
-            // nukki-signature 내부 라디오 버튼들과 연동
-            const radios = document.querySelectorAll('input[name="processingMode"]');
-            radios.forEach(r => {
-                if (r.value === modeValue) {
-                    r.checked = true;
-                    r.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            });
+            if (mode === 'ai') {
+                btnAi.classList.add('active');
+                btnStamp.classList.remove('active');
+                modeStamp.checked = false;
+                modeStamp.dispatchEvent(new Event('change', { bubbles: true }));
+                sensitivityControl.style.display = 'none';
+            } else {
+                btnStamp.classList.add('active');
+                btnAi.classList.remove('active');
+                modeStamp.checked = true;
+                modeStamp.dispatchEvent(new Event('change', { bubbles: true }));
+                sensitivityControl.style.display = 'block';
+            }
         }
     </script>
 
-    <!-- 교행노트 원본 번들 스크립트 로드 (모든 ID와 요소가 일치하여 에러 해결) -->
+    <!-- nukki-signature.js (교행노트 원본 번들 파일) 로드 -->
     <script type="module" src="/codes/nukki-signature.js"></script>
 </body>
 </html>
