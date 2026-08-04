@@ -320,19 +320,14 @@
         async function getAiSession() {
             if (aiSession) return aiSession;
             loadingMsg.style.display = 'block';
-            loadingMsg.textContent = "✨ Loading Fast AI Model...";
-            try {
-                aiSession = await ort.InferenceSession.create(modelU2NetpUrl.href, { 
-                    executionProviders: ['webgpu', 'wasm'], 
-                    graphOptimizationLevel: "all" 
-                });
-            } catch (err) {
-                console.warn("WebGPU initialization failed, falling back to WASM:", err);
-                aiSession = await ort.InferenceSession.create(modelU2NetpUrl.href, { 
-                    executionProviders: ['wasm'], 
-                    graphOptimizationLevel: "all" 
-                });
-            }
+            loadingMsg.textContent = "✨ Loading AI Model (WASM Mode)...";
+            
+            // WebGPU를 거치지 않고 호환성이 완벽한 WASM 모드로 세션 생성
+            aiSession = await ort.InferenceSession.create(modelU2NetpUrl, { 
+                executionProviders: ['wasm'], 
+                graphOptimizationLevel: "all" 
+            });
+            
             return aiSession;
         }
 
