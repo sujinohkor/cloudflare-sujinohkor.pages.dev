@@ -167,7 +167,9 @@
     <!-- ONNX Runtime Web 엔진 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script>
-        ort.env.wasm.numThreads = Math.max(1, Math.min(4, navigator.hardwareConcurrency || 2));
+        // 멀티스레드 충돌(crossOriginIsolated 오류)을 막기 위해 싱글스레드로 고정
+        ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
+        ort.env.wasm.numThreads = 1; 
         ort.env.logLevel = "warning";
 
         const sidebar = document.getElementById('sidebar');    
@@ -188,8 +190,9 @@
         let currentFile = null;
         let aiSession = null;
 
+        // /tools/ 구조에 맞게 상위 폴더로 빠져나가서 models 폴더 접근 및 문자열(.href) 처리
         const localBaseUrl = new URL("./", window.location.href);
-        const modelU2NetpUrl = new URL("models/u2netp.onnx", localBaseUrl);
+        const modelU2NetpUrl = new URL("../models/u2netp.onnx", localBaseUrl).href;
 
         const C = {
             get resultCanvas() {
@@ -321,15 +324,13 @@
             loadingMsg.style.display = 'block';
             loadingMsg.textContent = "✨ Loading Fast AI Model...";
             try {
-                aiSession = await ort.InferenceSession.create(modelU2NetpUrl.href, { 
-                    executionProviders: ['webgpu', 'wasm'], 
-                    graphOptimizationLevel: "all" 
-                });
-            } catch (err) {
-                aiSession = await ort.InferenceSession.create(modelU2NetpUrl.href, { 
+                aiSession = await ort.InferenceSession.create(modelU2NetpUrl, { 
                     executionProviders: ['wasm'], 
                     graphOptimizationLevel: "all" 
                 });
+            } catch (err) {
+                console.error("AI Session Creation Failed:", err);
+                throw err;
             }
             return aiSession;
         }
@@ -354,18 +355,28 @@
         }
 
         function Cc(e) {
-            let r = Number.POSITIVE_INFINITY, i = Number.NEGATIVE_INFINITY;
-            for (const m of e) Number.isFinite(m) && (r = Math.min(r, m), i = Math.max(i, m));
-            const u = Math.max(i - r, Number.EPSILON),
-                  s = document.createElement("canvas");
-            s.width = de, s.height = de;
-            const f = s.getContext("2d"),
-                  c = f.createImageData(de, de),
-                  h = Math.min(e.length, de * de);
-            for (let m = 0; m < h; m += 1) {
-                const g = Math.round(Math.max(0, Math.min(1, (e[m] - r) / u)) * 255),
-                      v = m * 4;
-                c.data[v] = 255, c.data[v + 1] = 255, c.data[v + 2] = 255, c.data[v + 3] = g;
+            const s = document.createElement("canvas");
+            s.width = de; 
+            s.height = de;
+            const f = s.getContext("2d");
+            const c = f.createImageData(de, de);
+            
+            let minVal = e[0], maxVal = e[0];
+            for (let i = 1; i < e.length; i++) {
+                if (e[i] < minVal) minVal = e[i];
+                if (e[i] > maxVal) maxVal = e[i];
+            }
+            const range = (maxVal - minVal) || 1;
+
+            for (let m = 0; m < de * de; m++) {
+                let norm = (e[m] - minVal) / range;
+                let alpha = Math.round(Math.max(0, Math.min(1, norm)) * 255);
+                
+                const v = m * 4;
+                c.data[v] = 255;     
+                c.data[v + 1] = 255; 
+                c.data[v + 2] = 255; 
+                c.data[v + 3] = alpha; 
             }
             f.putImageData(c, 0, 0);
             return s;
@@ -373,11 +384,13 @@
 
         // 4. 최종 결과 합성 (destination-in)
         function wi(e, r, i, u) {
-            const s = C.resultCanvas.getContext("2d");
-            C.resultCanvas.width = i;
-            C.resultCanvas.height = u;
+            const resultCanvas = C.resultCanvas;
+            const s = resultCanvas.getContext("2d");
+            resultCanvas.width = i;
+            resultCanvas.height = u;
+            
             s.clearRect(0, 0, i, u);
-            s.imageSmoothingEnabled = !0;
+            s.imageSmoothingEnabled = true;
             s.imageSmoothingQuality = "high";
             
             s.drawImage(e, 0, 0, i, u);
@@ -385,11 +398,12 @@
             s.drawImage(r, 0, 0, i, u);
             s.globalCompositeOperation = "source-over";
             
-            C.resultCanvas.hidden = !1;
-            C.resultPlaceholder.hidden = !0;
+            resultCanvas.style.display = 'block';
+            resultCanvas.hidden = false;
+            C.resultPlaceholder.hidden = true;
             
             resultContainer.innerHTML = '';
-            resultContainer.appendChild(C.resultCanvas);
+            resultContainer.appendChild(resultCanvas);
         }
 
         async function handleAiFile(file) {
@@ -420,8 +434,8 @@
                 const maskCanvas = Cc(outputData);
                 wi(imgBitmap, maskCanvas, width, height);
             } catch (error) {            
-                console.error(error);            
-                alert('Error occurred while removing background.');            
+                console.error("AI Processing Error:", error);            
+                alert('Error occurred while removing background: ' + error.message);            
                 resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;        
             } finally {            
                 loadingMsg.style.display = 'none';        
