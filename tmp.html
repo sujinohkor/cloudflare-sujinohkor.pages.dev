@@ -63,7 +63,7 @@
             cursor: pointer;
         }
 
-        /* 공통 이미지 컨테이너 */
+        /* 공통 이미지 컨테이너 (좌우 동일한 틀) */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
@@ -106,6 +106,7 @@
             margin-top: 10px;
         }
 
+        /* 다크 모드 그림자 */
         .card, .content-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -149,10 +150,10 @@
         <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
         <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
 
-        <!-- Signature 모드 전용 강도 조절 옵션 -->
+        <!-- Signature 모드 전용 강도 조절 옵션 (1~100 스케일 적용) -->
         <div class="control-group" id="signature-controls" style="display: none;">
             <label for="thresholdRange">
-                <span>제거 강도 (Sensitivity)</span>
+                <span>제거 강도</span>
                 <span id="thresholdVal">50</span>
             </label>
             <input type="range" id="thresholdRange" min="1" max="100" value="50">
@@ -182,16 +183,16 @@
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading-msg">✨ Processing image...</div>
+                <div id="loading-msg">✨ AI is removing the background...</div>
             </section>
         </div>
     </main>
 </div>
 
-<!-- 스크립트 연동 (codes/nukki-signature.js 임포트) -->
+<!-- 브라우저 AI 누끼 및 서명 처리 스크립트 연동 -->
 <script type="module">
     import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-    import { qf, Hf } from '/codes/nukki-signature.js';
+    import { qf, Hf } from './codes/nukki-signature.js';
 
     const sidebar = document.getElementById('sidebar');
     const dropZone = document.getElementById('drop-zone');
@@ -209,7 +210,7 @@
     const thresholdRange = document.getElementById('thresholdRange');
     const thresholdVal = document.getElementById('thresholdVal');
 
-    let currentMode = 'ai'; 
+    let currentMode = 'ai'; // 'ai' 또는 'signature'
     let currentFile = null;
 
     window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
@@ -267,13 +268,29 @@
 
         resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ AI is removing the background...";
+
+        const steps = [
+            "✨ Loading AI engine...",
+            "🔍 Analyzing image and detecting objects...",
+            "✂️ Removing background cleanly...",
+            "🎨 Refining final results..."
+        ];
+        let stepIndex = 0;
+        loadingMsg.textContent = steps[0];
+
+        const stepInterval = setInterval(() => {
+            stepIndex = (stepIndex + 1) % steps.length;
+            loadingMsg.textContent = steps[stepIndex];
+        }, 1500);
 
         try {
             const blob = await removeBackground(file);
             const resultUrl = URL.createObjectURL(blob);
+
+            clearInterval(stepInterval);
             resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
         } catch (error) {
+            clearInterval(stepInterval);
             console.error(error);
             alert('Error occurred while removing background.');
             resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
@@ -282,7 +299,7 @@
         }
     }
 
-    // 도장/서명 픽셀 처리 (codes/nukki-signature.js의 qf, Hf 활용)
+    // 도장/서명 픽셀 처리 (nukki-signature.js의 qf, Hf 함수 연동)
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
         loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
@@ -298,13 +315,13 @@
                 canvas.width = img.width;
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d', { willReadFrequently: true });
-                ctx.drawImage(img, 0, 0);
 
+                ctx.drawImage(img, 0, 0);
                 const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imgData.data;
-                const sensitivity = parseInt(thresholdRange.value);
+                const sensitivity = parseInt(thresholdRange.value); // 슬라이더 값 (1~100)
 
-                // codes/nukki-signature.js에 포함된 고도화된 배경 분석 및 매팅 함수 호출
+                // nukki-signature.js에 있는 배경 분석(qf) 및 매팅 알고리즘(Hf) 호출
                 const analysis = qf(data, canvas.width, canvas.height);
                 Hf(data, analysis.background, sensitivity);
 
