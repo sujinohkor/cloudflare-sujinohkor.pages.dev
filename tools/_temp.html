@@ -160,8 +160,29 @@
 
     let lastResultBlob = null;
 
-    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
+    function toggleSidebar() { 
+        sidebar.classList.toggle('active'); 
+    }
+    window.toggleSidebar = toggleSidebar;
+
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    function uploadFile() { 
+        fileSelector.click(); 
+    }
+    window.uploadFile = uploadFile;
+
+    function resetAll() {
+        originalContainer.innerHTML = `<div class="empty-msg">여기에 이미지를 드래그하거나 클릭하여 업로드</div>`;
+        resultContainer.innerHTML = `<div class="empty-msg">결과 이미지가 여기에 표시됩니다.</div>`;
+        statusBox.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        fileSelector.value = '';
+        lastResultBlob = null;
+    }
+    window.resetAll = resetAll;
 
     async function processImage(file) {
         if (!file || !file.type.startsWith('image/')) return;
@@ -169,7 +190,7 @@
         const originalUrl = URL.createObjectURL(file);
         originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original" class="preview-img">`;
 
-        resultContainer.innerHTML = `<div class="empty-msg">⚡ 고속 처리 중...</div>`;
+        resultContainer.innerHTML = `<div class="empty-msg">⚡ 누끼 처리 중...</div>`;
         statusBox.style.display = 'none';
         downloadBtn.style.display = 'none';
 
@@ -188,15 +209,29 @@
 
             const imgData = ctx.getImageData(0, 0, width, height);
             const data = imgData.data;
-            const r0 = data[0], g0 = data[1], b0 = data[2];
 
-            for (let i = 0; i < data.length; i += 16) {
+            // 사방 모서리의 평균 배경색 정확히 샘플링
+            const corners = [
+                0, (width - 1) * 4, 
+                (width * (height - 1)) * 4, 
+                (width * height - 1) * 4
+            ];
+            let bR = 0, bG = 0, bB = 0;
+            corners.forEach(idx => {
+                bR += data[idx];
+                bG += data[idx + 1];
+                bB += data[idx + 2];
+            });
+            bR /= 4; bG /= 4; bB /= 4;
+
+            // 배경색과 차이가 나는 픽셀(피사체)만 살리고 나머지는 완전 투명화
+            for (let i = 0; i < data.length; i += 4) {
                 const r = data[i], g = data[i+1], b = data[i+2];
-                if (Math.abs(r - r0) + Math.abs(g - g0) + Math.abs(b - b0) < 45) {
+                const diff = Math.abs(r - bR) + Math.abs(g - bG) + Math.abs(b - bB);
+                
+                // 배경색 범위 내의 픽셀은 투명하게 제거
+                if (diff < 42) {
                     data[i + 3] = 0;
-                    data[i + 7] = 0;
-                    data[i + 11] = 0;
-                    data[i + 15] = 0;
                 }
             }
 
@@ -231,26 +266,41 @@
         }
     }
 
-    window.downloadResult = function() {
+    function downloadResult() {
         if (!lastResultBlob) return;
         const a = document.createElement('a');
         a.href = URL.createObjectURL(lastResultBlob);
         a.download = 'removed_background.png';
         a.click();
-    };
+    }
+    window.downloadResult = downloadResult;
 
-    dropZone.addEventListener('click', () => fileSelector.click());
-    fileSelector.addEventListener('change', (e) => processImage(e.target.files[0]));
+    dropZone.addEventListener('click', () => {
+        fileSelector.click();
+    });
 
-    window.uploadFile = () => fileSelector.click();
-    window.resetAll = () => {
-        originalContainer.innerHTML = `<div class="empty-msg">여기에 이미지를 드래그하거나 클릭하여 업로드</div>`;
-        resultContainer.innerHTML = `<div class="empty-msg">결과 이미지가 여기에 표시됩니다.</div>`;
-        statusBox.style.display = 'none';
-        downloadBtn.style.display = 'none';
-        fileSelector.value = '';
-        lastResultBlob = null;
-    };
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            processImage(e.dataTransfer.files[0]);
+        }
+    });
+
+    fileSelector.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            processImage(e.target.files[0]);
+        }
+    });
 </script>
 </body>
 </html>
