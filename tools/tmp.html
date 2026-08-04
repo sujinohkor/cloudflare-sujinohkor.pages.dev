@@ -9,7 +9,7 @@
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                
+        
         /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
@@ -17,12 +17,11 @@
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
-                
+        
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
         }
-
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -71,7 +70,6 @@
             overflow: hidden; position: relative;
             cursor: pointer;
         }
-
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
         .image-preview-container {
             width: 100%;
@@ -105,6 +103,7 @@
         .card, .content-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
+
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; }
         body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
@@ -117,6 +116,7 @@
         body.light-mode .card, body.light-mode .content-box {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
+
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
         @media (max-width: 600px) {
@@ -129,254 +129,301 @@
     </style>
 </head>
 <body>
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<input type="file" id="file-selector" accept="image/*" style="display: none;">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <input type="file" id="file-selector" accept="image/*" style="display: none;">
 
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-                
-        <!-- 모드 전환 버튼 -->
-        <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
-        <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
-
-        <!-- Signature 모드 전용 강도 조절 옵션 -->
-        <div class="control-group" id="signature-controls" style="display: none;">
-            <label for="thresholdRange">
-                <span>제거 강도</span>
-                <span id="thresholdVal">50</span>
-            </label>
-            <input type="range" id="thresholdRange" min="1" max="100" value="50">
-        </div>
-
-        <!-- Upload, Reset 버튼 -->
-        <button class="menu-btn" onclick="uploadFile()">Upload</button>
-        <button class="menu-btn" onclick="resetAll()">Reset</button>
-    </aside>
-    
-    <main class="main-content">
-        <header class="top-section" id="header-section">
-            <h1 id="page-title">AI Background Remover</h1>
-            <p id="page-desc">Upload an image to remove background instantly.</p>
-        </header>
-        
-        <div class="workspace-container">
-            <!-- 왼쪽 박스: 초기/원본 사진 영역 -->
-            <section class="content-box content-mid" id="drop-zone">
-                <div class="image-preview-container" id="original-container">
-                    <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
-                </div>
-            </section>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
             
-            <!-- 오른쪽 박스: 누끼 결과 사진 영역 -->
-            <section class="content-box content-down" id="result-zone">
-                <div class="image-preview-container" id="result-container">
-                    <div class="empty-msg">Result image will appear here.</div>
-                </div>
-                <div id="loading-msg">✨ AI is removing the background...</div>
-            </section>
-        </div>
-    </main>
-</div>
+            <!-- 모드 전환 버튼 -->
+            <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
+            <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
 
-<!-- 기본 UI 인터랙션 및 버튼 동작을 보장하는 일반 스크립트 -->
-<script>
-    const sidebar = document.getElementById('sidebar');
-    window.currentMode = 'ai';
-    window.currentFile = null;
+            <!-- Signature 모드 전용 강도 조절 옵션 -->
+            <div class="control-group" id="signature-controls" style="display: none;">
+                <label for="thresholdRange">
+                    <span>제거 강도</span>
+                    <span id="thresholdVal">50</span>
+                </label>
+                <input type="range" id="thresholdRange" min="1" max="100" value="50">
+            </div>
 
-    window.toggleSidebar = function() { 
-        sidebar.classList.toggle('active'); 
-    };
+            <!-- Upload, Reset 버튼 -->
+            <button class="menu-btn" onclick="uploadFile()">Upload</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </aside>
 
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
+        <main class="main-content">
+            <header class="top-section" id="header-section">
+                <h1 id="page-title">AI Background Remover</h1>
+                <p id="page-desc">Upload an image to remove background instantly.</p>
+            </header>
 
-    document.querySelector('.main-content').addEventListener('click', (e) => { 
-        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
-            sidebar.classList.remove('active'); 
-        } 
-    });
+            <div class="workspace-container">
+                <!-- 왼쪽 박스: 초기/원본 사진 영역 -->
+                <section class="content-box content-mid" id="drop-zone">
+                    <div class="image-preview-container" id="original-container">
+                        <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
+                    </div>
+                </section>
 
-    window.switchMode = function(mode) {
-        window.currentMode = mode;
-        setInitialUI();
+                <!-- 오른쪽 박스: 누끼 결과 사진 영역 -->
+                <section class="content-box content-down" id="result-zone">
+                    <div class="image-preview-container" id="result-container">
+                        <div class="empty-msg">Result image will appear here.</div>
+                    </div>
+                    <div id="loading-msg">✨ AI is removing the background...</div>
+                </section>
+            </div>
+        </main>
+    </div>
 
-        const btnAiBg = document.getElementById('btn-ai-bg');
-        const btnSig = document.getElementById('btn-sig');
-        const signatureControls = document.getElementById('signature-controls');
-        const pageTitle = document.getElementById('page-title');
-        const pageDesc = document.getElementById('page-desc');
-
-        if (mode === 'ai') {
-            btnAiBg.classList.add('active');
-            btnSig.classList.remove('active');
-            signatureControls.style.display = 'none';
-            pageTitle.textContent = "AI Background Remover";
-            pageDesc.textContent = "Upload an image to remove background instantly.";
-        } else {
-            btnSig.classList.add('active');
-            btnAiBg.classList.remove('active');
-            signatureControls.style.display = 'block';
-            pageTitle.textContent = "Stamp & Signature Remover";
-            pageDesc.textContent = "Upload a document image to remove white background instantly.";
-        }
-    };
-
-    function setInitialUI() {
-        document.getElementById('original-container').innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
-        document.getElementById('result-container').innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('file-selector').value = '';
+    <!-- 기본 UI 인터랙션 및 버튼 동작 스크립트 -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        window.currentMode = 'ai';
         window.currentFile = null;
-    }
 
-    window.uploadFile = function() {
-        document.getElementById('file-selector').click();
-    };
-
-    window.resetAll = function() {
-        setInitialUI();
-    };
-</script>
-
-<!-- 브라우저 AI 누끼 및 nukki-signature.js 연동 모듈 스크립트 -->
-<script type="module">
-    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-    import { qf, Hf } from '/codes/nukki-signature.js';
-
-    const originalContainer = document.getElementById('original-container');
-    const resultContainer = document.getElementById('result-container');
-    const fileSelector = document.getElementById('file-selector');
-    const loadingMsg = document.getElementById('loading-msg');
-    const thresholdRange = document.getElementById('thresholdRange');
-    const thresholdVal = document.getElementById('thresholdVal');
-
-    thresholdRange.addEventListener('input', (e) => {
-        thresholdVal.textContent = e.target.value;
-        if (window.currentFile && window.currentMode === 'signature') {
-            processSignatureImage(window.currentFile);
-        }
-    });
-
-    // AI 배경 제거 처리
-    async function handleAiFile(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageUrl = e.target.result;
-            originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+        window.toggleSidebar = function() { 
+            sidebar.classList.toggle('active'); 
         };
-        reader.readAsDataURL(file);
 
-        resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
-        loadingMsg.style.display = 'block';
-        
-        const steps = [
-            "✨ Loading AI engine...",
-            "🔍 Analyzing image and detecting objects...",
-            "✂️ Removing background cleanly...",
-            "🎨 Refining final results..."
-        ];
-        let stepIndex = 0;
-        loadingMsg.textContent = steps[0];
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
 
-        const stepInterval = setInterval(() => {
-            stepIndex = (stepIndex + 1) % steps.length;
-            loadingMsg.textContent = steps[stepIndex];
-        }, 1500);
+        document.querySelector('.main-content').addEventListener('click', (e) => { 
+            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
 
-        try {
-            const blob = await removeBackground(file);
-            const resultUrl = URL.createObjectURL(blob);
-            clearInterval(stepInterval);
-            resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
-        } catch (error) {
-            clearInterval(stepInterval);
-            console.error(error);
-            alert('Error occurred while removing background.');
-            resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
-        } finally {
-            loadingMsg.style.display = 'none';
+        window.switchMode = function(mode) {
+            window.currentMode = mode;
+            setInitialUI();
+
+            const btnAiBg = document.getElementById('btn-ai-bg');
+            const btnSig = document.getElementById('btn-sig');
+            const signatureControls = document.getElementById('signature-controls');
+            const pageTitle = document.getElementById('page-title');
+            const pageDesc = document.getElementById('page-desc');
+
+            if (mode === 'ai') {
+                btnAiBg.classList.add('active');
+                btnSig.classList.remove('active');
+                signatureControls.style.display = 'none';
+                pageTitle.textContent = "AI Background Remover";
+                pageDesc.textContent = "Upload an image to remove background instantly.";
+            } else {
+                btnSig.classList.add('active');
+                btnAiBg.classList.remove('active');
+                signatureControls.style.display = 'block';
+                pageTitle.textContent = "Stamp & Signature Remover";
+                pageDesc.textContent = "Upload a document image to remove white background instantly.";
+            }
+        };
+
+        function setInitialUI() {
+            document.getElementById('original-container').innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
+            document.getElementById('result-container').innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
+            document.getElementById('loading-msg').style.display = 'none';
+            document.getElementById('file-selector').value = '';
+            window.currentFile = null;
         }
-    }
 
-    // nukki-signature.js의 qf, Hf 함수를 활용한 도장/서명 정밀 처리
-    function processSignatureImage(file) {
-        loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
+        window.uploadFile = function() {
+            document.getElementById('file-selector').click();
+        };
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageUrl = e.target.result;
-            originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+        window.resetAll = function() {
+            setInitialUI();
+        };
+    </script>
 
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    <!-- AI 배경 제거 및 도장/서명 제거 처리 스크립트 -->
+    <script type="module">
+        import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
 
-                ctx.drawImage(img, 0, 0);
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imgData.data;
-                const sensitivity = parseInt(thresholdRange.value);
+        const originalContainer = document.getElementById('original-container');
+        const resultContainer = document.getElementById('result-container');
+        const fileSelector = document.getElementById('file-selector');
+        const loadingMsg = document.getElementById('loading-msg');
+        const thresholdRange = document.getElementById('thresholdRange');
+        const thresholdVal = document.getElementById('thresholdVal');
 
-                // nukki-signature.js에 정의된 배경 분석 및 매팅 함수 호출
-                const analysis = qf(data, canvas.width, canvas.height);
-                Hf(data, analysis.background, sensitivity);
+        thresholdRange.addEventListener('input', (e) => {
+            thresholdVal.textContent = e.target.value;
+            if (window.currentFile && window.currentMode === 'signature') {
+                processSignatureImage(window.currentFile);
+            }
+        });
 
-                ctx.putImageData(imgData, 0, 0);
+        // 1. 도장/서명 제거를 위한 독립형 매팅 및 배경분석 함수 정의 (nukki-signature.js 대체)
+        function qf(data, width, height) {
+            const edgeSamples = [];
+            for (let y = 0; y < height; y += Math.max(1, Math.floor(height / 20))) {
+                for (let x = 0; x < width; x += Math.max(1, Math.floor(width / 20))) {
+                    if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
+                        const idx = (y * width + x) * 4;
+                        edgeSamples.push([data[idx], data[idx+1], data[idx+2]]);
+                    }
+                }
+            }
+            // 배경색 추정 (가장 밝은 계열 또는 흰색 계통 우선)
+            let bg = [255, 255, 255];
+            if (edgeSamples.length > 0) {
+                const rSum = edgeSamples.reduce((acc, cur) => acc + cur[0], 0);
+                const gSum = edgeSamples.reduce((acc, cur) => acc + cur[1], 0);
+                const bSum = edgeSamples.reduce((acc, cur) => acc + cur[2], 0);
+                bg = [Math.round(rSum / edgeSamples.length), Math.round(gSum / edgeSamples.length), Math.round(bSum / edgeSamples.length)];
+            }
+            return { background: bg };
+        }
 
-                const resultCanvas = document.createElement('canvas');
-                resultCanvas.width = canvas.width;
-                resultCanvas.height = canvas.height;
-                resultCanvas.className = 'preview-canvas';
-                const resCtx = resultCanvas.getContext('2d');
-                resCtx.drawImage(canvas, 0, 0);
+        function Hf(data, background, sensitivity = 50) {
+            const bgR = background[0];
+            const bgG = background[1];
+            const bgB = background[2];
+            const factor = sensitivity / 50;
 
-                resultContainer.innerHTML = '';
-                resultContainer.appendChild(resultCanvas);
-                loadingMsg.style.display = 'none';
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i+1];
+                const b = data[i+2];
+
+                // 배경과의 색상 차이 계산 (유클리드 거리)
+                const diff = Math.sqrt(Math.pow(r - bgR, 2) + Math.pow(g - bgG, 2) + Math.pow(b - bgB, 2));
+                const threshold = 40 * factor;
+
+                if (diff < threshold) {
+                    // 배경으로 판단하여 투명하게 처리
+                    data[i+3] = 0;
+                } else if (diff < threshold + 35) {
+                    // 경계 부드럽게(Anti-aliasing) 처리
+                    const alpha = Math.min(255, ((diff - threshold) / 35) * 255);
+                    data[i+3] = Math.round(alpha);
+                }
+            }
+        }
+
+        // AI 배경 제거 처리
+        async function handleAiFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageUrl = e.target.result;
+                originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
             };
-            img.src = imageUrl;
-        };
-        reader.readAsDataURL(file);
-    }
+            reader.readAsDataURL(file);
 
-    // 공통 파일 처리 분기
-    function handleFile(file) {
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            alert('Please upload an image file.');
-            return;
+            resultContainer.innerHTML = `<div class="empty-msg">Processing...</div>`;
+            loadingMsg.style.display = 'block';
+            
+            const steps = [
+                "✨ Loading AI engine...",
+                "🔍 Analyzing image and detecting objects...",
+                "✂️ Removing background cleanly...",
+                "🎨 Refining final results..."
+            ];
+            let stepIndex = 0;
+            loadingMsg.textContent = steps[0];
+
+            const stepInterval = setInterval(() => {
+                stepIndex = (stepIndex + 1) % steps.length;
+                loadingMsg.textContent = steps[stepIndex];
+            }, 1500);
+
+            try {
+                const blob = await removeBackground(file);
+                const resultUrl = URL.createObjectURL(blob);
+                clearInterval(stepInterval);
+                resultContainer.innerHTML = `<img src="${resultUrl}" alt="Result Preview" class="preview-img">`;
+            } catch (error) {
+                clearInterval(stepInterval);
+                console.error(error);
+                alert('Error occurred while removing background.');
+                resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
+            } finally {
+                loadingMsg.style.display = 'none';
+            }
         }
 
-        window.currentFile = file;
-        if (window.currentMode === 'ai') {
-            handleAiFile(file);
-        } else {
-            processSignatureImage(file);
+        // 도장/서명 정밀 처리
+        function processSignatureImage(file) {
+            loadingMsg.style.display = 'block';
+            loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageUrl = e.target.result;
+                originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
+
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+                    ctx.drawImage(img, 0, 0);
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+                    const sensitivity = parseInt(thresholdRange.value);
+
+                    // 내장된 배경 분석 및 매팅 함수 호출
+                    const analysis = qf(data, canvas.width, canvas.height);
+                    Hf(data, analysis.background, sensitivity);
+
+                    ctx.putImageData(imgData, 0, 0);
+
+                    const resultCanvas = document.createElement('canvas');
+                    resultCanvas.width = canvas.width;
+                    resultCanvas.height = canvas.height;
+                    resultCanvas.className = 'preview-canvas';
+                    const resCtx = resultCanvas.getContext('2d');
+                    resCtx.drawImage(canvas, 0, 0);
+
+                    resultContainer.innerHTML = '';
+                    resultContainer.appendChild(resultCanvas);
+                    loadingMsg.style.display = 'none';
+                };
+                img.src = imageUrl;
+            };
+            reader.readAsDataURL(file);
         }
-    }
 
-    const dropZone = document.getElementById('drop-zone');
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
-    dropZone.addEventListener('drop', (e) => { 
-        e.preventDefault(); 
-        dropZone.classList.remove('dragover'); 
-        const file = e.dataTransfer.files[0]; 
-        handleFile(file); 
-    });
-    dropZone.addEventListener('click', () => { fileSelector.click(); });
+        // 공통 파일 처리 분기
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file.');
+                return;
+            }
 
-    fileSelector.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        handleFile(file);
-    });
-</script>
+            window.currentFile = file;
+            if (window.currentMode === 'ai') {
+                handleAiFile(file);
+            } else {
+                processSignatureImage(file);
+            }
+        }
+
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => { 
+            e.preventDefault(); 
+            dropZone.classList.remove('dragover'); 
+            const file = e.dataTransfer.files[0]; 
+            handleFile(file); 
+        });
+        dropZone.addEventListener('click', () => { fileSelector.click(); });
+
+        fileSelector.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+    </script>
 </body>
 </html>
