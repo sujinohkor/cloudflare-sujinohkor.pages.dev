@@ -166,6 +166,8 @@
     <!-- ONNX Runtime Web 엔진 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script>
+        // WASM 경로 설정 (CDN 기반 바이너리 로드 오류 방지)
+        ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
         ort.env.wasm.numThreads = Math.max(1, Math.min(4, navigator.hardwareConcurrency || 2));
         ort.env.logLevel = "warning";
 
@@ -325,6 +327,7 @@
                     graphOptimizationLevel: "all" 
                 });
             } catch (err) {
+                console.warn("WebGPU initialization failed, falling back to WASM:", err);
                 aiSession = await ort.InferenceSession.create(modelU2NetpUrl.href, { 
                     executionProviders: ['wasm'], 
                     graphOptimizationLevel: "all" 
@@ -419,8 +422,8 @@
                 const maskCanvas = Cc(outputData);
                 wi(imgBitmap, maskCanvas, width, height);
             } catch (error) {            
-                console.error(error);            
-                alert('Error occurred while removing background.');            
+                console.error("AI Processing Error:", error);            
+                alert('Error occurred while removing background: ' + error.message);            
                 resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;        
             } finally {            
                 loadingMsg.style.display = 'none';        
