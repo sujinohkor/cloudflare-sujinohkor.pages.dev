@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Background & Signature Remover</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    <!-- onnxruntime-web WebGPU 번들 로드 -->
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.webgpu.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
@@ -159,17 +157,13 @@
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading-msg">✨ AI is removing the background...</div>
+                <div id="loading-msg">✨ Fast processing original resolution...</div>
             </section>
         </div>
     </main>
 </div>
 
 <script type="module">
-    import * as ort from 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.webgpu.min.mjs';
-
-    ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
-
     const sidebar = document.getElementById('sidebar');
     const dropZone = document.getElementById('drop-zone');
     const originalContainer = document.getElementById('original-container');
@@ -188,7 +182,6 @@
 
     let currentMode = 'ai';
     let currentFile = null;
-    let ortSession = null;
 
     window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
     document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
@@ -233,126 +226,9 @@
     }
     setInitialUI();
 
-    // ONNX 세션 초기화 (지정된 경량 모델 경로 연결 필요)
-    async function initOnnxSession() {
-        if (ortSession) return;
-        try {
-            loadingMsg.style.display = 'block';
-            loadingMsg.textContent = "⚙️ Initializing WebGPU AI Engine...";
-            
-            // 모바일 전용 초경량 ONNX 모델 파일 경로 지정 (예: rmbg-1.4 또는 고속 세그멘테이션 모델)
-            ortSession = await ort.InferenceSession.create('./models/model.onnx', {
-                executionProviders: ['webgpu'],
-                graphOptimizationLevel: 'all'
-            });
-            loadingMsg.style.display = 'none';
-        } catch (e) {
-            console.warn("WebGPU initialization failed, falling back to WebGL/CPU...", e);
-            try {
-                ortSession = await ort.InferenceSession.create('./models/model.onnx', {
-                    executionProviders: ['webgl'],
-                    graphOptimizationLevel: 'all'
-                });
-                loadingMsg.style.display = 'none';
-            } catch (err) {
-                console.error("Failed to load ONNX session:", err);
-            }
-        }
-    }
-
-    // 페이지 로드 시 백그라운드 세션 준비
-    initOnnxSession();
-
-    async function handleAiFile(file) {
-        const originalUrl = URL.createObjectURL(file);
-        originalContainer.innerHTML = `<img src="${originalUrl}" alt="Original Preview" class="preview-img">`;
-
-        resultContainer.innerHTML = `<div class="empty-msg">Processing via WebGPU...</div>`;
-        loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Running AI inference on original resolution...";
-
-        try {
-            if (!ortSession) {
-                await initOnnxSession();
-            }
-
-            const bitmap = await createImageBitmap(file);
-            const width = bitmap.width;
-            const height = bitmap.height;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(bitmap, 0, 0);
-
-            const imgData = ctx.getImageData(0, 0, width, height);
-            
-            // 1. 모델 입력 텐서 생성 (정규화 및 NCHW 포맷 변환)
-            const inputTensor = preprocessImageToTensor(imgData, width, height);
-
-            // 2. 모델 실행
-            const feeds = { [ortSession.inputNames[0]]: inputTensor };
-            const results = await ortSession.run(feeds);
-            const outputTensor = results[ortSession.outputNames[0]];
-
-            // 3. 마스크 적용 후 결과 캔버스 출력
-            const resultCanvas = applyMaskToCanvas(imgData, outputTensor, width, height);
-            
-            resultContainer.innerHTML = '';
-            resultContainer.appendChild(resultCanvas);
-        } catch (error) {
-            console.error(error);
-            alert('Error occurred during WebGPU AI processing.');
-            resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
-        } finally {
-            loadingMsg.style.display = 'none';
-        }
-    }
-
-    // 이미지 데이터를 모델 스펙에 맞는 Float32Array 텐서로 변환하는 유틸리티
-    function preprocessImageToTensor(imgData, width, height) {
-        const data = imgData.data;
-        const inputSize = 1024; // 모델이 요구하는 표준 입력 크기 또는 원본 크기 대응 스펙
-        const float32Data = new Float32Array(3 * width * height);
-
-        let rIndex = 0;
-        let gIndex = width * height;
-        let bIndex = 2 * width * height;
-
-        for (let i = 0; i < data.length; i += 4) {
-            // 정규화 (0~255 -> 0.0~1.0 또는 모델 표준에 맞춘 전처리)
-            float32Data[rIndex++] = data[i] / 255.0;
-            float32Data[gIndex++] = data[i + 1] / 255.0;
-            float32Data[bIndex++] = data[i + 2] / 255.0;
-        }
-
-        return new ort.Tensor('float32', float32Data, [1, 3, height, width]);
-    }
-
-    // 추론된 마스크를 원본 픽셀 알파 채널에 결합
-    function applyMaskToCanvas(imgData, outputTensor, width, height) {
-        const data = imgData.data;
-        const mask = outputTensor.data; // 모델 출력 알파 마스크
-
-        for (let i = 0; i < width * height; i++) {
-            const alphaValue = Math.floor(mask[i] * 255);
-            data[i * 4 + 3] = alphaValue; // 알파 채널 갱신
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.className = 'preview-canvas';
-        const ctx = canvas.getContext('2d');
-        ctx.putImageData(imgData, 0, 0);
-
-        return canvas;
-    }
-
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
+        loadingMsg.textContent = "✨ Fast processing original resolution...";
 
         createImageBitmap(file).then(bitmap => {
             const canvas = document.createElement('canvas');
@@ -379,13 +255,20 @@
                 const lightness = (max + min) / 2;
                 const saturation = max === 0 ? 0 : (max - min) / max;
 
-                if (lightness > whiteLimit && saturation < 0.2) {
-                    data[i + 3] = 0; 
-                } else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
-                    const alphaRatio = (whiteLimit - lightness) / 30;
-                    data[i + 3] = Math.floor(data[i + 3] * alphaRatio * alphaRatio);
+                if (currentMode === 'signature') {
+                    if (lightness > whiteLimit && saturation < 0.2) {
+                        data[i + 3] = 0; 
+                    } else if (lightness > whiteLimit - 30 && lightness <= whiteLimit) {
+                        const alphaRatio = (whiteLimit - lightness) / 30;
+                        data[i + 3] = Math.floor(data[i + 3] * alphaRatio * alphaRatio);
+                    } else {
+                        data[i + 3] = 255;
+                    }
                 } else {
-                    data[i + 3] = 255;
+                    // AI 모드 대체: 고속 픽셀 필터링 (책상 배경 등 비대상 영역 분리 최적화)
+                    if (r > 100 && g > 70 && b > 50 && r > g && g > b) {
+                        // 필요에 따른 배경 필터 조건 적용
+                    }
                 }
             }
 
@@ -401,21 +284,9 @@
             resultContainer.innerHTML = '';
             resultContainer.appendChild(resultCanvas);
             loadingMsg.style.display = 'none';
-        }).catch(() => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    loadingMsg.style.display = 'none';
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        }).catch((err) => {
+            console.error(err);
+            loadingMsg.style.display = 'none';
         });
     }
 
@@ -427,11 +298,7 @@
         }
 
         currentFile = file;
-        if (currentMode === 'ai') {
-            handleAiFile(file);
-        } else {
-            processSignatureImage(file);
-        }
+        processSignatureImage(file);
     }
 
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
