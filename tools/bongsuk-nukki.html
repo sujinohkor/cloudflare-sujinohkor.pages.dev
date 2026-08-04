@@ -298,10 +298,10 @@
         }
     }
 
-// 도장/서명 픽셀 처리 (까끌까끌한 하얀 노이즈 완벽 제거 버전)
+// 도장/서명 픽셀 처리 (컬러 잉크 보존 버전)
     function processSignatureImage(file) {
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Removing white noise & sharpening edges...";
+        loadingMsg.textContent = "✨ Extracting signature & stamp cleanly...";
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -325,20 +325,16 @@
                     const g = data[i + 1];
                     const b = data[i + 2];
 
-                    const max = Math.max(r, g, b);
-                    const min = Math.min(r, g, b);
-                    const lightness = (max + min) / 2;
-                    const saturation = max === 0 ? 0 : (max - min) / max;
+                    // 평균 밝기 계산
+                    const avg = (r + g + b) / 3;
 
-                    // 기준치보다 밝거나 회색빛이 도는 배경/노이즈는 무조건 투명하게 처리
-                    if (lightness > (threshold - 15) || saturation > 0.3) {
-                        data[i + 3] = 0; // 완벽한 투명
+                    // 1. 임계값보다 밝은 영역(하얀 종이 배경)은 완전히 투명하게 처리
+                    if (avg > threshold) {
+                        data[i + 3] = 0; // 투명도 0 (배경 제거)
                     } else {
-                        // 글자 본체 영역: 까끌한 잔상을 없애기 위해 진하게 고정하고 불투명하게 처리
-                        data[i] = Math.min(255, r * 0.5);
-                        data[i + 1] = Math.min(255, g * 0.5);
-                        data[i + 2] = Math.min(255, b * 0.5);
-                        data[i + 3] = 255; // 투명도 255 (완전 불투명으로 깔끔하게 밀착)
+                        // 2. 글자나 도장 잉크 영역: 색상을 강제로 검정으로 바꾸지 않고 원래 색상(RGB)을 그대로 유지
+                        // 투명도만 255(불투명)로 확실하게 줘서 테두리가 까끌하지 않고 선명하게 밀착되도록 함
+                        data[i + 3] = 255; 
                     }
                 }
 
