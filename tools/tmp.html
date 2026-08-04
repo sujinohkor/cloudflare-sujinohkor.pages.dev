@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이미지 배경 제거 - 교행노트 스타일</title>
+    <title>AI Background & Signature Remover</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
+        /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
+                
+        /* 2. Layout */
         .app-container { display: flex; min-height: 100vh; }
         .sidebar { 
             width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
             background-color: #101010; padding: 20px; z-index: 1000; 
             display: flex; flex-direction: column; transition: transform 0.3s ease; 
         }
+                
         .main-content { 
             margin-left: 250px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
         }
         .workspace-container {
-            display: flex; flex-direction: row; flex: 1; gap: 20px; min-height: 0;
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+            overflow: hidden;
         }
 
+        /* 3. Components */
         .menu-btn, .theme-btn { 
             width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
             background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
@@ -33,156 +42,208 @@
 
         /* 강도 조절 컨트롤 박스 */
         .control-group {
-            background: #181818; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 10px; text-align: left;
+            background: #181818;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            text-align: left;
         }
         .control-group label {
-            display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: #ff9e40; font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #ff9e40;
+            font-weight: bold;
         }
-        .control-group input[type="range"] { width: 100%; accent-color: #ff9e40; cursor: pointer; }
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: #ff9e40;
+            cursor: pointer;
+        }
 
-        /* 이미지 컨테이너 */
+        /* 공통 이미지 컨테이너 (좌우 동일한 틀) */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
             align-items: center; justify-content: center; gap: 10px; text-align: center;
-            overflow: hidden; position: relative; cursor: pointer;
+            overflow: hidden; position: relative;
+            cursor: pointer;
         }
-        .content-box.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
+        .content-box.is-dragging { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
         .image-preview-container {
-            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+            position: relative;
         }
-        #originalPreview, #resultCanvas { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
-        .empty-msg { color: #888; font-family: 'Consolas', monospace; font-size: 1rem; }
-
-        body.light-mode { background-color: #fff; color: #202020; }
-        body.light-mode .sidebar { background-color: #FDF5E6; }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #fff; }
+        #originalPreview, #resultCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .empty-msg {
+            color: #888;
+            font-family: 'Consolas', monospace;
+            font-size: 1rem;
+        }
         
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #fff; }
+        /* 다크 모드 그림자 */
+        .card, .content-box {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
+        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        body.light-mode .control-group { background: #fff5e6; border-color: #f38020; }
+        body.light-mode .card, body.light-mode .content-box {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
         @media (max-width: 600px) {
-            .menu-toggle-btn { display: block; }
+            .menu-toggle-btn { display: block; color: #ffffff; }
             .sidebar { transform: translateX(-250px); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
             .workspace-container { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <button class="menu-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('active')">MENU</button>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
     <div class="app-container">
-        <!-- 사이드바 메뉴 및 옵션 -->
+        <!-- 사이드바 -->
         <aside class="sidebar" id="sidebar">
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="themeToggle" class="theme-btn">
-                <span id="themeIcon">☾</span> DAY / NIGHT
-            </button>
+            <button id="themeToggle" class="theme-btn"><span id="themeIcon">☾</span> DAY / NIGHT</button>
             
-            <!-- 처리 방식 라디오를 자바스크립트로 연동하기 위한 숨김 처리 영역 -->
+            <!-- 번들 스크립트 모드 연동용 숨김 라디오 버튼 (자동/도장/인물/일반) -->
             <div style="display:none;">
                 <input type="radio" name="processingMode" value="auto" checked>
-                <input type="radio" name="processingMode" value="subject">
-                <input type="radio" name="processingMode" value="portrait">
+                <input type="radio" name="processingMode" value="subject" id="modeSubject">
+                <input type="radio" name="processingMode" value="portrait" id="modePortrait">
                 <input type="radio" name="processingMode" value="stamp" id="modeStamp">
             </div>
 
             <!-- 모드 전환 버튼 -->
-            <button class="menu-btn active" id="btnAi" onclick="switchUI('ai')">AI 배경 제거</button>
-            <button class="menu-btn" id="btnStamp" onclick="switchUI('stamp')">도장·서명 제거</button>
+            <button class="menu-btn active" id="btnAiBg" onclick="manualSwitchMode('auto')">AI BG Remover</button>
+            <button class="menu-btn" id="btnSig" onclick="manualSwitchMode('stamp')">Signature Remover</button>
 
-            <!-- 강도 조절 (도장 모드 전용) -->
-            <div id="sensitivityControl" class="control-group" style="display: none;">
+            <!-- Signature 모드 전용 강도 조절 옵션 -->
+            <div class="control-group" id="sensitivityControl">
                 <label for="sensitivityRange">
-                    <span>배경 제거 강도</span>
+                    <span>제거 강도</span>
                     <span id="sensitivityValue">50 · 보통</span>
                 </label>
-                <input id="sensitivityRange" type="range" min="0" max="100" value="50">
+                <input type="range" id="sensitivityRange" min="0" max="100" value="50">
             </div>
 
-            <button id="replaceButton" class="menu-btn">다른 이미지</button>
-            <button id="resetButton" class="menu-btn">처음부터</button>
-            <button id="downloadButton" class="menu-btn" style="background:#ff9e40; color:#101010;" disabled>투명 PNG 다운로드</button>
+            <!-- 스크립트 연동 제어 버튼들 -->
+            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+            <button class="menu-btn" id="replaceButton">Upload</button>
+            <button class="menu-btn" id="resetButton">Reset</button>
+            <button class="menu-btn" id="downloadButton" style="background:#ff9e40; color:#101010;" disabled>투명 PNG 다운로드</button>
         </aside>
 
-        <!-- 메인 작업 공간 -->
+        <!-- 메인 콘텐츠 영역 -->
         <main class="main-content">
-            <header>
-                <h1 id="pageTitle">이미지 배경 제거</h1>
+            <header class="top-section" id="header-section">
+                <h1 id="page-title">AI Background & Signature Remover</h1>
                 <p id="modeHint">자동으로 이미지에 맞는 방식을 선택합니다.</p>
+                <div id="fileName" style="font-size: 0.9rem; color: #ff9e40; margin-top: 5px;">선택한 이미지</div>
+                <div id="fileMeta" style="font-size: 0.8rem; color: #aaa;"></div>
             </header>
 
-            <!-- 업로드 전 화면 (uploadView) -->
-            <div id="uploadView" style="flex: 1; display: flex;">
-                <label id="dropZone" class="content-box content-mid" style="width: 100%; cursor: pointer;">
-                    <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" hidden />
-                    <span style="font-size: 2rem; color: #ff9e40;">↑</span>
-                    <strong>이미지를 끌어놓거나 눌러서 선택하세요</strong>
-                    <span class="empty-msg">JPG, PNG, WEBP · 최대 30MB</span>
-                </label>
+            <!-- 업로드 전 화면 -->
+            <div id="uploadView" style="flex: 1; display: flex; width: 100%;">
+                <section class="content-box" id="dropZone" style="width: 100%;">
+                    <div class="image-preview-container">
+                        <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
+                    </div>
+                </section>
             </div>
 
-            <!-- 업로드 후 작업 화면 (workspaceView) -->
-            <div id="workspaceView" hidden class="workspace-container">
-                <!-- 원본 이미지 보기 -->
-                <section class="content-box">
+            <!-- 업로드 후 작업 결과 화면 (좌우 분할) -->
+            <div class="workspace-container" id="workspaceView" hidden>
+                <!-- 왼쪽 박스: 원본 사진 영역 -->
+                <section class="content-box" style="cursor: default;">
                     <div class="image-preview-container">
-                        <img id="originalPreview" alt="원본 이미지" />
+                        <img id="originalPreview" alt="Original Preview">
                     </div>
                     <span style="font-size: 0.85rem; color: #888;">원본</span>
                 </section>
 
-                <!-- 결과 이미지 보기 -->
-                <section class="content-box">
-                    <div class="image-preview-container" style="position: relative;">
+                <!-- 오른쪽 박스: 결과 사진 영역 -->
+                <section class="content-box" style="cursor: default;">
+                    <div class="image-preview-container">
                         <canvas id="resultCanvas" hidden></canvas>
-                        <div id="resultPlaceholder" class="empty-msg">결과를 만들고 있어요</div>
+                        <div id="resultPlaceholder" class="empty-msg">Result image will appear here.</div>
                     </div>
                     <span id="runtimeBadge" style="font-size: 0.85rem; color: #ff9e40;">처리 대기</span>
                 </section>
             </div>
 
-            <!-- 상태바 및 진행률 (스크립트 필수 연동 요소) -->
-            <div id="statusPanel" style="display:none; background:#181818; padding:10px 15px; border-radius:8px; border:1px solid #333; align-items:center; gap:10px;">
-                <span id="statusSpinner" class="status-spinner"></span>
-                <div>
-                    <strong id="statusTitle" style="font-size:0.9rem;">준비 중</strong>
-                    <div id="statusDetail" style="font-size:0.8rem; color:#aaa;">잠시만 기다려 주세요.</div>
-                    <div id="progressTrack" style="width:100%; height:4px; background:#333; margin-top:5px; border-radius:2px; overflow:hidden;">
-                        <span id="progressBar" style="display:block; width:0%; height:100%; background:#ff9e40; transition:width 0.3s;"></span>
-                    </div>
-                </div>
-                <button id="retryButton" hidden>다시 시도</button>
+            <!-- 스크립트 상태바 (숨김 처리하여 내부 에러 방지) -->
+            <div id="statusPanel" style="display: none;">
+                <span id="statusSpinner"></span>
+                <span id="statusTitle"></span>
+                <span id="statusDetail"></span>
+                <div id="progressTrack"><span id="progressBar"></span></div>
+                <button id="retryButton"></button>
             </div>
         </main>
     </div>
 
-    <!-- UI 전환 및 스크립트 연동 제어 -->
+    <!-- UI 연동 및 사이드바 토글 스크립트 -->
     <script>
-        function switchUI(mode) {
-            const btnAi = document.getElementById('btnAi');
-            const btnStamp = document.getElementById('btnStamp');
-            const modeStamp = document.getElementById('modeStamp');
-            const sensitivityControl = document.getElementById('sensitivityControl');
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
 
-            if (mode === 'ai') {
-                btnAi.classList.add('active');
-                btnStamp.classList.remove('active');
-                modeStamp.checked = false;
-                modeStamp.dispatchEvent(new Event('change', { bubbles: true }));
-                sensitivityControl.style.display = 'none';
+        function manualSwitchMode(mode) {
+            const btnAiBg = document.getElementById('btnAiBg');
+            const btnSig = document.getElementById('btnSig');
+            const modeStamp = document.getElementById('modeStamp');
+            const modeAuto = document.querySelector('input[name="processingMode"][value="auto"]');
+
+            if (mode === 'auto') {
+                btnAiBg.classList.add('active');
+                btnSig.classList.remove('active');
+                modeAuto.checked = true;
+                modeAuto.dispatchEvent(new Event('change', { bubbles: true }));
             } else {
-                btnStamp.classList.add('active');
-                btnAi.classList.remove('active');
+                btnSig.classList.add('active');
+                btnAiBg.classList.remove('active');
                 modeStamp.checked = true;
                 modeStamp.dispatchEvent(new Event('change', { bubbles: true }));
-                sensitivityControl.style.display = 'block';
             }
         }
+
+        // 모바일 환경에서 메인 영역 클릭 시 사이드바 닫기
+        document.querySelector('.main-content').addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) {
+                sidebar.classList.remove('active');
+            }
+        });
     </script>
 
-    <!-- nukki-signature.js (교행노트 원본 번들 파일) 로드 -->
+    <!-- 원본 번들 스크립트 로드 -->
     <script type="module" src="/codes/nukki-signature.js"></script>
 </body>
 </html>
