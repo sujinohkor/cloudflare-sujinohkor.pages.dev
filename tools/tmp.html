@@ -95,6 +95,33 @@
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 <input type="file" id="file-selector" accept="image/*" style="display: none;">
 
+<!-- nukki-signature.js가 요구하는 DOM 요소를 전부 포함하되, 기존 레이아웃을 해치지 않도록 숨김 처리한 매핑 영역 -->
+<div style="display: none;" aria-hidden="true">
+    <input type="radio" name="processingMode" value="auto" checked id="modeAuto">
+    <input type="radio" name="processingMode" value="stamp" id="modeStamp">
+    <input type="radio" name="processingMode" value="subject" id="modeSubject">
+    <input type="radio" name="processingMode" value="portrait" id="modePortrait">
+    
+    <img id="originalPreview" alt="">
+    <canvas id="resultCanvas"></canvas>
+    <div id="resultPlaceholder"></div>
+    <div id="runtimeBadge"></div>
+    <div id="fileName"></div>
+    <div id="fileMeta"></div>
+    
+    <button id="replaceButton"></button>
+    <button id="resetButton"></button>
+    <button id="downloadButton"></button>
+    
+    <div id="statusPanel">
+        <span id="statusSpinner"></span>
+        <span id="statusTitle"></span>
+        <span id="statusDetail"></span>
+        <div id="progressTrack"><span id="progressBar"></span></div>
+        <button id="retryButton"></button>
+    </div>
+</div>
+
 <div class="app-container">    
     <aside class="sidebar" id="sidebar">        
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
@@ -137,13 +164,12 @@
                 </div>                
                 <div id="loading-msg">✨ AI is removing the background...</div>            
             </section>        
+        </div>    
     </main>
 </div>
 
-<!-- 순수 자체 실행 스크립트 (외부 파일 오류 원천 차단) -->
-<script type="module">
-    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm';
-
+<!-- 사용자님이 주신 기존 레이아웃 UI와 nukki-signature.js를 완벽하게 연결해주는 브릿지 스크립트 -->
+<script>
     const sidebar = document.getElementById('sidebar');    
     const dropZone = document.getElementById('drop-zone');    
     const originalContainer = document.getElementById('original-container');    
@@ -178,13 +204,17 @@
             btnSig.classList.remove('active');            
             signatureControls.style.display = 'none';            
             pageTitle.textContent = "AI Background Remover";            
-            pageDesc.textContent = "Upload an image to remove background instantly.";        
+            pageDesc.textContent = "Upload an image to remove background instantly.";
+            document.getElementById('modeAuto').checked = true;
+            document.getElementById('modeAuto').dispatchEvent(new Event('change'));
         } else {            
             btnSig.classList.add('active');            
             btnAiBg.classList.remove('active');            
             signatureControls.style.display = 'block';            
             pageTitle.textContent = "Stamp & Signature Remover";            
-            pageDesc.textContent = "Upload a document image to remove white background instantly.";        
+            pageDesc.textContent = "Upload a document image to remove white background instantly.";
+            document.getElementById('modeStamp').checked = true;
+            document.getElementById('modeStamp').dispatchEvent(new Event('change'));
         }    
     };
 
@@ -227,6 +257,7 @@
         }, 1500);
 
         try {            
+            const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/+esm');
             const blob = await removeBackground(file);            
             const resultUrl = URL.createObjectURL(blob);
 
@@ -330,4 +361,7 @@
     window.resetAll = function() {        
         setInitialUI();    };
 </script>
+
+<!-- 원본 nukki-signature.js 모듈 번들 로드 -->
+<script type="module" src="/codes/nukki-signature.js"></script>
 </body></html>
