@@ -321,15 +321,26 @@
         async function getAiSession() {
             if (aiSession) return aiSession;
             loadingMsg.style.display = 'block';
-            loadingMsg.textContent = "✨ Loading Fast AI Model...";
+            loadingMsg.textContent = "✨ Loading AI Model...";
+            
             try {
+                // 1순위: WebGPU 가속 시도 (속도가 가장 빠름)
                 aiSession = await ort.InferenceSession.create(modelU2NetpUrl, { 
-                    executionProviders: ['wasm'], 
+                    executionProviders: ['webgpu'], 
                     graphOptimizationLevel: "all" 
                 });
-            } catch (err) {
-                console.error("AI Session Creation Failed:", err);
-                throw err;
+            } catch (webgpuErr) {
+                console.warn("WebGPU not available or failed, falling back to WASM:", webgpuErr);
+                try {
+                    // 2순위: WASM 싱글스레드 안전 모드
+                    aiSession = await ort.InferenceSession.create(modelU2NetpUrl, { 
+                        executionProviders: ['wasm'], 
+                        graphOptimizationLevel: "all" 
+                    });
+                } catch (wasmErr) {
+                    console.error("All execution providers failed:", wasmErr);
+                    throw wasmErr;
+                }
             }
             return aiSession;
         }
