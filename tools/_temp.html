@@ -157,7 +157,7 @@
                 <div class="image-preview-container" id="result-container">
                     <div class="empty-msg">Result image will appear here.</div>
                 </div>
-                <div id="loading-msg">✨ Instant background removal...</div>
+                <div id="loading-msg">✨ Removing background instantly...</div>
             </section>
         </div>
     </main>
@@ -228,7 +228,7 @@
 
     function processFastRemoval(file) {
         loadingMsg.style.display = 'block';
-        loadingMsg.textContent = "✨ Fast background removal executing...";
+        loadingMsg.textContent = "✨ Removing background...";
 
         createImageBitmap(file).then(bitmap => {
             const canvas = document.createElement('canvas');
@@ -245,11 +245,12 @@
             const width = canvas.width;
             const height = canvas.height;
 
-            // 모서리(배경) 기준 색상 샘플링 (상하좌우 구역의 평균 배경색 추정)
+            // 모서리 샘플링을 통한 배경색 추출
             let bgR = 0, bgG = 0, bgB = 0, count = 0;
             const samplePoints = [
                 [0, 0], [width - 1, 0], [0, height - 1], [width - 1, height - 1],
-                [Math.floor(width / 2), 0], [Math.floor(width / 2), height - 1]
+                [Math.floor(width / 2), 0], [Math.floor(width / 2), height - 1],
+                [0, Math.floor(height / 2)], [width - 1, Math.floor(height / 2)]
             ];
 
             samplePoints.forEach(([x, y]) => {
@@ -262,21 +263,20 @@
 
             bgR /= count; bgG /= count; bgB /= count;
 
-            // 배경색과 차이가 적은 영역(배경)을 투명하게 처리하는 고속 마스킹
+            // 배경색과 일치하는 영역의 알파값을 0으로 만들어 투명하게 처리
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i];
                 const g = data[i + 1];
                 const b = data[i + 2];
 
-                // 배경과의 색상 유클리드 거리 계산
                 const diff = Math.sqrt(
                     (r - bgR) * (r - bgR) +
                     (g - bgG) * (g - bgG) +
                     (b - bgB) * (b - bgB)
                 );
 
-                // 차이가 임계값 이내면 배경으로 판단하여 투명화
-                if (diff < 45) {
+                // 임계값 내의 배경 색상을 투명하게 제거
+                if (diff < 50) {
                     data[i + 3] = 0;
                 }
             }
