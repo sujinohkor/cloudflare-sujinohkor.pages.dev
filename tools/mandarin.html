@@ -151,7 +151,6 @@
             font-weight: bold;
             outline: none;
         }
-        /* 한자 후보 목록 영역 */
         .candidates-list {
             display: flex;
             gap: 10px;
@@ -403,6 +402,7 @@
         const candidatesContainer = document.getElementById('candidates-container');
         const lineNumbers = document.getElementById('line-numbers');
         const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
         const contentCard = document.getElementById('content-card');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         const statusText = document.getElementById('status-text');
@@ -411,7 +411,6 @@
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
-        // 대규모 확장형 병음-한자 후보 사전 (주요 회화 및 필수 단어 수백 개 내장)
         const pinyinDict = {
             "nihao": ["你好", "妳好"],
             "ni": ["你", "妳", "拟", "匿"],
@@ -445,7 +444,7 @@
             "he": ["和", "喝", "河", "何", "合", "核"],
             "shu": ["书", "树", "数", "术", "叔", "鼠"],
             "gongzuo": ["工作", "公作"],
-            "xuesheng": ["学生"],
+            "xuesheng": ["학생" === "학생" ? "学生" : ""],
             "laoshi": ["老师"]
         };
 
@@ -474,8 +473,8 @@
             document.body.classList.toggle('light-mode'); 
         });
 
-        mainContent.addEventListener('click', () => { 
-            if (sidebar.classList.contains('active')) { 
+        mainContent.addEventListener('click', (e) => { 
+            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
                 sidebar.classList.remove('active'); 
             } 
         });
@@ -496,7 +495,6 @@
             }
         }
 
-        // 입력할 때마다 사전을 실시간 검색하여 후보 출력
         pinyinInputBox.addEventListener('input', (e) => {
             let query = pinyinInputBox.value.trim().toLowerCase();
             if (!query) {
@@ -508,7 +506,6 @@
             if (matches && matches.length > 0) {
                 renderCandidates(matches);
             } else {
-                // 사전에 정확히 일치하는 단어가 없으면 입력한 알파벳 그대로 후보로 표시
                 renderCandidates([query]);
             }
         });
@@ -533,7 +530,6 @@
             pinyinInputBox.focus();
         }
 
-        // 엔터키 입력 시 첫 번째 후보 자동 선택
         pinyinInputBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
