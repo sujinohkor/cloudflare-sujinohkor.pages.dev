@@ -1,83 +1,63 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HWP Editor</title>
+    <title>HWP/HWPX Editor</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #202020;
-            color: #fff;
-            transition: background 0.3s;
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
-        /* 2. Layout */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background-color: #101010;
-            padding: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            gap: 20px;
-            overflow: hidden;
-            transition: 0.3s;
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-align: center;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .menu-btn:hover {
-            background: #ff9e40;
-            color: #101010;
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        .theme-btn:hover {
-            background-color: #FDF5E6;
-            color: #F38020;
-            border-color: #FDF5E6;
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
         }
 
         /* Workspace Structure */
@@ -116,12 +96,12 @@
             flex-shrink: 0;
         }
 
-        /* 전체화면 버튼 스타일 (에디터 내부 우측 상단 고정) */
+        /* 전체화면 버튼 스타일 (에디터 내부 우측 상단 고정, z-index를 사이드바보다 낮게 조정) */
         .fullscreen-btn {
             position: absolute;
             top: 15px;
             right: 15px;
-            z-index: 10000;
+            z-index: 10;
             background: #202020;
             color: #ff9e40;
             border: 1px solid #ff9e40;
@@ -173,12 +153,27 @@
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .editor-container-wrapper { background: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .editor-container-wrapper.fullscreen { background: #fff !important; }
         body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
@@ -199,29 +194,27 @@
             cursor: pointer;
         }
 
-        @media (max-width: 768px) {
-            .app-container {
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; color: #ffffff; }
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             }
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); }
             .main-content {
                 margin-left: 0;
                 padding: 20px;
-                width: 100%;
+                width: 100vw;
+                max-height: 100svh;
+                overflow-y: auto;
                 height: auto;
-                min-height: 100vh;
-                overflow: visible;
-            }
-            .menu-toggle-btn {
-                display: block;
-                color: #ffffff;
-            }
-            .sidebar {
-                transform: translateX(-250px);
-            }
-            .sidebar.active {
-                transform: translateX(0);
             }
             .workspace-container {
                 display: flex;
@@ -236,113 +229,109 @@
     </style>
 </head>
 <body>
-
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
-        <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">Open File</button>
-        <input type="file" id="hwp-file-input" accept=".hwp,.hwpx" style="display: none;">
-
-        <div>
-            <button class="menu-btn" onclick="resetAll()">Reset</button>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <header class="top-section">
-            <h1>HWP Editor</h1>
-            <p>Embed full-featured HWP editor directly into your web browser.</p>
-        </header>
-
-        <div class="workspace-container">
-            <div class="content-mid">
-                <div class="controls">
-                    <div class="content-mid-header">
-                        <span id="file-name-display">Please use the 'Open File' button to open a file. The file name will appear here.</span>
-                    </div>
-                    <div class="editor-container-wrapper" id="editor-wrapper">
-                        <!-- 전체화면 토글 버튼을 에디터 래퍼 내부 우측 상단으로 이동 -->
-                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
-                        <div id="editor"></div>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">HWP/HWPX Editor</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <div class="bottom-btns">
+                <button class="menu-btn" onclick="document.getElementById('hwp-file-input').click()">Open File</button>
+                <input type="file" id="hwp-file-input" accept=".hwp,.hwpx" style="display: none;">
+                <button class="menu-btn" onclick="resetAll()">Reset</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="top-section">
+                <h1>HWP/HWPX Editor</h1>
+                <p>Embed full-featured HWP/HWPX editor directly into your web browser.</p>
+            </header>
+            <div class="workspace-container">
+                <div class="content-mid">
+                    <div class="controls">
+                        <div class="content-mid-header">
+                            <span id="file-name-display">Please use the 'Open File' button to open a file. The file name will appear here.</span>
+                        </div>
+                        <div class="editor-container-wrapper" id="editor-wrapper">
+                            <!-- 전체화면 토글 버튼의 z-index를 10으로 낮추어 사이드바(1000)보다 아래로 가도록 수정 -->
+                            <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
+                            <div id="editor"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
+    <script type="module">
+        import { createEditor } from 'https://cdn.jsdelivr.net/npm/@rhwp/editor/+esm';
 
-<script type="module">
-    import { createEditor } from 'https://cdn.jsdelivr.net/npm/@rhwp/editor/+esm';
+        const sidebar = document.getElementById('sidebar');
+        window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
 
-    const sidebar = document.getElementById('sidebar');
-    window.toggleSidebar = function() { sidebar.classList.toggle('active'); }
-    
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
-    
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } 
-    });
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
 
-    let editorInstance = null;
-    const fileInput = document.getElementById('hwp-file-input');
-    const fileNameDisplay = document.getElementById('file-name-display');
-    const editorWrapper = document.getElementById('editor-wrapper');
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
+        document.querySelector('.main-content').addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } 
+        });
 
-    window.toggleFullscreen = function() {
-        editorWrapper.classList.toggle('fullscreen');
-        if (editorWrapper.classList.contains('fullscreen')) {
-            fullscreenBtn.textContent = 'Minimize 🗗';
-        } else {
-            fullscreenBtn.textContent = 'Maximize ⛶';
-        }
-    };
+        let editorInstance = null;
+        const fileInput = document.getElementById('hwp-file-input');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const editorWrapper = document.getElementById('editor-wrapper');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-    async function initEditor() {
-        try {
-            editorInstance = await createEditor('#editor');
-            console.log('HWP Editor initialized successfully:', editorInstance);
-        } catch (err) {
-            console.error('Failed to initialize HWP editor:', err);
-            document.getElementById('editor').innerHTML = '<div style="padding: 20px; color: #ff6b6b; text-align: center;">Failed to load the editor. Please check package settings.</div>';
-        }
-    }
-
-    initEditor();
-
-    fileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file || !editorInstance) return;
-
-        try {
-            const buffer = await file.arrayBuffer();
-            
-            if (typeof editorInstance.loadFile === 'function') {
-                await editorInstance.loadFile(buffer, file.name);
-            } else if (typeof editorInstance.open === 'function') {
-                await editorInstance.open(buffer);
+        window.toggleFullscreen = function() {
+            editorWrapper.classList.toggle('fullscreen');
+            if (editorWrapper.classList.contains('fullscreen')) {
+                fullscreenBtn.textContent = 'Minimize 🗗';
             } else {
-                console.warn('Supported file load method not found. Please check the editor object.', editorInstance);
+                fullscreenBtn.textContent = 'Maximize ⛶';
             }
+        };
 
-            fileNameDisplay.textContent = file.name;
-        } catch (err) {
-            console.error('Failed to open the file:', err);
-            fileNameDisplay.textContent = 'Failed to open file';
-        } finally {
-            fileInput.value = ''; 
+        async function initEditor() {
+            try {
+                editorInstance = await createEditor('#editor');
+                console.log('HWP/HWPX Editor initialized successfully:', editorInstance);
+            } catch (err) {
+                console.error('Failed to initialize HWP/HWPX editor:', err);
+                document.getElementById('editor').innerHTML = '<div style="padding: 20px; color: #ff6b6b; text-align: center;">Failed to load the editor. Please check package settings.</div>';
+            }
         }
-    });
 
-    window.resetAll = function() {
-        location.reload();
-    }
-</script>
+        initEditor();
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !editorInstance) return;
+
+            try {
+                const buffer = await file.arrayBuffer();
+                            
+                if (typeof editorInstance.loadFile === 'function') {
+                    await editorInstance.loadFile(buffer, file.name);
+                } else if (typeof editorInstance.open === 'function') {
+                    await editorInstance.open(buffer);
+                } else {
+                    console.warn('Supported file load method not found. Please check the editor object.', editorInstance);
+                }
+
+                fileNameDisplay.textContent = file.name;
+            } catch (err) {
+                console.error('Failed to open the file:', err);
+                fileNameDisplay.textContent = 'Failed to open file';
+            } finally {
+                fileInput.value = ''; 
+            }
+        });
+
+        window.resetAll = function() {
+            location.reload();
+        }
+    </script>
 </body>
 </html>
