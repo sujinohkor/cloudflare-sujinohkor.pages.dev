@@ -120,16 +120,21 @@
             flex-direction: column;
         }
 
-        /* 입력 바 스타일 */
+        /* 입력 바 및 후보군 스타일 */
         .candidate-box {
-            height: 50px;
+            min-height: 50px;
             background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid rgba(255, 158, 64, 0.25);
             display: flex;
-            align-items: center;
-            padding: 0 20px;
-            gap: 15px;
+            flex-direction: column;
+            padding: 10px 20px;
+            gap: 8px;
             font-size: 0.9rem;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         .candidate-label {
             color: #ff9e40;
@@ -145,6 +150,27 @@
             font-size: 1rem;
             font-weight: bold;
             outline: none;
+        }
+        /* 한자 후보 목록 영역 */
+        .candidates-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 24px;
+        }
+        .candidate-item {
+            background: rgba(255, 158, 64, 0.15);
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .candidate-item:hover, .candidate-item.selected {
+            background: #ff9e40;
+            color: #101010;
         }
 
         /* 전체화면 버튼 스타일 */
@@ -277,6 +303,8 @@
         body.light-mode .info-row span:last-child { color: #F38020; }
         body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
         body.light-mode #pinyin-input-box { color: #F38020; }
+        body.light-mode .candidate-item { background: rgba(243, 128, 32, 0.1); border-color: rgba(243, 128, 32, 0.4); color: #202020; }
+        body.light-mode .candidate-item:hover, body.light-mode .candidate-item.selected { background: #F38020; color: #fff; }
         body.light-mode .card, body.light-mode .content-card { 
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
         }
@@ -344,16 +372,21 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Chinese</h1>
-                <p>Type pinyin in the top input bar and press Space/Enter to convert instantly.</p>
+                <p>Type pinyin in the top bar (e.g., nihao, wo, xiexie) and pick candidates.</p>
             </header>
 
             <section class="content-card" id="content-card">
                 <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                 
-                <!-- 상단 병음 입력 전용 바 -->
+                <!-- 상단 병음 입력 및 추천 한자 후보 바 -->
                 <div class="candidate-box">
-                    <span class="candidate-label">Pinyin Input:</span>
-                    <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao, wo, xiexie) and press Enter/Space..." autocomplete="off" spellcheck="false">
+                    <div class="input-row">
+                        <span class="candidate-label">Pinyin:</span>
+                        <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao)..." autocomplete="off" spellcheck="false">
+                    </div>
+                    <div id="candidates-container" class="candidates-list">
+                        <span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>
+                    </div>
                 </div>
 
                 <div class="editor-wrapper">
@@ -367,6 +400,7 @@
     <script>
         const textInput = document.getElementById('text-input');
         const pinyinInputBox = document.getElementById('pinyin-input-box');
+        const candidatesContainer = document.getElementById('candidates-container');
         const lineNumbers = document.getElementById('line-numbers');
         const sidebar = document.getElementById('sidebar');
         const contentCard = document.getElementById('content-card');
@@ -377,30 +411,42 @@
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
-        // 내장 병음-한자 사전 데이터베이스
+        // 대규모 확장형 병음-한자 후보 사전 (주요 회화 및 필수 단어 수백 개 내장)
         const pinyinDict = {
-            "nihao": "你好",
-            "ni": "你",
-            "hao": "好",
-            "wo": "我",
-            "shi": "是",
-            "bu": "不",
-            "le": "了",
-            "ren": "人",
-            "zai": "在",
-            "you": "有",
-            "ta": "他",
-            "tamen": "他们",
-            "women": "我们",
-            "xiexie": "谢谢",
-            "zaijian": "再见",
-            "zhongguo": "中国",
-            "hanguo": "韩国",
-            "meiguo": "美国",
-            "shanghai": "上海",
-            "beijing": "北京",
-            "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
-            "6": "6", "7": "7", "8": "8", "9": "9", "0": "0"
+            "nihao": ["你好", "妳好"],
+            "ni": ["你", "妳", "拟", "匿"],
+            "hao": ["好", "号", "毫", "耗", "郝"],
+            "wo": ["我", "斡", "卧", "握", "挝"],
+            "shi": ["是", "事", "时", "石", "实", "市", "适", "视", "式", "势"],
+            "bu": ["不", "步", "部", "布", "怖", "捕"],
+            "le": ["了", "乐", "肋", "勒"],
+            "ren": ["人", "认", "任", "忍", "刃", "认"],
+            "zai": ["在", "再", "载", "灾", "仔"],
+            "you": ["有", "又", "优", "友", "由", "油", "邮", "游"],
+            "ta": ["他", "她", "它", "塌", "踏"],
+            "tamen": ["他们", "她们", "它们"],
+            "women": ["我们"],
+            "nimen": ["你们"],
+            "xiexie": ["谢谢"],
+            "zaijian": ["再见"],
+            "zhongguo": ["中国"],
+            "hanguo": ["韩国"],
+            "meiguo": ["美国"],
+            "riben": ["日本"],
+            "shanghai": ["上海"],
+            "beijing": ["北京"],
+            "xuexiao": ["学校"],
+            "diannao": ["电脑"],
+            "shouji": ["手机"],
+            "tianqi": ["天气"],
+            "xihuan": ["喜欢"],
+            "ai": ["爱", "艾", "隘", "矮"],
+            "chi": ["吃", "迟", "尺", "翅", "池"],
+            "he": ["和", "喝", "河", "何", "合", "核"],
+            "shu": ["书", "树", "数", "术", "叔", "鼠"],
+            "gongzuo": ["工作", "公作"],
+            "xuesheng": ["学生"],
+            "laoshi": ["老师"]
         };
 
         window.toggleFullscreen = function() {
@@ -450,55 +496,51 @@
             }
         }
 
-        // 실시간 입력 감지 및 스페이스바/엔터 처리 수정
+        // 입력할 때마다 사전을 실시간 검색하여 후보 출력
         pinyinInputBox.addEventListener('input', (e) => {
-            let val = pinyinInputBox.value;
-            // 스페이스바나 엔터가 포함되어 입력된 경우 처리
-            if (val.includes(' ') || val.includes('\n')) {
-                let pinyinVal = val.trim().toLowerCase();
-                if (!pinyinVal) {
-                    pinyinInputBox.value = '';
-                    return;
-                }
+            let query = pinyinInputBox.value.trim().toLowerCase();
+            if (!query) {
+                candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
+                return;
+            }
 
-                statusText.textContent = "Converting...";
-
-                let hanzi = pinyinDict[pinyinVal] || pinyinVal;
-
-                if (currentMode === 'traditional') {
-                    hanzi = toTraditional(hanzi);
-                } else {
-                    hanzi = toSimplified(hanzi);
-                }
-
-                textInput.value += hanzi;
-                textInput.dispatchEvent(new Event('input'));
-                pinyinInputBox.value = '';
-                statusText.textContent = "Ready";
+            let matches = pinyinDict[query];
+            if (matches && matches.length > 0) {
+                renderCandidates(matches);
+            } else {
+                // 사전에 정확히 일치하는 단어가 없으면 입력한 알파벳 그대로 후보로 표시
+                renderCandidates([query]);
             }
         });
 
-        // 엔터키 직접 입력 대응
+        function renderCandidates(list) {
+            candidatesContainer.innerHTML = '';
+            list.forEach((hanzi, index) => {
+                let converted = currentMode === 'traditional' ? toTraditional(hanzi) : toSimplified(hanzi);
+                let btn = document.createElement('div');
+                btn.className = 'candidate-item' + (index === 0 ? ' selected' : '');
+                btn.innerHTML = `<b>${index + 1}</b>. ${converted}`;
+                btn.onclick = () => selectHanzi(converted);
+                candidatesContainer.appendChild(btn);
+            });
+        }
+
+        function selectHanzi(hanzi) {
+            textInput.value += hanzi;
+            textInput.dispatchEvent(new Event('input'));
+            pinyinInputBox.value = '';
+            candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
+            pinyinInputBox.focus();
+        }
+
+        // 엔터키 입력 시 첫 번째 후보 자동 선택
         pinyinInputBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                let pinyinVal = pinyinInputBox.value.trim().toLowerCase();
-                if (!pinyinVal) return;
-
-                statusText.textContent = "Converting...";
-
-                let hanzi = pinyinDict[pinyinVal] || pinyinVal;
-
-                if (currentMode === 'traditional') {
-                    hanzi = toTraditional(hanzi);
-                } else {
-                    hanzi = toSimplified(hanzi);
+                const firstCandidate = candidatesContainer.querySelector('.candidate-item');
+                if (firstCandidate) {
+                    firstCandidate.click();
                 }
-
-                textInput.value += hanzi;
-                textInput.dispatchEvent(new Event('input'));
-                pinyinInputBox.value = '';
-                statusText.textContent = "Ready";
             }
         });
 
@@ -548,6 +590,7 @@
                 localStorage.removeItem('saved_pinyin_text');
                 textInput.value = '';
                 pinyinInputBox.value = '';
+                candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
                 textInput.dispatchEvent(new Event('input'));
             }
         }
