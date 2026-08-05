@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
+
+        /* 모바일용 상단 카테고리/컨트롤 영역 (기본 숨김) */
+        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .mobile-theme-row { display: none; width: 100%; justify-content: flex-end; margin-bottom: 10px; }
+        #theme-toggle-mobile {
+            padding: 6px 12px; font-size: 0.75rem; border-radius: 16px; width: auto;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5);
+            font-weight: bold; cursor: pointer;
+        }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* Memo color buttons group layout */
+        .memo-buttons-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .memo-buttons-group .menu-btn {
+            margin-bottom: 0;
+        }
+        .memo-btn-yellow { color: #fff9c4 !important; border-color: rgba(255, 249, 196, 0.5) !important; }
+        .memo-btn-yellow:hover { background: #fff9c4 !important; color: #101010 !important; }
+        .memo-btn-pink { color: #f8bbd0 !important; border-color: rgba(248, 187, 208, 0.5) !important; }
+        .memo-btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
+        .memo-btn-green { color: #c8e6c9 !important; border-color: rgba(200, 230, 201, 0.5) !important; }
+        .memo-btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
+        .memo-btn-blue { color: #bbdefb !important; border-color: rgba(187, 222, 251, 0.5) !important; }
+        .memo-btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
+
+        .search-container {
+            margin-bottom: 10px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 11px 14px; 
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px;
+            outline: none;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .search-input::placeholder { color: #888; }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
+        .content-card { 
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            flex: 1; 
+            display: flex; 
+            overflow: hidden; 
+            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
+            background-color: #d2b48c;
+            position: relative; 
+        }
+
+        /* Fullscreen button style */
+        .fullscreen-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            z-index: 10000; 
+            background: #202020; 
+            color: #ff9e40; 
+            border: 1px solid #ff9e40; 
+            padding: 6px 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+            transition: all 0.3s; 
+        }
+        .fullscreen-btn:hover { 
+            background: #ff9e40; 
+            color: #101010; 
+        }
+
+        /* Fullscreen active class */
+        .content-card.fullscreen { 
+            position: fixed !important; 
+            top: 0 !important; 
+            left: 0 !important; 
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important; 
+            height: 100vh !important; 
+            z-index: 9999 !important; 
+            border-radius: 0 !important; 
+            border: none !important; 
+            padding: 0 !important; 
+            margin: 0 !important;
+        }
+
+        /* Corkboard note area */
+        #board {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Individual sticky note style */
+        .sticky-note {
+            width: 210px;
+            height: 210px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.4);
+            position: absolute;
+            cursor: grab;
+            padding: 35px 15px 15px 15px;
+            box-sizing: border-box;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            transform-origin: center center;
+        }
+        
+        .sticky-note:active {
+            cursor: grabbing;
+        }
+
+        .sticky-note.filtered-out {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* Pushpin image */
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 25px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/1759/1759197.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+
+        /* Note top toolbar (Font size adjustment) */
+        .note-toolbar {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            display: flex;
+            gap: 4px;
+        }
+        .font-btn {
+            background: none;
+            border: none;
+            font-size: 11px;
+            color: #666;
+            cursor: pointer;
+            padding: 0 2px;
+            font-weight: bold;
+        }
+        .font-btn:hover { color: #000; }
+
+        /* Top right button group (Rotate + Delete) */
+        .note-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        /* Rotate handle button */
+        .rotate-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            cursor: ew-resize;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            opacity: 0.5;
+            transition: opacity 0.2s, color 0.2s;
+        }
+        .sticky-note:hover .rotate-btn {
+            opacity: 1;
+            color: #1976d2;
+        }
+
+        /* Delete button */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: opacity 0.2s, color 0.2s;
+        }
+        .sticky-note:hover .delete-btn {
+             opacity: 1;
+             color: #f44336;
+        }
+
+        .note-textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-family: inherit;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #333;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        .note-yellow { background-color: #fff9c4; }
+        .note-pink { background-color: #f8bbd0; }
+        .note-green { background-color: #c8e6c9; }
+        .note-blue { background-color: #bbdefb; }
+
+        #import-file { display: none; }
+
+        /* 다크 모드 카드/패널 그림자 */
+        .card, .content-card, .search-input {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode .memo-btn-yellow { color: #8d7b00 !important; border-color: rgba(230, 211, 75, 0.5) !important; }
+        body.light-mode .memo-btn-yellow:hover { background: #fff9c4 !important; color: #101010 !important; }
+        body.light-mode .memo-btn-pink { color: #b8326e !important; border-color: rgba(240, 136, 168, 0.5) !important; }
+        body.light-mode .memo-btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
+        body.light-mode .memo-btn-green { color: #2e6b31 !important; border-color: rgba(140, 196, 142, 0.5) !important; }
+        body.light-mode .memo-btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
+        body.light-mode .memo-btn-blue { color: #1565c0 !important; border-color: rgba(100, 181, 246, 0.5) !important; }
+        body.light-mode .memo-btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
+
+        body.light-mode .search-input {
+            background: rgba(0, 0, 0, 0.02);
+            color: #202020;
+            border-color: rgba(243, 128, 32, 0.5);
+        }
+        body.light-mode .search-input::placeholder { color: #888; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-card.fullscreen { 
+            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png') !important;
+            background-color: #d2b48c !important; 
+        }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 데이 모드 카드/패널 그림자 */
+        body.light-mode .card, 
+        body.light-mode .content-card,
+        body.light-mode .search-input {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff;
+        }                
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar {
+                background: #ffffff !important; /* 모바일 데이모드일 때 순수 흰색 배경 */
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; /* 연주황빛 그림자 */
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
+            .content-card { min-height: 0; height: 100%; } 
+            .mobile-theme-row { display: flex; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Sticky Notes</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search notes..." oninput="filterNotes()">
+            </div>
+
+            <div class="bottom-btns">
+                <div class="memo-buttons-group">
+                    <button class="menu-btn memo-btn-yellow" onclick="createNote('note-yellow')">Yellow</button>
+                    <button class="menu-btn memo-btn-pink" onclick="createNote('note-pink')">Pink</button>
+                    <button class="menu-btn memo-btn-green" onclick="createNote('note-green')">Green</button>
+                    <button class="menu-btn memo-btn-blue" onclick="createNote('note-blue')">Blue</button>
+                </div>
+                <button class="menu-btn" onclick="exportData()">Export</button>
+                <button class="menu-btn" onclick="document.getElementById('import-file').click()">Import</button>
+                <input type="file" id="import-file" accept=".json" onchange="importData(event)">
+                <button class="menu-btn" onclick="deleteAllNotes()">Reset</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-section">
+                <h1>Stiky Notes</h1>
+                <p>Pin sticky notes onto the corkboard</p>
+            </header>
+            <section class="content-card" id="content-card">
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
+                <div id="board">
+                    <!-- Board area and generated sticky notes -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const board = document.getElementById('board');
+        let noteCounter = 0;
+
+        window.onload = function() {
+            loadNotes();
+        };
+
+        window.toggleFullscreen = function() {
+            contentCard.classList.toggle('fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {
+                fullscreenBtn.textContent = 'Minimize 🗗';
+            } else {
+                fullscreenBtn.textContent = 'Maximize ⛶';
+            }
+        };
+
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+        }
+
+        // 모바일 화면에서 버튼을 눌렀을 때만 사이드바가 닫히도록 수정 (검색창 input은 제외)
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    if (element.id === 'import-file') return;
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
+
+        document.querySelector('.main-content').addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
+
+        function createNote(colorClass = 'note-yellow', text = '', position = null, rotation = null, fontSize = 16) {
+            noteCounter++;
+            const noteId = 'note-' + noteCounter;
+            
+            const noteEl = document.createElement('div');
+            noteEl.className = `sticky-note ${colorClass}`;
+            noteEl.id = noteId;
+            noteEl.draggable = true;
+
+            const rot = rotation !== null ? rotation : (Math.random() * 10 - 5);
+            noteEl.style.transform = `rotate(${rot}deg)`;
+
+            if (!position) {
+                const startX = Math.random() * (board.clientWidth - 250) + 20;
+                const startY = Math.random() * (board.clientHeight - 250) + 20;
+                noteEl.style.left = `${startX}px`;
+                noteEl.style.top = `${startY}px`;
+            } else {
+                noteEl.style.left = position.left;
+                noteEl.style.top = position.top;
+            }
+
+            noteEl.innerHTML = `
+                <div class="note-toolbar">
+                    <button class="font-btn" onclick="changeFontSize('${noteId}', 2)" title="Increase font size">A+</button>
+                    <button class="font-btn" onclick="changeFontSize('${noteId}', -2)" title="Decrease font size">A-</button>
+                </div>
+                <div class="note-actions">
+                    <button class="rotate-btn" onmousedown="initRotateElement(event, '${noteId}')" title="Rotate">⟳</button>
+                    <button class="delete-btn" onclick="deleteNote('${noteId}')">×</button>
+                </div>
+                <textarea class="note-textarea" style="font-size: ${fontSize}px;" placeholder="Type your note here..." oninput="saveNotesToLocalStorage()">${text}</textarea>
+            `;
+
+            initDragElement(noteEl);
+            board.appendChild(noteEl);
+            saveNotesToLocalStorage();
+        }
+
+        function changeFontSize(noteId, delta) {
+            const noteEl = document.getElementById(noteId);
+            if (noteEl) {
+                const textarea = noteEl.querySelector('.note-textarea');
+                let currentSize = parseInt(window.getComputedStyle(textarea).fontSize);
+                let newSize = Math.max(12, Math.min(28, currentSize + delta));
+                textarea.style.fontSize = newSize + 'px';
+                saveNotesToLocalStorage();
+            }
+        }
+
+        function deleteNote(noteId) {
+            const noteEl = document.getElementById(noteId);
+            if (noteEl) {
+                board.removeChild(noteEl);
+                saveNotesToLocalStorage();
+            }
+        }
+
+        function deleteAllNotes() {
+            if (confirm('Are you sure you want to delete all notes?')) {
+                const notes = document.querySelectorAll('.sticky-note');
+                notes.forEach(note => board.removeChild(note));
+                localStorage.removeItem('corkboard_notes');
+            }
+        }
+
+        function initDragElement(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                if (e.target.tagName.toLowerCase() === 'textarea') return;
+                if (e.target.tagName.toLowerCase() === 'button') return;
+
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                
+                elmnt.style.zIndex = '500';
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                let newTop = elmnt.offsetTop - pos2;
+                let newLeft = elmnt.offsetLeft - pos1;
+
+                const maxX = board.clientWidth - elmnt.offsetWidth;
+                const maxY = board.clientHeight - elmnt.offsetHeight;
+                
+                newLeft = Math.max(0, Math.min(newLeft, maxX));
+                newTop = Math.max(0, Math.min(newTop, maxY));
+
+                elmnt.style.top = newTop + "px";
+                elmnt.style.left = newLeft + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                elmnt.style.zIndex = '1';
+                saveNotesToLocalStorage();
+            }
+        }
+
+        function initRotateElement(e, noteId) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            const noteEl = document.getElementById(noteId);
+            const rect = noteEl.getBoundingClientRect();
+            
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            function onMouseMove(event) {
+                const radians = Math.atan2(event.clientY - centerY, event.clientX - centerX);
+                let degrees = radians * (180 / Math.PI);
+                degrees = degrees + 90;
+
+                const currentTransform = noteEl.style.transform.replace(/rotate\([^)]+\)/, '');
+                noteEl.style.transform = `${currentTransform} rotate(${degrees}deg)`;
+            }
+
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                saveNotesToLocalStorage();
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+
+        function filterNotes() {
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            const notes = document.querySelectorAll('.sticky-note');
+
+            notes.forEach(note => {
+                const text = note.querySelector('textarea').value.toLowerCase();
+                if (text.includes(keyword) || keyword === '') {
+                    note.classList.remove('filtered-out');
+                } else {
+                    note.classList.add('filtered-out');
+                }
+            });
+        }
+
+        function exportData() {
+            const data = localStorage.getItem('corkboard_notes');
+            if (!data || JSON.parse(data).length === 0) {
+                alert('No notes to export.');
+                return;
+            }
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'corkboard_notes.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedNotes = JSON.parse(e.target.result);
+                    if (Array.isArray(importedNotes)) {
+                        deleteAllNotesWithoutConfirm();
+                        localStorage.setItem('corkboard_notes', JSON.stringify(importedNotes));
+                        location.reload();
+                    } else {
+                        alert('Invalid file format.');
+                    }
+                } catch (err) {
+                    alert('Error reading file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function deleteAllNotesWithoutConfirm() {
+            const notes = document.querySelectorAll('.sticky-note');
+            notes.forEach(note => board.removeChild(note));
+        }
+
+        function saveNotesToLocalStorage() {
+            const notes = document.querySelectorAll('.sticky-note');
+            const notesData = [];
+            notes.forEach(note => {
+                const id = note.id;
+                const left = note.style.left;
+                const top = note.style.top;
+                const text = note.querySelector('textarea').value;
+                const fontSize = parseInt(note.querySelector('textarea').style.fontSize) || 16;
+                
+                const transformMatch = note.style.transform.match(/rotate\(([^)]+)\)/);
+                const rotation = transformMatch ? parseFloat(transformMatch[1]) : 0;
+
+                const className = Array.from(note.classList).find(c => c.startsWith('note-'));
+
+                notesData.push({ id, left, top, text, className, rotation, fontSize });
+            });
+            localStorage.setItem('corkboard_notes', JSON.stringify(notesData));
+        }
+
+        function loadNotes() {
+            const savedNotes = JSON.parse(localStorage.getItem('corkboard_notes'));
+            if (savedNotes) {
+                savedNotes.forEach(noteData => {
+                    noteCounter++;
+                    createNote(
+                        noteData.className || 'note-yellow',
+                        noteData.text,
+                        { left: noteData.left, top: noteData.top },
+                        noteData.rotation,
+                        noteData.fontSize || 16
+                    );
+                });
+            }
+        }
+    </script>
+</body>
+</html>
