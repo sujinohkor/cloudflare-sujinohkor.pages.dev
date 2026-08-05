@@ -1,25 +1,60 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background & Signature Remover</title>
+    <title>AI Background Remover</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                
-        .app-container { display: flex; min-height: 100vh; }
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
+            margin-left: 300px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            gap: 20px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            width: calc(100% - 300px);
         }
+
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -28,26 +63,33 @@
             min-height: 0;
         }
 
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover, .menu-btn.active { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .menu-btn.active {
+            background: rgba(255, 158, 64, 0.35);
+            border-color: rgba(255, 158, 64, 0.8);
+        }
 
         .control-group {
-            background: #181818;
+            background: rgba(255, 255, 255, 0.03);
             padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            margin-bottom: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            margin-top: 4px;
+            margin-bottom: 4px;
             text-align: left;
         }
         .control-group label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 8px;
             color: #ff9e40;
             font-weight: bold;
@@ -58,6 +100,16 @@
             cursor: pointer;
         }
 
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
+        /* 공통 이미지/결과 컨테이너 */
         .content-box { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: transparent; flex-direction: column; 
@@ -66,6 +118,7 @@
             cursor: pointer;
         }
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; }
+                        
         .image-preview-container {
             width: 100%;
             height: 100%;
@@ -95,26 +148,76 @@
             margin-top: 10px;
         }
 
+        /* 다크 모드 그림자 */
         .card, .content-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .control-group { background: #fff5e6; border-color: #f38020; }
-        body.light-mode .card, body.light-mode .content-box { box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                        
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .menu-btn.active {
+            background: rgba(243, 128, 32, 0.25);
+            border-color: rgba(243, 128, 32, 0.7);
+        }
+        body.light-mode .control-group { 
+            background: rgba(0, 0, 0, 0.02); 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        body.light-mode .card, body.light-mode .content-box {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode .empty-msg { color: #666; }
 
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }                
-        
-        @media (max-width: 600px) {            
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+                        
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            }
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
-            .workspace-container { flex-direction: column; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }
+                        
+            .workspace-container { 
+                flex-direction: column;
+                flex: none;
+                height: auto;
+                min-height: auto;
+                gap: 15px;
+            }
+                        
+            .content-box { 
+                flex: none;
+                min-height: 250px;
+                height: auto;
+            }
         }
     </style>
 </head>
@@ -122,45 +225,52 @@
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <input type="file" id="file-selector" accept="image/*" style="display: none;">
     
-    <div class="app-container">    
-        <aside class="sidebar" id="sidebar">        
-            <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>                        
-            <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
-            <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature Remover</button>
-            
-            <div class="control-group" id="signature-controls" style="display: none;">            
-                <label for="thresholdRange">                
-                    <span>제거 강도</span>                
-                    <span id="thresholdVal">50</span>            
-                </label>            
-                <input type="range" id="thresholdRange" min="0" max="100" value="50">        
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">AI BG Remover</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
+                                                
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
             
-            <button class="menu-btn" onclick="uploadFile()">Upload</button>        
-            <button class="menu-btn" onclick="resetAll()">Reset</button>    
+            <div class="bottom-btns">
+            <button class="menu-btn active" id="btn-ai-bg" onclick="switchMode('ai')">AI BG Remover</button>
+            <button class="menu-btn" id="btn-sig" onclick="switchMode('signature')">Signature BG Remover</button>
+
+            <div class="control-group" id="signature-controls" style="display: none;">
+                <label for="thresholdRange">
+                    <span>제거 강도</span>
+                    <span id="thresholdVal">50</span>
+                </label>
+                <input type="range" id="thresholdRange" min="0" max="100" value="50">
+            </div>
+
+                <button class="menu-btn" onclick="uploadFile()">Upload</button>
+                <button class="menu-btn" onclick="resetAll()">Reset</button>
+            </div>
         </aside>
         
-        <main class="main-content">        
-            <header class="top-section" id="header-section">            
-                <h1 id="page-title">AI Background Remover</h1>            
-                <p id="page-desc">Upload an image to remove background instantly.</p>        
+        <main class="main-content">
+            <header class="top-section" id="header-section">
+                <h1 id="page-title">AI Background Remover</h1>
+                <p id="page-desc">Upload an image to remove background instantly.</p>
             </header>
-            
-            <div class="workspace-container">            
-                <section class="content-box content-mid" id="drop-zone">                
-                    <div class="image-preview-container" id="original-container">                    
-                        <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>                
-                    </div>            
+            <div class="workspace-container">
+                <!-- 왼쪽 박스: 원본 사진 영역 -->
+                <section class="content-box content-mid" id="drop-zone">
+                    <div class="image-preview-container" id="original-container">
+                        <div class="empty-msg">Drag & Drop an image file here or click to upload.</div>
+                    </div>
                 </section>
-                
-                <section class="content-box content-down" id="result-zone">                
-                    <div class="image-preview-container" id="result-container">                    
-                        <div class="empty-msg">Result image will appear here.</div>                
-                    </div>                
-                    <div id="loading-msg">✨ Processing...</div>            
-                </section>        
-            </div>    
+                <!-- 오른쪽 박스: 결과 영역 -->
+                <section class="content-box content-down" id="result-zone">
+                    <div class="image-preview-container" id="result-container">
+                        <div class="empty-msg">Result image will appear here.</div>
+                    </div>
+                    <div id="loading-msg">✨ Processing...</div>
+                </section>
+            </div>
         </main>
     </div>
 
@@ -172,21 +282,23 @@
         ort.env.wasm.numThreads = 1; 
         ort.env.logLevel = "warning";
 
-        const sidebar = document.getElementById('sidebar');    
-        const dropZone = document.getElementById('drop-zone');    
-        const originalContainer = document.getElementById('original-container');    
-        const resultContainer = document.getElementById('result-container');    
-        const fileSelector = document.getElementById('file-selector');    
-        const loadingMsg = document.getElementById('loading-msg');            
-        const btnAiBg = document.getElementById('btn-ai-bg');    
-        const btnSig = document.getElementById('btn-sig');    
-        const signatureControls = document.getElementById('signature-controls');    
-        const pageTitle = document.getElementById('page-title');    
-        const pageDesc = document.getElementById('page-desc');            
-        const thresholdRange = document.getElementById('thresholdRange');    
+        const sidebar = document.getElementById('sidebar');
+        const dropZone = document.getElementById('drop-zone');
+        const originalContainer = document.getElementById('original-container');
+        const resultContainer = document.getElementById('result-container');
+        const fileSelector = document.getElementById('file-selector');
+        const loadingMsg = document.getElementById('loading-msg');
+                
+        const btnAiBg = document.getElementById('btn-ai-bg');
+        const btnSig = document.getElementById('btn-sig');
+        const signatureControls = document.getElementById('signature-controls');
+        const pageTitle = document.getElementById('page-title');
+        const pageDesc = document.getElementById('page-desc');
+                
+        const thresholdRange = document.getElementById('thresholdRange');
         const thresholdVal = document.getElementById('thresholdVal');
 
-        let currentMode = 'ai';    
+        let currentMode = 'ai';
         let currentFile = null;
         let aiSession = null;
 
@@ -217,52 +329,60 @@
 
         window.toggleSidebar = function() { 
             sidebar.classList.toggle('active'); 
-        };    
-        
+        }
+
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    if (element.id === 'file-selector') return;
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
         document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
-        });    
-        
-        document.querySelector('.main-content').addEventListener('click', (e) => {         
-            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) {             
-                sidebar.classList.remove('active');         
-            }     
         });
 
-        window.switchMode = function(mode) {        
-            currentMode = mode;        
+        document.querySelector('.main-content').addEventListener('click', (e) => { 
+            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
+
+        window.switchMode = function(mode) {
+            currentMode = mode;
             setInitialUI();
 
-            if (mode === 'ai') {            
-                btnAiBg.classList.add('active');            
-                btnSig.classList.remove('active');            
-                signatureControls.style.display = 'none';            
-                pageTitle.textContent = "AI Background Remover";            
-                pageDesc.textContent = "Upload an image to remove background instantly.";        
-            } else {            
-                btnSig.classList.add('active');            
-                btnAiBg.classList.remove('active');            
-                signatureControls.style.display = 'block';            
-                pageTitle.textContent = "Stamp & Signature Remover";            
-                pageDesc.textContent = "Upload a document image to remove white background instantly.";        
-            }    
+            if (mode === 'ai') {
+                btnAiBg.classList.add('active');
+                btnSig.classList.remove('active');
+                signatureControls.style.display = 'none';
+                pageTitle.textContent = "AI Background Remover";
+                pageDesc.textContent = "Upload an image to remove background instantly.";
+            } else {
+                btnSig.classList.add('active');
+                btnAiBg.classList.remove('active');
+                signatureControls.style.display = 'block';
+                pageTitle.textContent = "Stamp & Signature Remover";
+                pageDesc.textContent = "Upload a document image to remove white background instantly.";
+            }
         };
 
-        thresholdRange.addEventListener('input', (e) => {        
-            thresholdVal.textContent = e.target.value;        
-            if (currentFile && currentMode === 'signature') {            
-                processSignatureImage(currentFile);        
-            }    
+        thresholdRange.addEventListener('input', (e) => {
+            thresholdVal.textContent = e.target.value;
+            if (currentFile && currentMode === 'signature') {
+                processSignatureImage(currentFile);
+            }
         });
 
-        function setInitialUI() {        
-            originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;        
-            resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;        
-            loadingMsg.style.display = 'none';        
-            fileSelector.value = '';        
-            currentFile = null;    
+        function setInitialUI() {
+            originalContainer.innerHTML = `<div class="empty-msg">Drag & Drop an image file here or click to upload.</div>`;
+            resultContainer.innerHTML = `<div class="empty-msg">Result image will appear here.</div>`;
+            loadingMsg.style.display = 'none';
+            fileSelector.value = '';
+            currentFile = null;
         }
-        
         setInitialUI();
 
         // 1. 도장·서명 배경 제거 방식 (캔버스 밝기 분석)
@@ -281,7 +401,7 @@
                 const mid = Math.floor(arr.length / 2);
                 return arr.length % 2 === 0 ? (arr[mid - 1] + arr[mid]) / 2 : arr[mid];
             };
-            const f = s.map(p => Math.round(Vf(p))),
+            const f = s.map(p => Math.round(Vf(p))), 
                   m = f[0] * .2126 + f[1] * .7152 + f[2] * .0722;
             const D = m >= 220 && Math.max(...f) - Math.min(...f) <= 30;
             const ae = D;
@@ -297,14 +417,14 @@
         }
 
         function Hf(e, r, i = 50) {
-            const u = [Math.max(1, Number(r?.[0]) || 255), Math.max(1, Number(r?.[1]) || 255), Math.max(1, Number(r?.[2]) || 255)],
+            const u = [Math.max(1, Number(r?.[0]) || 255), Math.max(1, Number(r?.[1]) || 255), Math.max(1, Number(r?.[2]) || 255)], 
                   s = jf(i);
             for (let f = 0; f < e.length; f += 4) {
                 const c = e[f + 3] / 255;
                 if (c <= 0) { e[f] = 0; e[f + 1] = 0; e[f + 2] = 0; continue; }
-                const h = [pt(e[f] / u[0]), pt(e[f + 1] / u[1]), pt(e[f + 2] / u[2])],
-                      m = 1 - Math.min(...h),
-                      g = pt((m - s) / (1 - s)),
+                const h = [pt(e[f] / u[0]), pt(e[f + 1] / u[1]), pt(e[f + 2] / u[2])], 
+                      m = 1 - Math.min(...h), 
+                      g = pt((m - s) / (1 - s)), 
                       v = g * c;
                 if (v <= 1 / 255) { e[f] = 0; e[f + 1] = 0; e[f + 2] = 0; e[f + 3] = 0; continue; }
                 for (let b = 0; b < 3; b += 1) {
@@ -317,8 +437,7 @@
         }
 
         // 2. 빠른 AI 배경 제거 방식 (U²-NetP ONNX 직접 연동)
-        const de = 320;
-        
+        const de = 320;                
         async function getAiSession() {
             if (aiSession) return aiSession;
             loadingMsg.style.display = 'block';
@@ -340,8 +459,8 @@
             r.width = de, r.height = de;
             const i = r.getContext("2d", { willReadFrequently: !0 });
             i.drawImage(e, 0, 0, de, de);
-            const u = i.getImageData(0, 0, de, de).data,
-                  s = de * de,
+            const u = i.getImageData(0, 0, de, de).data, 
+                  s = de * de, 
                   f = new Float32Array(s * 3);
             let c = 1;
             for (let h = 0; h < u.length; h += 4) c = Math.max(c, u[h], u[h + 1], u[h + 2]);
@@ -360,7 +479,7 @@
             s.height = de;
             const f = s.getContext("2d");
             const c = f.createImageData(de, de);
-            
+                        
             let minVal = e[0], maxVal = e[0];
             for (let i = 1; i < e.length; i++) {
                 if (e[i] < minVal) minVal = e[i];
@@ -371,9 +490,9 @@
             for (let m = 0; m < de * de; m++) {
                 let norm = (e[m] - minVal) / range;
                 let alpha = Math.round(Math.max(0, Math.min(1, norm)) * 255);
-                
+                                
                 const v = m * 4;
-                c.data[v] = 255;     
+                c.data[v] = 255; 
                 c.data[v + 1] = 255; 
                 c.data[v + 2] = 255; 
                 c.data[v + 3] = alpha; 
@@ -388,20 +507,20 @@
             const s = resultCanvas.getContext("2d");
             resultCanvas.width = i;
             resultCanvas.height = u;
-            
+                        
             s.clearRect(0, 0, i, u);
             s.imageSmoothingEnabled = true;
             s.imageSmoothingQuality = "high";
-            
+                        
             s.drawImage(e, 0, 0, i, u);
             s.globalCompositeOperation = "destination-in";
             s.drawImage(r, 0, 0, i, u);
             s.globalCompositeOperation = "source-over";
-            
+                        
             resultCanvas.style.display = 'block';
             resultCanvas.hidden = false;
             C.resultPlaceholder.hidden = true;
-            
+                        
             resultContainer.innerHTML = '';
             resultContainer.appendChild(resultCanvas);
         }
@@ -418,7 +537,7 @@
             loadingMsg.style.display = 'block';
             loadingMsg.textContent = "✨ Initializing Web ML engine...";
 
-            try {            
+            try {
                 const session = await getAiSession();
                 loadingMsg.textContent = "✨ Running AI inference...";
 
@@ -433,34 +552,34 @@
 
                 const maskCanvas = Cc(outputData);
                 wi(imgBitmap, maskCanvas, width, height);
-            } catch (error) {            
-                console.error("AI Processing Error:", error);            
-                alert('Error occurred while removing background: ' + error.message);            
-                resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;        
-            } finally {            
-                loadingMsg.style.display = 'none';        
-            }    
+            } catch (error) {
+                console.error("AI Processing Error:", error);
+                alert('Error occurred while removing background: ' + error.message);
+                resultContainer.innerHTML = `<div class="empty-msg">Error occurred</div>`;
+            } finally {
+                loadingMsg.style.display = 'none';
+            }
         }
 
-        function processSignatureImage(file) {        
+        function processSignatureImage(file) {
             loadingMsg.style.display = 'block';
             loadingMsg.textContent = "✨ Processing stamp & signature precisely...";
 
             const reader = new FileReader();
-            reader.onload = (e) => {            
+            reader.onload = (e) => {
                 const imageUrl = e.target.result;
                 originalContainer.innerHTML = `<img src="${imageUrl}" alt="Original Preview" class="preview-img">`;
 
                 const img = new Image();
-                img.onload = () => {                
-                    const canvas = document.createElement('canvas');                
-                    canvas.width = img.width;                
-                    canvas.height = img.height;                
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
 
-                    ctx.drawImage(img, 0, 0);                
-                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);                
-                    const data = imgData.data;                
+                    ctx.drawImage(img, 0, 0);
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
                     const threshold = parseInt(thresholdRange.value);
 
                     const analysisInfo = qf(data, canvas.width, canvas.height);
@@ -468,50 +587,50 @@
 
                     ctx.putImageData(imgData, 0, 0);
 
-                    const resultCanvas = document.createElement('canvas');                
-                    resultCanvas.width = canvas.width;                
-                    resultCanvas.height = canvas.height;                
-                    resultCanvas.className = 'preview-canvas';                
-                    const resCtx = resultCanvas.getContext('2d');                
+                    const resultCanvas = document.createElement('canvas');
+                    resultCanvas.width = canvas.width;
+                    resultCanvas.height = canvas.height;
+                    resultCanvas.className = 'preview-canvas';
+                    const resCtx = resultCanvas.getContext('2d');
                     resCtx.drawImage(canvas, 0, 0);
 
-                    resultContainer.innerHTML = '';                
-                    resultContainer.appendChild(resultCanvas);                
-                    loadingMsg.style.display = 'none';            
-                };            
-                img.src = imageUrl;        
+                    resultContainer.innerHTML = '';
+                    resultContainer.appendChild(resultCanvas);
+                    loadingMsg.style.display = 'none';
+                };
+                img.src = imageUrl;
             };
-            reader.readAsDataURL(file);    
+            reader.readAsDataURL(file);
         }
 
-        function handleFile(file) {        
-            if (!file) return;        
-            if (!file.type.startsWith('image/')) {            
-                alert('Please upload an image file.');            
-                return;        
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file.');
+                return;
             }
 
-            currentFile = file;        
-            if (currentMode === 'ai') {            
-                handleAiFile(file);        
-            } else {            
-                processSignatureImage(file);        
-            }    
+            currentFile = file;
+            if (currentMode === 'ai') {
+                handleAiFile(file);
+            } else {
+                processSignatureImage(file);
+            }
         }
 
         dropZone.addEventListener('dragover', (e) => { 
             e.preventDefault(); 
             dropZone.classList.add('dragover'); 
-        });    
+        });
         dropZone.addEventListener('dragleave', () => { 
             dropZone.classList.remove('dragover'); 
-        });    
-        dropZone.addEventListener('drop', (e) => {         
-            e.preventDefault();         
-            dropZone.classList.remove('dragover');         
-            const file = e.dataTransfer.files[0];         
-            handleFile(file);     
-        });    
+        });
+        dropZone.addEventListener('drop', (e) => { 
+            e.preventDefault(); 
+            dropZone.classList.remove('dragover'); 
+            const file = e.dataTransfer.files[0]; 
+            handleFile(file); 
+        });
         dropZone.addEventListener('click', () => { 
             fileSelector.click(); 
         });
@@ -520,9 +639,9 @@
             fileSelector.click(); 
         };
 
-        fileSelector.addEventListener('change', (e) => {        
-            const file = e.target.files[0];        
-            handleFile(file);    
+        fileSelector.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
         });
 
         window.resetAll = function() { 
