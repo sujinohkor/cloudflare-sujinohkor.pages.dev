@@ -10,69 +10,67 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* 1. Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #202020;
-            color: #fff;
-            transition: background 0.3s;
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
-        /* 2. Layout */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background-color: #101010;
-            padding: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            gap: 20px;
-            overflow: hidden;
-            transition: 0.3s;
-        }
+
         /* 3. Components */
-        .menu-btn, .theme-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover, .menu-btn.active {
-            background: #ff9e40;
-            color: #101010;
+        .menu-btn:hover, .menu-btn.active { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .top-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .theme-btn:hover {
-            background-color: #FDF5E6;
-            color: #F38020;
-            border-color: #FDF5E6;
+        .top-btns > .menu-btn {
+            margin-bottom: 0;
         }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
         /* Workspace Structure */
         .workspace-container {
             display: grid;
@@ -84,7 +82,7 @@
         }
 
         /* ===== Maximize / Minimize 상태별 제어 클래스 ===== */
-        
+                
         /* 1단계: 왼쪽(마크다운 입력창)이 화면 전체를 채우도록 고정 */
         .workspace-container.state-left {
             position: fixed !important;
@@ -93,7 +91,7 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 9999 !important;
-            background: #202020;
+            background: #101010;
             padding: 20px;
             margin: 0 !important;
             grid-template-columns: 1fr !important;
@@ -116,7 +114,7 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 9999 !important;
-            background: #202020;
+            background: #101010;
             padding: 20px;
             margin: 0 !important;
             grid-template-columns: 1fr 1fr !important;
@@ -137,7 +135,7 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 9999 !important;
-            background: #202020;
+            background: #101010;
             padding: 20px;
             margin: 0 !important;
             grid-template-columns: 1fr !important;
@@ -152,12 +150,12 @@
             height: 100% !important;
         }
 
-        /* Maximize 버튼 스타일 */
+        /* Maximize 버튼 스타일 (z-index를 낮춰 사이드바보다 밑에 오도록 수정) */
         .maximize-btn {
             position: absolute;
             top: 15px;
             right: 15px;
-            z-index: 10000;
+            z-index: 10;
             background: #202020;
             color: #ff9e40;
             border: 1px solid #ff9e40;
@@ -244,6 +242,7 @@
             resize: none;
             z-index: 2;
         }
+
         /* Copy Button */
         .copy-btn {
             background: transparent;
@@ -259,6 +258,7 @@
             background: #ff9e40;
             color: #101010;
         }
+
         /* ===== [Preview 영역] ===== */
         .content-down-wrapper {
             display: flex;
@@ -289,6 +289,7 @@
             word-break: break-all;
             overflow-wrap: break-word;
         }
+
         /* 마크다운 렌더링 스타일 (다크 모드 기본) */
         .content-down h1, .content-down h2, .content-down h3 { color: #ff9e40; margin-bottom: 10px; }
         .content-down p { margin-bottom: 10px; }
@@ -300,23 +301,40 @@
         .content-down table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
         .content-down th, .content-down td { border: 1px solid #444; padding: 8px; text-align: left; }
         .content-down th { background: #2a2a2a; }
+
         /* 카드/패널 그림자 */
         .card, .content-mid, .content-down, .code-editor-container {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
+
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
         body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
         body.light-mode .editor-textarea { color: #24292e; caret-color: #000; }
         body.light-mode .copy-btn { border-color: #F38020; color: #F38020; }
-        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }                
-        
+        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+                                
         body.light-mode .workspace-container.state-left,
         body.light-mode .workspace-container.state-fullscreen,
         body.light-mode .workspace-container.state-right { background: #fff !important; }
@@ -336,45 +354,30 @@
         body.light-mode .card, body.light-mode .content-mid, body.light-mode .content-down, body.light-mode .code-editor-container {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
+
         /* 5. Mobile Responsive */
-        .menu-toggle-btn {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 2000;
-            padding: 10px 15px;
-            background: #ff9e40;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
         }
-        @media (max-width: 768px) {
-            .app-container {
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
+                
+        @media (max-width: 900px) {                        
+            .menu-toggle-btn { display: block; }                        
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            }                        
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-                width: 100%;
-                height: auto;
-                min-height: 100vh;
-                overflow: visible;
-            }
-            .menu-toggle-btn {
-                display: block;
-                color: #ffffff;
-            }
-            .sidebar {
-                transform: translateX(-250px);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            .workspace-container {
+            .sidebar.active { transform: translateX(0); }                        
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                        
+            .workspace-container { 
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
@@ -388,82 +391,90 @@
     </style>
 </head>
 <body>
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        <div>
-            <button class="menu-btn" onclick="saveCode()">Save</button>
-            <button class="menu-btn" onclick="resetCode()">Reset</button>
-        </div>
-    </aside>
-    <main class="main-content">
-        <header class="top-section">
-            <h1 id="page-title">Markdown Editor</h1>
-            <p id="page-desc">Type markdown on the left, see rendered HTML on the right.</p>
-        </header>
-        <div class="workspace-container" id="workspace-container">
-            <!-- 4단계 순환 Maximize/Minimize 버튼 추가 -->
-            <button class="maximize-btn" id="maximize-btn" onclick="toggleMaximize()">Maximize ⛶</button>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Markdown Editor</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            
+            <div class="top-btns" style="width: 100%;">
+                <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            </div>
 
-            <div class="content-mid">
-                <div class="content-mid-header">
-                    <span>Markdown Input</span>
-                    <button class="copy-btn" onclick="copyCode()">Copy</button>
+            <div class="bottom-btns" style="width: 100%;">
+                <button class="menu-btn" onclick="saveCode()">Save</button>
+                <button class="menu-btn" onclick="resetCode()">Reset</button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-section">
+                <h1 id="page-title">Markdown Editor</h1>
+                <p id="page-desc">Type markdown on the left, see rendered HTML on the right.</p>
+            </header>
+            
+            <div class="workspace-container" id="workspace-container">
+                <!-- 4단계 순환 Maximize/Minimize 버튼 추가 (z-index를 10으로 낮춰 사이드바보다 밑에 오도록 수정) -->
+                <button class="maximize-btn" id="maximize-btn" onclick="toggleMaximize()">Maximize ⛶</button>
+
+                <div class="content-mid">
+                    <div class="content-mid-header">
+                        <span>Markdown Input</span>
+                        <button class="copy-btn" onclick="copyCode()">Copy</button>
+                    </div>
+                    <div class="code-editor-container">
+                        <div class="line-numbers" id="line-numbers">1</div>
+                        <div class="code-output-wrapper">
+                            <textarea id="code-textarea" class="editor-textarea" spellcheck="false"></textarea>
+                        </div>
+                    </div>
                 </div>
-                <div class="code-editor-container">
-                    <div class="line-numbers" id="line-numbers">1</div>
-                    <div class="code-output-wrapper">
-                        <textarea id="code-textarea" class="editor-textarea" spellcheck="false"></textarea>
+
+                <div class="content-down-wrapper">
+                    <label>Preview</label>
+                    <div class="content-down" id="preview-area">
+                        <!-- 마크다운 렌더링 결과가 출력되는 곳 -->
                     </div>
                 </div>
             </div>
-            <div class="content-down-wrapper">
-                <label>Preview</label>
-                <div class="content-down" id="preview-area">
-                    <!-- 마크다운 렌더링 결과가 출력되는 곳 -->
-                </div>
-            </div>
-        </div>
-    </main>
-</div>
-<script>
-    const sidebar = document.getElementById('sidebar');
-    const codeTextarea = document.getElementById('code-textarea');
-    const lineNumbers = document.getElementById('line-numbers');
-    const previewArea = document.getElementById('preview-area');
-    const workspaceContainer = document.getElementById('workspace-container');
-    const maximizeBtn = document.getElementById('maximize-btn');
+        </main>
+    </div>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const codeTextarea = document.getElementById('code-textarea');
+        const lineNumbers = document.getElementById('line-numbers');
+        const previewArea = document.getElementById('preview-area');
+        const workspaceContainer = document.getElementById('workspace-container');
+        const maximizeBtn = document.getElementById('maximize-btn');
 
-    let maximizeState = 0; // 0: 기본, 1: 왼쪽(마크다운창) Maximize, 2: 전체화면(좌우분할), 3: 오른쪽(프리뷰) Maximize
+        let maximizeState = 0; // 0: 기본, 1: 왼쪽(마크다운창) Maximize, 2: 전체화면(좌우분할), 3: 오른쪽(프리뷰) Maximize
+        function toggleMaximize() {
+            maximizeState = (maximizeState + 1) % 4;
 
-    function toggleMaximize() {
-        maximizeState = (maximizeState + 1) % 4;
+            // 클래스 초기화
+            workspaceContainer.classList.remove('state-left', 'state-right', 'state-fullscreen');
 
-        // 클래스 초기화
-        workspaceContainer.classList.remove('state-left', 'state-right', 'state-fullscreen');
-
-        if (maximizeState === 0) {
-            // 4번째 클릭: Minimize (기본 상태)
-            maximizeBtn.textContent = 'Maximize ⛶';
-        } else if (maximizeState === 1) {
-            // 1번째 클릭: 왼쪽창(마크다운창)이 화면 전체 Maximize
-            workspaceContainer.classList.add('state-left');
-            maximizeBtn.textContent = 'Fullscreen ⛶';
-        } else if (maximizeState === 2) {
-            // 2번째 클릭: 화면 전체에 좌우 분할 Maximize
-            workspaceContainer.classList.add('state-fullscreen');
-            maximizeBtn.textContent = 'Preview Max ⛶';
-        } else if (maximizeState === 3) {
-            // 3번째 클릭: 오른쪽창(프리뷰)이 화면 전체 Maximize
-            workspaceContainer.classList.add('state-right');
-            maximizeBtn.textContent = 'Minimize 🗗';
+            if (maximizeState === 0) {
+                // 4번째 클릭: Minimize (기본 상태)
+                maximizeBtn.textContent = 'Maximize ⛶';
+            } else if (maximizeState === 1) {
+                // 1번째 클릭: 왼쪽창(마크다운창)이 화면 전체 Maximize
+                workspaceContainer.classList.add('state-left');
+                maximizeBtn.textContent = 'Fullscreen ⛶';
+            } else if (maximizeState === 2) {
+                // 2번째 클릭: 화면 전체에 좌우 분할 Maximize
+                workspaceContainer.classList.add('state-fullscreen');
+                maximizeBtn.textContent = 'Preview Max ⛶';
+            } else if (maximizeState === 3) {
+                // 3번째 클릭: 오른쪽창(프리뷰)이 화면 전체 Maximize
+                workspaceContainer.classList.add('state-right');
+                maximizeBtn.textContent = 'Minimize 🗗';
+            }
         }
-    }
 
-    const defaultCode = `# Welcome to Markdown Editor! ✨
-
+        const defaultCode = `# Welcome to Markdown Editor! ✨
 Type your markdown text on the left and see it rendered instantly on the right.
 
 ## Features
@@ -478,136 +489,135 @@ Type your markdown text on the left and see it rendered instantly on the right.
 function greet() {
     console.log("Hello, Markdown!");
 }
-\`\`\``;
-    
-    function toggleSidebar() { 
-        sidebar.classList.toggle('active'); 
-    }
+\`\`\``;        
 
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+        }
 
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { 
-            sidebar.classList.remove('active'); 
-        } 
-    });
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
 
-    function updateEditor() {
-        const code = codeTextarea.value;
-        const lines = code.split('\n');
+        document.querySelector('.main-content').addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
 
-        // 가상으로 너비를 측정할 임시 div 생성 (textarea와 동일한 스타일 적용)
-        const measureDiv = document.createElement('div');
-        measureDiv.style.font = window.getComputedStyle(codeTextarea).font;
-        measureDiv.style.width = (codeTextarea.clientWidth - 24) + 'px'; // padding 12px * 2 제외
-        measureDiv.style.visibility = 'hidden';
-        measureDiv.style.position = 'absolute';
-        measureDiv.style.whiteSpace = 'pre-wrap';
-        measureDiv.style.wordBreak = 'break-all';
-        measureDiv.style.lineHeight = window.getComputedStyle(codeTextarea).lineHeight;
-        document.body.appendChild(measureDiv);
+        function updateEditor() {
+            const code = codeTextarea.value;
+            const lines = code.split('\n');
 
-        let lineNumbersHTML = '';
-        let currentLineNum = 1;
+            // 가상으로 너비를 측정할 임시 div 생성 (textarea와 동일한 스타일 적용)
+            const measureDiv = document.createElement('div');
+            measureDiv.style.font = window.getComputedStyle(codeTextarea).font;
+            measureDiv.style.width = (codeTextarea.clientWidth - 24) + 'px'; // padding 12px * 2 제외
+            measureDiv.style.visibility = 'hidden';
+            measureDiv.style.position = 'absolute';
+            measureDiv.style.whiteSpace = 'pre-wrap';
+            measureDiv.style.wordBreak = 'break-all';
+            measureDiv.style.lineHeight = window.getComputedStyle(codeTextarea).lineHeight;
+            document.body.appendChild(measureDiv);
 
-        lines.forEach((line) => {
-            measureDiv.textContent = line === '' ? ' ' : line;
-            const computedHeight = measureDiv.clientHeight;
-            const lineHeight = parseFloat(window.getComputedStyle(codeTextarea).lineHeight);
-            // 해당 물리적 한 줄이 화면에서 자동 줄바꿈으로 인해 몇 줄로 나뉘었는지 계산
-            const subLineCount = Math.max(1, Math.round(computedHeight / lineHeight));
+            let lineNumbersHTML = '';
+            let currentLineNum = 1;
 
-            for (let i = 0; i < subLineCount; i++) {
-                if (i === 0) {
-                    lineNumbersHTML += currentLineNum + '<br>';
-                } else {
-                    lineNumbersHTML += '&nbsp;<br>'; // 줄바꿈으로 꺾인 하위 줄은 번호 대신 빈칸 처리
+            lines.forEach((line) => {
+                measureDiv.textContent = line === '' ? ' ' : line;
+                const computedHeight = measureDiv.clientHeight;
+                const lineHeight = parseFloat(window.getComputedStyle(codeTextarea).lineHeight);
+                // 해당 물리적 한 줄이 화면에서 자동 줄바꿈으로 인해 몇 줄로 나뉘었는지 계산
+                const subLineCount = Math.max(1, Math.round(computedHeight / lineHeight));
+
+                for (let i = 0; i < subLineCount; i++) {
+                    if (i === 0) {
+                        lineNumbersHTML += currentLineNum + '<br>';
+                    } else {
+                        lineNumbersHTML += '&nbsp;<br>'; // 줄바꿈으로 꺾인 하위 줄은 번호 대신 빈칸 처리
+                    }
                 }
+                currentLineNum++;
+            });
+
+            document.body.removeChild(measureDiv);
+            lineNumbers.innerHTML = lineNumbersHTML || '1';
+
+            // 2. 마크다운을 HTML로 변환하여 프리뷰 영역에 반영
+            previewArea.innerHTML = marked.parse(code);
+        }
+
+        codeTextarea.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = codeTextarea.scrollTop;
+        });
+
+        codeTextarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = codeTextarea.selectionStart;
+                const end = codeTextarea.selectionEnd;
+
+                codeTextarea.value = codeTextarea.value.substring(0, start) + "  " + codeTextarea.value.substring(end);
+                codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 2;
+                updateEditor();
             }
-            currentLineNum++;
         });
 
-        document.body.removeChild(measureDiv);
-        lineNumbers.innerHTML = lineNumbersHTML || '1';
+        codeTextarea.addEventListener('input', updateEditor);
 
-        // 2. 마크다운을 HTML로 변환하여 프리뷰 영역에 반영
-        previewArea.innerHTML = marked.parse(code);
-    }
-
-    codeTextarea.addEventListener('scroll', () => {
-        lineNumbers.scrollTop = codeTextarea.scrollTop;
-    });
-
-    codeTextarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const start = codeTextarea.selectionStart;
-            const end = codeTextarea.selectionEnd;
-
-            codeTextarea.value = codeTextarea.value.substring(0, start) + "  " + codeTextarea.value.substring(end);
-            codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 2;
-            updateEditor();
-        }
-    });
-
-    codeTextarea.addEventListener('input', updateEditor);
-
-    function copyCode() {
-        const code = codeTextarea.value;
-        if (!code) return;
-        navigator.clipboard.writeText(code).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            btn.textContent = 'Copied!';
-            setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
-        });
-    }
-
-    function saveCode() {
-        const code = codeTextarea.value;
-        const fileName = 'MarkdownNote.md';
-
-        if (!code) {
-            alert('No text to save.');
-            return;
+        function copyCode() {
+            const code = codeTextarea.value;
+            if (!code) return;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+            });
         }
 
-        localStorage.setItem('saved_markdown_text', code);
-        const blob = new Blob([code], { type: 'text/markdown;charset=utf-8;' });
-        const link = document.createElement('a');
-                        
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        link.style.display = 'none';
+        function saveCode() {
+            const code = codeTextarea.value;
+            const fileName = 'MarkdownNote.md';
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            if (!code) {
+                alert('No text to save.');
+                return;
+            }
 
-        URL.revokeObjectURL(link.href);
-    }
+            localStorage.setItem('saved_markdown_text', code);
+            const blob = new Blob([code], { type: 'text/markdown;charset=utf-8;' });
+            const link = document.createElement('a');                                
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.style.display = 'none';
 
-    function resetCode() {
-        if (confirm('Are you sure you want to reset?')) {
-            localStorage.removeItem('saved_markdown_text');
-            codeTextarea.value = defaultCode;
-            updateEditor();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(link.href);
         }
-    }
 
-    function loadSavedCode() {
-        const savedCode = localStorage.getItem('saved_markdown_text');
-
-        if (savedCode !== null) {
-            codeTextarea.value = savedCode;
-        } else {
-            codeTextarea.value = defaultCode;
+        function resetCode() {
+            if (confirm('Are you sure you want to reset?')) {
+                localStorage.removeItem('saved_markdown_text');
+                codeTextarea.value = defaultCode;
+                updateEditor();
+            }
         }
-    }
 
-    loadSavedCode();
-    updateEditor();
-</script>
+        function loadSavedCode() {
+            const savedCode = localStorage.getItem('saved_markdown_text');
+
+            if (savedCode !== null) {
+                codeTextarea.value = savedCode;
+            } else {
+                codeTextarea.value = defaultCode;
+            }
+        }
+
+        loadSavedCode();
+        updateEditor();
+    </script>
 </body>
 </html>
