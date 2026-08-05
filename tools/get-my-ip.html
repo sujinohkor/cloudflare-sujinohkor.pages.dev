@@ -12,135 +12,219 @@
     <style>
         /* 1. Reset & Base */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
+        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
         /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s;
+            margin-left: 300px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            gap: 20px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        .menu-btn { 
+            width: 100%; 
+            padding: 11px 14px; 
+            cursor: pointer; 
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03); 
+            color: #ff9e40; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; 
+            font-weight: bold; 
+            transition: all 0.3s; 
+            font-size: 0.85rem;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1;
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
 
         .content-top { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(255, 158, 64, 0.02); min-height: 140px;
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            background: rgba(255, 158, 64, 0.02); 
+            min-height: 140px; 
+            flex-shrink: 0;
         }
         .ip-label { font-size: 1rem; color: #ff9e40; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }
         .ip-address { font-size: 5rem; font-weight: bold; font-family: 'Consolas', monospace; color: #fff; text-align: center; width: 100%; padding: 0 15px; word-break: break-all; overflow-wrap: break-word; }
 
         .content-down { 
-            flex: 2; display: flex; flex-direction: row; gap: 20px; overflow: hidden; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: row; 
+            gap: 20px; 
+            overflow: hidden; 
+            min-height: 0;
         }
         .half-box { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; 
-            overflow: hidden; display: flex; flex-direction: column; position: relative;
+            flex: 1; 
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
         }
 
         #map-container { width: 100%; height: 100%; min-height: 250px; background: #151515; z-index: 1; }
         
         #info-container { 
-            padding: 24px; 
-            background: transparent; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
+            padding: 24px;
+            background: transparent;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
             gap: 10px; 
         }
         
         .info-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding-bottom: 6px; 
-            border-bottom: 1px solid rgba(255, 158, 64, 0.15); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 158, 64, 0.15);
             font-size: 0.9rem;
         }
         
         .info-label { 
-            color: #ff9e40; 
-            font-weight: 600; 
-            flex-shrink: 0; 
+            color: #ff9e40;
+            font-weight: 600;
+            flex-shrink: 0;
             margin-right: 12px;
         }
         
         .info-value { 
-            color: #e0e0e0; 
-            font-family: 'Consolas', monospace; 
-            text-align: right; 
+            color: #e0e0e0;
+            font-family: 'Consolas', monospace;
+            text-align: right;
             word-break: break-all;
         }
 
-        /* 다크 모드 카드/패널 그림자 (IP 페이지 요소 확장) */
-        .card, .content-mid, .content-down, .content-top, .half-box {
+        /* 다크 모드 카드/패널 그림자 */
+        .card, .content-down, .content-top, .half-box {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .ip-address { color: #000; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .ip-address { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         body.light-mode .info-value { color: #202020; }
         body.light-mode .info-row { border-bottom-color: rgba(243, 128, 32, 0.2); }
-
-        /* 데이 모드 카드/패널 그림자 (IP 페이지 요소 확장) */
         body.light-mode .card, 
-        body.light-mode .content-mid, 
         body.light-mode .content-down,
         body.light-mode .content-top,
         body.light-mode .half-box {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
 
-        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
-        body.light-mode .color-card,
-        body.light-mode .list-item {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-        }
-
         /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
         
-        @media (max-width: 768px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            }
+            body.light-mode .sidebar {
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; overflow-y: auto; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; height: auto; overflow-y: auto; }
             .content-down { flex-direction: column; flex: none; height: auto; min-height: 600px; }
-            .content-down .half-box:nth-child(1) { flex: 1; min-height: 200px; }
+            .content-down .half-box:nth-child(1) { flex: 1; min-height: 250px; }
             .content-down .half-box:nth-child(2) { flex: 3; min-height: 0; }
-            .ip-address { font-size: 1.3rem; }
+            .ip-address { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">Get My IP</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
+
         <div class="bottom-btns">
             <button class="menu-btn" onclick="copyIP()">Copy IP</button>
             <button class="menu-btn" onclick="fetchIPInfo()">Refresh</button>
@@ -185,8 +269,24 @@
     };
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+    
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
+
+    sidebar.querySelectorAll('button').forEach(element => {
+        element.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
 
     function getClientEnv() {
         const ua = navigator.userAgent;
@@ -251,12 +351,12 @@
                         renderMap(gpsLat, gpsLon, "My Exact Location (GPS)");
 
                         try {
-                            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}`);
+                            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}&accept-language=en`);
                             const geoData = await geoRes.json();
 
                             if (geoData && geoData.address) {
                                 const addr = geoData.address;
-                                gpsLocationData.city = addr.city || addr.county || addr.district || "Unknown";
+                                gpsLocationData.city = addr.suburb || addr.neighbourhood || addr.quarter || addr.town || addr.village || addr.city || addr.county || addr.district || "Unknown";
                                 gpsLocationData.region = addr.state || addr.province || "Unknown";
                                 gpsLocationData.country = addr.country || "Unknown";
                                 gpsLocationData.postal = addr.postcode || "Unknown";
@@ -264,14 +364,14 @@
                                 setGpsFailedStatus("Not Found");
                             }
                         } catch (geoErr) {
-                            console.warn("역지오코딩 에러:", geoErr);
+                            console.warn("Reverse geocoding failed:", geoErr);
                             setGpsFailedStatus("Error");
                         }
 
                         renderDetails(data);
                     },
                     (geoError) => {
-                        console.warn("GPS 권한 거부 또는 조회 불가:", geoError);
+                        console.warn("GPS permission denied or timeout, fallback to IP location.", geoError);
                         setGpsFailedStatus("Permission Denied");
                         renderDetails(data);
                     },
