@@ -240,7 +240,7 @@
 
             <div class="control-group" id="signature-controls" style="display: none;">
                 <label for="thresholdRange">
-                    <span>제거 강도</span>
+                    <span>Removal Strength</span>
                     <span id="thresholdVal">50</span>
                 </label>
                 <input type="range" id="thresholdRange" min="0" max="100" value="50">
@@ -364,7 +364,7 @@
                 btnSig.classList.add('active');
                 btnAiBg.classList.remove('active');
                 signatureControls.style.display = 'block';
-                pageTitle.textContent = "Stamp & Signature Remover";
+                pageTitle.textContent = "Signature Background Remover";
                 pageDesc.textContent = "Upload a document image to remove white background instantly.";
             }
         };
