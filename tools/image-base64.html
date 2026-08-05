@@ -6,12 +6,12 @@
     <title>Image to Base64</title>
     <!-- 파비콘 설정 추가 -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    
+        
     <!-- PSD 파서 라이브러리 -->
     <script src="https://unpkg.com/psd/dist/psd.min.js"></script>
     <!-- AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    
+        
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,7 +38,7 @@
         /* DAY/NIGHT 버튼 최상단 배치 스타일 */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
-        .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         /* 메인 콘텐츠 영역 */
         .main-content { 
@@ -108,7 +108,7 @@
         }
         .content-viewer.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; color: #ff9e40; }
         .content-viewer.has-file { background-color: rgba(255, 158, 64, 0.05); padding: 10px; }
-        
+                
         .preview-img, .render-img, #viewCanvas {
             max-width: 100%;
             max-height: 100%;
@@ -160,7 +160,7 @@
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-        
+                
         /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
         body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
@@ -176,7 +176,7 @@
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode textarea { color: #000; }
         body.light-mode .menu-toggle-btn { color: #000000; }
-        
+                
         /* 데이 모드 카드/패널 그림자 */
         body.light-mode .card, 
         body.light-mode .content-card,
@@ -200,14 +200,14 @@
                 -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             } 
-            body.light-mode .sidebar {
+            body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
             .sidebar.active { transform: translateX(0); } 
             .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
             .editors-container { flex-direction: column; }
-            .content-card, .content-viewer { min-height: 200px; }
+            .content-card, .content-viewer { min-height: 200px; } 
         }
     </style>
 </head>
@@ -222,7 +222,7 @@
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
-            
+                        
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
             <div class="bottom-btns">
@@ -231,13 +231,12 @@
                 <button class="menu-btn" onclick="resetText()">Reset</button>
             </div>
         </aside>
-
         <main class="main-content">
             <header class="top-section">
                 <h1>Image to Base64</h1>
                 <p id="status-desc">Upload image to div 1, view Base64 in div 2, render image in div 3.</p>
             </header>
-                
+                            
             <!-- 3분할 컨테이너 -->
             <div class="editors-container">
                 <!-- 1번 div: 이미지 업로드 영역 -->
@@ -268,7 +267,6 @@
             </div>
         </main>
     </div>
-
     <script>
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -284,7 +282,7 @@
         const renderImg = document.getElementById('renderImg');
         const ctx = canvas.getContext('2d');
         const textInput2 = document.getElementById('text-input-2');
-                
+                        
         let loadedFile = null;
 
         function toggleSidebar() { 
@@ -345,7 +343,7 @@
                         const base64Val = e.target.result;
                         resultImg.src = base64Val;
                         resultImg.style.display = 'inline-block';
-                                                
+                                                                        
                         textInput2.value = base64Val;
                         renderBase64ToDiv3(base64Val);
                     };
@@ -370,7 +368,7 @@
 
                         resultImg.src = image.src;
                         resultImg.style.display = 'inline-block';
-                                                
+                                                                        
                         textInput2.value = image.src;
                         renderBase64ToDiv3(image.src);
                         resolve();
