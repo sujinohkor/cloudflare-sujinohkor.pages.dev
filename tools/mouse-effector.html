@@ -4,78 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mouse Effector</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #202020;
-            color: #fff;
-            transition: background 0.3s;
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
-        /* 2. Layout */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background-color: #101010;
-            padding: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            gap: 20px;
-            overflow: hidden;
-            transition: 0.3s;
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            gap: 20px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.active {
+            background: rgba(255, 158, 64, 0.35);
+            border-color: rgba(255, 158, 64, 0.8);
         }
 
-        .menu-btn:hover, .menu-btn.active {
-            background: #ff9e40;
-            color: #101010;
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        .theme-btn:hover {
-            background-color: #FDF5E6;
-            color: #F38020;
-            border-color: #FDF5E6;
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
         }
 
         /* Workspace Structure */
@@ -93,24 +92,26 @@
             gap: 8px;
             flex-shrink: 0;
         }
-
         .content-top label {
             color: #ff9e40;
             font-weight: bold;
         }
-
+        /* Textbox 내용물 왼쪽 정렬 적용 */
         .content-top input[type="text"] {
             width: 100%;
-            padding: 12px;
-            background: #101010;
-            border: 2px solid #ff9e40;
-            border-radius: 16px;
+            padding: 11px 18px; 
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.85rem;
+            font-weight: bold;
             outline: none;
+            text-align: left;
         }
+        .content-top input[type="text"]::placeholder { color: #888; }
 
-        /* ===== [Code Editor 영역 - 크기 고정] ===== */
+        /* Code Editor 영역 */
         .content-mid {
             display: flex;
             flex-direction: column;
@@ -119,7 +120,6 @@
             min-height: 0;
             min-width: 0;
         }
-
         .content-mid-header {
             color: #ff9e40;
             font-weight: bold;
@@ -128,44 +128,38 @@
             align-items: center;
             flex-shrink: 0;
         }
-
         .code-editor-container {
             position: relative;
             display: flex;
             width: 100%;
             flex: 1;
             min-height: 0;
-            background: #141414;
-            border: 2px solid #ff9e40;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
             border-radius: 16px;
             overflow: hidden;
             font-family: 'Consolas', 'Fira Code', Monaco, monospace;
             font-size: 0.88rem;
             line-height: 1.5;
         }
-
         .line-numbers {
             padding: 12px 8px 12px 12px;
-            background: #0a0a0a;
+            background: rgba(0, 0, 0, 0.15);
             color: #555;
             text-align: right;
             user-select: none;
-            border-right: 1px solid #282828;
+            border-right: 1px solid rgba(255, 158, 64, 0.2);
             font-family: inherit;
-            overflow-y: auto; /* hidden 대신 auto로 변경 */
-            scrollbar-width: none; /* 파이어폭스 스크롤바 숨김 */
+            overflow-y: auto;
+            scrollbar-width: none;
         }
-        /* 크롬, 사파리, 엣지에서 줄 번호 영역 스크롤바 숨기기 */
-        .line-numbers::-webkit-scrollbar {
-            display: none; 
-        }
-        
+        .line-numbers::-webkit-scrollbar { display: none; }
+                
         .code-output-wrapper {
             flex: 1;
             overflow: auto;
             padding: 12px;
         }
-
         .code-output-wrapper pre {
             margin: 0;
             white-space: pre;
@@ -183,21 +177,21 @@
         /* Copy Button */
         .copy-btn {
             background: transparent;
-            border: 1px solid #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.5);
             color: #ff9e40;
-            padding: 2px 10px;
+            padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.75rem;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .copy-btn:hover {
-            background: #ff9e40;
-            color: #101010;
+            background: rgba(255, 158, 64, 0.2);
+            border-color: rgba(255, 158, 64, 0.6);
         }
 
-        /* ===== [Preview 영역 - 크기 고정] ===== */
+        /* Preview 영역 */
         .content-down-wrapper {
             display: flex;
             flex-direction: column;
@@ -206,13 +200,11 @@
             min-height: 0;
             min-width: 0;
         }
-
         .content-down-wrapper label {
             color: #ff9e40;
             font-weight: bold;
             flex-shrink: 0;
         }
-
         .content-down {
             position: relative;
             flex: 1;
@@ -226,7 +218,6 @@
             overflow: hidden;
             cursor: crosshair;
         }
-
         .content-down p {
             color: #888;
             font-size: 1.1rem;
@@ -244,27 +235,47 @@
             user-select: none;
             z-index: 100;
         }
+        .content-down.hide-cursor { cursor: none; }
 
-        .content-down.hide-cursor {
-            cursor: none;
-        }
-
-        /* 다크 모드 카드/패널 그림자 (Mouse Effector 요소 확장) */
+        /* 다크 모드 카드/패널 그림자 */
         .card, .content-mid, .content-down, .code-editor-container, .content-top input[type="text"] {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .menu-btn.active {
+            background: rgba(243, 128, 32, 0.25);
+            border-color: rgba(243, 128, 32, 0.7);
+        }
+
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-top input { background: #FDF5E6; color: #000; border-color: #F38020; }
+        body.light-mode .content-top input { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #202020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .content-top input::placeholder { color: #888; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
-        body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
-        body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
+        body.light-mode .code-editor-container { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #aaa; border-right-color: rgba(243, 128, 32, 0.2); }
         body.light-mode .code-output-wrapper pre { color: #24292e; }
         body.light-mode .hl-keyword { color: #d73a49; }
         body.light-mode .hl-string  { color: #032f62; }
@@ -272,10 +283,10 @@
         body.light-mode .hl-comment { color: #6a737d; }
         body.light-mode .hl-tag     { color: #22863a; }
         body.light-mode .hl-builtin { color: #6f42c1; }
-        body.light-mode .copy-btn   { border-color: #F38020; color: #F38020; }
-        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+        body.light-mode .copy-btn   { border-color: rgba(243, 128, 32, 0.5); color: #F38020; }
+        body.light-mode .copy-btn:hover { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.6); }
 
-        /* 데이 모드 카드/패널 그림자 (Mouse Effector 요소 확장) */
+        /* 데이 모드 카드/패널 그림자 */
         body.light-mode .card, 
         body.light-mode .content-mid, 
         body.light-mode .content-down,
@@ -284,52 +295,29 @@
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
 
-        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
-        body.light-mode .color-card,
-        body.light-mode .list-item {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-        }
-
         /* 5. Mobile Responsive */
-        .menu-toggle-btn {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 2000;
-            padding: 10px 15px;
-            background: #ff9e40;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
         }
 
-        @media (max-width: 768px) {
-            .app-container {
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-                width: 100%;
-                height: auto;
-                min-height: 100vh;
-                overflow: visible;
-            }
-            .menu-toggle-btn {
-                display: block;
-                color: #ffffff;
-            }
-            .sidebar {
-                transform: translateX(-250px);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            .workspace-container {
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            } 
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; height: auto; overflow-y: auto; } 
+            .workspace-container { 
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
@@ -345,11 +333,13 @@
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">Mouse Effector</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
 
         <div class="bottom-btns">
             <button class="menu-btn active" id="btn-none" onclick="switchMode('none')">None</button>
@@ -415,21 +405,28 @@
     const codeOutputWrapper = document.querySelector('.code-output-wrapper');
     const lineNumbersEl = document.getElementById('line-numbers');
 
-    // 코드 박스를 스크롤할 때 줄 번호 박스도 함께 스크롤되도록 연동
     codeOutputWrapper.addEventListener('scroll', () => {
         lineNumbersEl.scrollTop = codeOutputWrapper.scrollTop;
     });
-    
+
     function toggleSidebar() { 
         sidebar.classList.toggle('active'); 
     }
+
+    sidebar.querySelectorAll('button').forEach(element => {
+        element.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
 
     document.getElementById('theme-toggle').addEventListener('click', () => { 
         document.body.classList.toggle('light-mode'); 
     });
 
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { 
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
             sidebar.classList.remove('active'); 
         } 
     });
@@ -441,7 +438,6 @@
             .replace(/>/g, '&gt;');
 
         const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;\/?[a-zA-Z0-9]+.*?&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
-
         return escaped.replace(tokenPattern, (match, comment, string, tag, keyword, builtin, number) => {
             if (comment) return `<span class="hl-comment">${comment}</span>`;
             if (string)  return `<span class="hl-string">${string}</span>`;
@@ -518,112 +514,118 @@
         } 
         else if (currentMode === 'typeA') {
             setCodeOutput(
-`<script>(function() {
-  const text = "${text}";
-  const chars = [];
-  let pos = { x: 0, y: 0 };
-  let history = [];
+`<script>
+(function() {
+    const text = "${text}";
+    const chars = [];
+    let pos = { x: 0, y: 0 };
+    let history = [];
 
-  text.split('').forEach((ch, i) => {
-    const el = document.createElement('span');
-    el.style.cssText = 'position:fixed; pointer-events:none; color:#ff9e40; font-weight:bold; z-index:9999; transition:transform 0.1s ease-out;';
-    el.textContent = ch === ' ' ? '\\u00A0' : ch;
-    document.body.appendChild(el);
-    chars.push(el);
-    history.push({ x: 0, y: 0 });
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    pos.x = e.clientX;
-    pos.y = e.clientY;
-  });
-
-  function render() {
-    history.unshift({ ...pos });
-    history.pop();
-    chars.forEach((el, i) => {
-      const p = history[Math.min(i * 3, history.length - 1)];
-      el.style.transform = \`translate(\${p.x + (i * 12) + 15}px, \${p.y + 15}px)\`;
+    text.split('').forEach((ch, i) => {
+        const el = document.createElement('span');
+        el.style.cssText = 'position:fixed; pointer-events:none; color:#ff9e40; font-weight:bold; z-index:9999; transition:transform 0.1s ease-out;';
+        el.textContent = ch === ' ' ? '\\u00A0' : ch;
+        document.body.appendChild(el);
+        chars.push(el);
+        history.push({ x: 0, y: 0 });
     });
-    requestAnimationFrame(render);
-  }
-  render();
-})();<\/script>`
+
+    window.addEventListener('mousemove', (e) => {
+        pos.x = e.clientX;
+        pos.y = e.clientY;
+    });
+
+    function render() {
+        history.unshift({ ...pos });
+        history.pop();
+        chars.forEach((el, i) => {
+            const p = history[Math.min(i * 3, history.length - 1)];
+            el.style.transform = \`translate(\${p.x + (i * 12) + 15}px, \${p.y + 15}px)\`;
+        });
+        requestAnimationFrame(render);
+    }
+    render();
+})();
+<\/script>`
             );
             setupPreviewText(text);
         }
         else if (currentMode === 'typeB') {
             setCodeOutput(
-`<script>(function() {
-  const text = "${text}";
-  const chars = text.split('');
-  let charIndex = 0;
-  let lastTime = 0;
-  const cooldown = 50;
+`<script>
+(function() {
+    const text = "${text}";
+    const chars = text.split('');
+    let charIndex = 0;
+    let lastTime = 0;
+    const cooldown = 50;
 
-  window.addEventListener('mousemove', (e) => {
-    const now = Date.now();
-    if (now - lastTime < cooldown) return;
-    lastTime = now;
+    window.addEventListener('mousemove', (e) => {
+        const now = Date.now();
+        if (now - lastTime < cooldown) return;
+        lastTime = now;
 
-    const el = document.createElement('span');
-    const ch = chars[charIndex % chars.length];
-    charIndex++;
+        const el = document.createElement('span');
+        const ch = chars[charIndex % chars.length];
+        charIndex++;
 
-    el.textContent = ch === ' ' ? '\\u00A0' : ch;
-    el.style.cssText = \`
-      position: fixed;
-      left: \${e.clientX + (Math.random() * 20 - 10)}px;
-      top: \${e.clientY + 10}px;
-      pointer-events: none;
-      color: #ff9e40;
-      font-weight: bold;
-      z-index: 9999;
-      transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease-out;
-      opacity: 1;
-      transform: translateY(0px);
-    \`;
-    document.body.appendChild(el);
+        el.textContent = ch === ' ' ? '\\u00A0' : ch;
+        el.style.cssText = \`
+            position: fixed;
+            left: \${e.clientX + (Math.random() * 20 - 10)}px;
+            top: \${e.clientY + 10}px;
+            pointer-events: none;
+            color: #ff9e40;
+            font-weight: bold;
+            z-index: 9999;
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease-out;
+            opacity: 1;
+            transform: translateY(0px);
+        \`;
+        document.body.appendChild(el);
 
-    requestAnimationFrame(() => {
-      el.style.transform = \`translateY(\${80 + Math.random() * 40}px) rotate(\${Math.random() * 40 - 20}deg)\`;
-      el.style.opacity = '0';
+        requestAnimationFrame(() => {
+            el.style.transform = \`translateY(\${80 + Math.random() * 40}px) rotate(\${Math.random() * 40 - 20}deg)\`;
+            el.style.opacity = '0';
+        });
+
+        setTimeout(() => {
+            el.remove();
+        }, 1200);
     });
-
-    setTimeout(() => {
-      el.remove();
-    }, 1200);
-  });
-})();<\/script>`
+})();
+<\/script>`
             );
             clearTrailElements();
         }
         else if (currentMode === 'typeC') {
             setCodeOutput(
-`<script>(function() {
-  const text = "${text}";
-  document.body.style.cursor = 'none';
+`<script>
+(function() {
+    const text = "${text}";
+    document.body.style.cursor = 'none';
 
-  const cursorEl = document.createElement('div');
-  cursorEl.textContent = text;
-  cursorEl.style.cssText = \`
-    position: fixed;
-    pointer-events: none;
-    color: #ff9e40;
-    font-weight: bold;
-    font-size: 1.1rem;
-    z-index: 99999;
-    white-space: nowrap;
-    text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
-    transform: translate(0, 0);
-  \`;
-  document.body.appendChild(cursorEl);
+    const cursorEl = document.createElement('div');
+    cursorEl.textContent = text;
+    cursorEl.style.cssText = \`
+        position: fixed;
+        pointer-events: none;
+        color: #ff9e40;
+        font-weight: bold;
+        font-size: 1.1rem;
+        z-index: 99999;
+        white-space: nowrap;
+        text-shadow: 0 0 5px rgba(255, 158, 64, 0.8);
+        transform: translate(0, 0);
+    \`;
+    document.body.appendChild(cursorEl);
 
-  window.addEventListener('mousemove', (e) => {
-    cursorEl.style.left = \`\${e.clientX + 10}px\`;
-    cursorEl.style.top = \`\${e.clientY + 10}px\`;
-  });
-})();<\/script>`
+    window.addEventListener('mousemove', (e) => {
+        cursorEl.style.left = \`\${e.clientX + 10}px\`;
+        cursorEl.style.top = \`\${e.clientY + 10}px\`;
+    });
+})();
+<\/script>`
             );
             setupCustomCursor(text);
         }
