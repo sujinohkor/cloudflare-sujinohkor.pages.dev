@@ -4,21 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Bounce SVG Generator</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; }
-                
-        .app-container { display: flex; min-height: 100vh; }
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
         }
-                
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 158, 64, 0.3); border-radius: 4px; }
+
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; min-height: 100vh; gap: 20px; transition: 0.3s; 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         .workspace-container {
@@ -26,436 +51,437 @@
             flex-direction: row;
             flex: 1;
             gap: 20px;
-            min-height: 0;
         }
 
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #F38020; }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
+        /* Generator Content Layouts */
         .content-left { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
-            padding: 25px; background: #1c1c1c; flex-direction: column; gap: 15px; 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
+            padding: 25px; background: rgba(0, 0, 0, 0.2); flex-direction: column; gap: 15px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-
         .content-left h2 { font-size: 1.1rem; color: #ff9e40; margin-bottom: 2px; }
-
         .parameters { display: flex; flex-direction: column; gap: 10px; }
         .field-group { display: flex; flex-direction: column; gap: 3px; }
         .field-group label { font-size: 0.8rem; color: #aaa; font-weight: 600; }
-        
+
         .row-group { display: flex; gap: 10px; }
         .row-group .field-group { flex: 1; }
-        
+
         input, select { 
-            background: #252525; border: 1px solid #444; border-radius: 16px; 
-            padding: 7px 10px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; 
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 16px; 
+            padding: 8px 12px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; font-weight: bold;
         }
-        input:focus, select:focus { outline: none; border-color: #ff9e40; }
+        input:focus, select:focus { outline: none; border-color: rgba(255, 158, 64, 0.8); }
+        select option { background: #181818; color: #fff; }
 
         .color-row { display: flex; gap: 10px; align-items: center; }
-        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 32px; }
+        .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 32px; background: transparent; }
         .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
-        
+
         .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 0.8rem; font-family: monospace; color: #aaa; }
-        .color-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #555; display: inline-block; }
-
+        .color-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(255, 158, 64, 0.4); display: inline-block; }
         .dimensions-group { display: flex; align-items: center; gap: 8px; }
-        .dimensions-group input { width: 100px; }
-
+        .dimensions-group input { width: 100px; text-align: center; }
+        
         .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #ccc; cursor: pointer; margin-top: 2px; }
         .checkbox-group input { accent-color: #ff9e40; width: 15px; height: 15px; cursor: pointer; width: auto; }
 
         .btn { 
-            background: #ff9e40; color: #101010; border: none; border-radius: 16px; 
-            padding: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; margin-top: 5px;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); 
+            border-radius: 16px; padding: 11px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; margin-top: 5px; 
         }
-        .btn:hover { background: #e08b35; }
+        .btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.8); }
 
         .content-right { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            padding: 25px; background: #1c1c1c; gap: 10px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); overflow-y: auto;
+            padding: 25px; background: rgba(0, 0, 0, 0.2); gap: 10px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
         .content-right h2 { font-size: 1.0rem; color: #ff9e40; margin-top: 5px; }
 
         .preview-box { 
-            width: 100%; height: 160px; background: #181818; border: 2px dashed #444; 
+            width: 100%; height: 160px; background: rgba(255, 255, 255, 0.02); border: 2px dashed rgba(255, 158, 64, 0.4); 
             border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; 
         }
-
         .code-container { 
-            background: #181818; color: #ff9e40; padding: 12px; border-radius: 16px; 
+            background: rgba(255, 255, 255, 0.02); color: #ff9e40; padding: 12px; border-radius: 16px; 
             font-family: monospace; font-size: 0.8rem; 
-            min-height: 130px; 
-            max-height: 220px; 
-            overflow-y: auto;  
-            overflow-x: hidden; 
-            white-space: pre-wrap; 
-            word-break: break-all; 
-            border: 1px solid #333; 
+            min-height: 100px; max-height: 180px; 
+            overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; word-break: break-all; 
+            border: 1px solid rgba(255, 158, 64, 0.3); 
         }
 
-        body.light-mode { background-color: #fff; color: #000; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn, body.light-mode .btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover, body.light-mode .btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .content-left, body.light-mode .content-right {
-            background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+            background-color: rgba(255, 255, 255, 0.5); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-        body.light-mode input, body.light-mode select { background: #fff; color: #000; border-color: #ccc; }
+        body.light-mode input, body.light-mode select { background: #fff; color: #000; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode select option { background: #fff; color: #000; }
         body.light-mode .field-group label, body.light-mode .checkbox-group { color: #555; }
-        body.light-mode .preview-box { background: #eee; border-color: #bbb; }
-        body.light-mode .code-container { background: #fff; color: #d35400; border-color: #ddd; }
-        body.light-mode .btn { background: #F38020; color: #fff; }
-        body.light-mode .btn:hover { background: #d35400; }
+        body.light-mode .preview-box { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .code-container { background: #fff; color: #d35400; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
 
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
 
-        @media (max-width: 850px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; }
-            .workspace-container { flex-direction: column; }
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; } 
+            .workspace-container { flex-direction: column; overflow: visible; }
+            .content-left, .content-right { height: auto; flex: none; }
         }
     </style>
 </head>
 <body>
-
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        <div class="bottom-btns">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Text Bounce SVG</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <button class="menu-btn" onclick="generator.resetAll()">Reset</button>
-        </div>
-    </aside>
+        </aside>
 
-    <main class="main-content">
-        <header class="top-section">
-            <h1>Text Bounce SVG Generator</h1>
-            <p>Create custom animated text SVGs for your GitHub README and web projects.</p>
-        </header>
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Text Bounce SVG Generator</h1>
+                <p>Create custom animated text SVGs for your GitHub README and web projects.</p>
+            </header>
 
-        <div class="workspace-container">
-            <!-- 왼쪽 박스: 바운싱 옵션 설정 -->
-            <section class="content-left">
-                <h2>Bounce Options</h2>
-                <div class="parameters">
-                    <div class="field-group">
-                        <label for="input-text">Enter Text</label>
-                        <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
-                    </div>
-
-                    <div class="field-group">
-                        <label for="font-family">Font Family</label>
-                        <select id="font-family" onchange="generator.update()">
-                            <option value="Fira Code" selected>Fira Code</option>
-                            <option value="Courier New">Courier New</option>
-                            <option value="Consolas">Consolas</option>
-                            <option value="Segoe UI">Segoe UI</option>
-                            <option value="Arial">Arial</option>
-                            <option value="Impact">Impact</option>
-                        </select>
-                    </div>
-
-                    <!-- Font Color & Opacity -->
-                    <div class="field-group">
-                        <label>Font color & Opacity</label>
-                        <div class="color-row">
-                            <input type="color" id="font-color" value="#36BCF7" oninput="generator.update()">
-                            <input type="range" id="font-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
-                        </div>
-                        <div class="color-preview-box">
-                            <span class="color-swatch" id="font-swatch"></span>
-                            <span id="font-hex-text">#36BCF7FF</span>
-                        </div>
-                    </div>
-
-                    <!-- Background Color & Opacity -->
-                    <div class="field-group">
-                        <label>Background color & Opacity</label>
-                        <div class="color-row">
-                            <input type="color" id="bg-color" value="#000000" oninput="generator.update()">
-                            <input type="range" id="bg-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
-                        </div>
-                        <div class="color-preview-box">
-                            <span class="color-swatch" id="bg-swatch"></span>
-                            <span id="bg-hex-text">#000000FF</span>
-                        </div>
-                    </div>
-
-                    <!-- Font Size & Bounce Height 한 줄 배치 -->
-                    <div class="row-group">
+            <div class="workspace-container">
+                <!-- 왼쪽 박스: 바운싱 옵션 설정 -->
+                <section class="content-left">
+                    <h2>Bounce Options</h2>
+                    <div class="parameters">
                         <div class="field-group">
-                            <label for="font-size">Font size</label>
-                            <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
+                            <label for="input-text">Enter Text</label>
+                            <input type="text" id="input-text" value="SUJIN's FUN SITE" oninput="generator.update()">
                         </div>
-                        <div class="field-group">
-                            <label for="bounce-height">Bounce Height (px)</label>
-                            <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
-                        </div>
-                    </div>
 
-                    <!-- 정렬 옵션 한 줄 배치 -->
-                    <div class="row-group">
                         <div class="field-group">
-                            <label for="h-align">Horizontally Alignment</label>
-                            <select id="h-align" onchange="generator.update()">
-                                <option value="center" selected>Center</option>
-                                <option value="left">Left</option>
-                                <option value="right">Right</option>
+                            <label for="font-family">Font Family</label>
+                            <select id="font-family" onchange="generator.update()">
+                                <option value="Fira Code" selected>Fira Code</option>
+                                <option value="Courier New">Courier New</option>
+                                <option value="Consolas">Consolas</option>
+                                <option value="Segoe UI">Segoe UI</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Impact">Impact</option>
                             </select>
                         </div>
+
+                        <!-- Font Color & Opacity -->
                         <div class="field-group">
-                            <label for="v-align">Vertically Alignment</label>
-                            <select id="v-align" onchange="generator.update()">
-                                <option value="middle" selected>Middle</option>
-                                <option value="top">Top</option>
-                                <option value="bottom">Bottom</option>
-                            </select>
+                            <label>Font color & Opacity</label>
+                            <div class="color-row">
+                                <input type="color" id="font-color" value="#36BCF7" oninput="generator.update()">
+                                <input type="range" id="font-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
+                            </div>
+                            <div class="color-preview-box">
+                                <span class="color-swatch" id="font-swatch"></span>
+                                <span id="font-hex-text">#36BCF7FF</span>
+                            </div>
+                        </div>
+
+                        <!-- Background Color & Opacity -->
+                        <div class="field-group">
+                            <label>Background color & Opacity</label>
+                            <div class="color-row">
+                                <input type="color" id="bg-color" value="#000000" oninput="generator.update()">
+                                <input type="range" id="bg-opacity" min="0" max="1" step="0.05" value="1" oninput="generator.update()">
+                            </div>
+                            <div class="color-preview-box">
+                                <span class="color-swatch" id="bg-swatch"></span>
+                                <span id="bg-hex-text">#000000FF</span>
+                            </div>
+                        </div>
+
+                        <!-- Font Size & Bounce Height 한 줄 배치 -->
+                        <div class="row-group">
+                            <div class="field-group">
+                                <label for="font-size">Font size</label>
+                                <input type="number" id="font-size" value="28" min="12" max="60" oninput="generator.update()">
+                            </div>
+                            <div class="field-group">
+                                <label for="bounce-height">Bounce Height (px)</label>
+                                <input type="number" id="bounce-height" value="15" min="5" max="50" oninput="generator.update()">
+                            </div>
+                        </div>
+
+                        <!-- 정렬 옵션 한 줄 배치 -->
+                        <div class="row-group">
+                            <div class="field-group">
+                                <label for="h-align">Horizontally Alignment</label>
+                                <select id="h-align" onchange="generator.update()">
+                                    <option value="center" selected>Center</option>
+                                    <option value="left">Left</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label for="v-align">Vertically Alignment</label>
+                                <select id="v-align" onchange="generator.update()">
+                                    <option value="middle" selected>Middle</option>
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 테두리 옵션 -->
+                        <label class="checkbox-group">
+                            <input type="checkbox" id="show-border" onchange="generator.update()"> Show Border
+                        </label>
+
+                        <div class="field-group">
+                            <label>Width ✕ Height (px)</label>
+                            <div class="dimensions-group">
+                                <input type="number" id="width" value="500" min="100" max="1000" oninput="generator.update()">
+                                <span>✕</span>
+                                <input type="number" id="height" value="120" min="50" max="400" oninput="generator.update()">
+                            </div>
                         </div>
                     </div>
+                    <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
+                </section>
 
-                    <!-- 테두리 옵션 -->
-                    <label class="checkbox-group">
-                        <input type="checkbox" id="show-border" onchange="generator.update()"> Show Border
-                    </label>
-
-                    <div class="field-group">
-                        <label>Width ✕ Height (px)</label>
-                        <div class="dimensions-group">
-                            <input type="number" id="width" value="500" min="100" max="1000" oninput="generator.update()">
-                            <span>✕</span>
-                            <input type="number" id="height" value="120" min="50" max="400" oninput="generator.update()">
-                        </div>
+                <!-- 우측 박스: 미리보기 및 소스 복사 -->
+                <section class="content-right">
+                    <h2>Preview</h2>
+                    <div class="preview-box" id="preview">
+                        <!-- 실시간 바운싱 렌더링 -->
                     </div>
-                </div>
-                <button class="btn" onclick="generator.downloadSVG()">Download SVG File</button>
-            </section>
 
-            <!-- 우측 박스: 미리보기 및 소스 복사 -->
-            <section class="content-right">
-                <h2>Preview</h2>
-                <div class="preview-box" id="preview">
-                    <!-- 실시간 바운싱 렌더링 -->
-                </div>
+                    <h2>Markdown Source</h2>
+                    <div class="code-container" id="md-code"><code></code></div>
+                    <button class="btn" onclick="generator.copyCode('markdown')">Copy Markdown</button>
 
-                <h2>Markdown Source</h2>
-                <div class="code-container" id="md-code"><code></code></div>
-                <button class="btn" onclick="generator.copyCode('markdown')">Copy Markdown</button>
+                    <h2>HTML Source</h2>
+                    <div class="code-container" id="html-code"><code></code></div>
+                    <button class="btn" onclick="generator.copyCode('html')">Copy HTML</button>
+                </section>
+            </div>
+        </main>
+    </div>
 
-                <h2>HTML Source</h2>
-                <div class="code-container" id="html-code"><code></code></div>
-                <button class="btn" onclick="generator.copyCode('html')">Copy HTML</button>
-            </section>
-        </div>
-    </main>
-</div>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
 
-<script>
-    const sidebar = document.getElementById('sidebar');
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
-    
-    document.querySelector('.main-content').addEventListener('click', (e) => { 
-        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
-    });
-
-    function getHexWithAlpha(colorId, opacityId) {
-        const hex = document.getElementById(colorId).value.toUpperCase();
-        const opacity = parseFloat(document.getElementById(opacityId).value);
-        const alphaHex = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
-        return hex + alphaHex;
-    }
-
-    const generator = {
-        workerUrl: 'https://text-bounce-svg.sujinohkor.workers.dev',
-
-        getSourceUrls() {
-            const text = document.getElementById('input-text').value;
-            const fontName = document.getElementById('font-family').value;
-            const fontColor = document.getElementById('font-color').value.replace('#', '').toUpperCase();
-            const bgColor = document.getElementById('bg-color').value.replace('#', '').toUpperCase();
-            const fontOpacity = document.getElementById('font-opacity').value;
-            const bgOpacity = document.getElementById('bg-opacity').value;
-            const fontSize = document.getElementById('font-size').value;
-            const bounceHeight = document.getElementById('bounce-height').value;
-            const hAlign = document.getElementById('h-align').value;
-            const vAlign = document.getElementById('v-align').value;
-            const showBorder = document.getElementById('show-border').checked;
-            const width = document.getElementById('width').value;
-            const height = document.getElementById('height').value;
-
-            const fontAlpha = Math.round(fontOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
-            const bgAlpha = Math.round(bgOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
-
-            const params = new URLSearchParams({
-                text: text,
-                font: fontName,
-                color: fontColor + fontAlpha,
-                background: bgColor + bgAlpha,
-                size: fontSize,
-                bounce: bounceHeight,
-                hAlign: hAlign,
-                vAlign: vAlign,
-                border: showBorder,
-                width: width,
-                height: height
-            });
-
-            const imageUrl = `${this.workerUrl}/?${params.toString()}`;
-            const markdown = `[![Bounce Text](${imageUrl})](https://sujinohkor.pages.dev)`;
-            const html = `<a href="https://sujinohkor.pages.dev"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
-            return { markdown, html, imageUrl };
-        },
-
-        getSVGString() {
-            const text = document.getElementById('input-text').value;
-            const fontName = document.getElementById('font-family').value;
-            const fontColorHex = getHexWithAlpha('font-color', 'font-opacity');
-            const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
-            const fontSize = parseInt(document.getElementById('font-size').value);
-            const bounceHeight = parseInt(document.getElementById('bounce-height').value);
-            const hAlign = document.getElementById('h-align').value;
-            const vAlign = document.getElementById('v-align').value;
-            const showBorder = document.getElementById('show-border').checked;
-            const width = parseInt(document.getElementById('width').value);
-            const height = parseInt(document.getElementById('height').value);
-
-            document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
-            document.getElementById('font-hex-text').textContent = fontColorHex;
-            document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
-            document.getElementById('bg-hex-text').textContent = bgColorHex;
-
-            const charWidth = fontSize * 0.55;
-            let totalTextWidth = 0;
-            [...text].forEach(char => {
-                totalTextWidth += (char === ' ' ? charWidth * 0.5 : charWidth);
-            });
-
-            const padding = 20; // 양옆에 줄 기본 여백(px)
-            let startX = padding;
-            
-            if (hAlign === 'center') { startX = (width - totalTextWidth) / 2; }
-            else if (hAlign === 'right') { startX = width - totalTextWidth - padding; }
-            else if (hAlign === 'left') { startX = 1; }
-            // 만약 글자가 너무 길어서 박스를 벗어나려 하면 최소 여백 보장
-            if (startX < 10) startX = 10;
-
-            let startY = height / 2 + fontSize / 3;
-            if (vAlign === 'top') startY = fontSize + 10;
-            else if (vAlign === 'bottom') startY = height - 15;
-
-            let textElements = '';
-            let currentX = startX;
-
-            [...text].forEach((char, index) => {
-                const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
-                const delay = (0.08 * (index + 1)).toFixed(2);
-                
-                textElements += `
-        <g class="bounce-char" style="animation-delay: ${delay}s;">
-            <text x="${currentX}" y="${startY}" class="bounce-text-svg">${escapedChar}</text>
-        </g>`;
-                currentX += charWidth;
-            });
-
-            const borderCss = showBorder ? `stroke: ${fontColorHex}; stroke-width: 2px;` : `stroke: none;`;
-
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-    <style>
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-${bounceHeight}px); }
-            50% { transform: translateY(0); }
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
         }
-        .bg { fill: ${bgColorHex}; ${borderCss} rx: 8px; }
-        .bounce-text-svg {
-            font-family: '${fontName}', monospace;
-            font-size: ${fontSize}px;
-            font-weight: bold;
-            fill: ${fontColorHex};
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
+
+        mainContent.addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
+
+        function getHexWithAlpha(colorId, opacityId) {
+            const hex = document.getElementById(colorId).value.toUpperCase();
+            const opacity = parseFloat(document.getElementById(opacityId).value);
+            const alphaHex = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
+            return hex + alphaHex;
         }
-        .bounce-char {
-            display: inline-block;
-            animation: bounce 1.2s infinite ease-in-out;
+
+        const generator = {
+            workerUrl: 'https://text-bounce-svg.sujinohkor.workers.dev',
+
+            getSourceUrls() {
+                const text = document.getElementById('input-text').value;
+                const fontName = document.getElementById('font-family').value;
+                const fontColor = document.getElementById('font-color').value.replace('#', '').toUpperCase();
+                const bgColor = document.getElementById('bg-color').value.replace('#', '').toUpperCase();
+                const fontOpacity = document.getElementById('font-opacity').value;
+                const bgOpacity = document.getElementById('bg-opacity').value;
+                const fontSize = document.getElementById('font-size').value;
+                const bounceHeight = document.getElementById('bounce-height').value;
+                const hAlign = document.getElementById('h-align').value;
+                const vAlign = document.getElementById('v-align').value;
+                const showBorder = document.getElementById('show-border').checked;
+                const width = document.getElementById('width').value;
+                const height = document.getElementById('height').value;
+
+                const fontAlpha = Math.round(fontOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
+                const bgAlpha = Math.round(bgOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
+
+                const params = new URLSearchParams({
+                    text: text,
+                    font: fontName,
+                    color: fontColor + fontAlpha,
+                    background: bgColor + bgAlpha,
+                    size: fontSize,
+                    bounce: bounceHeight,
+                    hAlign: hAlign,
+                    vAlign: vAlign,
+                    border: showBorder,
+                    width: width,
+                    height: height
+                });
+
+                const imageUrl = `${this.workerUrl}/?${params.toString()}`;
+                const markdown = `[![Bounce Text](${imageUrl})](https://sujinohkor.pages.dev)`;
+                const html = `<a href="https://sujinohkor.pages.dev"><img src="${imageUrl}" alt="Bounce Text" /></a>`;
+                return { markdown, html, imageUrl };
+            },
+
+            getSVGString() {
+                const text = document.getElementById('input-text').value;
+                const fontName = document.getElementById('font-family').value;
+                const fontColorHex = getHexWithAlpha('font-color', 'font-opacity');
+                const bgColorHex = getHexWithAlpha('bg-color', 'bg-opacity');
+                const fontSize = parseInt(document.getElementById('font-size').value);
+                const bounceHeight = parseInt(document.getElementById('bounce-height').value);
+                const hAlign = document.getElementById('h-align').value;
+                const vAlign = document.getElementById('v-align').value;
+                const showBorder = document.getElementById('show-border').checked;
+                const width = parseInt(document.getElementById('width').value);
+                const height = parseInt(document.getElementById('height').value);
+
+                document.getElementById('font-swatch').style.backgroundColor = fontColorHex;
+                document.getElementById('font-hex-text').textContent = fontColorHex;
+                document.getElementById('bg-swatch').style.backgroundColor = bgColorHex;
+                document.getElementById('bg-hex-text').textContent = bgColorHex;
+
+                const charWidth = fontSize * 0.55;
+                let totalTextWidth = 0;
+                [...text].forEach(char => {
+                    totalTextWidth += (char === ' ' ? charWidth * 0.5 : charWidth);
+                });
+
+                const padding = 20; 
+                let startX = padding;
+                            
+                if (hAlign === 'center') { startX = (width - totalTextWidth) / 2; }
+                else if (hAlign === 'right') { startX = width - totalTextWidth - padding; }
+                else if (hAlign === 'left') { startX = 1; }
+                if (startX < 10) startX = 10;
+
+                let startY = height / 2 + fontSize / 3;
+                if (vAlign === 'top') startY = fontSize + 10;
+                else if (vAlign === 'bottom') startY = height - 15;
+
+                let textElements = '';
+                let currentX = startX;
+
+                [...text].forEach((char, index) => {
+                    const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
+                    const delay = (0.08 * (index + 1)).toFixed(2);
+                                
+                    textElements += `        <g class="bounce-char" style="animation-delay: ${delay}s;">            <text x="${currentX}" y="${startY}" class="bounce-text-svg">${escapedChar}</text>        </g>`;
+                    currentX += charWidth;
+                });
+
+                const borderCss = showBorder ? `stroke: ${fontColorHex}; stroke-width: 2px;` : `stroke: none;`;
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">    <style>        @keyframes bounce {            0%, 100% { transform: translateY(0); }            30% { transform: translateY(-${bounceHeight}px); }            50% { transform: translateY(0); }        }        .bg { fill: ${bgColorHex}; ${borderCss} rx: 8px; }        .bounce-text-svg {            font-family: '${fontName}', monospace;            font-size: ${fontSize}px;            font-weight: bold;            fill: ${fontColorHex};        }        .bounce-char {            display: inline-block;            animation: bounce 1.2s infinite ease-in-out;        }    </style>    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" class="bg" />    <g>${textElements}</g></svg>`;
+            },
+
+            update() {
+                const svgStr = this.getSVGString();
+                document.getElementById('preview').innerHTML = svgStr;
+
+                const sources = this.getSourceUrls();
+                document.getElementById('html-code').querySelector('code').textContent = sources.html;
+                document.getElementById('md-code').querySelector('code').textContent = sources.markdown;
+            },
+
+            downloadSVG() {
+                const svgStr = this.getSVGString();
+                const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'bounce-text.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+
+            copyCode(type) {
+                const sources = this.getSourceUrls();
+                const text = (type === 'html') ? sources.html : sources.markdown;
+                            
+                navigator.clipboard.writeText(text).then(() => {
+                    alert(`${type.toUpperCase()} source copied to clipboard!`);
+                });
+            },
+
+            resetAll() {
+                document.getElementById('input-text').value = "SUJIN's FUN SITE";
+                document.getElementById('font-family').value = "Fira Code";
+                document.getElementById('font-color').value = "#36BCF7";
+                document.getElementById('font-opacity').value = "1";
+                document.getElementById('bg-color').value = "#000000";
+                document.getElementById('bg-opacity').value = "1";
+                document.getElementById('font-size').value = "28";
+                document.getElementById('bounce-height').value = "15";
+                document.getElementById('h-align').value = "center";
+                document.getElementById('v-align').value = "middle";
+                document.getElementById('show-border').checked = false;
+                document.getElementById('width').value = "500";
+                document.getElementById('height').value = "120";
+                this.update();
+            }
+        };
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
-    </style>
-    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" class="bg" />
-    <g>${textElements}</g>
-</svg>`;
-        },
 
-        update() {
-            const svgStr = this.getSVGString();
-            document.getElementById('preview').innerHTML = svgStr;
-
-            const sources = this.getSourceUrls();
-            document.getElementById('html-code').querySelector('code').textContent = sources.html;
-            document.getElementById('md-code').querySelector('code').textContent = sources.markdown;
-        },
-
-        downloadSVG() {
-            const svgStr = this.getSVGString();
-            const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'bounce-text.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        },
-
-        copyCode(type) {
-            const sources = this.getSourceUrls();
-            const text = (type === 'html') ? sources.html : sources.markdown;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                alert(`${type.toUpperCase()} source copied to clipboard!`);
-            });
-        },
-
-        resetAll() {
-            document.getElementById('input-text').value = "SUJIN's FUN SITE";
-            document.getElementById('font-family').value = "Fira Code";
-            document.getElementById('font-color').value = "#36BCF7";
-            document.getElementById('font-opacity').value = "1";
-            document.getElementById('bg-color').value = "#000000";
-            document.getElementById('bg-opacity').value = "1";
-            document.getElementById('font-size').value = "28";
-            document.getElementById('bounce-height').value = "15";
-            document.getElementById('h-align').value = "center";
-            document.getElementById('v-align').value = "middle";
-            document.getElementById('show-border').checked = false;
-            document.getElementById('width').value = "500";
-            document.getElementById('height').value = "120";
-            this.update();
-        }
-    };
-
-    function escapeHtml(text) {
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    window.onload = function() {
-        generator.update();
-    };
-</script>
-
+        window.onload = function() {
+            generator.update();
+        };
+    </script>
 </body>
 </html>
