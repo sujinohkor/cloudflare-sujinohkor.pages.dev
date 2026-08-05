@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinyin to Chinese</title>
+    <!-- 파비콘 설정 추가 -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <!-- OpenCC-JS (간체/번체 변환용) -->
+    <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 2000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .mode-group {
+            display: flex;
+            gap: 8px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .mode-btn.active {
+            background: rgba(255, 158, 64, 0.3);
+            border-color: rgba(255, 158, 64, 0.8);
+        }
+        .mode-btn:hover {
+            background: rgba(255, 158, 64, 0.2);
+        }
+
+        /* 통계 패널(카드) 스타일 */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 158, 64, 0.25);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+        .info-row span:last-child {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
+        .content-card { 
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            flex: 1; 
+            display: flex; 
+            overflow: hidden; 
+            background: rgba(0, 0, 0, 0.2); 
+            position: relative; 
+            flex-direction: column;
+        }
+
+        /* 후보군 및 안내 바 스타일 */
+        .candidate-box {
+            height: 45px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 158, 64, 0.25);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .candidate-label {
+            color: #ff9e40;
+            font-weight: bold;
+        }
+        #pinyin-display {
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+        }
+
+        /* 전체화면 버튼 스타일 */
+        .fullscreen-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.03); 
+            color: #ff9e40; 
+            border: 1px solid rgba(255, 158, 64, 0.5); 
+            padding: 6px 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+            transition: all 0.3s; 
+        }
+        .fullscreen-btn:hover { 
+            background: rgba(255, 158, 64, 0.2); 
+            color: #ff9e40; 
+            border-color: rgba(255, 158, 64, 0.8);
+        }
+
+        /* 전체화면 활성화 클래스 */
+        .content-card.fullscreen { 
+            position: fixed !important; 
+            top: 0 !important; 
+            left: 0 !important; 
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important; 
+            height: 100vh !important; 
+            z-index: 9999 !important; 
+            border-radius: 0 !important; 
+            border: none !important; 
+            padding: 0 !important; 
+            margin: 0 !important;
+            background: #101010; 
+        }
+        .content-card.fullscreen .editor-wrapper {
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Line Numbers & Editor Wrapper */
+        .editor-wrapper { 
+            display: flex; 
+            width: 100%; 
+            flex: 1;
+            overflow: hidden; 
+        }
+        .line-numbers { 
+            width: 50px; 
+            padding: 40px 10px 40px 0; 
+            background: rgba(0, 0, 0, 0.2); 
+            color: #666; 
+            font-family: 'Consolas', sans-serif; 
+            font-size: 1rem; 
+            text-align: right; 
+            user-select: none; 
+            overflow: hidden; 
+            line-height: 1.5; 
+        }
+        textarea { 
+            flex: 1; 
+            height: 100%; 
+            padding: 40px; 
+            background: transparent; 
+            border: none; 
+            color: #fff; 
+            font-family: 'Consolas', sans-serif; 
+            font-size: 1rem; 
+            resize: none; 
+            outline: none; 
+            line-height: 1.5; 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+            overflow-y: auto; 
+        }
+
+        /* 다크 모드 카드/패널 그림자 */
+        .card, .content-card { 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn, body.light-mode .mode-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover, body.light-mode .mode-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .mode-btn.active {
+            background: rgba(243, 128, 32, 0.3);
+            border-color: rgba(243, 128, 32, 0.8);
+        }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode textarea { color: #000; }
+        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #999; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        body.light-mode .content-card { background: rgba(255, 255, 255, 0.5); border-color: #F38020; }
+        body.light-mode .content-card.fullscreen { background: #fff !important; padding: 0 !important; }
+        body.light-mode .content-card.fullscreen .editor-wrapper { padding: 20px; }
+        body.light-mode .fullscreen-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .fullscreen-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .info-panel {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(243, 128, 32, 0.5);
+        }
+        body.light-mode .info-row { color: #202020; }
+        body.light-mode .info-row span:last-child { color: #F38020; }
+        body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
+        body.light-mode #pinyin-display { color: #202020; }
+        body.light-mode .card, body.light-mode .content-card { 
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 3000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
+
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
+            .content-card { min-height: 0; height: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Pinyin Input</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+            <!-- 간체/번체 변환 모드 선택 버튼 그룹 -->
+            <div class="mode-group">
+                <button class="mode-btn active" id="mode-simp" onclick="setMode('simplified')">간체 (Simp)</button>
+                <button class="mode-btn" id="mode-trad" onclick="setMode('traditional')">번체 (Trad)</button>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-row">
+                    <span>Characters</span>
+                    <span id="char-count">0</span>
+                </div>
+                <div class="info-row">
+                    <span>Input Status</span>
+                    <span id="status-text">Ready</span>
+                </div>
+            </div>
+
+            <div class="bottom-btns">
+                <button class="menu-btn" onclick="copyText()">Copy</button>
+                <button class="menu-btn" onclick="saveText()">Save</button>
+                <button class="menu-btn" onclick="resetText()">Reset</button>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Pinyin to Chinese</h1>
+                <p>Type English pinyin (e.g., nihao) and press Space or Enter to convert.</p>
+            </header>
+
+            <section class="content-card" id="content-card">
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
+                
+                <!-- 입력 버퍼 및 변환 가이드 바 -->
+                <div class="candidate-box">
+                    <span class="candidate-label">Current Pinyin:</span>
+                    <span id="pinyin-display">(Type english letters...)</span>
+                </div>
+
+                <div class="editor-wrapper">
+                    <div id="line-numbers" class="line-numbers">1</div>
+                    <textarea id="text-input" placeholder="Type pinyin here (e.g. nihao -> 你好)..."></textarea>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('text-input');
+        const lineNumbers = document.getElementById('line-numbers');
+        const sidebar = document.getElementById('sidebar');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const pinyinDisplay = document.getElementById('pinyin-display');
+        const statusText = document.getElementById('status-text');
+
+        let currentMode = 'simplified';
+        let currentPinyin = '';
+
+        // OpenCC 변환기 초기화
+        const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
+        const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
+
+        window.toggleFullscreen = function() {
+            contentCard.classList.toggle('fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {
+                fullscreenBtn.textContent = 'Minimize 🗗';
+            } else {
+                fullscreenBtn.textContent = 'Maximize ⛶';
+            }
+        };
+
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+        }
+
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
+
+        mainContent.addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-simp').classList.toggle('active', mode === 'simplified');
+            document.getElementById('mode-trad').classList.toggle('active', mode === 'traditional');
+
+            let text = textInput.value;
+            if (text) {
+                if (mode === 'traditional') {
+                    textInput.value = toTraditional(text);
+                } else {
+                    textInput.value = toSimplified(text);
+                }
+                textInput.dispatchEvent(new Event('input'));
+            }
+        }
+
+        // 구글 입력 도구 API(Google Input Tools)를 활용한 실시간 병음 변환 연동
+        textInput.addEventListener('keydown', async (e) => {
+            // 알파벳 입력 시 버퍼에 누적
+            if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+                currentPinyin += e.key;
+                pinyinDisplay.textContent = currentPinyin;
+                statusText.textContent = "Typing...";
+            } else if (e.key === 'Backspace') {
+                if (currentPinyin.length > 0) {
+                    currentPinyin = currentPinyin.slice(0, -1);
+                    pinyinDisplay.textContent = currentPinyin || "(Type english letters...)";
+                }
+            } else if ((e.key === ' ' || e.key === 'Enter') && currentPinyin.length > 0) {
+                e.preventDefault();
+                statusText.textContent = "Converting...";
+                
+                // Google Input Tools API 호출 (zh-t-i0-pinyin)
+                try {
+                    const res = await fetch(`https://inputtools.google.com/request?text=${encodeURIComponent(currentPinyin)}&itc=zh-t-i0-pinyin&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8`);
+                    const data = await res.json();
+                    
+                    if (data[0] === 'SUCCESS') {
+                        let hanzi = data[1][0][1][0]; // 첫 번째 추천 한자 매칭
+                        if (currentMode === 'traditional') {
+                            hanzi = toTraditional(hanzi);
+                        } else {
+                            hanzi = toSimplified(hanzi);
+                        }
+                        
+                        // 텍스트area에 한자 삽입
+                        const start = textInput.selectionStart;
+                        const end = textInput.selectionEnd;
+                        const val = textInput.value;
+                        textInput.value = val.substring(0, start) + hanzi + val.substring(end);
+                        textInput.selectionStart = textInput.selectionEnd = start + hanzi.length;
+                        
+                        textInput.dispatchEvent(new Event('input'));
+                    }
+                } catch (err) {
+                    console.error("Conversion error:", err);
+                }
+
+                currentPinyin = '';
+                pinyinDisplay.textContent = "(Type english letters...)";
+                statusText.textContent = "Ready";
+            } else if (e.key === 'Escape') {
+                currentPinyin = '';
+                pinyinDisplay.textContent = "(Type english letters...)";
+                statusText.textContent = "Ready";
+            }
+        });
+
+        textInput.addEventListener('input', () => {
+            const text = textInput.value;
+            document.getElementById('char-count').innerText = text.length;
+            updateLineNumbers();
+            saveToLocal();
+        });
+
+        function updateLineNumbers() {
+            const text = textInput.value;
+            const lines = text.split('\n');
+            const measureDiv = document.createElement('div');
+            measureDiv.style.font = window.getComputedStyle(textInput).font;
+            measureDiv.style.width = (textInput.clientWidth - 80) + 'px';
+            measureDiv.style.visibility = 'hidden';
+            measureDiv.style.position = 'absolute';
+            measureDiv.style.whiteSpace = 'pre-wrap';
+            measureDiv.style.wordBreak = 'break-all';
+            document.body.appendChild(measureDiv);
+
+            let simpleResult = '';
+            let currentLine = 1;
+
+            lines.forEach((line) => {
+                measureDiv.textContent = line === '' ? ' ' : line;
+                const lineCount = Math.max(1, Math.round(measureDiv.clientHeight / parseFloat(window.getComputedStyle(textInput).lineHeight)));
+                for (let i = 0; i < lineCount; i++) {
+                    simpleResult += (i === 0 ? currentLine : '&nbsp;') + '<br>';
+                }
+                currentLine++;
+            });
+
+            document.body.removeChild(measureDiv);
+            lineNumbers.innerHTML = simpleResult || '1';
+        }
+
+        textInput.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = textInput.scrollTop;
+        });
+
+        window.addEventListener('resize', updateLineNumbers);
+
+        function resetText() {
+            if (confirm('Are you sure you want to clear all text?')) {
+                localStorage.removeItem('saved_pinyin_text');
+                textInput.value = '';
+                currentPinyin = '';
+                pinyinDisplay.textContent = "(Type english letters...)";
+                textInput.dispatchEvent(new Event('input'));
+            }
+        }
+
+        function copyText() {
+            if (!textInput.value) return alert('No text to copy.');
+            textInput.select();
+            document.execCommand('copy');
+            alert('Text copied!');
+        }
+
+        function saveText() {
+            const text = textInput.value;
+            if (!text.trim()) return alert("No text to save.");
+
+            localStorage.setItem('saved_pinyin_text', text);
+            const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'ChineseText.txt';
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            alert('Text saved successfully.');
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('saved_pinyin_text', textInput.value);
+        }
+
+        function loadSavedText() {
+            const savedText = localStorage.getItem('saved_pinyin_text');
+            if (savedText !== null) {
+                textInput.value = savedText;
+                textInput.dispatchEvent(new Event('input')); 
+            }
+        }
+
+        loadSavedText();
+        updateLineNumbers();
+    </script>
+</body>
+</html>
