@@ -4,31 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSD AI Reader</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    
-    <!-- 1. PSD 파서 라이브러리 (unpkg 대체 CDN으로 안정화) -->
+        <!-- 1. PSD Parser Library -->
     <script src="https://unpkg.com/psd/dist/psd.min.js"></script>
     <script src="/codes/psd.min.js"></script>
-    
-    <!-- 2. AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
+        <!-- 2. AI (PDF Compatible Data) Parser Library (PDF.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-        
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* Fully transparent floating sidebar (Desktop only) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
-        
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT button top placement style */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* Main content area */
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s;
+            margin-left: 300px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            gap: 20px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
         }
 
         .workspace-container {
@@ -42,23 +90,29 @@
         #file-name-label {
             color: #ff9e40;
             font-weight: bold;
+            font-size: 0.95rem;
         }
 
-        /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s;
-        }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-        
         .content-mid { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; overflow: auto; 
-            padding: 20px; color: #888; font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; font-size: 1rem;
-            cursor: pointer; transition: all 0.3s ease; user-select: none;
-            flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
+            flex: 1; 
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            display: flex; 
+            overflow: auto; 
+            padding: 20px; 
+            color: #888; 
+            font-family: 'Consolas', 'Courier New', 'Monaco', monospace, sans-serif; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            user-select: none;
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            text-align: center;
             position: relative;
+            background: transparent;
         }
         .content-mid.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; color: #ff9e40; }
         .content-mid.has-file {
@@ -72,27 +126,40 @@
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
-                              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #ccc 75%), 
-                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+                               linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                               linear-gradient(45deg, transparent 75%, #ccc 75%),
+                               linear-gradient(-45deg, transparent 75%, #ccc 75%);
             background-size: 16px 16px;
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
             background-color: #fff;
             display: none;
         }
 
-        /* 다크 모드 카드/패널 그림자 (PSD AI Reader 요소 확장) */
-        .card, .content-mid, .content-down {
+        /* Dark mode card/panel shadow */
+        .card, .content-mid {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .content-mid { color: #666; }
         body.light-mode .content-mid.has-file { background-color: rgba(243, 128, 32, 0.05); }
@@ -100,43 +167,50 @@
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode #file-name-label { color: #F38020; }
 
-        /* 데이 모드 카드/패널 그림자 (PSD AI Reader 요소 확장) */
         body.light-mode .card, 
-        body.light-mode .content-mid, 
-        body.light-mode .content-down {
+        body.light-mode .content-mid {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
 
-        /* 데이 모드 내부 소형 카드/리스트 아이템 그림자 */
-        body.light-mode .color-card,
-        body.light-mode .list-item {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
         }
 
-        /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        
-        @media (max-width: 600px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
-            .workspace-container { flex-direction: column; }
-            .content-mid { flex: 1; }
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            } 
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; height: auto; overflow-y: auto; } 
+            .workspace-container { flex-direction: column; flex: none; height: auto; }
+            .content-mid { flex: none; min-height: 350px; }
         }
     </style>
 </head>
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <input type="file" id="file-selector" accept=".psd,.ai,image/*" style="display: none;">
-
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">PSD AI Reader</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        
+
         <div class="bottom-btns">
             <button class="menu-btn" onclick="uploadFile()">Upload</button>
             <button class="menu-btn" onclick="savePNG()">Save as PNG</button>
@@ -149,15 +223,15 @@
             <h1>PSD AI Reader</h1>
             <p id="status-desc">Upload a file below to view content.</p>
         </header>
-        
+
         <div class="workspace-container">
             <label id="file-name-label">File name will be appeared here.</label>
             <section class="content-mid" id="drop-zone">
                 <div id="default-ui">
                     <div style="font-size: 3rem;">🖼️</div>
-                    <div>Drag & Drop a PSD, AI, SVG, or Image file here or click to upload.</div>
+                    <div>Drag & Drop a PSD, AI, SVG, or image file here or click to upload.</div>
                 </div>
-                <img id="resultImg" alt="PSD 미리보기">
+                <img id="resultImg" alt="Preview">
                 <canvas id="viewCanvas"></canvas>
             </section>
         </div>
@@ -177,12 +251,31 @@
     const canvas = document.getElementById('viewCanvas');
     const resultImg = document.getElementById('resultImg');
     const ctx = canvas.getContext('2d');
-    
+
     let loadedFile = null;
 
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    function toggleSidebar() { 
+        sidebar.classList.toggle('active'); 
+    }
+
+    sidebar.querySelectorAll('button').forEach(element => {
+        element.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                if (element.id === 'file-selector') return;
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
 
     function setInitialUI() {
         dropZone.classList.remove('has-file');
@@ -199,12 +292,12 @@
 
         loadedFile = file;
         const fileName = file.name.toLowerCase();
-        
+
         defaultUI.style.display = 'none';
         resultImg.style.display = 'none';
         canvas.style.display = 'none';
         dropZone.classList.add('has-file');
-        fileNameLabel.innerText = `${file.name} (분석 중...)`;
+        fileNameLabel.innerText = `${file.name} (Analyzing...)`;
 
         try {
             if (fileName.endsWith('.psd')) {
@@ -221,22 +314,22 @@
                 };
                 reader.readAsDataURL(file);
             } else {
-                fileNameLabel.innerText = '지원하지 않는 파일 형식입니다.';
+                fileNameLabel.innerText = 'Unsupported file format.';
             }
         } catch (err) {
             console.error('File Parsing Error:', err);
-            fileNameLabel.innerText = `에러 발생: ${err.message || '파일을 읽을 수 없습니다.'}`;
+            fileNameLabel.innerText = `Error occurred: ${err.message || 'Unable to read file.'}`;
         }
     }
 
     function renderPSD(file) {
         return new Promise((resolve, reject) => {
-            fileNameLabel.innerText = `${file.name} (PSD 분석 중...)`;
-            
+            fileNameLabel.innerText = `${file.name} (Analyzing PSD...)`;
+
             const PSDParser = window.PSD || (window.require && window.require('psd'));
 
             if (!PSDParser) {
-                reject(new Error('PSD 라이브러리가 로드되지 않았습니다. 인터넷 연결을 확인하세요.'));
+                reject(new Error('PSD library is not loaded. Please check your internet connection.'));
                 return;
             }
 
@@ -246,30 +339,30 @@
                     const psd = new PSDParser(new Uint8Array(e.target.result));
                     psd.parse();
                     const image = psd.image.toPng();
-                    
+
                     resultImg.src = image.src;
                     resultImg.style.display = 'inline-block';
                     fileNameLabel.innerText = `${file.name} (${psd.header.width} x ${psd.header.height} px)`;
                     resolve();
                 } catch (err) {
-                    reject(new Error('PSD 호환성 오류 (8bit RGB PSD만 지원됩니다)'));
+                    reject(new Error('PSD compatibility error (Only 8-bit RGB PSDs are supported)'));
                 }
             };
-            reader.onerror = () => reject(new Error('파일 읽기 실패'));
+            reader.onerror = () => reject(new Error('Failed to read file'));
             reader.readAsArrayBuffer(file);
         });
     }
 
     async function renderAI(buffer, originalFileName) {
-        fileNameLabel.innerText = `${originalFileName} (AI 분석 중...)`;
+        fileNameLabel.innerText = `${originalFileName} (Analyzing AI...)`;
 
         if (typeof pdfjsLib === 'undefined') {
-            throw new Error('PDF.js 라이브러리가 로드되지 않았습니다.');
+            throw new Error('PDF.js library is not loaded.');
         }
 
         const loadingTask = pdfjsLib.getDocument({ data: buffer });
         const pdf = await loadingTask.promise;
-        
+
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 1.5 });
 
@@ -288,7 +381,7 @@
 
     function savePNG() {
         if (!loadedFile) {
-            alert('저장할 파일이 없습니다.');
+            alert('No file to save.');
             return;
         }
 
@@ -310,7 +403,7 @@
         }
 
         if (!downloadUrl) {
-            alert('이미지 데이터를 추출할 수 없습니다.');
+            alert('Unable to extract image data.');
             return;
         }
 
@@ -326,7 +419,7 @@
         e.preventDefault(); 
         dropZone.classList.remove('dragover'); 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0]); 
+            handleFile(e.dataTransfer.files[0]);
         }
     });
     dropZone.addEventListener('click', () => { fileSelector.click(); });
