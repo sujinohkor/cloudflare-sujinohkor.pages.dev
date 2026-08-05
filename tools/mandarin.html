@@ -353,7 +353,7 @@
                 <!-- 상단 병음 입력 전용 바 -->
                 <div class="candidate-box">
                     <span class="candidate-label">Pinyin Input:</span>
-                    <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao, wo, xiexie) and press Enter/Space..." autocomplete="off">
+                    <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao, wo, xiexie) and press Enter/Space..." autocomplete="off" spellcheck="false">
                 </div>
 
                 <div class="editor-wrapper">
@@ -377,7 +377,7 @@
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
-        // 자체 내장 병음-한자 사전 데이터베이스
+        // 내장 병음-한자 사전 데이터베이스
         const pinyinDict = {
             "nihao": "你好",
             "ni": "你",
@@ -450,16 +450,43 @@
             }
         }
 
-        // 스페이스바나 엔터를 치면 내장 사전에서 즉시 변환 수행
+        // 실시간 입력 감지 및 스페이스바/엔터 처리 수정
+        pinyinInputBox.addEventListener('input', (e) => {
+            let val = pinyinInputBox.value;
+            // 스페이스바나 엔터가 포함되어 입력된 경우 처리
+            if (val.includes(' ') || val.includes('\n')) {
+                let pinyinVal = val.trim().toLowerCase();
+                if (!pinyinVal) {
+                    pinyinInputBox.value = '';
+                    return;
+                }
+
+                statusText.textContent = "Converting...";
+
+                let hanzi = pinyinDict[pinyinVal] || pinyinVal;
+
+                if (currentMode === 'traditional') {
+                    hanzi = toTraditional(hanzi);
+                } else {
+                    hanzi = toSimplified(hanzi);
+                }
+
+                textInput.value += hanzi;
+                textInput.dispatchEvent(new Event('input'));
+                pinyinInputBox.value = '';
+                statusText.textContent = "Ready";
+            }
+        });
+
+        // 엔터키 직접 입력 대응
         pinyinInputBox.addEventListener('keydown', (e) => {
-            if (e.key === ' ' || e.key === 'Enter') {
+            if (e.key === 'Enter') {
                 e.preventDefault();
                 let pinyinVal = pinyinInputBox.value.trim().toLowerCase();
                 if (!pinyinVal) return;
 
                 statusText.textContent = "Converting...";
 
-                // 사전에 있는 경우 한자로 변환, 없으면 입력한 영어 그대로 삽입
                 let hanzi = pinyinDict[pinyinVal] || pinyinVal;
 
                 if (currentMode === 'traditional') {
