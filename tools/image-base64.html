@@ -11,71 +11,59 @@
     <script src="https://unpkg.com/psd/dist/psd.min.js"></script>
     <!-- AI(PDF 호환 데이터) 파서 라이브러리 (PDF.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
+    
     <style>
         /* 1. Reset & Base */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: #202020; 
-            color: #fff; 
-            transition: background 0.3s; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
                 
-        /* 2. Layout */
-        .app-container { 
-            display: flex; 
-            min-height: 100vh; 
-        }
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; 
-            height: 100vh; 
-            position: fixed; 
-            left: 0; 
-            top: 0; 
-            background-color: #101010; 
-            padding: 20px; 
-            z-index: 1000; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start; 
-            transition: transform 0.3s ease; 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; 
-            padding: 40px; 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden; 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 10px; 
-            cursor: pointer; 
-            background: #202020; 
-            color: #ff9e40; 
-            border: 2px solid #ff9e40; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            transition: all 0.3s; 
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover { 
-            background: #ff9e40; 
-            color: #101010; 
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .theme-btn:hover { 
-            background-color: #FDF5E6; 
-            color: #F38020; 
-            border-color: #FDF5E6; 
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
         }
 
         /* 3분할 컨테이너 스타일 */
@@ -84,7 +72,6 @@
             gap: 20px;
             flex: 1;
             overflow: hidden;
-            margin-top: 20px;
         }
 
         .content-card { 
@@ -93,7 +80,7 @@
             flex: 1; 
             display: flex; 
             overflow: hidden; 
-            background: transparent; 
+            background: transparent;
             position: relative; 
         }
 
@@ -121,7 +108,7 @@
         }
         .content-viewer.dragover { background-color: rgba(255, 158, 64, 0.1); border-style: dashed; color: #ff9e40; }
         .content-viewer.has-file { background-color: rgba(255, 158, 64, 0.05); padding: 10px; }
-
+        
         .preview-img, .render-img, #viewCanvas {
             max-width: 100%;
             max-height: 100%;
@@ -129,9 +116,9 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
-                               linear-gradient(-45deg, #ccc 25%, transparent 25%),
-                               linear-gradient(45deg, transparent 75%, #ccc 75%),
-                               linear-gradient(-45deg, transparent 75%, #ccc 75%);
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #ccc 75%),
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
             background-size: 16px 16px;
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
             background-color: #fff;
@@ -167,85 +154,48 @@
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { 
-            background-color: #fff; 
-        }
+        body.light-mode { background-color: #fff; color: #202020; }
         body.light-mode .sidebar { 
-            background-color: #FDF5E6; 
-            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { 
-            background: #FDF5E6; 
-            color: #F38020; 
-            border-color: #F38020; 
-        }
-        body.light-mode .menu-btn:hover { 
-            background: #F38020; 
-            color: #ffffff; 
-            border-color: #F38020; 
-        }
-        body.light-mode .theme-btn:hover { 
-            background-color: #202020; 
-            color: #ff9e40; 
-            border-color: #202020; 
-        }
-        body.light-mode .top-section h1, body.light-mode .top-section p { 
-            color: #202020; 
-        }
-        body.light-mode textarea { 
-            color: #000; 
-        }
-        body.light-mode .menu-toggle-btn { 
-            color: #000000; 
-        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode textarea { color: #000; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        
+        /* 데이 모드 카드/패널 그림자 */
         body.light-mode .card, 
-        body.light-mode .content-card, 
+        body.light-mode .content-card,
         body.light-mode .content-viewer { 
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
         }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { 
-            display: none; 
-            position: fixed; 
-            bottom: 20px; 
-            left: 20px; 
-            z-index: 2000; 
-            padding: 10px 15px; 
-            background: #ff9e40; 
-            border: none; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            cursor: pointer; 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff;
         }                
-        @media (max-width: 900px) {
-            .editors-container {
-                flex-direction: column;
-            }
-        }
-        @media (max-width: 600px) { 
-            .menu-toggle-btn { 
-                display: block; 
-                color: #ffffff; 
-            } 
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
             .sidebar { 
-                transform: translateX(-250px); 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             } 
-            .sidebar.active { 
-                transform: translateX(0); 
-            } 
-            .main-content { 
-                margin-left: 0; 
-                padding: 20px; 
-                width: 100%; 
-                max-height: 100svh; 
-                flex: 1; 
-                display: flex; 
-                flex-direction: column; 
-            } 
-            .content-card, .content-viewer { 
-                min-height: 200px; 
-            } 
+            body.light-mode .sidebar {
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
+            .editors-container { flex-direction: column; }
+            .content-card, .content-viewer { min-height: 200px; }
         }
     </style>
 </head>
@@ -256,18 +206,26 @@
 
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Image to Base64</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-            <button class="menu-btn" onclick="uploadFile()">Upload Image</button>
-            <button class="menu-btn" onclick="copyBase64()">Copy Base64</button>
-            <button class="menu-btn" onclick="resetText()">Reset</button>
+
+            <div class="bottom-btns">
+                <button class="menu-btn" onclick="uploadFile()">Upload Image</button>
+                <button class="menu-btn" onclick="copyBase64()">Copy Base64</button>
+                <button class="menu-btn" onclick="resetText()">Reset</button>
+            </div>
         </aside>
+
         <main class="main-content">
             <header class="top-section">
                 <h1>Image to Base64</h1>
                 <p id="status-desc">Upload image to div 1, view Base64 in div 2, render image in div 3.</p>
             </header>
-            
+                
             <!-- 3분할 컨테이너 -->
             <div class="editors-container">
                 <!-- 1번 div: 이미지 업로드 영역 -->
@@ -298,7 +256,7 @@
             </div>
         </main>
     </div>
-    
+
     <script>
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -314,12 +272,21 @@
         const renderImg = document.getElementById('renderImg');
         const ctx = canvas.getContext('2d');
         const textInput2 = document.getElementById('text-input-2');
-        
+                
         let loadedFile = null;
 
         function toggleSidebar() { 
             sidebar.classList.toggle('active'); 
         }
+
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    if (element.id === 'file-selector') return;
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
 
         document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
@@ -366,7 +333,7 @@
                         const base64Val = e.target.result;
                         resultImg.src = base64Val;
                         resultImg.style.display = 'inline-block';
-                        
+                                                
                         textInput2.value = base64Val;
                         renderBase64ToDiv3(base64Val);
                     };
@@ -391,7 +358,7 @@
 
                         resultImg.src = image.src;
                         resultImg.style.display = 'inline-block';
-                        
+                                                
                         textInput2.value = image.src;
                         renderBase64ToDiv3(image.src);
                         resolve();
