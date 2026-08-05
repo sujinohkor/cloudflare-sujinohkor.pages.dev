@@ -371,7 +371,7 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Chinese</h1>
-                <p>Type pinyin in the top bar (e.g., nihao, wo, xiexie) and pick candidates.</p>
+                <p>Type pinyin in the top bar and press 1-5 or Enter to select candidates.</p>
             </header>
 
             <section class="content-card" id="content-card">
@@ -408,6 +408,7 @@
         const statusText = document.getElementById('status-text');
 
         let currentMode = 'simplified';
+        let currentMatches = []; // 현재 떠 있는 후보 목록 저장용
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
@@ -419,7 +420,7 @@
             "shi": ["是", "事", "时", "石", "实", "市", "适", "视", "式", "势"],
             "bu": ["不", "步", "部", "布", "怖", "捕"],
             "le": ["了", "乐", "肋", "勒"],
-            "ren": ["人", "认", "任", "忍", "刃", "认"],
+            "ren": ["人", "认", "任", "忍", "刃"],
             "zai": ["在", "再", "载", "灾", "仔"],
             "you": ["有", "又", "优", "友", "由", "油", "邮", "游"],
             "ta": ["他", "她", "它", "塌", "踏"],
@@ -443,8 +444,8 @@
             "chi": ["吃", "迟", "尺", "翅", "池"],
             "he": ["和", "喝", "河", "何", "合", "核"],
             "shu": ["书", "树", "数", "术", "叔", "鼠"],
-            "gongzuo": ["工作", "公作"],
-            "xuesheng": ["학생" === "학생" ? "学生" : ""],
+            "gongzuo": ["工作"],
+            "xuesheng": ["学生"],
             "laoshi": ["老师"]
         };
 
@@ -498,14 +499,17 @@
         pinyinInputBox.addEventListener('input', (e) => {
             let query = pinyinInputBox.value.trim().toLowerCase();
             if (!query) {
+                currentMatches = [];
                 candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
                 return;
             }
 
             let matches = pinyinDict[query];
             if (matches && matches.length > 0) {
+                currentMatches = matches;
                 renderCandidates(matches);
             } else {
+                currentMatches = [query];
                 renderCandidates([query]);
             }
         });
@@ -526,16 +530,26 @@
             textInput.value += hanzi;
             textInput.dispatchEvent(new Event('input'));
             pinyinInputBox.value = '';
+            currentMatches = [];
             candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
             pinyinInputBox.focus();
         }
 
+        // 숫자 키(1~5) 및 엔터키로 후보 선택 기능 구현
         pinyinInputBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const firstCandidate = candidatesContainer.querySelector('.candidate-item');
                 if (firstCandidate) {
                     firstCandidate.click();
+                }
+            } else if (/^[1-5]$/.test(e.key)) {
+                // 1부터 5 사이의 숫자를 누르면 해당 순서의 후보 선택
+                const index = parseInt(e.key) - 1;
+                const candidateItems = candidatesContainer.querySelectorAll('.candidate-item');
+                if (candidateItems[index]) {
+                    e.preventDefault();
+                    candidateItems[index].click();
                 }
             }
         });
@@ -586,6 +600,7 @@
                 localStorage.removeItem('saved_pinyin_text');
                 textInput.value = '';
                 pinyinInputBox.value = '';
+                currentMatches = [];
                 candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
                 textInput.dispatchEvent(new Event('input'));
             }
