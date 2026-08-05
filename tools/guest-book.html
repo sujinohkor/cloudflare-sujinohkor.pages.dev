@@ -11,7 +11,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
-                
+
         .app-container { display: flex; min-height: 100vh; width: 100%; }
 
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
@@ -70,6 +70,7 @@
         }
         .info-row span:last-child {
             color: #ff9e40;
+            font-weight: bold;
         }
 
         .content-top { 
@@ -111,7 +112,7 @@
             background: rgba(255, 255, 255, 0.3); 
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
-        }        
+        }
         body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
@@ -122,14 +123,12 @@
             color: #F38020; 
             border-color: rgba(243, 128, 32, 0.4); 
         }
-
         body.light-mode .info-panel {
             background: rgba(0, 0, 0, 0.02);
             border-color: rgba(243, 128, 32, 0.5);
         }
         body.light-mode .info-row { color: #202020; }
         body.light-mode .info-row span:last-child { color: #F38020; }
-
         body.light-mode .content-top { border-color: #F38020; background: rgba(243, 128, 32, 0.02); }
         body.light-mode .content-down { border-color: #F38020; background: rgba(255, 255, 255, 0.5); }
         body.light-mode .content-top input[type="text"] {
@@ -138,7 +137,6 @@
             border-color: rgba(243, 128, 32, 0.5);
         }
         body.light-mode .content-top input[type="text"]::placeholder { color: #888; }
-
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .guestbook-item { 
             background: rgba(0, 0, 0, 0.02); 
@@ -149,7 +147,6 @@
         body.light-mode .guestbook-item .body { color: #202020; }
         body.light-mode .guestbook-item .meta { color: #666; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
-
         body.light-mode .card, 
         body.light-mode .content-down,
         body.light-mode .content-top {
@@ -161,7 +158,7 @@
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
             font-weight: bold; cursor: pointer; color: #ffffff; 
-        }        
+        }
 
         @media (max-width: 900px) { 
             .menu-toggle-btn { display: block; } 
@@ -189,7 +186,7 @@
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
-            
+
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <button class="menu-btn" id="submit-btn">Save Note</button>
 
@@ -200,7 +197,7 @@
                 </div>
                 <div class="info-row">
                     <span>Character Count</span>
-                    <span><span id="char-count">0</span>/1,000</span>
+                    <span><span id="char-count" style="font-weight: bold;">0</span>/1,000</span>
                 </div>
             </div>
         </aside>
@@ -277,9 +274,10 @@
             guestbookForm.requestSubmit();
         });
     </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBaH4OIqC_x0-6jIq4RnJv_wCD9efC4wUU",
@@ -318,7 +316,7 @@
 
         guestbookForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            
+
             const nicknameVal = nicknameInput.value.trim();
             const contentVal = contentInput.value.trim();
 
@@ -346,7 +344,7 @@
         onSnapshot(q, (snapshot) => {
             const listElement = document.getElementById("guestbook-list");
             const countElement = document.getElementById("note-count-all");
-            
+
             listElement.innerHTML = "";
             countElement.textContent = snapshot.docs.length;
 
