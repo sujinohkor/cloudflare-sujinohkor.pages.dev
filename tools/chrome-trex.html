@@ -4,45 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chrome Dino Game</title>
-    <!-- 파비콘 설정 추가 -->
+    <!-- 파비콘 설정 -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; user-select: none; }
-                
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; user-select: none; }
+        a { text-decoration: none; color: inherit; display: block; }
+                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            margin-left: 300px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            gap: 20px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .content-card { 
-            border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
-            display: flex; justify-content: center; align-items: center; overflow: hidden; background: transparent;
+        .content-card {             
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            flex: 1; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+            background: transparent;
             padding: 20px;
         }
 
-        /* Game Canvas Style (부모 div에 가득 차도록 반응형 설정) */
-        canvas { 
-            /*background: #fff;*/
+        /* Game Canvas Style */
+        canvas {            
             background: linear-gradient(to bottom, #87ceeb 0%, #ffffff 50%, #d2b48c 100%);
-            border-bottom: 2px solid #535353; 
+            border-bottom: 2px solid #535353;             
             border-radius: 8px;
             cursor: pointer; 
             width: 100%;
@@ -51,177 +88,217 @@
         }
 
         /* 다크 모드 카드/패널 그림자 */
-        .card, .content-card, .content-mid, .content-down {
+        .card, .content-card {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+                
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
-
+        
         body.light-mode .card, 
-        body.light-mode .content-card,
-        body.light-mode .content-mid, 
-        body.light-mode .content-down {
+        body.light-mode .content-card {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
 
         /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
                 
-        @media (max-width: 600px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; flex: 1; display: flex; flex-direction: column; }
-            .content-card { min-height: 0; height: 100%; }
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            } 
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
+            .content-card { min-height: 0; height: 100%; } 
         }
     </style>
 </head>
 <body>
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-    </aside>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Dino Game</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        </aside>
 
-    <main class="main-content">
-        <header class="top-section">
-            <h1>Chrome Dino Game</h1>
-            <p>Press the spacebar or click the screen to jump!</p>
-        </header>
-        <section class="content-card" style="margin-top: 20px;">
-            <canvas id="game"></canvas>
-        </section>
-    </main>
-</div>
+        <main class="main-content">
+            <header class="top-section">
+                <h1>Chrome Dino Game</h1>
+                <p>Press the spacebar or click the screen to jump!</p>
+            </header>
+            <section class="content-card">
+                <canvas id="game"></canvas>
+            </section>
+        </main>
+    </div>
 
-<script>
-    const sidebar = document.getElementById('sidebar');
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { 
-            sidebar.classList.remove('active'); 
-        } 
-    });
-
-    const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
-
-    // 캔버스 내부 해상도 설정 (고정 비율 유지 기준)
-    const baseWidth = 800;
-    const baseHeight = 250;
-    canvas.width = baseWidth;
-    canvas.height = baseHeight;
-
-    const dino = {
-        x: 50, y: 170, width: 35, height: 35,
-        dy: 0, gravity: 0.45, jumpPower: -9.5, isGrounded: true
-    };
-
-    let cactusArray = [];
-    let score = 0;
-    let isGameOver = false;
-    let lastCactusTime = 0;
-
-    function jump() {
-        if (dino.isGrounded && !isGameOver) {
-            dino.dy = dino.jumpPower;
-            dino.isGrounded = false;
-        }
-    }
-
-    window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' || e.key === ' ') {
-            e.preventDefault();
-            jump();
-        }
-    });
-
-    window.addEventListener('click', jump);
-    window.addEventListener('touchstart', (e) => {
-        jump();
-    });
-
-    function spawnCactus() {
-        lastCactusTime++;
-        if (lastCactusTime > 120 && Math.random() < 0.02) {
-            cactusArray.push({ x: baseWidth, y: 170, width: 30, height: 35 });
-            lastCactusTime = 0;
-        }
-    }
-
-    function update() {
-        if (isGameOver) return;
-
-        dino.dy += dino.gravity;
-        dino.y += dino.dy;
-
-        if (dino.y >= 170) {
-            dino.y = 170;
-            dino.dy = 0;
-            dino.isGrounded = true;
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
         }
 
-        spawnCactus();
-        for (let i = cactusArray.length - 1; i >= 0; i--) {
-            let c = cactusArray[i];
-            c.x -= 3;
-
-            const padding = 6;
-            if (dino.x + padding < c.x + c.width - padding &&
-                dino.x + dino.width - padding > c.x + padding &&
-                dino.y + padding < c.y + c.height - padding &&
-                dino.y + dino.height - padding > c.y + padding) {
-                isGameOver = true;
-                setTimeout(() => {
-                    alert(`Game Over! Score: ${Math.floor(score)}`);
-                    location.reload();
-                }, 10);
-            }
-
-            if (c.x < -40) cactusArray.splice(i, 1);
-        }
-        score += 0.05;
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.save();
-        ctx.translate(dino.x + dino.width, dino.y);
-        ctx.scale(-1, 1);
-        ctx.font = '35px Segoe UI Emoji, Apple Color Emoji, sans-serif';
-        ctx.textBaseline = 'top';
-        ctx.fillText('🦖', 0, 0);
-        ctx.restore();
-
-        cactusArray.forEach(c => {
-            ctx.font = '35px Segoe UI Emoji, Apple Color Emoji, sans-serif';
-            ctx.textBaseline = 'top';
-            ctx.fillText('🌵', c.x, c.y);
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
         });
 
-        ctx.fillStyle = '#000';
-        ctx.font = '18px monospace';
-        ctx.fillText(`Score: ${Math.floor(score)}`, baseWidth - 140, 25);
-    }
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
 
-    function gameLoop() {
-        update();
-        draw();
-        if (!isGameOver) requestAnimationFrame(gameLoop);
-    }
+        document.querySelector('.main-content').addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
 
-    gameLoop();
-</script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+
+        const baseWidth = 800;
+        const baseHeight = 250;
+        canvas.width = baseWidth;
+        canvas.height = baseHeight;
+
+        const dino = {
+            x: 50, y: 170, width: 35, height: 35,
+            dy: 0, gravity: 0.45, jumpPower: -9.5, isGrounded: true
+        };
+        let cactusArray = [];
+        let score = 0;
+        let isGameOver = false;
+        let lastCactusTime = 0;
+
+        function jump() {
+            if (dino.isGrounded && !isGameOver) {
+                dino.dy = dino.jumpPower;
+                dino.isGrounded = false;
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        window.addEventListener('click', jump);
+        window.addEventListener('touchstart', (e) => {
+            jump();
+        });
+
+        function spawnCactus() {
+            lastCactusTime++;
+            if (lastCactusTime > 120 && Math.random() < 0.02) {
+                cactusArray.push({ x: baseWidth, y: 170, width: 30, height: 35 });
+                lastCactusTime = 0;
+            }
+        }
+
+        function update() {
+            if (isGameOver) return;
+
+            dino.dy += dino.gravity;
+            dino.y += dino.dy;
+
+            if (dino.y >= 170) {
+                dino.y = 170;
+                dino.dy = 0;
+                dino.isGrounded = true;
+            }
+
+            spawnCactus();
+            for (let i = cactusArray.length - 1; i >= 0; i--) {
+                let c = cactusArray[i];
+                c.x -= 3;
+
+                const padding = 6;
+                if (dino.x + padding < c.x + c.width - padding &&
+                    dino.x + dino.width - padding > c.x + padding &&
+                    dino.y + padding < c.y + c.height - padding &&
+                    dino.y + dino.height - padding > c.y + padding) {
+                    isGameOver = true;
+                    setTimeout(() => {
+                        alert(`Game Over! Score: ${Math.floor(score)}`);
+                        location.reload();
+                    }, 10);
+                }
+
+                if (c.x < -40) cactusArray.splice(i, 1);
+            }
+            score += 0.05;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(dino.x + dino.width, dino.y);
+            ctx.scale(-1, 1);
+            ctx.font = '35px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+            ctx.textBaseline = 'top';
+            ctx.fillText('🦖', 0, 0);
+            ctx.restore();
+
+            cactusArray.forEach(c => {
+                ctx.font = '35px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+                ctx.textBaseline = 'top';
+                ctx.fillText('🌵', c.x, c.y);
+            });
+
+            ctx.fillStyle = '#000';
+            ctx.font = '18px monospace';
+            ctx.fillText(`Score: ${Math.floor(score)}`, baseWidth - 140, 25);
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (!isGameOver) requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
 </body>
 </html>
