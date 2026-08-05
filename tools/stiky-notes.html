@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,33 +8,59 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; overflow: hidden; height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
                 
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
+
+        /* 모바일용 상단 카테고리/컨트롤 영역 (기본 숨김) */
+        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .mobile-theme-row { display: none; width: 100%; justify-content: flex-end; margin-bottom: 10px; }
+        #theme-toggle-mobile {
+            padding: 6px 12px; font-size: 0.75rem; border-radius: 16px; width: auto;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5);
+            font-weight: bold; cursor: pointer;
+        }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
+            margin-left: 300px; padding: 40px; flex: 1; 
             display: flex; flex-direction: column; height: 100vh; 
             gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; 
-            display: flex; align-items: center; justify-content: center; font-size: 0.9rem; line-height: 1;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        /* Memo color buttons group layout (간격 10px로 통일) */
+        /* Memo color buttons group layout */
         .memo-buttons-group {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -42,15 +68,15 @@
             margin-bottom: 10px;
         }
         .memo-buttons-group .menu-btn {
-            margin-bottom: 0; /* 그리드 gap으로 간격 제어 */
+            margin-bottom: 0;
         }
-        .memo-btn-yellow { color: #fff9c4 !important; border-color: #fff9c4 !important; }
+        .memo-btn-yellow { color: #fff9c4 !important; border-color: rgba(255, 249, 196, 0.5) !important; }
         .memo-btn-yellow:hover { background: #fff9c4 !important; color: #101010 !important; }
-        .memo-btn-pink { color: #f8bbd0 !important; border-color: #f8bbd0 !important; }
+        .memo-btn-pink { color: #f8bbd0 !important; border-color: rgba(248, 187, 208, 0.5) !important; }
         .memo-btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
-        .memo-btn-green { color: #c8e6c9 !important; border-color: #c8e6c9 !important; }
+        .memo-btn-green { color: #c8e6c9 !important; border-color: rgba(200, 230, 201, 0.5) !important; }
         .memo-btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
-        .memo-btn-blue { color: #bbdefb !important; border-color: #bbdefb !important; }
+        .memo-btn-blue { color: #bbdefb !important; border-color: rgba(187, 222, 251, 0.5) !important; }
         .memo-btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
 
         .search-container {
@@ -58,26 +84,24 @@
         }
         .search-input {
             width: 100%;
-            padding: 10px; 
-            background: #202020;
+            padding: 11px 14px; 
+            background: rgba(255, 255, 255, 0.03);
             color: #fff;
-            border: 2px solid #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.35);
             border-radius: 50px;
             outline: none;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
         }
+        .search-input::placeholder { color: #888; }
 
         .bottom-btns {
             display: flex;
             flex-direction: column;
+            gap: 10px;
         }
-
         .bottom-btns > .menu-btn {
-            margin-bottom: 10px;
-        }
-        .bottom-btns > .menu-btn:last-child {
             margin-bottom: 0;
         }
 
@@ -275,23 +299,27 @@
 
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; color: #202020; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .memo-btn-yellow { color: #8d7b00 !important; border-color: #e6d34b !important; }
+        body.light-mode .memo-btn-yellow { color: #8d7b00 !important; border-color: rgba(230, 211, 75, 0.5) !important; }
         body.light-mode .memo-btn-yellow:hover { background: #fff9c4 !important; color: #101010 !important; }
-        body.light-mode .memo-btn-pink { color: #b8326e !important; border-color: #f088a8 !important; }
+        body.light-mode .memo-btn-pink { color: #b8326e !important; border-color: rgba(240, 136, 168, 0.5) !important; }
         body.light-mode .memo-btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
-        body.light-mode .memo-btn-green { color: #2e6b31 !important; border-color: #8cc48e !important; }
+        body.light-mode .memo-btn-green { color: #2e6b31 !important; border-color: rgba(140, 196, 142, 0.5) !important; }
         body.light-mode .memo-btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
-        body.light-mode .memo-btn-blue { color: #1565c0 !important; border-color: #64b5f6 !important; }
+        body.light-mode .memo-btn-blue { color: #1565c0 !important; border-color: rgba(100, 181, 246, 0.5) !important; }
         body.light-mode .memo-btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
 
         body.light-mode .search-input {
-            background: #FDF5E6;
+            background: rgba(0, 0, 0, 0.02);
             color: #202020;
-            border-color: #F38020;
+            border-color: rgba(243, 128, 32, 0.5);
         }
         body.light-mode .search-input::placeholder { color: #888; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
@@ -314,14 +342,25 @@
         .menu-toggle-btn { 
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
-            font-weight: bold; cursor: pointer; 
+            font-weight: bold; cursor: pointer; color: #ffffff;
         }                
-        @media (max-width: 600px) { 
-            .menu-toggle-btn { display: block; color: #ffffff; } 
-            .sidebar { transform: translateX(-250px); } 
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar {
+                background: #ffffff !important; /* 모바일 데이모드일 때 순수 흰색 배경 */
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; /* 연주황빛 그림자 */
+            }
             .sidebar.active { transform: translateX(0); } 
-            .main-content { margin-left: 0; padding: 20px; width: 100%; max-height: 100svh; } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
             .content-card { min-height: 0; height: 100%; } 
+            .mobile-theme-row { display: flex; }
         }
     </style>
 </head>
@@ -329,9 +368,13 @@
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
-            <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+            <div class="sidebar-title">Stiky Notes</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
             
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
             <div class="search-container">
                 <input type="text" id="search-input" class="search-input" placeholder="Search notes..." oninput="filterNotes()">
             </div>
@@ -387,6 +430,16 @@
         function toggleSidebar() { 
             sidebar.classList.toggle('active'); 
         }
+
+        // 모바일 화면에서 버튼을 눌렀을 때만 사이드바가 닫히도록 수정 (검색창 input은 제외)
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    if (element.id === 'import-file') return;
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
 
         document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
