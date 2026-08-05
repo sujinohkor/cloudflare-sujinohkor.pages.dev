@@ -32,7 +32,7 @@
         /* DAY/NIGHT 버튼 최상단 배치 스타일 */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
-        .theme-toggle-btn:hover { background: #ff9e40; color: #101010; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         /* 메인 콘텐츠 영역 */
         .main-content { 
@@ -134,7 +134,7 @@
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-        
+                
         /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
         body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
@@ -166,7 +166,7 @@
                 -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             }
-            body.light-mode .sidebar {
+            body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
@@ -192,29 +192,24 @@
 <body>
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <input type="file" id="file-selector" accept="image/*" style="display: none;">
-
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-title">Bongsuk Checker</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>
-                        
+            </div>                                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-
             <div class="bottom-btns">
                 <button class="menu-btn" onclick="uploadFile()">Upload</button>
                 <button class="menu-btn" onclick="bongsuk()">Bongsuk</button>
                 <button class="menu-btn" onclick="resetAll()">Reset</button>
             </div>
         </aside>
-
         <main class="main-content">
             <header class="top-section">
                 <h1>🐾 Bongsuk Checker 🐾</h1>
                 <p>Upload a photo to find out if it's 'Bongsuk'!</p>
             </header>
-
             <div class="workspace-container">
                 <!-- 왼쪽 박스: 원본 사진 영역 -->
                 <section class="content-box content-mid" id="drop-zone">
@@ -233,7 +228,6 @@
             </div>
         </main>
     </div>
-
     <script>
         const sidebar = document.getElementById('sidebar');
         const dropZone = document.getElementById('drop-zone');
@@ -312,7 +306,7 @@
                             const max = 300; 
                             let w = img.width;
                             let h = img.height;
-                                                        
+                                                                    
                             if (w > h) {
                                 if (w > max) { h *= max / w; w = max; }
                             } else {
