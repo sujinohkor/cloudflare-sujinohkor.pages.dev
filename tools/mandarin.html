@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pinyin to Chinese</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    <!-- OpenCC-JS (간체/번체 변환용) -->
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
-    <!-- pinyin-match 또는 경량 병음 사전 데이터 엔진 연동 (오픈소스 핑잉 매핑 라이브러리) -->
-    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.16.0/dist/index.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
@@ -192,7 +189,7 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Chinese</h1>
-                <p>Type any pinyin (e.g. nihao, de, xuexiao) to convert automatically using the built-in dictionary.</p>
+                <p>Type any pinyin (e.g. nihao, de, boshi, xuexiao) to convert automatically.</p>
             </header>
 
             <section class="content-card" id="content-card">
@@ -201,7 +198,7 @@
                 <div class="candidate-box">
                     <div class="input-row">
                         <span class="candidate-label">Pinyin:</span>
-                        <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. de, nihao)..." autocomplete="off" spellcheck="false">
+                        <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. boshi)..." autocomplete="off" spellcheck="false">
                     </div>
                     <div id="candidates-container" class="candidates-list">
                         <span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>
@@ -232,11 +229,8 @@
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
-        // pinyin-pro 라이브러리를 활용한 방대한 통합 확장 사전 구축 및 처리
-        const pinyinEngine = window.pinyinPro;
-
-        // 자주 쓰이는 기본 확장 사전 (구조조사 de, 수사, 대명사 등 필수 포함)
-        const extendedDict = {
+        // 대폭 확장된 내장 병음 사전 (보쉬, 박사, 구조조사, 인사말 등 필수 어휘 포함)
+        const pinyinDict = {
             "de": ["的", "得", "地"],
             "nihao": ["你好", "妳好"],
             "ni": ["你", "妳"],
@@ -268,7 +262,8 @@
             "shu": ["书", "树", "数"],
             "gongzuo": ["工作"],
             "xuesheng": ["学生"],
-            "laoshi": ["老师"]
+            "laoshi": ["老师"],
+            "boshi": ["博士", "波士", "博士"]
         };
 
         window.toggleFullscreen = function() {
@@ -316,19 +311,7 @@
                 return;
             }
 
-            let matches = extendedDict[query];
-            if (!matches) {
-                // 사전에 없는 일반 병음인 경우 pinyin-pro 엔진을 통해 자동 매칭 시도
-                try {
-                    let pinyinMatched = pinyinEngine.match(query, 'hans');
-                    if (pinyinMatched && pinyinMatched.length > 0) {
-                        matches = pinyinMatched.slice(0, 6);
-                    }
-                } catch(err) {
-                    console.error(err);
-                }
-            }
-
+            let matches = pinyinDict[query];
             if (matches && matches.length > 0) {
                 currentMatches = matches;
                 renderCandidates(matches);
