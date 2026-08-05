@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bongsuk Checker</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
@@ -133,8 +134,19 @@
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        
+        /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .card, body.light-mode .content-box {
@@ -162,7 +174,7 @@
             .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }
             
             .workspace-container { 
-                flex-direction: column; 
+                flex-direction: column;
                 flex: none;
                 height: auto;
                 min-height: auto;
@@ -180,14 +192,14 @@
 <body>
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <input type="file" id="file-selector" accept="image/*" style="display: none;">
-    
+
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-title">Bongsuk Checker</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
-            
+                        
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
             <div class="bottom-btns">
