@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather and Time</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    
-    <!-- Leaflet CSS -->
+        <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
-    <!-- Three.js 및 Globe.gl CDN -->
+        <!-- Three.js 및 Globe.gl CDN -->
     <script src="https://unpkg.com/three"></script>
     <script src="https://unpkg.com/globe.gl"></script>
 
@@ -23,20 +21,39 @@
             transition: background 0.3s; 
             overflow: hidden; 
         }
-        
+                
         /* 2. Layout (PC 기본) */
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (기준 소스 스타일 적용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
-        
-        .sidebar > * { margin-bottom: 10px; }
-        .sidebar > *:last-child { margin-bottom: 0; }
-        
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
         .main-content { 
-            margin-left: 250px; 
+            margin-left: 300px; 
             padding: 40px; 
             flex: 1; 
             display: flex; 
@@ -45,6 +62,7 @@
             gap: 20px; 
             overflow: hidden; 
             transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         .workspace-container {
@@ -57,38 +75,52 @@
 
         /* 3. Components (Sidebar Controls) */
         .menu-btn, .theme-btn, .reset-btn { 
-            width: 100%; padding: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover, .reset-btn:hover { background: #ff9e40; color: #101010; }
+        .menu-btn:hover, .reset-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
         .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
 
-        .search-box { display: flex; gap: 6px; margin-top: 20px; }
+        .search-box { display: flex; gap: 6px; width: 100%; align-items: center; }
         .search-input {
-            flex: 1; padding: 8px 12px; background: #202020; border: 2px solid #ff9e40;
-            border-radius: 16px; color: #fff; font-size: 0.85rem; outline: none; width: 100%;
+            flex: 1; min-width: 0; padding: 11px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px; color: #fff; font-size: 0.8rem; outline: none; text-align: center; font-weight: bold;
         }
+        .search-input::placeholder { color: #888; }
         .search-btn {
-            padding: 8px 12px; background: #ff9e40; color: #101010; border: none;
-            border-radius: 16px; cursor: pointer; font-weight: bold; font-size: 0.85rem;
+            flex-shrink: 0; padding: 11px 10px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: all 0.3s; white-space: nowrap;
         }
+        .search-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .api-switcher { display: flex; gap: 6px; margin-bottom: 30px; }
+        .api-switcher { display: flex; gap: 6px; }
         .api-btn {
-            flex: 1; padding: 8px 0; background: #202020; color: #888;
-            border: 1px solid #444; border-radius: 16px; cursor: pointer; font-size: 0.8rem; font-weight: bold;
-            transition: all 0.2s;
+            flex: 1; padding: 10px 0; background: rgba(255, 255, 255, 0.03); color: #888;
+            border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 50px; cursor: pointer; font-size: 0.8rem; font-weight: bold;
+            transition: all 0.2s; text-align: center;
         }
-        .api-btn.active { background: #ff9e40; color: #101010; border-color: #ff9e40; }
+        .api-btn.active { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         .view-switcher { display: flex; flex-direction: column; gap: 10px; }
         .view-btn {
-            width: 100%; padding: 8px 0; background: #202020; color: #ff9e40;
-            border: 2px solid #ff9e40; border-radius: 16px; cursor: pointer; font-size: 0.8rem; font-weight: bold;
+            width: 100%; padding: 11px 14px; background: rgba(255, 255, 255, 0.03); color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: bold;
             transition: all 0.2s; text-align: center;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .view-btn.active { background: #ff9e40; color: #101010; }
+        .view-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+        .view-btn.active { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
 
         /* 4. Weather Display Components */
         .card { 
@@ -96,18 +128,15 @@
             width: 300px; flex-shrink: 0; text-align: center; display: flex; flex-direction: column;
             justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
-
         .forecast-panel {
             background: #101010; padding: 25px; border-radius: 16px; border: 2px solid #ff9e40; 
             flex-grow: 1; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             min-height: 0;
         }
-
         .forecast-title {
             font-size: 1.1rem; color: #ff9e40; font-weight: bold; margin-bottom: 15px;
             padding-bottom: 8px; border-bottom: 1px solid #333;
         }
-
         .forecast-list {
             overflow-y: auto; 
             overflow-x: auto; 
@@ -121,7 +150,6 @@
         }
         .forecast-list::-webkit-scrollbar { width: 6px; height: 6px; }
         .forecast-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
-
         .forecast-item {
             display: grid;
             grid-template-columns: 100px 1fr 80px 80px 80px 70px 60px;
@@ -140,7 +168,6 @@
         .forecast-humidity { color: #81c784; text-align: center; }
         .forecast-uv { color: #ffb74d; text-align: center; }
         .forecast-temp { color: #ff9e40; font-weight: bold; text-align: right; }
-
         .city { font-size: 1.8rem; color: #ff9e40; font-weight: bold; margin-bottom: 10px; text-transform: capitalize; }
         .temp { font-size: 3.5rem; font-weight: bold; margin: 15px 0; }
         .desc { font-size: 1.1rem; color: #ccc; }
@@ -161,7 +188,7 @@
             position: relative;
         }
         .globe-view-container { background: #101010; }
-        
+                
         #map, #globeViz { 
             position: absolute !important;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -201,50 +228,69 @@
         .globe-info-btn:hover { background: #ffb74d; }
 
         /* 5. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; color: #000; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .reset-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .reset-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1 { color: #000; }
-        body.light-mode .top-section p { color: #202020; }
-        
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn, body.light-mode .reset-btn, body.light-mode .view-btn, body.light-mode .search-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover, body.light-mode .reset-btn:hover, body.light-mode .view-btn:hover, body.light-mode .search-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .view-btn.active, body.light-mode .api-btn.active {
+            background: rgba(243, 128, 32, 0.15);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.6);
+        }
+        body.light-mode .api-btn {
+            background: rgba(0, 0, 0, 0.02);
+            color: #666;
+            border-color: rgba(243, 128, 32, 0.3);
+        }
+
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+                
         body.light-mode .card, body.light-mode .forecast-panel, body.light-mode .map-view-container, body.light-mode .globe-view-container { 
-            background-color: #FDF5E6; 
+            background-color: #fff; 
             border-color: #F38020; 
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
         }
         body.light-mode .forecast-title { color: #F38020; border-bottom-color: #fbd3b1; }
         body.light-mode .forecast-item { 
-            background: #fff; 
-            color: #000; 
-            border: 1px solid #fce3ce; 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #202020; 
+            border: 1px solid rgba(243, 128, 32, 0.2); 
             box-shadow: 0 2px 5px rgba(0,0,0,0.03); 
         }
         body.light-mode .forecast-time { color: #202020; }
-        body.light-mode .forecast-desc { color: #000; }
+        body.light-mode .forecast-desc { color: #202020; }
         body.light-mode .forecast-rain { color: #1976d2; }
         body.light-mode .forecast-wind { color: #424242; }
         body.light-mode .forecast-humidity { color: #2e7d32; }
         body.light-mode .forecast-uv { color: #f57c00; }
         body.light-mode .forecast-temp { color: #F38020; }
         body.light-mode .city { color: #F38020; }
-        body.light-mode .temp { color: #000; }
-        body.light-mode .desc { color: #000; }
+        body.light-mode .temp { color: #202020; }
+        body.light-mode .desc { color: #202020; }
         body.light-mode .details { color: #202020; }
-        body.light-mode .search-input { background: #fff; color: #000; border-color: #F38020; }
-        body.light-mode .search-input::placeholder { color: #666; }
-        body.light-mode .search-btn { background: #F38020; color: #fff; }
-        body.light-mode .api-btn, body.light-mode .view-btn { background: #fff; border-color: #ccc; color: #202020; }
-        body.light-mode .api-btn.active, body.light-mode .view-btn.active { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .search-input { background: rgba(0, 0, 0, 0.02); color: #202020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .search-input::placeholder { color: #888; }
         body.light-mode .menu-toggle-btn { color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
-        body.light-mode .globe-info-card { background: rgba(253, 245, 230, 0.95); border-color: #F38020; color: #000; }
+                
+        body.light-mode .globe-info-card { background: rgba(255, 255, 255, 0.95); border-color: #F38020; color: #202020; }
         body.light-mode .globe-info-card h3 { color: #F38020; }
         body.light-mode .globe-info-card p { color: #333; }
         body.light-mode .globe-info-btn { background: #F38020; color: #fff; }
 
-        /* 6. 모바일 대응 (1100px 이하에서는 화면 고정 해제 및 스크롤 허용) */
+        /* 6. 모바일 대응 */
         @media (max-width: 1100px) {
             body { overflow: auto; }
             .main-content { height: auto; overflow-y: auto; }
@@ -254,25 +300,37 @@
             .map-view-container, .globe-view-container { height: 500px; }
         }
 
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        
-        @media (max-width: 680px) {
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+                
+        @media (max-width: 900px) {
             .menu-toggle-btn { display: block; }
-            .sidebar { transform: translateX(-250px); }
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            }
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; height: auto; overflow-y: auto; }
         }
     </style>
 </head>
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">Weather & Time</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
 
         <div class="search-box">
             <input type="text" id="city-input" list="city-list" class="search-input" placeholder="Select/type city" onchange="searchCity()" onkeydown="if(event.key==='Enter') searchCity()">
@@ -310,7 +368,7 @@
             <h1 id="main-title">Weather and Time</h1>
             <p id="main-desc">Check the weather and time now.</p>
         </header>
-        
+                
         <!-- 날씨 대시보드 뷰 -->
         <div class="workspace-container" id="weather-workspace">
             <section class="card">
@@ -350,7 +408,6 @@
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
 <script>
     const sidebar = document.getElementById('sidebar');
     let currentProvider = 'wttr';
@@ -363,8 +420,24 @@
     let selectedGlobeCity = null;
 
     function toggleSidebar() { sidebar.classList.toggle('active'); }
-    document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-    document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+    
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
+            sidebar.classList.remove('active'); 
+        } 
+    });
+
+    sidebar.querySelectorAll('button').forEach(element => {
+        element.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
 
     function switchView(viewType) {
         const weatherView = document.getElementById('weather-workspace');
@@ -464,7 +537,6 @@
             { name: 'Tel Aviv', lat: 32.0853, lng: 34.7818, tz: 'Asia/Jerusalem' },
             { name: 'Istanbul', lat: 41.0082, lng: 28.9784, tz: 'Europe/Istanbul' },
             { name: 'Athens', lat: 37.9838, lng: 23.7275, tz: 'Europe/Athens' },
-            { name: 'Rome', lat: 41.9028, lng: 12.4964, tz: 'Europe/Rome' },
             { name: 'Vienna', lat: 48.2082, lng: 16.3738, tz: 'Europe/Vienna' },
             { name: 'Prague', lat: 50.0755, lng: 14.4378, tz: 'Europe/Prague' },
             { name: 'Warsaw', lat: 52.2297, lng: 21.0122, tz: 'Europe/Warsaw' },
@@ -534,7 +606,6 @@
         }).addTo(map);
 
         const cities = getCityData();
-
         cities.forEach(city => {
             const marker = L.marker([city.lat, city.lng]).addTo(map);
             marker.bindPopup(`
@@ -554,7 +625,6 @@
 
     function init3DGlobe() {
         const cities = getCityData();
-
         globeInstance = Globe()
             (document.getElementById('globeViz'))
             .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
@@ -569,7 +639,7 @@
             .onLabelClick(city => {
                 selectedGlobeCity = city.name;
                 const timeStr = getCityTime(city.tz);
-                
+                                
                 document.getElementById('card-city-name').innerText = city.name;
                 document.getElementById('card-city-time').innerText = `현재 시간: ${timeStr}`;
                 document.getElementById('globe-info-card').style.display = 'block';
@@ -645,13 +715,13 @@
             currentCity = data.nearest_area[0].areaName[0].value;
             document.getElementById('city-input').value = currentCity;
         }
-        
+                
         const forecastList = [];
         const now = new Date();
 
         data.weather.slice(0, 3).forEach(day => {
             const dateStr = day.date.slice(5); 
-            
+                        
             day.hourly.forEach(hour => {
                 const timeNum = parseInt(hour.time, 10) / 100; 
                 const hoursFormatted = String(timeNum).padStart(2, '0');
@@ -688,26 +758,26 @@
     async function fetchOpenMeteo() {
         const coords = await getCoordinates(currentCity);
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,weathercode,uv_index&forecast_days=16`;
-            
+                    
         const response = await fetch(url);
         if (!response.ok) throw new Error('Open-Meteo request failed');
         const data = await response.json();
-    
+            
         const currentWeather = data.current_weather;
         const hourly = data.hourly;
         const currentHumidity = hourly.relativehumidity_2m[0];
-    
+            
         const forecastList = [];
         const now = new Date();
         const maxFutureTime = new Date(now.getTime() + 16 * 24 * 60 * 60 * 1000);
-    
+            
         for (let i = 0; i < hourly.time.length; i++) {
             const forecastTime = new Date(hourly.time[i]);
-    
+                
             if (forecastTime >= now && forecastTime <= maxFutureTime) {
                 const timeStr = hourly.time[i].replace('T', ' ').slice(5);
                 const windMs = (hourly.windspeed_10m[i] / 3.6).toFixed(1);
-    
+                    
                 forecastList.push({
                     time: timeStr,
                     desc: getWeatherDescription(hourly.weathercode[i]),
@@ -719,7 +789,7 @@
                 });
             }
         }
-    
+            
         return {
             current: {
                 temp: Math.round(currentWeather.temperature),
@@ -830,7 +900,6 @@
 
         let locationSecured = false;
 
-        // 1. 모바일 GPS 우선 시도 (4초 타임아웃 설정으로 무한 대기 방지)
         if ("geolocation" in navigator) {
             try {
                 const position = await new Promise((resolve, reject) => {
@@ -846,7 +915,6 @@
                 currentCoords = { latitude: gpsLat, longitude: gpsLon };
                 locationSecured = true;
 
-                // 역지오코딩 (상세 동네 이름 추출)
                 try {
                     const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsLat}&lon=${gpsLon}&accept-language=ko`, {
                         headers: { 'User-Agent': 'WeatherAndTimeApp/1.0' }
@@ -860,22 +928,20 @@
                         }
                     }
                 } catch (geoErr) {
-                    console.warn("역지오코딩 실패:", geoErr);
+                    console.warn("Reverse geocoding failed:", geoErr);
                 }
             } catch (gpsErr) {
-                console.warn("GPS 권한 거부 또는 타임아웃, IP 위치로 우회합니다.", gpsErr);
+                console.warn("GPS permission denied or timeout, fallback to IP location.", gpsErr);
             }
         }
 
-        // 2. GPS를 얻지 못했거나 차단된 경우 IP 기반 위치로 대체
         if (!locationSecured) {
             await fetchIpLocationSilently();
         }
 
-        // 3. 최종 확정된 위치(GPS 또는 IP)를 기반으로 단 한 번만 날씨 데이터 호출
         await updateWeather();
     }
-    
+        
     initLocation();
 </script>
 </body>
