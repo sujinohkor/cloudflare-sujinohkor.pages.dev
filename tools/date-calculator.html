@@ -4,23 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Date Calculator</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s; }
-                
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; transition: transform 0.3s ease; 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
-                
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         .workspace-container {
@@ -29,53 +48,59 @@
             flex: 1;
             gap: 20px;
             min-height: 0;
-            position: relative; /* 팝업 좌표 기준점 설정 */
+            position: relative;
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
 
         /* 왼쪽 박스: 달력 꽉 차게 배치 */
         .content-mid { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
-            padding: 20px; background: transparent; flex-direction: column; 
+            padding: 20px; background: rgba(0, 0, 0, 0.2); flex-direction: column; 
             justify-content: space-between; overflow: hidden;
         }
-
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
         .calendar-header h2 {
             color: #ff9e40;
             font-size: 1.2rem;
         }
-
         .nav-btn {
-            background: #202020;
+            background: rgba(255, 255, 255, 0.03);
             color: #ff9e40;
-            border: 1px solid #ff9e40;
-            padding: 5px 12px;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            padding: 6px 14px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
         }
-
         .nav-btn:hover {
-            background: #ff9e40;
-            color: #101010;
+            background: rgba(255, 158, 64, 0.2);
+            color: #ff9e40;
+            border-color: rgba(255, 158, 64, 0.6);
         }
-
         .weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -85,7 +110,6 @@
             font-size: 0.85rem;
             margin-bottom: 8px;
         }
-
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -94,40 +118,36 @@
             flex: 1;
             min-height: 0;
         }
-
         .day {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #252525;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.15);
             border-radius: 10px;
             font-size: 0.95rem;
-            cursor: default; /* pointer */
+            cursor: default;
             transition: 0.2s;
         }
-
         .day:hover {
-            background: #ff9e40;
-            color: #101010;
+            background: rgba(255, 158, 64, 0.2);
+            color: #ff9e40;
+            border-color: rgba(255, 158, 64, 0.6);
         }
-
         .day.empty {
             background: transparent;
+            border: none;
             cursor: default;
         }
-
         .day.today {
             border: 2px solid #ff9e40;
             color: #ff9e40;
             font-weight: bold;
         }
-
-        /* 아래 코드를 추가 또는 수정해주세요 */
         .day.today:hover {
-            background: #ff9e40;
-            color: #FFFFFF; /* 호버 시 글자 색상을 하얀색으로 고정 */
+            background: rgba(255, 158, 64, 0.2);
+            color: #ff9e40;
         }
-
         .day.selected {
             background: #ff9e40;
             color: #101010;
@@ -137,12 +157,11 @@
         /* 오른쪽 박스: overflow를 visible로 두어 팝업이 외부로 튀어나오게 허용 */
         .content-down { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow: visible; padding: 20px; background: transparent; gap: 15px; position: relative;
+            overflow: visible; padding: 20px; background: rgba(0, 0, 0, 0.2); gap: 15px; position: relative;
         }
-
         .calc-card {
-            background: #1c1c1c;
-            border: 1px solid #333;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
             border-radius: 12px;
             padding: 15px;
             display: flex;
@@ -151,41 +170,37 @@
             flex-shrink: 0;
             position: relative;
         }
-
         .calc-card h3 {
             font-size: 0.85rem;
             color: #ff9e40;
         }
-
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 3px;
             position: relative;
         }
-
         .input-group label {
             font-size: 0.75rem;
             color: #aaa;
         }
-
         .input-group input {
-            background: #252525;
-            border: 1px solid #444;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
             border-radius: 8px;
-            padding: 6px 10px;
+            padding: 8px 10px;
             color: #fff;
             font-family: inherit;
             font-size: 0.85rem;
             cursor: pointer;
+            font-weight: bold;
         }
-
         .input-group input:focus {
             outline: none;
-            border-color: #ff9e40;
+            border-color: rgba(255, 158, 64, 0.8);
         }
 
-        /* 커스텀 팝업 캘린더 스타일 (박스 바깥으로 자유롭게 오버레이) */
+        /* 커스텀 팝업 캘린더 스타일 */
         .popup-calendar {
             display: none;
             position: absolute;
@@ -198,60 +213,54 @@
             z-index: 9999;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
-
         .popup-calendar.active {
             display: block;
         }
-
         .popup-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
         .popup-header h4 {
             color: #ff9e40;
             font-size: 0.95rem;
         }
-
         .popup-nav-btn {
-            background: #252525;
+            background: rgba(255, 255, 255, 0.03);
             color: #ff9e40;
-            border: 1px solid #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.35);
             padding: 3px 8px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
         }
-
         .popup-days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
         }
-
         .popup-day {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 32px;
-            background: #252525;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.15);
             border-radius: 8px;
             font-size: 0.8rem;
             cursor: pointer;
         }
-
         .popup-day:hover {
-            background: #ff9e40;
-            color: #101010;
+            background: rgba(255, 158, 64, 0.2);
+            color: #ff9e40;
+            border-color: rgba(255, 158, 64, 0.6);
         }
-
         .popup-day.empty {
             background: transparent;
+            border: none;
             cursor: default;
         }
-
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -260,23 +269,21 @@
             color: #ccc;
             cursor: pointer;
         }
-
         .checkbox-group input {
             accent-color: #ff9e40;
             width: 14px;
             height: 14px;
             cursor: pointer;
         }
-
         .result-box {
-            background: #252525;
+            background: rgba(255, 255, 255, 0.02);
             border-radius: 6px;
-            padding: 7px;
+            padding: 8px;
             font-size: 0.85rem;
             color: #fff;
             text-align: center;
             font-weight: bold;
-            border: 1px dashed #444;
+            border: 1px dashed rgba(255, 158, 64, 0.4);
         }
 
         /* 그림자 설정 */
@@ -285,384 +292,421 @@
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #000000; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .content-mid, body.light-mode .content-down, body.light-mode .calc-card {
-            background-color: #fafafa;
+            background-color: rgba(255, 255, 255, 0.5);
             border-color: #F38020;
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-        body.light-mode .day, body.light-mode .popup-day { background: #eee; color: #333; }
-        body.light-mode .day:hover, body.light-mode .popup-day:hover { background: #F38020; color: #fff; }
+        body.light-mode .day, body.light-mode .popup-day { background: rgba(0, 0, 0, 0.02); color: #333; border-color: rgba(243, 128, 32, 0.2); }
+        body.light-mode .day:hover, body.light-mode .popup-day:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .day.today, body.light-mode .day.selected, body.light-mode .popup-day.selected { background: #F38020; color: #fff; border-color: #F38020; }
-        body.light-mode .input-group input, body.light-mode .result-box, body.light-mode .popup-calendar { background: #fff; color: #000; border-color: #ccc; }
+        body.light-mode .input-group input, body.light-mode .result-box, body.light-mode .popup-calendar { background: #fff; color: #000; border-color: #F38020; }
         body.light-mode .input-group label, body.light-mode .checkbox-group { color: #555; }
-        body.light-mode .nav-btn, body.light-mode .popup-nav-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .nav-btn:hover, body.light-mode .popup-nav-btn:hover { background: #F38020; color: #fff; }
+        body.light-mode .nav-btn, body.light-mode .popup-nav-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .nav-btn:hover, body.light-mode .popup-nav-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
 
         /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
 
-        @media (max-width: 768px) {
-            .menu-toggle-btn { display: block; color: #ffffff; }
-            .sidebar { transform: translateX(-250px); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; overflow: visible; }
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; } 
             .workspace-container { flex-direction: column; overflow: visible; }
             .content-mid, .content-down { height: auto; overflow: visible; }
         }
     </style>
 </head>
 <body>
-
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        <div class="bottom-btns">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Date Calculator</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <button class="menu-btn" onclick="resetAll()">Reset</button>
-        </div>
-    </aside>
+        </aside>
 
-    <main class="main-content">
-        <header class="top-section">
-            <h1>Date Calculator</h1>
-            <p>Calculate dates and intervals easily with a convenient calendar.</p>
-        </header>
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Date Calculator</h1>
+                <p>Calculate dates and intervals easily with a convenient calendar.</p>
+            </header>
 
-        <div class="workspace-container">
-            <!-- 왼쪽 박스: 메인 달력 -->
-            <section class="content-mid">
-                <div class="calendar-header">
-                    <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
-                    <h2 id="calendar-title">2026년 7월</h2>
-                    <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
+            <div class="workspace-container">
+                <!-- 왼쪽 박스: 메인 달력 -->
+                <section class="content-mid">
+                    <div class="calendar-header">
+                        <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
+                        <h2 id="calendar-title">2026년 7월</h2>
+                        <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
+                    </div>
+                    <div class="weekdays">
+                        <div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div>
+                    </div>
+                    <div class="days-grid" id="days-grid"></div>
+                </section>
+
+                <!-- 오른쪽 박스: 날짜 계산기 및 요일 계산기 -->
+                <section class="content-down">
+                    <!-- 날짜 간격 계산 -->
+                    <div class="calc-card">
+                        <h3>Date Interval</h3>
+                        <div class="input-group">
+                            <label>Start Date</label>
+                            <input type="text" id="date1" readonly onclick="openPopup('date1', event)">
+                            <div class="popup-calendar" id="popup-date1"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>End Date</label>
+                            <input type="text" id="date2" readonly onclick="openPopup('date2', event)">
+                            <div class="popup-calendar" id="popup-date2"></div>
+                        </div>
+                        <label class="checkbox-group">
+                            <input type="checkbox" id="include-start-interval" onchange="calculateInterval()"> Include start date (+1 day)
+                        </label>
+                        <div class="result-box" id="interval-result">Select two dates</div>
+                    </div>
+
+                    <!-- 날짜 더하기/빼기 계산 -->
+                    <div class="calc-card">
+                        <h3>Add / Subtract Days</h3>
+                        <div class="input-group">
+                            <label>Base Date</label>
+                            <input type="text" id="base-date" readonly onclick="openPopup('base-date', event)">
+                            <div class="popup-calendar" id="popup-base-date"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>Days to Add (+ or -)</label>
+                            <input type="number" id="days-input" value="30" oninput="calculateAddDays()">
+                        </div>
+                        <label class="checkbox-group">
+                            <input type="checkbox" id="include-start-add" checked onchange="calculateAddDays()"> Include base date (D-Day style)
+                        </label>
+                        <div class="result-box" id="add-result">Result date</div>
+                    </div>
+
+                    <!-- 요일 계산기 -->
+                    <div class="calc-card">
+                        <h3>Day of the Week</h3>
+                        <div class="input-group">
+                            <label>Target Date</label>
+                            <input type="text" id="weekday-date" readonly onclick="openPopup('weekday-date', event)">
+                            <div class="popup-calendar" id="popup-weekday-date"></div>
+                        </div>
+                        <div class="result-box" id="weekday-result">Select a date</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        function toggleSidebar() { 
+            // 사이드바를 열 때(현재 닫혀있는 상태에서 열릴 때) 열려있는 팝업 달력들을 모두 닫음
+            if (!sidebar.classList.contains('active')) {
+                document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
+            }
+            sidebar.classList.toggle('active'); 
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
+
+        mainContent.addEventListener('click', (e) => { 
+            if (sidebar.classList.contains('active')) { 
+                sidebar.classList.remove('active'); 
+            }
+            if (!e.target.closest('.input-group')) {
+                document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
+            }
+        });
+
+        let currentDate = new Date();
+        const popupDates = {
+            'date1': new Date(),
+            'date2': new Date(),
+            'base-date': new Date(),
+            'weekday-date': new Date()
+        };
+        let activeInputId = null;
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('calendar-title').textContent = `${year}년 ${month + 1}월`;
+
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+
+            let firstDayIndex = new Date(year, month, 1).getDay();
+            firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
+
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'day empty';
+                grid.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= lastDay; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.textContent = day;
+
+                if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                    dayDiv.classList.add('today');
+                }
+
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function openPopup(inputId, event) {
+            event.stopPropagation();
+            
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+
+            const popup = document.getElementById('popup-' + inputId);
+            const isActive = popup.classList.contains('active');
+
+            document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
+
+            if (!isActive) {
+                activeInputId = inputId;
+                popup.classList.add('active');
+
+                const val = document.getElementById(inputId).value;
+                if (val) popupDates[inputId] = new Date(val);
+                renderPopupCalendar(inputId);
+
+                const inputGroup = popup.parentElement;
+                const rect = inputGroup.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                
+                if (spaceBelow < 320) {
+                    popup.style.bottom = '100%';
+                    popup.style.top = 'auto';
+                    popup.style.marginBottom = '5px';
+                    popup.style.marginTop = '0';
+                } else {
+                    popup.style.top = '100%';
+                    popup.style.bottom = 'auto';
+                    popup.style.marginTop = '5px';
+                    popup.style.marginBottom = '0';
+                }
+            }
+        }
+
+        function renderPopupCalendar(inputId) {
+            const popup = document.getElementById('popup-' + inputId);
+            const dateObj = popupDates[inputId];
+            const year = dateObj.getFullYear();
+            const month = dateObj.getMonth();
+
+            const selectedVal = document.getElementById(inputId).value;
+
+            let html = `
+                <div class="popup-header">
+                    <button class="popup-nav-btn" onclick="changePopupMonth('${inputId}', -1, event)">&lt;</button>
+                    <h4>${year}년 ${month + 1}월</h4>
+                    <button class="popup-nav-btn" onclick="changePopupMonth('${inputId}', 1, event)">&gt;</button>
                 </div>
-                <div class="weekdays">
+                <div class="weekdays" style="font-size:0.75rem; margin-bottom:4px;">
                     <div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div>
                 </div>
-                <div class="days-grid" id="days-grid"></div>
-            </section>
+                <div class="popup-days-grid">
+            `;
 
-            <!-- 오른쪽 박스: 날짜 계산기 및 요일 계산기 -->
-            <section class="content-down">
-                <!-- 날짜 간격 계산 -->
-                <div class="calc-card">
-                    <h3>Date Interval</h3>
-                    <div class="input-group">
-                        <label>Start Date</label>
-                        <input type="text" id="date1" readonly onclick="openPopup('date1', event)">
-                        <div class="popup-calendar" id="popup-date1"></div>
-                    </div>
-                    <div class="input-group">
-                        <label>End Date</label>
-                        <input type="text" id="date2" readonly onclick="openPopup('date2', event)">
-                        <div class="popup-calendar" id="popup-date2"></div>
-                    </div>
-                    <label class="checkbox-group">
-                        <input type="checkbox" id="include-start-interval" onchange="calculateInterval()"> Include start date (+1 day)
-                    </label>
-                    <div class="result-box" id="interval-result">Select two dates</div>
-                </div>
+            let firstDayIndex = new Date(year, month, 1).getDay();
+            firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
 
-                <!-- 날짜 더하기/빼기 계산 -->
-                <div class="calc-card">
-                    <h3>Add / Subtract Days</h3>
-                    <div class="input-group">
-                        <label>Base Date</label>
-                        <input type="text" id="base-date" readonly onclick="openPopup('base-date', event)">
-                        <div class="popup-calendar" id="popup-base-date"></div>
-                    </div>
-                    <div class="input-group">
-                        <label>Days to Add (+ or -)</label>
-                        <input type="number" id="days-input" value="30" oninput="calculateAddDays()">
-                    </div>
-                    <label class="checkbox-group">
-                        <input type="checkbox" id="include-start-add" checked onchange="calculateAddDays()"> Include base date (D-Day style)
-                    </label>
-                    <div class="result-box" id="add-result">Result date</div>
-                </div>
-
-                <!-- 요일 계산기 -->
-                <div class="calc-card">
-                    <h3>Day of the Week</h3>
-                    <div class="input-group">
-                        <label>Target Date</label>
-                        <input type="text" id="weekday-date" readonly onclick="openPopup('weekday-date', event)">
-                        <div class="popup-calendar" id="popup-weekday-date"></div>
-                    </div>
-                    <div class="result-box" id="weekday-result">Select a date</div>
-                </div>
-            </section>
-        </div>
-    </main>
-</div>
-
-<script>
-    const sidebar = document.getElementById('sidebar');
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-    
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
-    
-    document.querySelector('.main-content').addEventListener('click', (e) => { 
-        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
-        if (!e.target.closest('.input-group')) {
-            document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
-        }
-    });
-
-    let currentDate = new Date();
-    const popupDates = {
-        'date1': new Date(),
-        'date2': new Date(),
-        'base-date': new Date(),
-        'weekday-date': new Date()
-    };
-    let activeInputId = null;
-
-    function renderCalendar() {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-
-        document.getElementById('calendar-title').textContent = `${year}년 ${month + 1}월`;
-
-        const grid = document.getElementById('days-grid');
-        grid.innerHTML = '';
-
-        let firstDayIndex = new Date(year, month, 1).getDay();
-        firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
-
-        const lastDay = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
-
-        for (let i = 0; i < firstDayIndex; i++) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.className = 'day empty';
-            grid.appendChild(emptyDiv);
-        }
-
-        for (let day = 1; day <= lastDay; day++) {
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'day';
-            dayDiv.textContent = day;
-
-            if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
-                dayDiv.classList.add('today');
+            for (let i = 0; i < firstDayIndex; i++) {
+                html += `<div class="popup-day empty"></div>`;
             }
 
-            grid.appendChild(dayDiv);
+            for (let day = 1; day <= lastDay; day++) {
+                const mStr = String(month + 1).padStart(2, '0');
+                const dStr = String(day).padStart(2, '0');
+                const fullDateStr = `${year}-${mStr}-${dStr}`;
+
+                let classes = 'popup-day';
+                if (fullDateStr === selectedVal) classes += ' selected';
+                else if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) classes += ' today';
+
+                html += `<div class="${classes}" onclick="selectDate('${inputId}', '${fullDateStr}', event)">${day}</div>`;
+            }
+
+            html += `</div>`;
+            popup.innerHTML = html;
         }
-    }
 
-    function changeMonth(direction) {
-        currentDate.setMonth(currentDate.getMonth() + direction);
-        renderCalendar();
-    }
-
-    function openPopup(inputId, event) {
-        event.stopPropagation();
-        
-        const popup = document.getElementById('popup-' + inputId);
-        const isActive = popup.classList.contains('active');
-
-        document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
-
-        if (!isActive) {
-            activeInputId = inputId;
-            popup.classList.add('active');
-
-            const val = document.getElementById(inputId).value;
-            if (val) popupDates[inputId] = new Date(val);
+        function changePopupMonth(inputId, direction, event) {
+            event.stopPropagation();
+            popupDates[inputId].setMonth(popupDates[inputId].getMonth() + direction);
             renderPopupCalendar(inputId);
+        }
 
-            // 아래쪽 공간이 부족할 경우 위쪽으로 팝업 위치 자동 조정
-            const inputGroup = popup.parentElement;
-            const rect = inputGroup.getBoundingClientRect();
-            const spaceBelow = window.innerHeight - rect.bottom;
+        function selectDate(inputId, dateStr, event) {
+            event.stopPropagation();
+            document.getElementById(inputId).value = dateStr;
+            document.getElementById('popup-' + inputId).classList.remove('active');
             
-            if (spaceBelow < 320) {
-                popup.style.bottom = '100%';
-                popup.style.top = 'auto';
-                popup.style.marginBottom = '5px';
-                popup.style.marginTop = '0';
+            if (inputId === 'date1' || inputId === 'date2') calculateInterval();
+            if (inputId === 'base-date') calculateAddDays();
+            if (inputId === 'weekday-date') calculateWeekday();
+        }
+
+        function calculateInterval() {
+            const d1 = document.getElementById('date1').value;
+            const d2 = document.getElementById('date2').value;
+            const includeStart = document.getElementById('include-start-interval').checked;
+            const resultBox = document.getElementById('interval-result');
+
+            if (!d1 || !d2) {
+                resultBox.textContent = 'Select two dates';
+                return;
+            }
+
+            const date1 = new Date(d1);
+            const date2 = new Date(d2);
+            const diffTime = date2 - date1;
+            let diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+            if (includeStart) {
+                if (diffDays >= 0) diffDays += 1;
+                else diffDays -= 1;
+            }
+
+            if (diffDays === 0) {
+                resultBox.textContent = 'Same day (0 days)';
+            } else if (diffDays > 0) {
+                resultBox.textContent = `Difference: ${diffDays} days`;
             } else {
-                popup.style.top = '100%';
-                popup.style.bottom = 'auto';
-                popup.style.marginTop = '5px';
-                popup.style.marginBottom = '0';
+                resultBox.textContent = `Difference: ${Math.abs(diffDays)} days (Inverted)`;
             }
         }
-    }
 
-    function renderPopupCalendar(inputId) {
-        const popup = document.getElementById('popup-' + inputId);
-        const dateObj = popupDates[inputId];
-        const year = dateObj.getFullYear();
-        const month = dateObj.getMonth();
+        function calculateAddDays() {
+            const bDate = document.getElementById('base-date').value;
+            let daysVal = parseInt(document.getElementById('days-input').value);
+            const includeStart = document.getElementById('include-start-add').checked;
+            const resultBox = document.getElementById('add-result');
 
-        const selectedVal = document.getElementById(inputId).value;
+            if (!bDate || isNaN(daysVal)) {
+                resultBox.textContent = 'Result date';
+                return;
+            }
 
-        let html = `
-            <div class="popup-header">
-                <button class="popup-nav-btn" onclick="changePopupMonth('${inputId}', -1, event)">&lt;</button>
-                <h4>${year}년 ${month + 1}월</h4>
-                <button class="popup-nav-btn" onclick="changePopupMonth('${inputId}', 1, event)">&gt;</button>
-            </div>
-            <div class="weekdays" style="font-size:0.75rem; margin-bottom:4px;">
-                <div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div>
-            </div>
-            <div class="popup-days-grid">
-        `;
+            if (includeStart && daysVal !== 0) {
+                daysVal = daysVal > 0 ? daysVal - 1 : daysVal + 1;
+            }
 
-        let firstDayIndex = new Date(year, month, 1).getDay();
-        firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
-        const lastDay = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
+            const date = new Date(bDate);
+            date.setDate(date.getDate() + daysVal);
 
-        for (let i = 0; i < firstDayIndex; i++) {
-            html += `<div class="popup-day empty"></div>`;
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            resultBox.textContent = `Result: ${year}-${month}-${day}`;
         }
 
-        for (let day = 1; day <= lastDay; day++) {
-            const mStr = String(month + 1).padStart(2, '0');
-            const dStr = String(day).padStart(2, '0');
-            const fullDateStr = `${year}-${mStr}-${dStr}`;
+        function calculateWeekday() {
+            const wDate = document.getElementById('weekday-date').value;
+            const resultBox = document.getElementById('weekday-result');
 
-            let classes = 'popup-day';
-            if (fullDateStr === selectedVal) classes += ' selected';
-            else if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) classes += ' today';
+            if (!wDate) {
+                resultBox.textContent = 'Select a date';
+                return;
+            }
 
-            html += `<div class="${classes}" onclick="selectDate('${inputId}', '${fullDateStr}', event)">${day}</div>`;
+            const date = new Date(wDate);
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = days[date.getDay()];
+
+            resultBox.textContent = `Day of the week: ${dayName}`;
         }
 
-        html += `</div>`;
-        popup.innerHTML = html;
-    }
-
-    function changePopupMonth(inputId, direction, event) {
-        event.stopPropagation();
-        popupDates[inputId].setMonth(popupDates[inputId].getMonth() + direction);
-        renderPopupCalendar(inputId);
-    }
-
-    function selectDate(inputId, dateStr, event) {
-        event.stopPropagation();
-        document.getElementById(inputId).value = dateStr;
-        document.getElementById('popup-' + inputId).classList.remove('active');
-        
-        if (inputId === 'date1' || inputId === 'date2') calculateInterval();
-        if (inputId === 'base-date') calculateAddDays();
-        if (inputId === 'weekday-date') calculateWeekday();
-    }
-
-    function calculateInterval() {
-        const d1 = document.getElementById('date1').value;
-        const d2 = document.getElementById('date2').value;
-        const includeStart = document.getElementById('include-start-interval').checked;
-        const resultBox = document.getElementById('interval-result');
-
-        if (!d1 || !d2) {
-            resultBox.textContent = 'Select two dates';
-            return;
+        function resetAll() {
+            currentDate = new Date();
+            renderCalendar();
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('date1').value = todayStr;
+            document.getElementById('date2').value = todayStr;
+            document.getElementById('base-date').value = todayStr;
+            document.getElementById('weekday-date').value = todayStr;
+            document.getElementById('days-input').value = 30;
+            document.getElementById('include-start-interval').checked = false;
+            document.getElementById('include-start-add').checked = true;
+            calculateInterval();
+            calculateAddDays();
+            calculateWeekday();
         }
 
-        const date1 = new Date(d1);
-        const date2 = new Date(d2);
-        const diffTime = date2 - date1;
-        let diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-        if (includeStart) {
-            if (diffDays >= 0) diffDays += 1;
-            else diffDays -= 1;
-        }
-
-        if (diffDays === 0) {
-            resultBox.textContent = 'Same day (0 days)';
-        } else if (diffDays > 0) {
-            resultBox.textContent = `Difference: ${diffDays} days`;
-        } else {
-            resultBox.textContent = `Difference: ${Math.abs(diffDays)} days (Inverted)`;
-        }
-    }
-
-    function calculateAddDays() {
-        const bDate = document.getElementById('base-date').value;
-        let daysVal = parseInt(document.getElementById('days-input').value);
-        const includeStart = document.getElementById('include-start-add').checked;
-        const resultBox = document.getElementById('add-result');
-
-        if (!bDate || isNaN(daysVal)) {
-            resultBox.textContent = 'Result date';
-            return;
-        }
-
-        if (includeStart && daysVal !== 0) {
-            daysVal = daysVal > 0 ? daysVal - 1 : daysVal + 1;
-        }
-
-        const date = new Date(bDate);
-        date.setDate(date.getDate() + daysVal);
-
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-
-        resultBox.textContent = `Result: ${year}-${month}-${day}`;
-    }
-
-    function calculateWeekday() {
-        const wDate = document.getElementById('weekday-date').value;
-        const resultBox = document.getElementById('weekday-result');
-
-        if (!wDate) {
-            resultBox.textContent = 'Select a date';
-            return;
-        }
-
-        const date = new Date(wDate);
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const dayName = days[date.getDay()];
-
-        resultBox.textContent = `Day of the week: ${dayName}`;
-    }
-
-    function resetAll() {
-        currentDate = new Date();
-        renderCalendar();
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('date1').value = todayStr;
-        document.getElementById('date2').value = todayStr;
-        document.getElementById('base-date').value = todayStr;
-        document.getElementById('weekday-date').value = todayStr;
-        document.getElementById('days-input').value = 30;
-        document.getElementById('include-start-interval').checked = false;
-        document.getElementById('include-start-add').checked = true;
-        calculateInterval();
-        calculateAddDays();
-        calculateWeekday();
-    }
-
-    window.onload = function() {
-        renderCalendar();
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('date1').value = todayStr;
-        document.getElementById('date2').value = todayStr;
-        document.getElementById('base-date').value = todayStr;
-        document.getElementById('weekday-date').value = todayStr;
-        calculateInterval();
-        calculateAddDays();
-        calculateWeekday();
-    };
-</script>
-
+        window.onload = function() {
+            renderCalendar();
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('date1').value = todayStr;
+            document.getElementById('date2').value = todayStr;
+            document.getElementById('base-date').value = todayStr;
+            document.getElementById('weekday-date').value = todayStr;
+            calculateInterval();
+            calculateAddDays();
+            calculateWeekday();
+        };
+    </script>
 </body>
 </html>
