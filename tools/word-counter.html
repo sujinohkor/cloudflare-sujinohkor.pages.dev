@@ -8,84 +8,78 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: #202020; 
-            color: #fff; 
-            transition: background 0.3s; 
-        }
-                        
-        /* 2. Layout */
-        .app-container { 
-            display: flex; 
-            min-height: 100vh; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; 
-            height: 100vh; 
-            position: fixed; 
-            left: 0; 
-            top: 0; 
-            background-color: #101010; 
-            padding: 20px; 
-            z-index: 1000; 
-            display: flex; 
-            flex-direction: column; 
-            transition: transform 0.3s ease; 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 2000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
         .main-content { 
-            margin-left: 250px; 
-            padding: 40px; 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden; 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 10px; 
-            cursor: pointer; 
-            background: #202020; 
-            color: #ff9e40; 
-            border: 2px solid #ff9e40; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            transition: all 0.3s; 
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
-        .menu-btn:hover { 
-            background: #ff9e40; 
-            color: #101010; 
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 통계 패널(카드) 스타일 */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 158, 64, 0.25);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .theme-btn:hover { 
-            background-color: #FDF5E6; 
-            color: #F38020; 
-            border-color: #FDF5E6; 
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #ccc;
         }
-                        
-        .menu-list { 
-            margin: 20px 0; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
+        .info-row span:last-child {
+            color: #ff9e40;
+            font-weight: bold;
         }
-        .menu-list a { 
-            display: flex; 
-            justify-content: space-between; 
-            color: #fff; 
-            font-size: 0.95rem; 
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .menu-list span { 
-            color: #e68a35; 
-            font-weight: bold; 
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
         }
 
         .content-card { 
@@ -94,19 +88,19 @@
             flex: 1; 
             display: flex; 
             overflow: hidden; 
-            background: transparent; 
+            background: rgba(0, 0, 0, 0.2); 
             position: relative; 
         }
 
-        /* 전체화면 버튼 스타일 (에디터 내부 우측 상단 고정) */
+        /* 전체화면 버튼 스타일 (사이드바보다 낮은 z-index 부여) */
         .fullscreen-btn { 
             position: absolute; 
             top: 15px; 
             right: 15px; 
-            z-index: 10000; 
-            background: #202020; 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.03); 
             color: #ff9e40; 
-            border: 1px solid #ff9e40; 
+            border: 1px solid rgba(255, 158, 64, 0.5); 
             padding: 6px 14px; 
             border-radius: 8px; 
             cursor: pointer; 
@@ -116,11 +110,12 @@
             transition: all 0.3s; 
         }
         .fullscreen-btn:hover { 
-            background: #ff9e40; 
-            color: #101010; 
+            background: rgba(255, 158, 64, 0.2); 
+            color: #ff9e40; 
+            border-color: rgba(255, 158, 64, 0.8);
         }
 
-        /* 전체화면 활성화 클래스 (최상단 빈틈없이 완벽 채우기) */
+        /* 전체화면 활성화 클래스 */
         .content-card.fullscreen { 
             position: fixed !important; 
             top: 0 !important; 
@@ -134,10 +129,8 @@
             border: none !important; 
             padding: 0 !important; 
             margin: 0 !important;
-            background: #202020; 
+            background: #101010; 
         }
-
-        /* 전체화면일 때 내부 래퍼에 패딩 부여 */
         .content-card.fullscreen .editor-wrapper {
             padding: 20px;
             width: 100%;
@@ -181,107 +174,77 @@
         }
 
         /* 다크 모드 카드/패널 그림자 */
-        .card, .content-card, .content-mid, .content-down { 
+        .card, .content-card { 
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { 
-            background-color: #fff; 
-        }
+        body.light-mode { background-color: #fff; color: #202020; }
         body.light-mode .sidebar { 
-            background-color: #FDF5E6; 
-            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { 
-            background: #FDF5E6; 
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
-            border-color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
         }
-        body.light-mode .menu-btn:hover { 
-            background: #F38020; 
-            color: #ffffff; 
-            border-color: #F38020; 
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
         }
-        body.light-mode .theme-btn:hover { 
-            background-color: #202020; 
-            color: #ff9e40; 
-            border-color: #202020; 
-        }
-        body.light-mode .top-section h1, body.light-mode .top-section p, body.light-mode .menu-list a { 
-            color: #202020; 
-        }
-        body.light-mode textarea { 
-            color: #000; 
-        }
-        body.light-mode .line-numbers { 
-            background: rgba(0, 0, 0, 0.05); 
-            color: #999; 
-        }
-        body.light-mode .menu-toggle-btn { 
-            color: #000000; 
-        }
-        body.light-mode .content-card.fullscreen { 
-            background: #fff !important; 
-            padding: 0 !important;
-        }
-        body.light-mode .content-card.fullscreen .editor-wrapper {
-            padding: 20px;
-        }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode textarea { color: #000; }
+        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #999; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        body.light-mode .content-card { background: rgba(255, 255, 255, 0.5); border-color: #F38020; }
+        body.light-mode .content-card.fullscreen { background: #fff !important; padding: 0 !important; }
+        body.light-mode .content-card.fullscreen .editor-wrapper { padding: 20px; }
         body.light-mode .fullscreen-btn { 
-            background: #FDF5E6; 
+            background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
-            border-color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
         }
         body.light-mode .fullscreen-btn:hover { 
-            background: #F38020; 
-            color: #ffffff; 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
         }
-        body.light-mode .card, 
-        body.light-mode .content-card, 
-        body.light-mode .content-mid, 
-        body.light-mode .content-down { 
+        body.light-mode .info-panel {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(243, 128, 32, 0.5);
+        }
+        body.light-mode .info-row { color: #202020; }
+        body.light-mode .info-row span:last-child { color: #F38020; }
+        body.light-mode .card, body.light-mode .content-card { 
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
         }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { 
-            display: none; 
-            position: fixed; 
-            bottom: 20px; 
-            left: 20px; 
-            z-index: 2000; 
-            padding: 10px 15px; 
-            background: #ff9e40; 
-            border: none; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            cursor: pointer; 
-        }                        
-        @media (max-width: 600px) { 
-            .menu-toggle-btn { 
-                display: block; 
-                color: #ffffff; 
-            } 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 3000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
+
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
             .sidebar { 
-                transform: translateX(-250px); 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             } 
-            .sidebar.active { 
-                transform: translateX(0); 
-            } 
-            .main-content { 
-                margin-left: 0; 
-                padding: 20px; 
-                width: 100%; 
-                max-height: 100svh; 
-                flex: 1; 
-                display: flex; 
-                flex-direction: column; 
-            } 
-            .content-card { 
-                min-height: 0; 
-                height: 100%; 
-            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
+            .content-card { min-height: 0; height: 100%; }
         }
     </style>
 </head>
@@ -289,27 +252,50 @@
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Word Counter</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-            <nav class="menu-list">
-                <a>Characters (with spaces) <span id="char-count-all">0</span></a>
-                <a>Characters (no spaces) <span id="char-count-no-space">0</span></a>
-                <a>Word Count <span id="word-count">0</span></a>
-                <a>Paragraph Count <span id="para-count">0</span></a>
-                <a>Byte Count <span id="byte-count">0</span></a>
-            </nav>
+
+            <div class="info-panel">
+                <div class="info-row">
+                    <span>Characters (with spaces)</span>
+                    <span id="char-count-all">0</span>
+                </div>
+                <div class="info-row">
+                    <span>Characters (no spaces)</span>
+                    <span id="char-count-no-space">0</span>
+                </div>
+                <div class="info-row">
+                    <span>Word Count</span>
+                    <span id="word-count">0</span>
+                </div>
+                <div class="info-row">
+                    <span>Paragraph Count</span>
+                    <span id="para-count">0</span>
+                </div>
+                <div class="info-row">
+                    <span>Byte Count</span>
+                    <span id="byte-count">0</span>
+                </div>
+            </div>
+
             <div class="bottom-btns">
                 <button class="menu-btn" onclick="copyText()">Copy</button>
                 <button class="menu-btn" onclick="saveText()">Save</button>
                 <button class="menu-btn" onclick="resetText()">Reset</button>
             </div>
         </aside>
-        <main class="main-content">
+
+        <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Word Counter</h1>
                 <p>You can count the number of words, etc.</p>
             </header>
-            <section class="content-card" id="content-card" style="margin-top: 20px;">
+
+            <section class="content-card" id="content-card">
                 <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                 <div class="editor-wrapper">
                     <div id="line-numbers" class="line-numbers">1</div>
@@ -318,6 +304,7 @@
             </section>
         </main>
     </div>
+
     <script>
         const textInput = document.getElementById('text-input');
         const lineNumbers = document.getElementById('line-numbers');
@@ -338,11 +325,19 @@
             sidebar.classList.toggle('active'); 
         }
 
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
         document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
         });
 
-        document.querySelector('.main-content').addEventListener('click', () => { 
+        mainContent.addEventListener('click', () => { 
             if (sidebar.classList.contains('active')) { 
                 sidebar.classList.remove('active'); 
             } 
@@ -396,6 +391,7 @@
             document.getElementById('byte-count').innerText = bytes;
 
             updateLineNumbers();
+            saveToLocal();
         });
 
         function resetText() {
@@ -418,7 +414,6 @@
             if (!text.trim()) return alert("No text to save.");
 
             localStorage.setItem('saved_word_counter_text', text);
-
             const blob = new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -427,6 +422,10 @@
             URL.revokeObjectURL(link.href);
 
             alert('Text saved successfully.');
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('saved_word_counter_text', textInput.value);
         }
 
         function loadSavedText() {
