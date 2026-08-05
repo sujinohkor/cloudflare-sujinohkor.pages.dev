@@ -266,8 +266,8 @@
             opacity: 0.5;
             transition: opacity 0.2s, color 0.2s;
         }
-        .sticky-note:hover .delete-btn {
-             opacity: 1;
+        .sticky-note:hover .delete-btn { 
+             opacity: 1; 
              color: #f44336;
         }
 
@@ -304,9 +304,21 @@
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
+        
+        /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        
         body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
+        
         body.light-mode .memo-btn-yellow { color: #8d7b00 !important; border-color: rgba(230, 211, 75, 0.5) !important; }
         body.light-mode .memo-btn-yellow:hover { background: #fff9c4 !important; color: #101010 !important; }
         body.light-mode .memo-btn-pink { color: #b8326e !important; border-color: rgba(240, 136, 168, 0.5) !important; }
@@ -342,8 +354,9 @@
         .menu-toggle-btn { 
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
-            font-weight: bold; cursor: pointer; color: #ffffff;
-        }                
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
+                
         @media (max-width: 900px) { 
             .menu-toggle-btn { display: block; } 
             .sidebar { 
@@ -372,7 +385,7 @@
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
-            
+                        
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
             <div class="search-container">
@@ -413,7 +426,7 @@
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         const board = document.getElementById('board');
         let noteCounter = 0;
-        let highestZIndex = 10; // 노트가 클릭될 때마다 증가할 z-index 기준값
+        let highestZIndex = 10;
 
         window.onload = function() {
             loadNotes();
@@ -451,23 +464,21 @@
             } 
         });
 
-        // 특정 노트를 맨 앞으로 가져오는 함수
         function bringToFront(noteEl) {
             highestZIndex++;
             noteEl.style.zIndex = highestZIndex;
-            saveNotesToLocalStorage(); // z-index가 변경될 때마다 즉시 저장
+            saveNotesToLocalStorage();
         }
 
         function createNote(colorClass = 'note-yellow', text = '', position = null, rotation = null, fontSize = 16, zIndex = null) {
             noteCounter++;
             const noteId = 'note-' + noteCounter;
-            
+                        
             const noteEl = document.createElement('div');
             noteEl.className = `sticky-note ${colorClass}`;
             noteEl.id = noteId;
             noteEl.draggable = true;
 
-            // 전달받은 zIndex가 있으면 사용하고, 없으면 최신 zIndex 적용
             if (zIndex !== null) {
                 noteEl.style.zIndex = zIndex;
                 if (zIndex > highestZIndex) {
@@ -503,7 +514,6 @@
                 <textarea class="note-textarea" style="font-size: ${fontSize}px;" placeholder="Type your note here..." oninput="saveNotesToLocalStorage()">${text}</textarea>
             `;
 
-            // 노트를 클릭(포커스)하거나 누를 때 맨 앞으로 가져오기
             noteEl.addEventListener('mousedown', () => bringToFront(noteEl));
             noteEl.querySelector('.note-textarea').addEventListener('focus', () => bringToFront(noteEl));
 
@@ -542,7 +552,7 @@
 
         function initDragElement(elmnt) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            
+                        
             elmnt.onmousedown = dragMouseDown;
 
             function dragMouseDown(e) {
@@ -555,7 +565,7 @@
 
                 document.onmouseup = closeDragElement;
                 document.onmousemove = elementDrag;
-                
+                                
                 bringToFront(elmnt);
             }
 
@@ -565,13 +575,13 @@
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                
+                                
                 let newTop = elmnt.offsetTop - pos2;
                 let newLeft = elmnt.offsetLeft - pos1;
 
                 const maxX = board.clientWidth - elmnt.offsetWidth;
                 const maxY = board.clientHeight - elmnt.offsetHeight;
-                
+                                
                 newLeft = Math.max(0, Math.min(newLeft, maxX));
                 newTop = Math.max(0, Math.min(newTop, maxY));
 
@@ -593,7 +603,7 @@
             const noteEl = document.getElementById(noteId);
             bringToFront(noteEl);
             const rect = noteEl.getBoundingClientRect();
-            
+                        
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
@@ -681,13 +691,12 @@
                 const top = note.style.top;
                 const text = note.querySelector('textarea').value;
                 const fontSize = parseInt(note.querySelector('textarea').style.fontSize) || 16;
-                const zIndex = parseInt(note.style.zIndex) || 1; // z-index 값 추출
-                
+                const zIndex = parseInt(note.style.zIndex) || 1;
+                                
                 const transformMatch = note.style.transform.match(/rotate\(([^)]+\))/);
                 const rotation = transformMatch ? parseFloat(transformMatch[1]) : 0;
 
                 const className = Array.from(note.classList).find(c => c.startsWith('note-'));
-
                 notesData.push({ id, left, top, text, className, rotation, fontSize, zIndex });
             });
             localStorage.setItem('corkboard_notes', JSON.stringify(notesData));
@@ -704,7 +713,7 @@
                         { left: noteData.left, top: noteData.top },
                         noteData.rotation,
                         noteData.fontSize || 16,
-                        noteData.zIndex || null // 저장된 z-index 전달
+                        noteData.zIndex || null
                     );
                 });
             }
