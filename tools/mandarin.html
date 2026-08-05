@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pinyin to Chinese</title>
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <!-- OpenCC-JS (간체/번체 변환용) -->
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -189,7 +190,7 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Chinese</h1>
-                <p>Type any pinyin (e.g. nihao, de, boshi, xuexiao) to convert automatically.</p>
+                <p>Type any pinyin (e.g., nihao, de, boshi) to get full IME suggestions instantly.</p>
             </header>
 
             <section class="content-card" id="content-card">
@@ -229,42 +230,8 @@
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
-        // 대폭 확장된 내장 병음 사전 (보쉬, 박사, 구조조사, 인사말 등 필수 어휘 포함)
-        const pinyinDict = {
-            "de": ["的", "得", "地"],
-            "nihao": ["你好", "妳好"],
-            "ni": ["你", "妳"],
-            "hao": ["好", "号"],
-            "wo": ["我"],
-            "shi": ["是", "事", "时", "石", "实", "市"],
-            "bu": ["不", "步", "部", "布"],
-            "le": ["了", "乐"],
-            "ren": ["人", "认", "任"],
-            "zai": ["在", "再", "载"],
-            "you": ["有", "又", "优", "友"],
-            "ta": ["他", "她", "它"],
-            "tamen": ["他们", "她们"],
-            "women": ["我们"],
-            "nimen": ["你们"],
-            "xiexie": ["谢谢"],
-            "zaijian": ["再见"],
-            "zhongguo": ["中国"],
-            "hanguo": ["韩国"],
-            "meiguo": ["美国"],
-            "xuexiao": ["学校"],
-            "diannao": ["电脑"],
-            "shouji": ["手机"],
-            "tianqi": ["天气"],
-            "xihuan": ["喜欢"],
-            "ai": ["爱", "艾"],
-            "chi": ["吃", "迟"],
-            "he": ["和", "喝", "河"],
-            "shu": ["书", "树", "数"],
-            "gongzuo": ["工作"],
-            "xuesheng": ["学生"],
-            "laoshi": ["老师"],
-            "boshi": ["博士", "波士", "博士"]
-        };
+        // ⭐ 본인이 생성한 클라우드플레어 워커 주소로 변경하세요!
+        const PROXY_URL = "pinyin-proxy.sujinohkor.workers.dev";
 
         window.toggleFullscreen = function() {
             contentCard.classList.toggle('fullscreen');
@@ -303,22 +270,38 @@
             }
         }
 
+        // 실시간 입력 시 서버리스 프록시를 통해 대형 IME 엔진 검색 결과 요청
+        let debounceTimer;
         pinyinInputBox.addEventListener('input', (e) => {
             let query = pinyinInputBox.value.trim().toLowerCase();
             if (!query) {
                 currentMatches = [];
                 candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
+                statusText.textContent = "Ready";
                 return;
             }
 
-            let matches = pinyinDict[query];
-            if (matches && matches.length > 0) {
-                currentMatches = matches;
-                renderCandidates(matches);
-            } else {
-                currentMatches = [query];
-                renderCandidates([query]);
-            }
+            statusText.textContent = "Searching...";
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+
+                    if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
+                        currentMatches = data[1][0][1]; // 추천 한자 배열 리스트
+                        renderCandidates(currentMatches);
+                        statusText.textContent = "Ready";
+                    } else {
+                        currentMatches = [query];
+                        renderCandidates([query]);
+                        statusText.textContent = "Ready";
+                    }
+                } catch (err) {
+                    console.error("Proxy fetch error:", err);
+                    statusText.textContent = "Error";
+                }
+            }, 150); // 타이핑 속도에 맞춘 디바운스 최적화
         });
 
         function renderCandidates(list) {
