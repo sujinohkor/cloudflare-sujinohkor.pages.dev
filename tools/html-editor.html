@@ -4,78 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Editor</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #202020;
-            color: #fff;
-            transition: background 0.3s;
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) - z-index를 낮춰서 버튼이 위로 오도록 설정 */
+        .sidebar { 
+            width: 260px; 
+            height: calc(100vh - 40px); 
+            position: fixed; 
+            left: 20px; 
+            top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; 
+            z-index: 100; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
-        /* 2. Layout */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background-color: #101010;
-            padding: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            gap: 20px;
-            overflow: hidden;
-            transition: 0.3s;
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; 
+            padding: 40px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            gap: 20px; 
+            overflow: hidden; 
+            transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn, .theme-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s;
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .menu-btn:hover, .menu-btn.active {
-            background: #ff9e40;
-            color: #101010;
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        .theme-btn:hover {
-            background-color: #FDF5E6;
-            color: #F38020;
-            border-color: #FDF5E6;
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
         }
 
         /* Workspace Structure */
@@ -89,8 +84,6 @@
         }
 
         /* ===== Maximize / Minimize 상태별 제어 클래스 ===== */
-        
-        /* 1단계: 왼쪽(코드뷰)이 화면 전체를 채우도록 고정 */
         .workspace-container.state-left {
             position: fixed !important;
             top: 0 !important;
@@ -98,11 +91,14 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 9999 !important;
-            background: #202020;
-            padding: 20px;
+            background: #101010;
+            padding: 40px;
             margin: 0 !important;
             grid-template-columns: 1fr !important;
             gap: 0 !important;
+        }
+        body.light-mode .workspace-container.state-left {
+            background: #fff !important;
         }
         .workspace-container.state-left .content-down-wrapper {
             display: none !important;
@@ -113,7 +109,6 @@
             height: 100% !important;
         }
 
-        /* 2단계: 화면 전체에 좌우 분할 Maximize */
         .workspace-container.state-fullscreen {
             position: fixed !important;
             top: 0 !important;
@@ -121,11 +116,14 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 9999 !important;
-            background: #202020;
-            padding: 20px;
+            background: #101010;
+            padding: 40px;
             margin: 0 !important;
             grid-template-columns: 1fr 1fr !important;
             gap: 20px !important;
+        }
+        body.light-mode .workspace-container.state-fullscreen {
+            background: #fff !important;
         }
         .workspace-container.state-fullscreen .content-mid {
             display: flex !important;
@@ -134,7 +132,6 @@
             display: flex !important;
         }
 
-        /* 3단계: 오른쪽(프리뷰)이 화면 전체를 채우도록 고정 */
         .workspace-container.state-right {
             position: fixed !important;
             top: 0 !important;
@@ -142,11 +139,14 @@
             width: 100vw !important;
             height: 100vh !important;
             z-index: 9999 !important;
-            background: #202020;
-            padding: 20px;
+            background: #101010;
+            padding: 40px;
             margin: 0 !important;
             grid-template-columns: 1fr !important;
             gap: 0 !important;
+        }
+        body.light-mode .workspace-container.state-right {
+            background: #fff !important;
         }
         .workspace-container.state-right .content-mid {
             display: none !important;
@@ -157,12 +157,12 @@
             height: 100% !important;
         }
 
-        /* Maximize 버튼 스타일 */
+        /* Maximize 버튼 스타일 - z-index를 사이드바(100)보다 낮게(50) 설정하여 사이드바가 위로 오도록 함 */
         .maximize-btn {
             position: absolute;
             top: 15px;
             right: 15px;
-            z-index: 10000;
+            z-index: 50;
             background: #202020;
             color: #ff9e40;
             border: 1px solid #ff9e40;
@@ -205,8 +205,8 @@
             width: 100%;
             flex: 1;
             min-height: 0;
-            background: #141414;
-            border: 2px solid #ff9e40;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
             border-radius: 16px;
             overflow: hidden;
             font-family: 'Consolas', 'Fira Code', Monaco, monospace;
@@ -216,11 +216,11 @@
 
         .line-numbers {
             padding: 12px 8px 12px 12px;
-            background: #0a0a0a;
+            background: rgba(0, 0, 0, 0.15);
             color: #555;
             text-align: right;
             user-select: none;
-            border-right: 1px solid #282828;
+            border-right: 1px solid rgba(255, 158, 64, 0.2);
             font-family: inherit;
             overflow-y: hidden;
         }
@@ -232,7 +232,6 @@
             overflow: hidden;
         }
 
-        /* Textarea 및 Syntax Display 겹침 처리 */
         .editor-textarea, .code-output-display {
             position: absolute;
             top: 0;
@@ -278,18 +277,18 @@
         /* Copy Button */
         .copy-btn {
             background: transparent;
-            border: 1px solid #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.5);
             color: #ff9e40;
-            padding: 2px 10px;
+            padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.75rem;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .copy-btn:hover {
-            background: #ff9e40;
-            color: #101010;
+            background: rgba(255, 158, 64, 0.2);
+            border-color: rgba(255, 158, 64, 0.6);
         }
 
         /* ===== [Preview 영역] ===== */
@@ -332,17 +331,30 @@
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
-        body.light-mode .menu-btn:hover, body.light-mode .menu-btn.active { background: #F38020; color: #ffffff; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
 
-        body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; }
-        body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
+        body.light-mode .code-editor-container { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #aaa; border-right-color: rgba(243, 128, 32, 0.2); }
         body.light-mode .editor-textarea { caret-color: #000; }
-        
         body.light-mode .code-output-display { color: #24292e; }
         body.light-mode .hl-tag    { color: #22863a; font-weight: bold; }
         body.light-mode .hl-bracket { color: #22863a; font-weight: bold; }
@@ -352,13 +364,9 @@
         body.light-mode .hl-number  { color: #005cc5; }
         body.light-mode .hl-comment { color: #6a737d; }
         body.light-mode .hl-builtin { color: #e36209; }
-        body.light-mode .copy-btn   { border-color: #F38020; color: #F38020; }
-        body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
+        body.light-mode .copy-btn   { border-color: rgba(243, 128, 32, 0.5); color: #F38020; }
+        body.light-mode .copy-btn:hover { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.6); }
 
-        body.light-mode .workspace-container.state-left,
-        body.light-mode .workspace-container.state-fullscreen,
-        body.light-mode .workspace-container.state-right { background: #fff !important; }
-        
         body.light-mode .maximize-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .maximize-btn:hover { background: #F38020; color: #fff; }
 
@@ -370,45 +378,28 @@
         }
 
         /* 5. Mobile Responsive */
-        .menu-toggle-btn {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 2000;
-            padding: 10px 15px;
-            background: #ff9e40;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
         }
 
-        @media (max-width: 768px) {
-            .app-container {
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-                width: 100%;
-                height: auto;
-                min-height: 100vh;
-                overflow: visible;
-            }
-            .menu-toggle-btn {
-                display: block;
-                color: #ffffff;
-            }
-            .sidebar {
-                transform: translateX(-250px);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            .workspace-container {
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            } 
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; height: auto; overflow-y: auto; } 
+            .workspace-container { 
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
@@ -424,12 +415,15 @@
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">HTML Editor</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
-        <div>
+
+        <div class="bottom-btns">
             <button class="menu-btn" onclick="saveCode()">Save</button>
             <button class="menu-btn" onclick="resetCode()">Reset</button>
         </div>
@@ -442,9 +436,7 @@
         </header>
 
         <div class="workspace-container" id="workspace-container">
-            <!-- 4단계 순환 Maximize/Minimize 버튼 -->
             <button class="maximize-btn" id="maximize-btn" onclick="toggleMaximize()">Maximize ⛶</button>
-
             <div class="content-mid">
                 <div class="content-mid-header">
                     <span>HTML / CSS / JS</span>
@@ -478,27 +470,21 @@
     const workspaceContainer = document.getElementById('workspace-container');
     const maximizeBtn = document.getElementById('maximize-btn');
 
-    let maximizeState = 0; // 0: 기본, 1: 왼쪽(코드뷰) Maximize, 2: 전체화면(좌우분할), 3: 오른쪽(프리뷰) Maximize
-
+    let maximizeState = 0; 
     function toggleMaximize() {
         maximizeState = (maximizeState + 1) % 4;
 
-        // 클래스 초기화
         workspaceContainer.classList.remove('state-left', 'state-right', 'state-fullscreen');
 
         if (maximizeState === 0) {
-            // 4번째 클릭: Minimize (기본 상태)
             maximizeBtn.textContent = 'Maximize ⛶';
         } else if (maximizeState === 1) {
-            // 1번째 클릭: 왼쪽창(코드뷰)이 화면 전체 Maximize
             workspaceContainer.classList.add('state-left');
             maximizeBtn.textContent = 'Fullscreen ⛶';
         } else if (maximizeState === 2) {
-            // 2번째 클릭: 화면 전체에 좌우 분할 Maximize
             workspaceContainer.classList.add('state-fullscreen');
             maximizeBtn.textContent = 'Preview Max ⛶';
         } else if (maximizeState === 3) {
-            // 3번째 클릭: 오른쪽창(프리뷰)이 화면 전체 Maximize
             workspaceContainer.classList.add('state-right');
             maximizeBtn.textContent = 'Minimize 🗗';
         }
@@ -507,40 +493,40 @@
     const defaultCode = `<!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body {
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background: #f0f2f5;
-    }
-    .card {
-      background: white;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    button {
-      background: #ff9e40;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f0f2f5;
+        }
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        button {
+            background: #ff9e40;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Hello, World!</h2>
-    <p>Edit HTML on the left to see live preview.</p>
-    <button onclick="alert('Button Clicked!')">Click Me</button>
-  </div>
+    <div class="card">
+        <h2>Hello, World!</h2>
+        <p>Edit HTML on the left to see live preview.</p>
+        <button onclick="alert('Button Clicked!')">Click Me</button>
+    </div>
 </body>
 </html>`;
 
@@ -548,12 +534,20 @@
         sidebar.classList.toggle('active'); 
     }
 
+    sidebar.querySelectorAll('button').forEach(element => {
+        element.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+
     document.getElementById('theme-toggle').addEventListener('click', () => { 
         document.body.classList.toggle('light-mode'); 
     });
 
-    document.querySelector('.main-content').addEventListener('click', () => { 
-        if (sidebar.classList.contains('active')) { 
+    document.querySelector('.main-content').addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
             sidebar.classList.remove('active'); 
         } 
     });
@@ -565,7 +559,6 @@
             .replace(/>/g, '&gt;');
 
         const tokenPattern = /(&lt;!--[\s\S]*?--&gt;|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(&lt;!DOCTYPE\s+([a-zA-Z0-9]+)&gt;)|(&lt;\/?[a-zA-Z0-9\-]+([\s\S]*?)&gt;)|\b(const|let|var|function|return|if|else|for|while|new|this)\b|\b(document|window|Math|Date|requestAnimationFrame|cancelAnimationFrame|setTimeout)\b|\b(\d+)\b/g;
-
         return escaped.replace(tokenPattern, (match, comment, string, doctypeFull, doctypeType, fullTag, tagInner, keyword, builtin, number) => {
             if (comment) return `<span class="hl-comment">${comment}</span>`;
             if (string) return `<span class="hl-string">${string}</span>`;
@@ -598,7 +591,6 @@
         const code = codeTextarea.value;
 
         codeDisplay.innerHTML = highlightSyntax(code) + (code.endsWith('\n') ? ' ' : '');
-
         const lineCount = code.split('\n').length;
         lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
 
@@ -620,8 +612,8 @@
             const start = codeTextarea.selectionStart;
             const end = codeTextarea.selectionEnd;
 
-            codeTextarea.value = codeTextarea.value.substring(0, start) + "  " + codeTextarea.value.substring(end);
-            codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 2;
+            codeTextarea.value = codeTextarea.value.substring(0, start) + "    " + codeTextarea.value.substring(end);
+            codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 4;
             updateEditor();
         }
     });
@@ -648,10 +640,9 @@
         }
 
         localStorage.setItem('saved_html_code', code);
-
         const blob = new Blob([code], { type: 'text/html;charset=utf-8;' });
         const link = document.createElement('a');
-        
+                
         link.href = URL.createObjectURL(blob);
         link.download = fileName;
         link.style.display = 'none';
