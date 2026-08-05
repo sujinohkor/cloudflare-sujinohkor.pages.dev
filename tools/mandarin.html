@@ -344,7 +344,7 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Chinese</h1>
-                <p>Type pinyin in the top input bar and press Space/Enter to convert into Chinese.</p>
+                <p>Type pinyin in the top input bar and press Space/Enter to convert instantly.</p>
             </header>
 
             <section class="content-card" id="content-card">
@@ -353,7 +353,7 @@
                 <!-- 상단 병음 입력 전용 바 -->
                 <div class="candidate-box">
                     <span class="candidate-label">Pinyin Input:</span>
-                    <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao) and press Enter/Space..." autocomplete="off">
+                    <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao, wo, xiexie) and press Enter/Space..." autocomplete="off">
                 </div>
 
                 <div class="editor-wrapper">
@@ -376,6 +376,32 @@
         let currentMode = 'simplified';
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
+
+        // 자체 내장 병음-한자 사전 데이터베이스
+        const pinyinDict = {
+            "nihao": "你好",
+            "ni": "你",
+            "hao": "好",
+            "wo": "我",
+            "shi": "是",
+            "bu": "不",
+            "le": "了",
+            "ren": "人",
+            "zai": "在",
+            "you": "有",
+            "ta": "他",
+            "tamen": "他们",
+            "women": "我们",
+            "xiexie": "谢谢",
+            "zaijian": "再见",
+            "zhongguo": "中国",
+            "hanguo": "韩国",
+            "meiguo": "美国",
+            "shanghai": "上海",
+            "beijing": "北京",
+            "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
+            "6": "6", "7": "7", "8": "8", "9": "9", "0": "0"
+        };
 
         window.toggleFullscreen = function() {
             contentCard.classList.toggle('fullscreen');
@@ -424,34 +450,27 @@
             }
         }
 
-        // 상단 입력창에서 스페이스바나 엔터를 치면 구글 입력 API로 변환 수행
-        pinyinInputBox.addEventListener('keydown', async (e) => {
+        // 스페이스바나 엔터를 치면 내장 사전에서 즉시 변환 수행
+        pinyinInputBox.addEventListener('keydown', (e) => {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
-                const pinyinVal = pinyinInputBox.value.trim();
+                let pinyinVal = pinyinInputBox.value.trim().toLowerCase();
                 if (!pinyinVal) return;
 
                 statusText.textContent = "Converting...";
 
-                try {
-                    const res = await fetch(`https://inputtools.google.com/request?text=${encodeURIComponent(pinyinVal)}&itc=zh-t-i0-pinyin&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8`);
-                    const data = await res.json();
+                // 사전에 있는 경우 한자로 변환, 없으면 입력한 영어 그대로 삽입
+                let hanzi = pinyinDict[pinyinVal] || pinyinVal;
 
-                    if (data[0] === 'SUCCESS' && data[1] && data[1][0]) {
-                        let hanzi = data[1][0][1][0];
-                        if (currentMode === 'traditional') {
-                            hanzi = toTraditional(hanzi);
-                        } else {
-                            hanzi = toSimplified(hanzi);
-                        }
-
-                        textInput.value += hanzi;
-                        textInput.dispatchEvent(new Event('input'));
-                        pinyinInputBox.value = '';
-                    }
-                } catch (err) {
-                    console.error("API Error:", err);
+                if (currentMode === 'traditional') {
+                    hanzi = toTraditional(hanzi);
+                } else {
+                    hanzi = toSimplified(hanzi);
                 }
+
+                textInput.value += hanzi;
+                textInput.dispatchEvent(new Event('input'));
+                pinyinInputBox.value = '';
                 statusText.textContent = "Ready";
             }
         });
