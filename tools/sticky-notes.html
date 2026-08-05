@@ -121,7 +121,7 @@
             position: absolute; 
             top: 15px; 
             right: 15px; 
-            z-index: 10000; 
+            z-index: 10; 
             background: #202020; 
             color: #ff9e40; 
             border: 1px solid #ff9e40; 
@@ -147,7 +147,7 @@
             bottom: 0 !important;
             width: 100vw !important; 
             height: 100vh !important; 
-            z-index: 9999 !important; 
+            z-index: 999 !important; 
             border-radius: 0 !important; 
             border: none !important; 
             padding: 0 !important; 
@@ -354,8 +354,8 @@
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             } 
             body.light-mode .sidebar {
-                background: #ffffff !important; /* 모바일 데이모드일 때 순수 흰색 배경 */
-                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; /* 연주황빛 그림자 */
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
             .sidebar.active { transform: translateX(0); } 
             .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
@@ -413,6 +413,7 @@
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         const board = document.getElementById('board');
         let noteCounter = 0;
+        let highestZIndex = 10; // 노트가 클릭될 때마다 증가할 z-index 기준값
 
         window.onload = function() {
             loadNotes();
@@ -431,7 +432,6 @@
             sidebar.classList.toggle('active'); 
         }
 
-        // 모바일 화면에서 버튼을 눌렀을 때만 사이드바가 닫히도록 수정 (검색창 input은 제외)
         sidebar.querySelectorAll('button').forEach(element => {
             element.addEventListener('click', () => {
                 if (window.innerWidth <= 900) {
@@ -451,6 +451,12 @@
             } 
         });
 
+        // 특정 노트를 맨 앞으로 가져오는 함수
+        function bringToFront(noteEl) {
+            highestZIndex++;
+            noteEl.style.zIndex = highestZIndex;
+        }
+
         function createNote(colorClass = 'note-yellow', text = '', position = null, rotation = null, fontSize = 16) {
             noteCounter++;
             const noteId = 'note-' + noteCounter;
@@ -459,6 +465,10 @@
             noteEl.className = `sticky-note ${colorClass}`;
             noteEl.id = noteId;
             noteEl.draggable = true;
+
+            // 새로 만들거나 불러올 때 최신 z-index 적용
+            highestZIndex++;
+            noteEl.style.zIndex = highestZIndex;
 
             const rot = rotation !== null ? rotation : (Math.random() * 10 - 5);
             noteEl.style.transform = `rotate(${rot}deg)`;
@@ -485,6 +495,10 @@
                 <textarea class="note-textarea" style="font-size: ${fontSize}px;" placeholder="Type your note here..." oninput="saveNotesToLocalStorage()">${text}</textarea>
             `;
 
+            // 노트를 클릭(포커스)하거나 누를 때 맨 앞으로 가져오기
+            noteEl.addEventListener('mousedown', () => bringToFront(noteEl));
+            noteEl.querySelector('.note-textarea').addEventListener('focus', () => bringToFront(noteEl));
+
             initDragElement(noteEl);
             board.appendChild(noteEl);
             saveNotesToLocalStorage();
@@ -493,6 +507,7 @@
         function changeFontSize(noteId, delta) {
             const noteEl = document.getElementById(noteId);
             if (noteEl) {
+                bringToFront(noteEl);
                 const textarea = noteEl.querySelector('.note-textarea');
                 let currentSize = parseInt(window.getComputedStyle(textarea).fontSize);
                 let newSize = Math.max(12, Math.min(28, currentSize + delta));
@@ -533,7 +548,7 @@
                 document.onmouseup = closeDragElement;
                 document.onmousemove = elementDrag;
                 
-                elmnt.style.zIndex = '500';
+                bringToFront(elmnt);
             }
 
             function elementDrag(e) {
@@ -559,7 +574,6 @@
             function closeDragElement() {
                 document.onmouseup = null;
                 document.onmousemove = null;
-                elmnt.style.zIndex = '1';
                 saveNotesToLocalStorage();
             }
         }
@@ -569,6 +583,7 @@
             e.preventDefault();
 
             const noteEl = document.getElementById(noteId);
+            bringToFront(noteEl);
             const rect = noteEl.getBoundingClientRect();
             
             const centerX = rect.left + rect.width / 2;
@@ -659,7 +674,7 @@
                 const text = note.querySelector('textarea').value;
                 const fontSize = parseInt(note.querySelector('textarea').style.fontSize) || 16;
                 
-                const transformMatch = note.style.transform.match(/rotate\(([^)]+)\)/);
+                const transformMatch = note.style.transform.match(/rotate\(([^)]+\))/);
                 const rotation = transformMatch ? parseFloat(transformMatch[1]) : 0;
 
                 const className = Array.from(note.classList).find(c => c.startsWith('note-'));
