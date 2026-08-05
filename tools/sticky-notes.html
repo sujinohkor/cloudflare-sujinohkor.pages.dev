@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sticky Notes</title>
@@ -455,9 +455,10 @@
         function bringToFront(noteEl) {
             highestZIndex++;
             noteEl.style.zIndex = highestZIndex;
+            saveNotesToLocalStorage(); // z-index가 변경될 때마다 즉시 저장
         }
 
-        function createNote(colorClass = 'note-yellow', text = '', position = null, rotation = null, fontSize = 16) {
+        function createNote(colorClass = 'note-yellow', text = '', position = null, rotation = null, fontSize = 16, zIndex = null) {
             noteCounter++;
             const noteId = 'note-' + noteCounter;
             
@@ -466,9 +467,16 @@
             noteEl.id = noteId;
             noteEl.draggable = true;
 
-            // 새로 만들거나 불러올 때 최신 z-index 적용
-            highestZIndex++;
-            noteEl.style.zIndex = highestZIndex;
+            // 전달받은 zIndex가 있으면 사용하고, 없으면 최신 zIndex 적용
+            if (zIndex !== null) {
+                noteEl.style.zIndex = zIndex;
+                if (zIndex > highestZIndex) {
+                    highestZIndex = zIndex;
+                }
+            } else {
+                highestZIndex++;
+                noteEl.style.zIndex = highestZIndex;
+            }
 
             const rot = rotation !== null ? rotation : (Math.random() * 10 - 5);
             noteEl.style.transform = `rotate(${rot}deg)`;
@@ -673,13 +681,14 @@
                 const top = note.style.top;
                 const text = note.querySelector('textarea').value;
                 const fontSize = parseInt(note.querySelector('textarea').style.fontSize) || 16;
+                const zIndex = parseInt(note.style.zIndex) || 1; // z-index 값 추출
                 
                 const transformMatch = note.style.transform.match(/rotate\(([^)]+\))/);
                 const rotation = transformMatch ? parseFloat(transformMatch[1]) : 0;
 
                 const className = Array.from(note.classList).find(c => c.startsWith('note-'));
 
-                notesData.push({ id, left, top, text, className, rotation, fontSize });
+                notesData.push({ id, left, top, text, className, rotation, fontSize, zIndex });
             });
             localStorage.setItem('corkboard_notes', JSON.stringify(notesData));
         }
@@ -694,7 +703,8 @@
                         noteData.text,
                         { left: noteData.left, top: noteData.top },
                         noteData.rotation,
-                        noteData.fontSize || 16
+                        noteData.fontSize || 16,
+                        noteData.zIndex || null // 저장된 z-index 전달
                     );
                 });
             }
