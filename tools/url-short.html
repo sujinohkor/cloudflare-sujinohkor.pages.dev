@@ -4,23 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
+    <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #202020; color: #fff; transition: background 0.3s, color 0.3s; }
-                        
-        /* 2. Layout */
-        .app-container { display: flex; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
-            width: 250px; height: 100vh; position: fixed; left: 0; top: 0; 
-            background-color: #101010; padding: 20px; z-index: 1000; 
-            display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease; 
-        }                        
-        .main-content { 
-            margin-left: 250px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .top-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .top-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -30,22 +78,13 @@
             position: relative;
         }
 
-        /* 3. Components */
-        .menu-btn, .theme-btn { 
-            width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer;
-            background: #202020; color: #ff9e40; border: 2px solid #ff9e40; 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; text-align: center;
-        }
-        .menu-btn:hover { background: #ff9e40; color: #101010; }
-        .theme-btn:hover { background-color: #FDF5E6; color: #F38020; border-color: #FDF5E6; }
-
         /* 왼쪽 박스: URL 단축 폼 */
         .content-mid { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 25px; background: transparent; flex-direction: column; 
             gap: 20px; overflow-y: auto;
         }
-        
+                
         /* 오른쪽 박스: QR 코드 및 히스토리 (1:1 세로 분할) */
         .content-down { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
@@ -82,7 +121,7 @@
             color: #ff9e40;
             font-weight: 600;
         }
-        
+                
         .input-group input {
             width: 100%;
             padding: 12px 18px;
@@ -152,7 +191,7 @@
             color: #aaa;
             margin-bottom: 10px;
         }
-        
+                
         /* 복사 버튼 색상 주황색 계열로 변경 */
         .copy-btn {
             background: #202020;
@@ -223,7 +262,7 @@
         }
         .history-url:hover { text-decoration: underline; }
         .history-date { color: #888; font-size: 0.7rem; }
-        
+                
         /* 미니 복사 버튼 색상 주황색 계열로 변경 */
         .mini-copy-btn {
             background: #202020;
@@ -237,8 +276,8 @@
             transition: all 0.3s;
         }
         .mini-copy-btn:hover { background: #ff9e40; color: #101010; }
-        
-        /* 마크다운 에디터 스타일을 가져온 Clear All 버튼 디자인 */
+                
+        /* Clear All 버튼 디자인 */
         .clear-history-btn {
             background: transparent;
             border: 1px solid #ff9e40;
@@ -260,12 +299,25 @@
         }
 
         /* 4. Theme (Light Mode) */
-        body.light-mode { background-color: #fff; color: #000; }
-        body.light-mode .sidebar { background-color: #FDF5E6; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); }
-        body.light-mode .menu-btn, body.light-mode .theme-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .menu-btn:hover { background: #F38020; color: #ffffff; border-color: #F38020; }
-        body.light-mode .theme-btn:hover { background-color: #202020; color: #ff9e40; border-color: #202020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #000000; }
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+                
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .content-mid, body.light-mode .content-down, body.light-mode .calc-card {
             background-color: #fafafa;
             border-color: #F38020;
@@ -278,12 +330,10 @@
         body.light-mode .checkbox-group { color: #555; }
         body.light-mode .action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
-        
-        /* 라이트모드 복사 버튼 색상 맞춤 */
+                
         body.light-mode .copy-btn, body.light-mode .mini-copy-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .copy-btn:hover, body.light-mode .mini-copy-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
-        
-        /* 라이트모드 Clear All 버튼 색상 맞춤 */
+                
         body.light-mode .clear-history-btn {
             background: transparent;
             border-color: #e68a35;
@@ -294,36 +344,51 @@
             color: #fff;
             border-color: #F38020;
         }
-        
+                
         body.light-mode .menu-toggle-btn { color: #ffffff; }
 
+        body.light-mode .card, 
+        body.light-mode .content-card {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
         /* 5. Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        @media (max-width: 768px) {            
-            .menu-toggle-btn { display: block; color: #ffffff; }            
-            .sidebar { transform: translateX(-250px); }            
-            .sidebar.active { transform: translateX(0); }            
-            .main-content { margin-left: 0; padding: 20px; width: 100%; height: auto; overflow: visible; }            
-            .workspace-container { flex-direction: column; overflow: visible; }            
-            .content-mid { height: auto; overflow: visible; flex: none; }            
-            .content-down { height: auto; overflow: visible; min-height: 400px; }
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        @media (max-width: 900px) {                        
+            .menu-toggle-btn { display: block; }                        
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            }                        
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); }                        
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                        
+            .workspace-container { flex-direction: column; overflow: visible; }                        
+            .content-mid { height: auto; overflow: visible; flex: none; }                        
+            .content-down { height: auto; overflow: visible; min-height: 400px; }        
         }
     </style>
 </head>
 <body>
-
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
-        <div class="top-btns" style="width: 100%;">
-            <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button id="theme-toggle" class="theme-btn">DAY / NIGHT</button>
+        <div class="sidebar-title">URL Shortener</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        
+        <div class="bottom-btns" style="width: 100%;">
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
-        <div class="bottom-btns" style="width: 100%;"></div>
     </aside>
-
     <main class="main-content">
         <header class="top-section">
             <h1>URL Shortener</h1>
@@ -382,7 +447,6 @@
         </div>
     </main>
 </div>
-
 <script>
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
@@ -448,7 +512,7 @@
             }
 
             document.getElementById('resultUrl').innerText = data.shortUrl;
-            
+                        
             let formattedDate = '';
             if (data.createdAt) {
                 const dateObj = new Date(data.createdAt);
@@ -465,13 +529,10 @@
 
             resultBox.classList.add('active');
 
-            // 오른쪽 패널 QR 코드 자동 생성
             const qrContainer = document.getElementById('qrContainer');
             qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.shortUrl)}" alt="QR Code">`;
 
-            // 로컬 스토리지에 히스토리 저장
             saveHistory(data.shortUrl, longUrl, formattedDate);
-
         } catch (err) {
             errorMsg.innerText = err.message;
             errorMsg.classList.add('active');
@@ -535,6 +596,5 @@
         document.getElementById('qrContainer').innerHTML = `<span style="font-size: 0.8rem; color: #888;">Generate a link to view QR code</span>`;
     }
 </script>
-
 </body>
 </html>
