@@ -120,9 +120,9 @@
             flex-direction: column;
         }
 
-        /* 후보군 및 안내 바 스타일 */
+        /* 입력 바 스타일 */
         .candidate-box {
-            height: 45px;
+            height: 50px;
             background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid rgba(255, 158, 64, 0.25);
             display: flex;
@@ -130,17 +130,21 @@
             padding: 0 20px;
             gap: 15px;
             font-size: 0.9rem;
-            overflow-x: auto;
-            white-space: nowrap;
         }
         .candidate-label {
             color: #ff9e40;
             font-weight: bold;
+            flex-shrink: 0;
         }
-        #pinyin-display {
-            color: #fff;
+        #pinyin-input-box {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ff9e40;
             font-family: 'Consolas', monospace;
+            font-size: 1rem;
             font-weight: bold;
+            outline: none;
         }
 
         /* 전체화면 버튼 스타일 */
@@ -166,7 +170,6 @@
             border-color: rgba(255, 158, 64, 0.8);
         }
 
-        /* 전체화면 활성화 클래스 */
         .content-card.fullscreen { 
             position: fixed !important; 
             top: 0 !important; 
@@ -224,7 +227,6 @@
             overflow-y: auto; 
         }
 
-        /* 다크 모드 카드/패널 그림자 */
         .card, .content-card { 
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
         }
@@ -274,12 +276,11 @@
         body.light-mode .info-row { color: #202020; }
         body.light-mode .info-row span:last-child { color: #F38020; }
         body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
-        body.light-mode #pinyin-display { color: #202020; }
+        body.light-mode #pinyin-input-box { color: #F38020; }
         body.light-mode .card, body.light-mode .content-card { 
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
         }
 
-        /* 5. Mobile Responsive */
         .menu-toggle-btn { 
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 3000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
@@ -316,7 +317,7 @@
 
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
-            <!-- 간체/번체 변환 모드 선택 버튼 그룹 -->
+            <!-- 간체/번체 모드 선택 -->
             <div class="mode-group">
                 <button class="mode-btn active" id="mode-simp" onclick="setMode('simplified')">간체 (Simp)</button>
                 <button class="mode-btn" id="mode-trad" onclick="setMode('traditional')">번체 (Trad)</button>
@@ -328,7 +329,7 @@
                     <span id="char-count">0</span>
                 </div>
                 <div class="info-row">
-                    <span>Input Status</span>
+                    <span>Status</span>
                     <span id="status-text">Ready</span>
                 </div>
             </div>
@@ -343,21 +344,21 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Chinese</h1>
-                <p>Type English pinyin (e.g., nihao) and press Space or Enter to convert.</p>
+                <p>Type pinyin in the top input bar and press Space/Enter to convert into Chinese.</p>
             </header>
 
             <section class="content-card" id="content-card">
                 <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                 
-                <!-- 입력 버퍼 및 변환 가이드 바 -->
+                <!-- 상단 병음 입력 전용 바 -->
                 <div class="candidate-box">
-                    <span class="candidate-label">Current Pinyin:</span>
-                    <span id="pinyin-display">(Type english letters...)</span>
+                    <span class="candidate-label">Pinyin Input:</span>
+                    <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. nihao) and press Enter/Space..." autocomplete="off">
                 </div>
 
                 <div class="editor-wrapper">
                     <div id="line-numbers" class="line-numbers">1</div>
-                    <textarea id="text-input" placeholder="Type pinyin here (e.g. nihao -> 你好)..."></textarea>
+                    <textarea id="text-input" placeholder="Converted Chinese text will appear here..." readonly></textarea>
                 </div>
             </section>
         </main>
@@ -365,17 +366,14 @@
 
     <script>
         const textInput = document.getElementById('text-input');
+        const pinyinInputBox = document.getElementById('pinyin-input-box');
         const lineNumbers = document.getElementById('line-numbers');
         const sidebar = document.getElementById('sidebar');
         const contentCard = document.getElementById('content-card');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
-        const pinyinDisplay = document.getElementById('pinyin-display');
         const statusText = document.getElementById('status-text');
 
         let currentMode = 'simplified';
-        let currentPinyin = '';
-
-        // OpenCC 변환기 초기화
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
@@ -426,54 +424,34 @@
             }
         }
 
-        // 구글 입력 도구 API(Google Input Tools)를 활용한 실시간 병음 변환 연동
-        textInput.addEventListener('keydown', async (e) => {
-            // 알파벳 입력 시 버퍼에 누적
-            if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
-                currentPinyin += e.key;
-                pinyinDisplay.textContent = currentPinyin;
-                statusText.textContent = "Typing...";
-            } else if (e.key === 'Backspace') {
-                if (currentPinyin.length > 0) {
-                    currentPinyin = currentPinyin.slice(0, -1);
-                    pinyinDisplay.textContent = currentPinyin || "(Type english letters...)";
-                }
-            } else if ((e.key === ' ' || e.key === 'Enter') && currentPinyin.length > 0) {
+        // 상단 입력창에서 스페이스바나 엔터를 치면 구글 입력 API로 변환 수행
+        pinyinInputBox.addEventListener('keydown', async (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
+                const pinyinVal = pinyinInputBox.value.trim();
+                if (!pinyinVal) return;
+
                 statusText.textContent = "Converting...";
-                
-                // Google Input Tools API 호출 (zh-t-i0-pinyin)
+
                 try {
-                    const res = await fetch(`https://inputtools.google.com/request?text=${encodeURIComponent(currentPinyin)}&itc=zh-t-i0-pinyin&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8`);
+                    const res = await fetch(`https://inputtools.google.com/request?text=${encodeURIComponent(pinyinVal)}&itc=zh-t-i0-pinyin&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8`);
                     const data = await res.json();
-                    
-                    if (data[0] === 'SUCCESS') {
-                        let hanzi = data[1][0][1][0]; // 첫 번째 추천 한자 매칭
+
+                    if (data[0] === 'SUCCESS' && data[1] && data[1][0]) {
+                        let hanzi = data[1][0][1][0];
                         if (currentMode === 'traditional') {
                             hanzi = toTraditional(hanzi);
                         } else {
                             hanzi = toSimplified(hanzi);
                         }
-                        
-                        // 텍스트area에 한자 삽입
-                        const start = textInput.selectionStart;
-                        const end = textInput.selectionEnd;
-                        const val = textInput.value;
-                        textInput.value = val.substring(0, start) + hanzi + val.substring(end);
-                        textInput.selectionStart = textInput.selectionEnd = start + hanzi.length;
-                        
+
+                        textInput.value += hanzi;
                         textInput.dispatchEvent(new Event('input'));
+                        pinyinInputBox.value = '';
                     }
                 } catch (err) {
-                    console.error("Conversion error:", err);
+                    console.error("API Error:", err);
                 }
-
-                currentPinyin = '';
-                pinyinDisplay.textContent = "(Type english letters...)";
-                statusText.textContent = "Ready";
-            } else if (e.key === 'Escape') {
-                currentPinyin = '';
-                pinyinDisplay.textContent = "(Type english letters...)";
                 statusText.textContent = "Ready";
             }
         });
@@ -523,8 +501,7 @@
             if (confirm('Are you sure you want to clear all text?')) {
                 localStorage.removeItem('saved_pinyin_text');
                 textInput.value = '';
-                currentPinyin = '';
-                pinyinDisplay.textContent = "(Type english letters...)";
+                pinyinInputBox.value = '';
                 textInput.dispatchEvent(new Event('input'));
             }
         }
