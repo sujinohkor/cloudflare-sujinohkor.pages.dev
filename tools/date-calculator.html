@@ -9,7 +9,7 @@
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
 
         .app-container { display: flex; min-height: 100vh; width: 100%; }
@@ -26,7 +26,12 @@
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
         }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 158, 64, 0.3); border-radius: 4px; }
+
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
         /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
@@ -37,8 +42,8 @@
         /* 메인 콘텐츠 영역 */
         .main-content { 
             margin-left: 300px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; 
-            gap: 20px; overflow: hidden; transition: 0.3s; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: 0.3s; 
             width: calc(100% - 300px);
         }
 
@@ -47,7 +52,6 @@
             flex-direction: row;
             flex: 1;
             gap: 20px;
-            min-height: 0;
             position: relative;
         }
 
@@ -70,11 +74,11 @@
             margin-bottom: 0;
         }
 
-        /* 왼쪽 박스: 달력 꽉 차게 배치 */
+        /* 왼쪽 박스 */
         .content-mid { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 20px; background: rgba(0, 0, 0, 0.2); flex-direction: column; 
-            justify-content: space-between; overflow: hidden;
+            justify-content: space-between; min-height: 400px;
         }
         .calendar-header {
             display: flex;
@@ -116,7 +120,7 @@
             grid-template-rows: repeat(6, 1fr);
             gap: 6px;
             flex: 1;
-            min-height: 0;
+            min-height: 300px;
         }
         .day {
             display: flex;
@@ -154,7 +158,7 @@
             font-weight: bold;
         }
 
-        /* 오른쪽 박스: overflow를 visible로 두어 팝업이 외부로 튀어나오게 허용 */
+        /* 오른쪽 박스 */
         .content-down { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
             overflow: visible; padding: 20px; background: rgba(0, 0, 0, 0.2); gap: 15px; position: relative;
@@ -442,12 +446,20 @@
         const mainContent = document.getElementById('main-content');
 
         function toggleSidebar() { 
-            // 사이드바를 열 때(현재 닫혀있는 상태에서 열릴 때) 열려있는 팝업 달력들을 모두 닫음
             if (!sidebar.classList.contains('active')) {
                 document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
             }
             sidebar.classList.toggle('active'); 
         }
+
+        // 모바일 화면에서 사이드바 내부의 버튼을 클릭하면 사이드바가 닫히도록 설정
+        sidebar.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
 
         document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
@@ -511,8 +523,8 @@
         }
 
         function openPopup(inputId, event) {
-            event.stopPropagation();
-            
+            event.stopPropagation(); 
+                       
             if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
             }
@@ -532,8 +544,8 @@
 
                 const inputGroup = popup.parentElement;
                 const rect = inputGroup.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                
+                const spaceBelow = window.innerHeight - rect.bottom; 
+                              
                 if (spaceBelow < 320) {
                     popup.style.bottom = '100%';
                     popup.style.top = 'auto';
@@ -602,8 +614,8 @@
         function selectDate(inputId, dateStr, event) {
             event.stopPropagation();
             document.getElementById(inputId).value = dateStr;
-            document.getElementById('popup-' + inputId).classList.remove('active');
-            
+            document.getElementById('popup-' + inputId).classList.remove('active'); 
+                      
             if (inputId === 'date1' || inputId === 'date2') calculateInterval();
             if (inputId === 'base-date') calculateAddDays();
             if (inputId === 'weekday-date') calculateWeekday();
