@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diff Checker</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .workspace-container {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+        }
+
+        .pane {
+            flex: 1;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .pane h2 {
+            font-size: 1rem;
+            color: #ff9e40;
+        }
+
+        textarea {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 12px;
+            padding: 15px;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        textarea:focus {
+            border-color: rgba(255, 158, 64, 0.8);
+        }
+
+        .diff-output {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 158, 64, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .line-added { background: rgba(46, 204, 113, 0.2); color: #2ecc71; display: block; }
+        .line-removed { background: rgba(231, 76, 60, 0.2); color: #e74c3c; display: block; }
+        .line-normal { color: #ccc; display: block; }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.03);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .action-btn:hover {
+            background: rgba(255, 158, 64, 0.2);
+            border-color: rgba(255, 158, 64, 0.8);
+        }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.3); border-color: rgba(243, 128, 32, 0.35); }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn, body.light-mode .action-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover, body.light-mode .action-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; }
+        body.light-mode .pane { background: rgba(255, 255, 255, 0.5); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode textarea { background: #fff; color: #000; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .diff-output { background: #fff; color: #333; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+
+        /* Mobile */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { transform: translateX(-320px); background: #101010 !important; }
+            body.light-mode .sidebar { background: #ffffff !important; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; }
+            .workspace-container { flex-direction: column; }
+            .pane { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Diff Checker</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <button class="menu-btn" onclick="compareTexts()">Compare</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Diff Checker</h1>
+                <p>Compare two texts or pieces of code side by side.</p>
+            </header>
+            <div class="workspace-container">
+                <section class="pane">
+                    <h2>Original Text</h2>
+                    <textarea id="text1" placeholder="Enter original text here..." oninput="compareTexts()"></textarea>
+                </section>
+                <section class="pane">
+                    <h2>Modified Text</h2>
+                    <textarea id="text2" placeholder="Enter modified text here..." oninput="compareTexts()"></textarea>
+                </section>
+                <section class="pane">
+                    <h2>Comparison Result</h2>
+                    <div class="diff-output" id="diff-output">Results will appear here...</div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        sidebar.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 900) sidebar.classList.remove('active');
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+
+        mainContent.addEventListener('click', () => {
+            if (sidebar.classList.contains('active')) sidebar.classList.remove('active');
+        });
+
+        function compareTexts() {
+            const t1 = document.getElementById('text1').value.split('\n');
+            const t2 = document.getElementById('text2').value.split('\n');
+            const output = document.getElementById('diff-output');
+            
+            output.innerHTML = '';
+            const maxLines = Math.max(t1.length, t2.length);
+            let html = '';
+
+            for (let i = 0; i < maxLines; i++) {
+                const line1 = t1[i] !== undefined ? t1[i] : '';
+                const line2 = t2[i] !== undefined ? t2[i] : '';
+
+                if (line1 === line2) {
+                    html += `<span class="line-normal">  ${line1}</span>`;
+                } else {
+                    if (line1 !== '') html += `<span class="line-removed">- ${line1}</span>`;
+                    if (line2 !== '') html += `<span class="line-added">+ ${line2}</span>`;
+                }
+            }
+            output.innerHTML = html || 'No difference or empty input.';
+        }
+
+        function resetAll() {
+            document.getElementById('text1').value = '';
+            document.getElementById('text2').value = '';
+            document.getElementById('diff-output').textContent = 'Results will appear here...';
+        }
+    </script>
+</body>
+</html>
