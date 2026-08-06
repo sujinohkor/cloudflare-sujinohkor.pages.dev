@@ -47,6 +47,9 @@
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
+        /* ⭐ 처음 원본 코드와 동일하게 하단 버튼 전용 패딩 크기(11px 14px)로 복원 */
+        .bottom-btns .menu-btn { padding: 11px 14px; font-size: 0.85rem; }
+
         .mode-group { display: flex; gap: 8px; }
         .mode-btn {
             flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.03);
@@ -66,7 +69,6 @@
         .info-row span:last-child { color: #ff9e40; font-weight: bold; }
 
         .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
-        .bottom-btns > .menu-btn { margin-bottom: 0; }
 
         .content-card { 
             border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
@@ -79,13 +81,7 @@
             border-bottom: 1px solid rgba(255, 158, 64, 0.25);
             display: flex; flex-direction: column; padding: 10px 20px; gap: 8px; font-size: 0.9rem;
         }
-        .input-row { display: flex; align-items: center; gap: 15px; }
-        .candidate-label { color: #ff9e40; font-weight: bold; flex-shrink: 0; }
-        #pinyin-input-box {
-            flex: 1; background: transparent; border: none; color: #ff9e40;
-            font-family: 'Consolas', monospace; font-size: 1rem; font-weight: bold; outline: none;
-        }
-        .candidates-list { display: flex; gap: 10px; flex-wrap: wrap; min-height: 24px; }
+        .candidates-list { display: flex; gap: 10px; flex-wrap: wrap; min-height: 24px; align-items: center; }
         .candidate-item {
             background: rgba(255, 158, 64, 0.15); border: 1px solid rgba(255, 158, 64, 0.4);
             color: #fff; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; transition: 0.2s;
@@ -137,7 +133,6 @@
         body.light-mode .info-row { color: #202020; }
         body.light-mode .info-row span:last-child { color: #F38020; }
         body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
-        body.light-mode #pinyin-input-box { color: #F38020; }
         body.light-mode .candidate-item { background: rgba(243, 128, 32, 0.1); border-color: rgba(243, 128, 32, 0.4); color: #202020; }
         body.light-mode .candidate-item:hover, body.light-mode .candidate-item.selected { background: #F38020; color: #fff; }
 
@@ -190,25 +185,21 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Pinyin to Mandarin</h1>
-                <p>Type any pinyin (e.g., nihao, de, boshi) to get full IME suggestions instantly.</p>
+                <p>Type pinyin or punctuation directly in the editor to convert instantly.</p>
             </header>
 
             <section class="content-card" id="content-card">
                 <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                 
                 <div class="candidate-box">
-                    <div class="input-row">
-                        <span class="candidate-label">Pinyin:</span>
-                        <input type="text" id="pinyin-input-box" placeholder="Type pinyin here (e.g. boshi)..." autocomplete="off" spellcheck="false">
-                    </div>
                     <div id="candidates-container" class="candidates-list">
-                        <span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>
+                        <span style="color: #666; font-size: 0.85rem;">Candidates will appear here as you type...</span>
                     </div>
                 </div>
 
                 <div class="editor-wrapper">
                     <div id="line-numbers" class="line-numbers">1</div>
-                    <textarea id="text-input" placeholder="Converted Chinese text will appear here..." readonly></textarea>
+                    <textarea id="text-input" placeholder="Type Chinese pinyin or punctuation here..." autocomplete="off" spellcheck="false"></textarea>
                 </div>
             </section>
         </main>
@@ -216,7 +207,6 @@
 
     <script>
         const textInput = document.getElementById('text-input');
-        const pinyinInputBox = document.getElementById('pinyin-input-box');
         const candidatesContainer = document.getElementById('candidates-container');
         const lineNumbers = document.getElementById('line-numbers');
         const sidebar = document.getElementById('sidebar');
@@ -227,11 +217,25 @@
 
         let currentMode = 'simplified';
         let currentMatches = [];
+        let currentPinyinToken = ''; 
+        let currentPinyinStart = 0;  
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
-        // ⭐ 본인이 생성한 클라우드플레어 워커 주소로 변경하세요!
         const PROXY_URL = "https://pinyin-proxy.sujinohkor.workers.dev";
+
+        const punctuationMap = {
+            '.': ['。', '…', '·'],
+            ',': ['，', '、', '·'],
+            '?': ['？'],
+            '!': ['！'],
+            '"': ['“', '”', '『', '』'],
+            "'": ['‘', '’', '「', '」'],
+            '~': ['～', '〜'],
+            ':': ['：'],
+            ';': ['；'],
+            '-': ['—', '–', '-']
+        };
 
         window.toggleFullscreen = function() {
             contentCard.classList.toggle('fullscreen');
@@ -270,14 +274,32 @@
             }
         }
 
-        // 실시간 입력 시 서버리스 프록시를 통해 대형 IME 엔진 검색 결과 요청
         let debounceTimer;
-        pinyinInputBox.addEventListener('input', (e) => {
-            let query = pinyinInputBox.value.trim().toLowerCase();
-            if (!query) {
-                currentMatches = [];
-                candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
+        textInput.addEventListener('input', (e) => {
+            const val = textInput.value;
+            const cursorPos = textInput.selectionStart;
+
+            const charBeforeCursor = val[cursorPos - 1];
+            if (punctuationMap[charBeforeCursor]) {
+                currentPinyinStart = cursorPos - 1;
+                currentPinyinToken = charBeforeCursor;
+                currentMatches = punctuationMap[charBeforeCursor];
+                renderCandidates(currentMatches);
                 statusText.textContent = "Ready";
+                updateEditorState();
+                return;
+            }
+
+            let start = cursorPos;
+            while (start > 0 && /[a-zA-Z]/.test(val[start - 1])) {
+                start--;
+            }
+
+            currentPinyinStart = start;
+            currentPinyinToken = val.substring(start, cursorPos).toLowerCase();
+
+            if (!currentPinyinToken) {
+                clearCandidates();
                 return;
             }
 
@@ -285,29 +307,39 @@
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(async () => {
                 try {
-                    const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(query)}`);
+                    const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(currentPinyinToken)}`);
                     const data = await res.json();
 
                     if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
-                        currentMatches = data[1][0][1]; // 추천 한자 배열 리스트
+                        currentMatches = data[1][0][1];
                         renderCandidates(currentMatches);
                         statusText.textContent = "Ready";
                     } else {
-                        currentMatches = [query];
-                        renderCandidates([query]);
+                        currentMatches = [currentPinyinToken];
+                        renderCandidates([currentPinyinToken]);
                         statusText.textContent = "Ready";
                     }
                 } catch (err) {
                     console.error("Proxy fetch error:", err);
                     statusText.textContent = "Error";
                 }
-            }, 150); // 타이핑 속도에 맞춘 디바운스 최적화
+            }, 150);
+
+            updateEditorState();
         });
+
+        function clearCandidates() {
+            currentMatches = [];
+            currentPinyinToken = '';
+            candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here as you type...</span>`;
+            statusText.textContent = "Ready";
+            updateEditorState();
+        }
 
         function renderCandidates(list) {
             candidatesContainer.innerHTML = '';
             list.forEach((hanzi, index) => {
-                let converted = currentMode === 'traditional' ? toTraditional(hanzi) : toSimplified(hanzi);
+                let converted = punctuationMap[currentPinyinToken] ? hanzi : (currentMode === 'traditional' ? toTraditional(hanzi) : toSimplified(hanzi));
                 let btn = document.createElement('div');
                 btn.className = 'candidate-item' + (index === 0 ? ' selected' : '');
                 btn.innerHTML = `<b>${index + 1}</b>. ${converted}`;
@@ -317,35 +349,45 @@
         }
 
         function selectHanzi(hanzi) {
-            textInput.value += hanzi;
-            textInput.dispatchEvent(new Event('input'));
-            pinyinInputBox.value = '';
-            currentMatches = [];
-            candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
-            pinyinInputBox.focus();
+            const val = textInput.value;
+            const cursorPos = textInput.selectionStart;
+            
+            const newVal = val.substring(0, currentPinyinStart) + hanzi + val.substring(cursorPos);
+            textInput.value = newVal;
+            
+            const newCursorPos = currentPinyinStart + hanzi.length;
+            textInput.setSelectionRange(newCursorPos, newCursorPos);
+            
+            clearCandidates();
+            textInput.focus();
+            updateEditorState();
         }
 
-        pinyinInputBox.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const firstCandidate = candidatesContainer.querySelector('.candidate-item');
-                if (firstCandidate) firstCandidate.click();
-            } else if (/^[1-5]$/.test(e.key)) {
-                const index = parseInt(e.key) - 1;
-                const candidateItems = candidatesContainer.querySelectorAll('.candidate-item');
-                if (candidateItems[index]) {
+        textInput.addEventListener('keydown', (e) => {
+            if (currentPinyinToken) {
+                if (e.key === 'Enter') {
                     e.preventDefault();
-                    candidateItems[index].click();
+                    const firstCandidate = candidatesContainer.querySelector('.candidate-item');
+                    if (firstCandidate) firstCandidate.click();
+                    return;
+                } else if (/^[1-5]$/.test(e.key)) {
+                    const index = parseInt(e.key) - 1;
+                    const candidateItems = candidatesContainer.querySelectorAll('.candidate-item');
+                    if (candidateItems[index]) {
+                        e.preventDefault();
+                        candidateItems[index].click();
+                        return;
+                    }
                 }
             }
         });
 
-        textInput.addEventListener('input', () => {
+        function updateEditorState() {
             const text = textInput.value;
             document.getElementById('char-count').innerText = text.length;
             updateLineNumbers();
             saveToLocal();
-        });
+        }
 
         function updateLineNumbers() {
             const text = textInput.value;
@@ -382,10 +424,8 @@
             if (confirm('Are you sure you want to clear all text?')) {
                 localStorage.removeItem('saved_pinyin_text');
                 textInput.value = '';
-                pinyinInputBox.value = '';
-                currentMatches = [];
-                candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here...</span>`;
-                textInput.dispatchEvent(new Event('input'));
+                clearCandidates();
+                updateEditorState();
             }
         }
 
@@ -415,7 +455,7 @@
             const savedText = localStorage.getItem('saved_pinyin_text');
             if (savedText !== null) {
                 textInput.value = savedText;
-                textInput.dispatchEvent(new Event('input')); 
+                updateEditorState(); 
             }
         }
 
