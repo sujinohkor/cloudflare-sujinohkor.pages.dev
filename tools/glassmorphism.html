@@ -9,24 +9,28 @@
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
-                
+                    
         .app-container { display: flex; min-height: 100vh; width: 100%; }
 
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
-        .sidebar { 
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
-            background: rgba(16, 16, 16, 0.25); 
-            backdrop-filter: blur(16px); 
+        .sidebar {             
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
+            background: rgba(16, 16, 16, 0.25);             
+            backdrop-filter: blur(16px);             
             -webkit-backdrop-filter: blur(16px);
-            padding: 25px 20px; z-index: 1000; 
-            display: flex; flex-direction: column; gap: 12px; 
-            border: 1px solid rgba(255, 158, 64, 0.35); 
+            padding: 25px 20px; z-index: 1000;             
+            display: flex; flex-direction: column; gap: 12px;             
+            border: 1px solid rgba(255, 158, 64, 0.35);             
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
         }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 158, 64, 0.3); border-radius: 4px; }
+
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
         /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
@@ -35,17 +39,17 @@
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         /* 메인 콘텐츠 영역 */
-        .main-content { 
-            margin-left: 300px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; 
-            gap: 20px; overflow: hidden; transition: 0.3s; 
+        .main-content {             
+            margin-left: 300px; padding: 40px; flex: 1;             
+            display: flex; flex-direction: column; min-height: 100vh;             
+            gap: 20px; transition: 0.3s;             
             width: calc(100% - 300px);
         }
 
         /* 3. Components */
-        .menu-btn { 
+        .menu-btn {             
             width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
             border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center; line-height: 1;
         }
@@ -62,55 +66,52 @@
 
         /* Workspace Structure */
         .workspace-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            display: flex;
+            flex-direction: row;
             flex: 1;
-            min-height: 0;
+            gap: 20px;
         }
 
         /* ===== [Controls / Code Editor 영역] ===== */
         .content-mid {
+            flex: 1;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
             display: flex;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
             flex-direction: column;
-            gap: 12px;
-            height: 100%;
-            min-height: 0;
-            min-width: 0;
+            gap: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
             height: 100%;
-            min-height: 0;
         }
 
         .sliders-wrapper {
-            background: #181818;
-            border: 2px solid #ff9e40;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 158, 64, 0.3);
             border-radius: 16px;
-            padding: 12px 20px;
-            flex: 0 0 auto;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
         }
 
         .control-group {
-            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
-
         .control-group label {
-            display: block;
             font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 2px;
-            color: #ff9e40;
+            color: #aaa;
+            font-weight: 600;
         }
-
         .control-group input {
             width: 100%;
             accent-color: #ff9e40;
@@ -124,6 +125,7 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            font-size: 1.0rem;
         }
 
         .code-editor-container {
@@ -131,24 +133,23 @@
             display: flex;
             width: 100%;
             flex: 1; 
-            min-height: 0;
-            background: #141414;
-            border: 2px solid #ff9e40;
+            min-height: 120px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 158, 64, 0.3);
             border-radius: 16px;
             overflow: hidden;
             font-family: 'Consolas', 'Fira Code', Monaco, monospace;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             line-height: 1.5;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .line-numbers {
             padding: 12px 8px 12px 12px;
-            background: #0a0a0a;
+            background: rgba(0, 0, 0, 0.2);
             color: #555;
             text-align: right;
             user-select: none;
-            border-right: 1px solid #282828;
+            border-right: 1px solid rgba(255, 158, 64, 0.2);
             font-family: inherit;
             overflow-y: hidden;
         }
@@ -177,7 +178,6 @@
             overflow: auto;
             tab-size: 2;
         }
-
         .editor-textarea {
             color: transparent;
             background: transparent;
@@ -185,11 +185,10 @@
             resize: none;
             z-index: 2;
         }
-
         .code-output-display {
             pointer-events: none;
             z-index: 1;
-            color: #fff;
+            color: #ff9e40;
         }
 
         /* Syntax Highlighting Colors (Dark Mode) */
@@ -211,7 +210,6 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .copy-btn:hover {
             background: #ff9e40;
             color: #101010;
@@ -219,34 +217,34 @@
 
         /* ===== [Preview 영역] ===== */
         .content-down-wrapper {
+            flex: 1;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            height: 100%;
-            min-height: 0;
-            min-width: 0;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-
-        .content-down-wrapper label {
+        .content-down-wrapper > label {
             color: #ff9e40;
             font-weight: bold;
+            font-size: 1.0rem;
             flex-shrink: 0;
         }
-
         .content-down {
             position: relative;
             flex: 1;
-            min-height: 0;
-            border: 2px solid #ff9e40;
-            border-radius: 16px;
+            min-height: 250px;
+            border: 2px dashed rgba(255, 158, 64, 0.4);
+            border-radius: 10px;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-
         .preview-area {
             display: flex;
             justify-content: center;
@@ -254,7 +252,6 @@
             width: 100%;
             height: 100%;
         }
-
         #glass-preview {
             width: 200px;
             height: 200px;
@@ -269,30 +266,26 @@
 
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; color: #202020; }
-        body.light-mode .sidebar { 
-            background: rgba(255, 255, 255, 0.3); 
-            border-color: rgba(243, 128, 32, 0.35); 
-            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
-        }
-                
-        /* 라이트 모드 사이드바 버튼 및 토글 버튼 호버 시 투명한 주황색 스타일 적용 */
-        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
-            background: rgba(0, 0, 0, 0.02); 
-            color: #F38020; 
-            border-color: rgba(243, 128, 32, 0.5); 
-        }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
-            background: rgba(243, 128, 32, 0.15); 
-            color: #F38020; 
-            border-color: rgba(243, 128, 32, 0.4); 
-        }
+        body.light-mode .sidebar {             
+            background: rgba(255, 255, 255, 0.3);             
+            border-color: rgba(243, 128, 32, 0.35);             
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
+        }                        
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
+            background: rgba(0, 0, 0, 0.02);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.5);         }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
+            background: rgba(243, 128, 32, 0.15);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.4);         }
 
-        body.light-mode .sliders-wrapper { background: #fff; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
-        body.light-mode .control-group label { color: #F38020; }
+        body.light-mode .sliders-wrapper { background: rgba(255, 255, 255, 0.5); border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .control-group label { color: #555; }
         body.light-mode .control-group input { accent-color: #F38020; }
 
-        body.light-mode .code-editor-container { background: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
-        body.light-mode .line-numbers { background: #f0f0f0; color: #aaa; border-right-color: #ddd; }
+        body.light-mode .code-editor-container { background: #fff; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #aaa; border-right-color: rgba(243, 128, 32, 0.3); }
         body.light-mode .editor-textarea { caret-color: #000; }
 
         /* Light Mode Syntax Highlighting */
@@ -307,53 +300,39 @@
         body.light-mode .copy-btn { border-color: #F38020; color: #F38020; }
         body.light-mode .copy-btn:hover { background: #F38020; color: #fff; }
 
-        body.light-mode .content-down { border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .content-mid, body.light-mode .content-down-wrapper {
+            background-color: rgba(255, 255, 255, 0.5); 
+            border-color: #F38020; 
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode .content-down { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%); border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
 
-        /* 데이 모드 카드/패널 그림자 */
-        body.light-mode .card, 
-        body.light-mode .content-card {
-            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {             
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;             
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
+            font-weight: bold; cursor: pointer; color: #ffffff;         
         }
 
-        /* 5. Mobile Responsive */
-        .menu-toggle-btn { 
-            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
-            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
-            font-weight: bold; cursor: pointer; color: #ffffff; 
-        }
-                
-        @media (max-width: 900px) { 
+        @media (max-width: 900px) {             
             .menu-toggle-btn { display: block; } 
-            .sidebar { 
-                transform: translateX(-320px); 
-                background: #101010 !important; 
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            } 
-            body.light-mode .sidebar { 
-                background: #ffffff !important; 
-                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
-            }
-            .sidebar.active { transform: translateX(0); } 
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; } 
-            .workspace-container { 
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                height: auto;
-            }
-            .content-mid {
-                height: auto; 
-            }
-            .code-editor-container {
-                min-height: 220px; 
-            }
-            .content-down-wrapper {
-                height: 450px; 
-            }
+            .sidebar {                 
+                transform: translateX(-320px);                 
+                background: #101010 !important;                 
+                backdrop-filter: none !important;                
+                -webkit-backdrop-filter: none !important;                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;             
+            }             
+            body.light-mode .sidebar {                 
+                background: #ffffff !important;                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             
+            }            
+            .sidebar.active { transform: translateX(0); }             
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }             
+            .workspace-container { flex-direction: column; overflow: visible; }
+            .content-mid, .content-down-wrapper { height: auto; flex: none; }
         }
     </style>
 </head>
@@ -370,7 +349,7 @@
                 <button class="menu-btn" onclick="resetAll()">Reset</button>
             </div>
         </aside>
-        <main class="main-content">
+        <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>Glassmorphism</h1>
                 <p>Customize glass effect style and copy CSS code easily.</p>
@@ -436,9 +415,21 @@
     </div>
     <script>
         const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
         function toggleSidebar() { sidebar.classList.toggle('active'); }
+        
+        // 모바일 화면에서 사이드바 내부의 버튼을 클릭하면 사이드바가 닫히도록 설정
+        sidebar.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
         document.getElementById('theme-toggle').addEventListener('click', () => { document.body.classList.toggle('light-mode'); });
-        document.querySelector('.main-content').addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
+        mainContent.addEventListener('click', () => { if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); } });
 
         const blurInput = document.getElementById('blur');
         const opacityInput = document.getElementById('opacity');
@@ -509,7 +500,7 @@
             const cssCode = `width: ${boxWidth}px;\nheight: ${boxHeight}px;\nbackground: rgba(255, 255, 255, ${opacity});\nbackdrop-filter: blur(${blur}px);\n-webkit-backdrop-filter: blur(${blur}px);\nborder-radius: ${radius}px;\nborder: ${borderWidth}px solid rgba(255, 255, 255, 0.3);\nbox-shadow: 0 8px 32px 0 rgba(0, 0, 0, ${shadowOpacity});`;
             codeTextarea.value = cssCode;
             codeDisplay.innerHTML = highlightCSS(cssCode) + (cssCode.endsWith('\n') ? ' ' : '');
-
+            
             const lineCount = cssCode.split('\n').length;
             lineNumbers.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
         }
