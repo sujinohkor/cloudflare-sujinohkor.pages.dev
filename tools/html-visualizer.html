@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Dependency Visualizer</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+        
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 사이드바 */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s; 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: all 0.3s ease; 
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .stats-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 158, 64, 0.25);
+            border-radius: 16px;
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            color: #ddd;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .stats-box .stat-item { display: flex; justify-content: space-between; }
+        .stats-box .stat-value { font-weight: bold; color: #ff9e40; }
+        .stats-box .stat-value.danger { color: #ff4d4d; }
+
+        .search-container { margin-bottom: 5px; }
+        .search-input { 
+            width: 100%; padding: 11px 14px; 
+            background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 50px;
+            outline: none; text-align: center; font-size: 0.85rem; font-weight: bold; 
+        }
+        .search-input::placeholder { color: #888; }
+        
+        .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
+        .bottom-btns > .menu-btn { margin-bottom: 0; }
+
+        .content-card { 
+            border: 2px solid #ff9e40; border-radius: 16px; flex: 1; 
+            display: flex; overflow: hidden; background: #181818;
+            position: relative; transition: all 0.3s ease; 
+        }
+
+        .fullscreen-btn { 
+            position: absolute; top: 15px; right: 15px; z-index: 2001; 
+            background: #202020; color: #ff9e40; border: 1px solid #ff9e40; 
+            padding: 6px 14px; border-radius: 8px; cursor: pointer; 
+            font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); transition: all 0.3s; 
+        }
+        .fullscreen-btn:hover { background: #ff9e40; color: #101010; }
+
+        .canvas-toolbar { position: absolute; top: 15px; left: 15px; z-index: 2001; display: flex; gap: 8px; }
+        .canvas-tool-btn {
+            background: #202020; color: #ff9e40; border: 1px solid #ff9e40;
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); transition: all 0.3s;
+        }
+        .canvas-tool-btn:hover { background: #ff9e40; color: #101010; }
+
+        body.is-fullscreen .sidebar { transform: translateX(-120%); opacity: 0; pointer-events: none; }
+        body.is-fullscreen .main-content { margin-left: 0 !important; width: 100vw !important; padding: 0 !important; height: 100vh !important; }
+        body.is-fullscreen .top-section { display: none !important; }
+        body.is-fullscreen .content-card { 
+            position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; 
+            width: 100vw !important; height: 100vh !important; z-index: 9999 !important; 
+            border-radius: 0 !important; border: none !important; padding: 0 !important; margin: 0 !important; 
+        }
+
+        #network-canvas { width: 100%; height: 100%; display: block; cursor: grab; }
+        #network-canvas:active { cursor: grabbing; }
+
+        .node-inspect-panel {
+            position: absolute; bottom: 20px; right: 20px;
+            background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 12px;
+            padding: 16px; width: 320px; z-index: 2000; display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .node-inspect-panel h4 { color: #ff9e40; margin-bottom: 8px; font-size: 0.95rem; }
+        .node-inspect-panel p { font-size: 0.8rem; color: #ccc; margin-bottom: 6px; }
+        .node-inspect-panel ul { list-style: disc; padding-left: 18px; font-size: 0.75rem; color: #aaa; max-height: 120px; overflow-y: auto; }
+        .node-inspect-panel .close-inspect {
+            position: absolute; top: 10px; right: 12px; background: none; border: none; color: #aaa; cursor: pointer; font-size: 1rem;
+        }
+        .node-inspect-panel .close-inspect:hover { color: #fff; }
+
+        #upload-html-input { display: none; }
+        .menu-toggle-btn { display: none; }
+
+        /* Light Mode */
+        body.light-mode { background-color: #f4f5f7; color: #202020; }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.7); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .stats-box { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.3); color: #444; }
+        body.light-mode .search-input { background: rgba(0, 0, 0, 0.02); color: #202020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .search-input::placeholder { color: #888; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-card { background: #ffffff; border-color: #F38020; }
+        body.light-mode .fullscreen-btn, body.light-mode .canvas-tool-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover, body.light-mode .canvas-tool-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .node-inspect-panel { background: rgba(255, 255, 255, 0.95); border-color: #F38020; color: #333; }
+        body.light-mode .node-inspect-panel h4 { color: #F38020; }
+        body.light-mode .node-inspect-panel p { color: #555; }
+        body.light-mode .node-inspect-panel ul { color: #666; }
+
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; position: fixed; bottom: 20px; left: 20px; z-index: 3000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; } 
+            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; z-index: 3000; } 
+            body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; } 
+            .content-card { min-height: 0; height: 100%; } 
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">HTML Visualizer</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                
+            
+            <div class="stats-box">
+                <div class="stat-item"><span>Total Nodes:</span> <span class="stat-value" id="stat-nodes">0</span></div>
+                <div class="stat-item"><span>Dependencies:</span> <span class="stat-value" id="stat-edges">0</span></div>
+                <div class="stat-item"><span>Circular Loops:</span> <span class="stat-value danger" id="stat-cycles">0</span></div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search element/script..." oninput="filterGraph()">
+            </div>
+            
+            <div class="bottom-btns">
+                <button class="menu-btn" onclick="document.getElementById('upload-html-input').click()">Upload HTML File</button>
+                <input type="file" id="upload-html-input" accept=".html,.htm" onchange="handleHtmlUpload(event)">
+                <button class="menu-btn" onclick="loadSampleProject()">Load Sample Dashboard</button>
+                <button class="menu-btn" onclick="exportArchitectureData()">Export Analysis</button>
+                <button class="menu-btn" onclick="resetViewPort()">Reset View</button>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>HTML Dependency Visualizer</h1>
+                <p>Upload any HTML file to inspect script tags, internal/external links, and asset dependencies</p>
+            </header>
+            
+            <section class="content-card" id="content-card">
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
+                <div class="canvas-toolbar">
+                    <button class="canvas-tool-btn" onclick="recalculateLayout()">Force Circle Layout</button>
+                    <button class="canvas-tool-btn" onclick="toggleCycleHighlight()">Toggle Cycle Glow</button>
+                </div>
+                <canvas id="network-canvas"></canvas>
+
+                <div class="node-inspect-panel" id="inspect-panel">
+                    <button class="close-inspect" onclick="closeInspect()">×</button>
+                    <h4 id="inspect-title">Node Name</h4>
+                    <p><strong>Type:</strong> <span id="inspect-type">-</span></p>
+                    <p><strong>Details:</strong> <span id="inspect-details">-</span></p>
+                    <p><strong>Connected Links (<span id="inspect-link-count">0</span>):</strong></p>
+                    <ul id="inspect-links-list"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let nodes = [];
+        let edges = [];
+        let cycles = [];
+        let selectedNode = null;
+        let hoveredNode = null;
+        let isDragging = false;
+        let dragNode = null;
+        let panX = 0, panY = 0;
+        let startPanX = 0, startPanY = 0;
+        let zoom = 1;
+        let highlightCyclesOnly = false;
+        let filterKeyword = '';
+
+        window.onload = function() {
+            loadSampleProject();
+            initCanvasEvents();
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        };
+
+        function resizeCanvas() {
+            canvas.width = contentCard.clientWidth;
+            canvas.height = contentCard.clientHeight;
+            drawGraph();
+        }
+
+        window.toggleFullscreen = function() {
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {
+                fullscreenBtn.textContent = 'Minimize 🗗';
+            } else {
+                fullscreenBtn.textContent = 'Maximize ⛶';
+            }
+            setTimeout(resizeCanvas, 100);
+        };
+
+        function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+        // 모바일 화면에서 사이드바 내부의 버튼을 누르면 사이드바가 닫히도록 설정
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            drawGraph();
+        });
+
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        function handleHtmlUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const htmlContent = e.target.result;
+                parseHtmlToDependencyGraph(file.name, htmlContent);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseHtmlToDependencyGraph(fileName, htmlString) {
+            nodes = [];
+            edges = [];
+
+            nodes.push({ id: fileName, type: 'html', details: 'Root HTML Document', x: 0, y: 0 });
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlString, 'text/html');
+
+            const links = doc.querySelectorAll('link[rel="stylesheet"]');
+            links.forEach((link, idx) => {
+                const href = link.getAttribute('href') || `stylesheet_${idx}.css`;
+                if (!nodes.some(n => n.id === href)) {
+                    nodes.push({ id: href, type: 'css', details: 'External Stylesheet Link', x: -250, y: -150 + idx * 70 });
+                }
+                edges.push({ from: fileName, to: href });
+            });
+
+            const scripts = doc.querySelectorAll('script');
+            scripts.forEach((script, idx) => {
+                const src = script.getAttribute('src');
+                const scriptId = src ? src : `inline-script-${idx + 1}`;
+                const type = src ? 'script-external' : 'script-inline';
+                
+                if (!nodes.some(n => n.id === scriptId)) {
+                    nodes.push({ id: scriptId, type: type, details: src ? `External JS: ${src}` : 'Inline JavaScript Block', x: -250, y: 150 + idx * 70 });
+                }
+                edges.push({ from: fileName, to: scriptId });
+
+                if (!src && script.textContent) {
+                    const text = script.textContent;
+                    const importMatches = text.matchAll(/import\s+.*?from\s+['"]([^'"]+)['"]/g);
+                    for (const match of importMatches) {
+                        const importedModule = match[1];
+                        if (!nodes.some(n => n.id === importedModule)) {
+                            nodes.push({ id: importedModule, type: 'module', details: `ES Module Import`, x: -400 + Math.random()*50, y: 150 + idx * 70 });
+                        }
+                        edges.push({ from: scriptId, to: importedModule });
+                    }
+                }
+            });
+
+            const images = doc.querySelectorAll('img');
+            images.forEach((img, idx) => {
+                const src = img.getAttribute('src') || `image_${idx}`;
+                if (!nodes.some(n => n.id === src)) {
+                    nodes.push({ id: src, type: 'image', details: 'Image Asset Reference', x: 250, y: -150 + idx * 70 });
+                }
+                edges.push({ from: fileName, to: src });
+            });
+
+            const anchors = doc.querySelectorAll('a[href]');
+            anchors.forEach((a, idx) => {
+                const href = a.getAttribute('href');
+                if (href && !href.startsWith('#') && !nodes.some(n => n.id === href)) {
+                    nodes.push({ id: href, type: 'link', details: 'Hyperlink Destination', x: 250, y: 150 + idx * 70 });
+                    edges.push({ from: fileName, to: href });
+                }
+            });
+
+            analyzeArchitecture();
+            resetViewPort();
+            drawGraph();
+            alert(`HTML Successfully Parsed! Found ${nodes.length} connected resources.`);
+        }
+
+        function loadSampleProject() {
+            nodes = [
+                { id: 'index.html', type: 'html', details: 'Root Web Page', x: 0, y: 0 },
+                { id: 'style.css', type: 'css', details: 'Design System & Stylesheet', x: -200, y: -150 },
+                { id: 'main.js', type: 'script-external', details: 'Core Application Script', x: -200, y: 100 },
+                { id: 'apiClient.js', type: 'module', details: 'Fetch API wrapper module', x: -300, y: 200 },
+                { id: 'authStore.js', type: 'module', details: 'State management module', x: -100, y: 200 },
+                { id: 'logo.png', type: 'image', details: 'Brand Logo Asset', x: 200, y: -150 },
+                { id: 'analytics.js', type: 'script-external', details: 'Third-party tracker', x: 250, y: 100 },
+                { id: 'dashboard.html', type: 'link', details: 'Sub-page navigation', x: 280, y: 0 }
+            ];
+
+            edges = [
+                { from: 'index.html', to: 'style.css' },
+                { from: 'index.html', to: 'main.js' },
+                { from: 'index.html', to: 'logo.png' },
+                { from: 'index.html', to: 'analytics.js' },
+                { from: 'index.html', to: 'dashboard.html' },
+                { from: 'main.js', to: 'apiClient.js' },
+                { from: 'main.js', to: 'authStore.js' },
+                { from: 'authStore.js', to: 'apiClient.js' },
+                { from: 'apiClient.js', to: 'authStore.js' }
+            ];
+
+            analyzeArchitecture();
+            resetViewPort();
+            drawGraph();
+        }
+
+        function resetViewPort() {
+            zoom = 1;
+            panX = 0;
+            panY = 0;
+            drawGraph();
+        }
+
+        function analyzeArchitecture() {
+            cycles = [];
+            const adj = {};
+            nodes.forEach(n => adj[n.id] = []);
+            edges.forEach(e => { if (adj[e.from]) adj[e.from].push(e.to); });
+
+            function dfs(node, visited, stack, path) {
+                visited[node] = true; stack[node] = true; path.push(node);
+                if (adj[node]) {
+                    for (let neighbor of adj[node]) {
+                        if (!visited[neighbor]) {
+                            dfs(neighbor, visited, stack, path);
+                        } else if (stack[neighbor]) {
+                            cycles.push(path.slice(path.indexOf(neighbor)));
+                        }
+                    }
+                }
+                path.pop(); stack[node] = false;
+            }
+
+            const visited = {}, stack = {};
+            nodes.forEach(n => { if (!visited[n.id]) dfs(n.id, visited, stack, []); });
+
+            edges.forEach(e => {
+                e.isCircular = cycles.some(cycle => {
+                    for (let i = 0; i < cycle.length; i++) {
+                        if (cycle[i] === e.from && cycle[(i + 1) % cycle.length] === e.to) return true;
+                    }
+                    return false;
+                });
+            });
+
+            document.getElementById('stat-nodes').textContent = nodes.length;
+            document.getElementById('stat-edges').textContent = edges.length;
+            document.getElementById('stat-cycles').textContent = cycles.length;
+        }
+
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            
+            ctx.translate(canvas.width / 2 + panX, canvas.height / 2 + panY);
+            ctx.scale(zoom, zoom);
+
+            const isLight = document.body.classList.contains('light-mode');
+            const edgeColor = isLight ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)';
+
+            edges.forEach(edge => {
+                const fromNode = nodes.find(n => n.id === edge.from);
+                const toNode = nodes.find(n => n.id === edge.to);
+                if (!fromNode || !toNode) return;
+
+                const matchesFilter = !filterKeyword || 
+                    fromNode.id.toLowerCase().includes(filterKeyword) || 
+                    toNode.id.toLowerCase().includes(filterKeyword);
+
+                if (highlightCyclesOnly && !edge.isCircular) return;
+
+                ctx.beginPath();
+                ctx.moveTo(fromNode.x, fromNode.y);
+                ctx.lineTo(toNode.x, toNode.y);
+
+                if (edge.isCircular) {
+                    ctx.strokeStyle = '#ff3333'; ctx.lineWidth = 3.5;
+                    ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 10;
+                } else {
+                    ctx.strokeStyle = matchesFilter ? (isLight ? '#666' : '#888') : edgeColor;
+                    ctx.lineWidth = 1.5; ctx.shadowBlur = 0;
+                }
+                ctx.stroke(); ctx.shadowBlur = 0;
+                drawArrowHead(fromNode, toNode, edge.isCircular ? '#ff3333' : (isLight ? '#666' : '#888'));
+            });
+
+            nodes.forEach(node => {
+                const matchesFilter = !filterKeyword || node.id.toLowerCase().includes(filterKeyword);
+                if (filterKeyword && !matchesFilter) return;
+
+                const isSelected = selectedNode === node;
+                const isHovered = hoveredNode === node;
+
+                ctx.save();
+                ctx.translate(node.x, node.y);
+
+                const width = 150, height = 44, radius = 8;
+                ctx.beginPath();
+                ctx.roundRect(-width/2, -height/2, width, height, radius);
+                
+                if (isLight) {
+                    ctx.fillStyle = isSelected ? '#ff9e40' : (node.type === 'html' ? '#e2e8f0' : '#ffffff');
+                    ctx.strokeStyle = isSelected ? '#d87010' : (node.type === 'html' ? '#005088' : '#cbd5e1');
+                } else {
+                    ctx.fillStyle = isSelected ? '#ff9e40' : (node.type === 'html' ? '#222' : '#2a2a2a');
+                    ctx.strokeStyle = isSelected ? '#fff' : (node.type === 'html' ? '#ff9e40' : '#444');
+                }
+                ctx.lineWidth = isSelected || isHovered ? 2.5 : 1.5;
+                ctx.fill(); ctx.stroke();
+
+                ctx.fillStyle = isLight ? (isSelected ? '#fff' : '#111') : (isSelected ? '#000' : '#fff');
+                ctx.font = 'bold 11px Segoe UI'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                
+                let displayName = node.id;
+                if (displayName.length > 20) displayName = displayName.substring(0, 17) + '...';
+                ctx.fillText(displayName, 0, -5);
+
+                ctx.font = '9px Segoe UI';
+                ctx.fillStyle = isLight ? (isSelected ? '#eee' : '#666') : (isSelected ? '#222' : '#888');
+                ctx.fillText(node.type.toUpperCase(), 0, 12);
+                ctx.restore();
+            });
+            ctx.restore();
+        }
+
+        function drawArrowHead(from, to, color) {
+            const angle = Math.atan2(to.y - from.y, to.x - from.x);
+            const dist = 32;
+            const x = to.x - Math.cos(angle) * dist;
+            const y = to.y - Math.sin(angle) * dist;
+
+            ctx.save();
+            ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+            ctx.translate(x, y); ctx.rotate(angle);
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-10, -5); ctx.lineTo(-10, 5); ctx.closePath();
+            ctx.fill(); ctx.restore();
+        }
+
+        function initCanvasEvents() {
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left - canvas.width / 2 - panX) / zoom;
+                const mouseY = (e.clientY - rect.top - canvas.height / 2 - panY) / zoom;
+
+                const clicked = nodes.slice().reverse().find(node => Math.abs(mouseX - node.x) < 75 && Math.abs(mouseY - node.y) < 22);
+
+                if (clicked) {
+                    isDragging = true; dragNode = clicked; selectedNode = clicked;
+                    showNodeInspector(clicked);
+                } else {
+                    isDragging = false; dragNode = null;
+                    startPanX = e.clientX - panX; startPanY = e.clientY - panY;
+                    selectedNode = null; closeInspect();
+                }
+                drawGraph();
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left - canvas.width / 2 - panX) / zoom;
+                const mouseY = (e.clientY - rect.top - canvas.height / 2 - panY) / zoom;
+
+                if (isDragging && dragNode) {
+                    dragNode.x = mouseX; dragNode.y = mouseY; drawGraph();
+                } else if (!isDragging && e.buttons === 1) {
+                    panX = e.clientX - startPanX; panY = e.clientY - startPanY; drawGraph();
+                } else {
+                    const hovered = nodes.find(node => Math.abs(mouseX - node.x) < 75 && Math.abs(mouseY - node.y) < 22);
+                    if (hovered !== hoveredNode) {
+                        hoveredNode = hovered; canvas.style.cursor = hovered ? 'pointer' : 'grab'; drawGraph();
+                    }
+                }
+            });
+
+            canvas.addEventListener('mouseup', () => { isDragging = false; dragNode = null; });
+
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = 1.1;
+                if (e.deltaY < 0) zoom *= zoomFactor; else zoom /= zoomFactor;
+                zoom = Math.max(0.3, Math.min(3, zoom));
+                drawGraph();
+            }, { passive: false });
+        }
+
+        function showNodeInspector(node) {
+            const panel = document.getElementById('inspect-panel');
+            document.getElementById('inspect-title').textContent = node.id;
+            document.getElementById('inspect-type').textContent = node.type;
+            document.getElementById('inspect-details').textContent = node.details;
+
+            const connected = edges.filter(e => e.from === node.id || e.to === node.id).map(e => `${e.from} → ${e.to}`);
+            document.getElementById('inspect-link-count').textContent = connected.length;
+            document.getElementById('inspect-links-list').innerHTML = connected.length ? connected.map(c => `<li>${c}</li>`).join('') : '<li>None</li>';
+            panel.style.display = 'block';
+        }
+
+        function closeInspect() {
+            document.getElementById('inspect-panel').style.display = 'none';
+            selectedNode = null; drawGraph();
+        }
+
+        function filterGraph() {
+            filterKeyword = document.getElementById('search-input').value.toLowerCase();
+            drawGraph();
+        }
+
+        function recalculateLayout() {
+            const cx = 0, cy = 0;
+            const radius = 220;
+            nodes.forEach((node, idx) => {
+                const angle = (idx / nodes.length) * 2 * Math.PI;
+                node.x = cx + Math.cos(angle) * radius + (Math.random() * 40 - 20);
+                node.y = cy + Math.sin(angle) * radius + (Math.random() * 40 - 20);
+            });
+            resetViewPort();
+        }
+
+        function toggleCycleHighlight() { highlightCyclesOnly = !highlightCyclesOnly; drawGraph(); }
+
+        function exportArchitectureData() {
+            const blob = new Blob([JSON.stringify({ nodes, edges, cycles }, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'html_dependency_analysis.json'; a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
