@@ -6,10 +6,12 @@
     <title>PSD AI Reader</title>
     <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-        <!-- 1. PSD Parser Library -->
+    
+    <!-- 1. PSD Parser Library -->
     <script src="https://unpkg.com/psd/dist/psd.min.js"></script>
     <script src="/codes/psd.min.js"></script>
-        <!-- 2. AI (PDF Compatible Data) Parser Library (PDF.js) -->
+    
+    <!-- 2. AI (PDF Compatible Data) Parser Library (PDF.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <style>
@@ -17,7 +19,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
-                        
+        
         .app-container { display: flex; min-height: 100vh; width: 100%; }
 
         /* Fully transparent floating sidebar (Desktop only) */
@@ -127,9 +129,9 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
-                               linear-gradient(-45deg, #ccc 25%, transparent 25%),
-                               linear-gradient(45deg, transparent 75%, #ccc 75%),
-                               linear-gradient(-45deg, transparent 75%, #ccc 75%);
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #ccc 75%),
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
             background-size: 16px 16px;
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
             background-color: #fff;
@@ -148,7 +150,6 @@
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
-                
         body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
@@ -159,14 +160,12 @@
             color: #F38020; 
             border-color: rgba(243, 128, 32, 0.4); 
         }
-        
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .content-mid { color: #666; }
         body.light-mode .content-mid.has-file { background-color: rgba(243, 128, 32, 0.05); }
         body.light-mode .content-mid.dragover { background-color: rgba(243, 128, 32, 0.1); border-style: dashed; color: #f38020; }
         body.light-mode .menu-toggle-btn { color: #000000; }
         body.light-mode #file-name-label { color: #F38020; }
-
         body.light-mode .card, 
         body.light-mode .content-mid {
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
@@ -191,11 +190,10 @@
             body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
-            } 
+            }
             .sidebar.active { transform: translateX(0); } 
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; height: auto; overflow-y: auto; } 
-            .workspace-container { flex-direction: column; flex: none; height: auto; }
-            .content-mid { flex: none; min-height: 350px; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; } 
+            .content-card { min-height: 0; height: 100%; }
         }
     </style>
 </head>
@@ -203,6 +201,7 @@
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 <input type="file" id="file-selector" accept=".psd,.ai,image/*" style="display: none;">
+
 <div class="app-container">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-title">PSD AI Reader</div>
@@ -218,7 +217,7 @@
         </div>
     </aside>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <header class="top-section">
             <h1>PSD AI Reader</h1>
             <p id="status-desc">Upload a file below to view content.</p>
@@ -244,6 +243,7 @@
     }
 
     const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
     const dropZone = document.getElementById('drop-zone');
     const defaultUI = document.getElementById('default-ui');
     const fileSelector = document.getElementById('file-selector');
@@ -255,6 +255,9 @@
     let loadedFile = null;
 
     function toggleSidebar() { 
+        if (!sidebar.classList.contains('active')) {
+            document.querySelectorAll('.popup-calendar').forEach(p => p.classList.remove('active'));
+        }
         sidebar.classList.toggle('active'); 
     }
 
@@ -271,10 +274,10 @@
         document.body.classList.toggle('light-mode'); 
     });
 
-    document.querySelector('.main-content').addEventListener('click', (e) => { 
-        if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
+    mainContent.addEventListener('click', (e) => { 
+        if (sidebar.classList.contains('active')) { 
             sidebar.classList.remove('active'); 
-        } 
+        }
     });
 
     function setInitialUI() {
@@ -327,7 +330,6 @@
             fileNameLabel.innerText = `${file.name} (Analyzing PSD...)`;
 
             const PSDParser = window.PSD || (window.require && window.require('psd'));
-
             if (!PSDParser) {
                 reject(new Error('PSD library is not loaded. Please check your internet connection.'));
                 return;
