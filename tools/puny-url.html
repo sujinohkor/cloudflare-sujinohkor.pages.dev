@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punycode and URL</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .content-card {
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            gap: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .content-card h3 {
+            font-size: 1.1rem;
+            color: #ff9e40;
+            border-bottom: 1px solid rgba(255, 158, 64, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            height: 85px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+        }
+        textarea:focus {
+            border-color: rgba(255, 158, 64, 0.8);
+        }
+        textarea[readonly] {
+            background: rgba(255, 255, 255, 0.01);
+            color: #aaa;
+            cursor: default;
+        }
+
+        /* 퀵 프리셋 및 액션 버튼 스타일 */
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.03);
+            color: #bbb;
+            border: 1px solid rgba(255, 158, 64, 0.2);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .preset-btn:hover {
+            background: rgba(255, 158, 64, 0.15);
+            color: #ff9e40;
+            border-color: rgba(255, 158, 64, 0.4);
+        }
+        .copy-btn {
+            background: rgba(255, 158, 64, 0.1);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 158, 64, 0.25);
+            border-color: rgba(255, 158, 64, 0.7);
+        }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.3); border-color: rgba(243, 128, 32, 0.35); }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; }
+        body.light-mode .content-card { background: rgba(255, 255, 255, 0.5); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode textarea { background: #fff; color: #000; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode textarea[readonly] { background: rgba(0, 0, 0, 0.02); color: #666; }
+        body.light-mode .input-group label { color: #666; }
+        body.light-mode .preset-btn { background: rgba(0, 0, 0, 0.03); color: #555; border-color: rgba(243, 128, 32, 0.3); }
+        body.light-mode .preset-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; }
+        body.light-mode .copy-btn { background: rgba(243, 128, 32, 0.1); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .copy-btn:hover { background: rgba(243, 128, 32, 0.25); }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+
+        /* Mobile */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { transform: translateX(-320px); background: #101010 !important; }
+            body.light-mode .sidebar { background: #ffffff !important; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; }
+            .cards-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Punycode and URL</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Punycode and URL</h1>
+                <p>Convert domain names and encode/decode URL strings.</p>
+            </header>
+
+            <div class="cards-container">
+                <!-- 1. Punycode Converter Card -->
+                <section class="content-card">
+                    <h3>Punycode Converter</h3>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label>Unicode Domain</label>
+                            <textarea id="unicode-input" placeholder="e.g. 예시.한국" oninput="toPunycode()"></textarea>
+                        </div>
+                        <div class="button-row">
+                            <button class="preset-btn" onclick="setPreset('unicode-input', '예시.한국', toPunycode)">예시.한국</button>
+                            <button class="preset-btn" onclick="setPreset('unicode-input', '한국어.com', toPunycode)">한국어.com</button>
+                        </div>
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label>Punycode (ASCII)</label>
+                                <button class="copy-btn" onclick="copyText('punycode-input')">Copy</button>
+                            </div>
+                            <textarea id="punycode-input" readonly placeholder="Converted punycode will appear here..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. URL Encoder / Decoder Card -->
+                <section class="content-card">
+                    <h3>URL Encoder / Decoder</h3>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label>Input Text / URL</label>
+                            <textarea id="url-input" placeholder="Enter text to encode/decode..." oninput="handleUrlConversion()"></textarea>
+                        </div>
+                        <div class="button-row">
+                            <button class="preset-btn" onclick="setPreset('url-input', 'https://example.com/search?q=한글검색', handleUrlConversion)">한글 주소</button>
+                            <button class="preset-btn" onclick="setPreset('url-input', 'Hello World & Co?', handleUrlConversion)">특수문자</button>
+                        </div>
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label>Result</label>
+                                <button class="copy-btn" onclick="copyText('url-output')">Copy</button>
+                            </div>
+                            <textarea id="url-output" readonly placeholder="Result will appear here..."></textarea>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        sidebar.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 900) sidebar.classList.remove('active');
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+
+        mainContent.addEventListener('click', () => {
+            if (sidebar.classList.contains('active')) sidebar.classList.remove('active');
+        });
+
+        function setPreset(elementId, text, callback) {
+            const el = document.getElementById(elementId);
+            el.value = text;
+            callback();
+        }
+
+        function copyText(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el.value) {
+                alert('No text to copy.');
+                return;
+            }
+            navigator.clipboard.writeText(el.value).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function toPunycode() {
+            const val = document.getElementById('unicode-input').value.trim();
+            if (!val) {
+                document.getElementById('punycode-input').value = '';
+                return;
+            }
+            try {
+                const host = val.includes('://') ? new URL(val).hostname : val;
+                const encoded = new URL('http://' + host).hostname;
+                document.getElementById('punycode-input').value = encoded;
+            } catch (e) {
+                document.getElementById('punycode-input').value = 'Invalid domain';
+            }
+        }
+
+        function handleUrlConversion() {
+            const val = document.getElementById('url-input').value;
+            const output = document.getElementById('url-output');
+            if (!val) {
+                output.value = '';
+                return;
+            }
+            try {
+                if (val.includes('%') || val.includes('&') || val.includes('?')) {
+                    try {
+                        output.value = decodeURIComponent(val);
+                        return;
+                    } catch (err) {}
+                }
+                output.value = encodeURIComponent(val);
+            } catch (e) {
+                output.value = 'Error processing URL';
+            }
+        }
+
+        function resetAll() {
+            document.getElementById('unicode-input').value = '';
+            document.getElementById('punycode-input').value = '';
+            document.getElementById('url-input').value = '';
+            document.getElementById('url-output').value = '';
+        }
+    </script>
+</body>
+</html>
