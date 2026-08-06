@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPT Retrospective Board</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                                
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 사이드바 스타일 */
+        .sidebar {                         
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         
+            background: rgba(16, 16, 16, 0.25);                         
+            backdrop-filter: blur(16px);                         
+            -webkit-backdrop-filter: blur(16px);                        
+            padding: 25px 20px; z-index: 1000;                         
+            display: flex; flex-direction: column; gap: 12px;                         
+            border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 24px;                        
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;                 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {                         
+            margin-left: 300px; padding: 40px; flex: 1;                         
+            display: flex; flex-direction: column; height: 100vh;                         
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;                         
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {                         
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        
+            display: flex; align-items: center; justify-content: center; line-height: 1;        
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 작성자 이름 설정 입력창 스타일 */
+        .name-container { display: flex; flex-direction: column; gap: 4px; }
+        .name-label { font-size: 0.75rem; color: #ff9e40; font-weight: bold; padding-left: 5px; }
+        .name-input {            
+            width: 100%;            
+            padding: 10px 14px;             
+            background: rgba(255, 255, 255, 0.03);            
+            color: #fff;            
+            border: 1px solid rgba(255, 158, 64, 0.35);            
+            border-radius: 50px;            
+            outline: none;            
+            text-align: center;            
+            font-size: 0.85rem;            
+            font-weight: bold;        
+        }
+        .name-input::placeholder { color: #888; }
+
+        .search-container { margin-bottom: 0; }
+        .search-input {            
+            width: 100%;            
+            padding: 11px 14px;             
+            background: rgba(255, 255, 255, 0.03);            
+            color: #fff;            
+            border: 1px solid rgba(255, 158, 64, 0.35);            
+            border-radius: 50px;            
+            outline: none;            
+            text-align: center;            
+            font-size: 0.85rem;            
+            font-weight: bold;        
+        }
+        .search-input::placeholder { color: #888; }
+
+        /* KPT 회고 카드 생성 버튼 그룹 */
+        .kpt-buttons-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .kpt-btn-green { color: #c8e6c9 !important; border-color: rgba(200, 230, 201, 0.5) !important; }
+        .kpt-btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
+        .kpt-btn-pink { color: #f8bbd0 !important; border-color: rgba(248, 187, 208, 0.5) !important; }
+        .kpt-btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
+        .kpt-btn-blue { color: #bbdefb !important; border-color: rgba(187, 222, 251, 0.5) !important; }
+        .kpt-btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .content-card {                         
+            border: 2px solid #ff9e40;                         
+            border-radius: 16px;                         
+            flex: 1;                         
+            display: flex;                         
+            overflow: hidden;                         
+            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
+            background-color: #d2b48c;
+            position: relative;             
+            transition: all 0.3s ease;        
+        }
+
+        /* Fullscreen button style */
+        .fullscreen-btn {                         
+            position: absolute;                         
+            top: 15px;                         
+            right: 15px;                         
+            z-index: 2001;                         
+            background: #202020;                         
+            color: #ff9e40;                         
+            border: 1px solid #ff9e40;                         
+            padding: 6px 14px;                         
+            border-radius: 8px;                         
+            cursor: pointer;                         
+            font-size: 0.8rem;                         
+            font-weight: bold;                         
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         
+            transition: all 0.3s;                 
+        }
+        .fullscreen-btn:hover {                         
+            background: #ff9e40;                         
+            color: #101010;         
+        }
+
+        /* 풀스크린 활성화 시 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 캔버스 보드 영역 */
+        #board {            
+            width: 100%;            
+            height: 100%;            
+            position: relative;            
+            overflow: hidden;
+        }
+
+        /* 회고 포스트잇 카드 스타일 */
+        .kpt-card {            
+            width: 300px;            
+            box-shadow: 6px 6px 15px rgba(0,0,0,0.4);            
+            position: absolute;            
+            cursor: grab;            
+            padding: 25px 15px 15px 15px;            
+            box-sizing: border-box;            
+            z-index: 1;            
+            display: flex;            
+            flex-direction: column;            
+            border-radius: 12px;
+            transform-origin: center center;
+        }                
+        .kpt-card:active {            
+            cursor: grabbing;        
+        }
+        .kpt-card.filtered-out {            
+            opacity: 0.2;            
+            pointer-events: none;        }
+
+        /* 핀 아이콘 장식 */
+        .kpt-card::before {            
+            content: '';            
+            position: absolute;            
+            top: -10px;            
+            left: 50%;            
+            transform: translateX(-50%);            
+            width: 24px;            
+            height: 24px;            
+            background-image: url('https://cdn-icons-png.flaticon.com/512/1759/1759197.png');            
+            background-size: contain;            
+            background-repeat: no-repeat;            
+            pointer-events: none;        }
+
+        /* 카드 삭제 버튼 */
+        .delete-card-btn {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .delete-card-btn:hover { color: #f44336; }
+
+        /* 카드 내부 카테고리 배지 & 텍스트에리어 */
+        .card-badge {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 6px;
+            width: fit-content;
+        }
+        .badge-green { background: #2e7d32; color: #fff; }
+        .badge-pink { background: #c2185b; color: #fff; }
+        .badge-blue { background: #1565c0; color: #fff; }
+
+        .kpt-textarea {
+            width: 100%;
+            height: 80px;
+            border: none;
+            background: transparent;
+            color: #222;
+            font-family: inherit;
+            font-size: 13px;
+            resize: none;
+            outline: none;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        /* 댓글 스레드 영역 */
+        .comment-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 6px;
+        }
+        .comment-box {
+            background: rgba(255,255,255,0.5);
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #333;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+        .comment-input-row {
+            display: flex;
+            gap: 4px;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 4px 6px;
+            border: 1px solid rgba(0,0,0,0.15);
+            border-radius: 8px;
+            font-size: 10px;
+            outline: none;
+            background: #fff;
+            color: #333;
+        }
+        .comment-add-btn {
+            padding: 0 8px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .comment-add-btn:hover { background: #ff9e40; color: #101010; }
+
+        /* 카드 색상 테마 */
+        .card-green { background-color: #c8e6c9; }
+        .card-pink { background-color: #f8bbd0; }
+        .card-blue { background-color: #bbdefb; }
+
+        #import-file { display: none; }
+
+        /* 4. Theme (Light Mode) */                
+        body.light-mode { background-color: #fff; color: #202020; }                
+        body.light-mode .sidebar {                         
+            background: rgba(255, 255, 255, 0.3);                         
+            border-color: rgba(243, 128, 32, 0.35);                         
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 
+        }                        
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {                         
+            background: rgba(0, 0, 0, 0.02);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.5);         
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {                         
+            background: rgba(243, 128, 32, 0.15);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.4);         
+        }
+        
+        /* 라이트 모드에서 KPT 버튼 선명하게 가시성 확보 */
+        body.light-mode .kpt-btn-green { color: #2e6b31 !important; border-color: rgba(140, 196, 142, 0.6) !important; }
+        body.light-mode .kpt-btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
+        body.light-mode .kpt-btn-pink { color: #b8326e !important; border-color: rgba(240, 136, 168, 0.6) !important; }
+        body.light-mode .kpt-btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
+        body.light-mode .kpt-btn-blue { color: #1565c0 !important; border-color: rgba(100, 181, 246, 0.6) !important; }
+        body.light-mode .kpt-btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
+
+        body.light-mode .search-input, body.light-mode .name-input {            
+            background: rgba(0, 0, 0, 0.02);            
+            color: #202020;            
+            border-color: rgba(243, 128, 32, 0.5);        }
+        body.light-mode .search-input::placeholder, body.light-mode .name-input::placeholder { color: #888; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode body.is-fullscreen .content-card {                         
+            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png') !important;                        
+            background-color: #d2b48c !important;         
+        }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+        
+        body.light-mode .card,                 
+        body.light-mode .content-card,                
+        body.light-mode .search-input,
+        body.light-mode .name-input {                        
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);        
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {                         
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;                         
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         
+            font-weight: bold; cursor: pointer; color: #ffffff;         
+        }                        
+        @media (max-width: 900px) {                         
+            .menu-toggle-btn { display: block; }                         
+            .sidebar {                                 
+                transform: translateX(-320px);                                 
+                background: #101010 !important;                                 
+                backdrop-filter: none !important;                                
+                -webkit-backdrop-filter: none !important;                                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 
+                z-index: 3000;            
+            }                         
+            body.light-mode .sidebar {                                
+                background: #ffffff !important;                                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             
+            }
+            .sidebar.active { transform: translateX(0); }                         
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }                         
+            .content-card { min-height: 0; height: 100%; }        
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">KPT Retrospective</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                                
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+            <!-- 작성자 이름 설정 입력창 -->
+            <div class="name-container">
+                <div class="name-label">Author Name</div>
+                <input type="text" id="author-name-input" class="name-input" value="Member" placeholder="Enter your name..." oninput="saveAuthorName()">
+            </div>
+
+            <div class="search-container">                
+                <input type="text" id="search-input" class="search-input" placeholder="Search retro notes..." oninput="filterCards()">            
+            </div>
+
+            <!-- KPT 카테고리별 생성 버튼 -->
+            <div class="kpt-buttons-group">
+                <button class="menu-btn kpt-btn-green" onclick="createCard('card-green', 'Keep')">+ Keep (잘한 점)</button>
+                <button class="menu-btn kpt-btn-pink" onclick="createCard('card-pink', 'Problem')">+ Problem (아쉬운 점)</button>
+                <button class="menu-btn kpt-btn-blue" onclick="createCard('card-blue', 'Try')">+ Try (시도할 점)</button>
+            </div>
+
+            <div class="control-group">
+                <button class="menu-btn" onclick="exportData()">Export JSON</button>
+                <button class="menu-btn" onclick="document.getElementById('import-file').click()">Import</button>
+                <input type="file" id="import-file" accept=".json" onchange="importData(event)">
+                <button class="menu-btn" onclick="deleteAllCards()">Reset Board</button>
+            </div>        
+        </aside>
+
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>KPT Retrospective Board</h1>                
+                <p>Organize project feedback into Keep, Problem, and Try</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                <div id="board">                    
+                    <!-- KPT cards area -->                
+                </div>            
+            </section>        
+        </main>    
+    </div>
+
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const board = document.getElementById('board');
+        const authorInput = document.getElementById('author-name-input');
+        let cardCounter = 0;
+        let highestZIndex = 10;
+
+        window.onload = function() {            
+            loadAuthorName();
+            loadCards();        
+        };
+
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {                
+                fullscreenBtn.textContent = 'Minimize 🗗';            
+            } else {                
+                fullscreenBtn.textContent = 'Maximize ⛶';            
+            }        
+        };
+
+        function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+        sidebar.querySelectorAll('button').forEach(element => {            
+            element.addEventListener('click', () => {                
+                if (window.innerWidth <= 900) {                    
+                    if (element.id === 'import-file') return;                    
+                    sidebar.classList.remove('active');                
+                }            });        
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        mainContent.addEventListener('click', () => {             
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+                sidebar.classList.remove('active');             
+            }         
+        });
+
+        function saveAuthorName() {
+            const name = authorInput.value.trim() || 'Member';
+            localStorage.setItem('kpt_author_name', name);
+        }
+
+        function loadAuthorName() {
+            const savedName = localStorage.getItem('kpt_author_name');
+            if (savedName) {
+                authorInput.value = savedName;
+            }
+        }
+
+        function bringToFront(el) {            
+            highestZIndex++;            
+            el.style.zIndex = highestZIndex;            
+            saveCardsToLocalStorage();        
+        }
+
+        function createCard(colorClass = 'card-green', category = 'Keep', contentText = '', comments = [], position = null, rotation = null, zIndex = null) {            
+            cardCounter++;            
+            const cardId = 'kpt-card-' + cardCounter;                                    
+            const el = document.createElement('div');            
+            el.className = `kpt-card ${colorClass}`;            
+            el.id = cardId;            
+
+            if (zIndex !== null) {                
+                el.style.zIndex = zIndex;                
+                if (zIndex > highestZIndex) highestZIndex = zIndex;            
+            } else {                
+                highestZIndex++;                
+                el.style.zIndex = highestZIndex;            
+            }
+
+            const rot = rotation !== null ? rotation : (Math.random() * 6 - 3);
+            el.style.transform = `rotate(${rot}deg)`;
+
+            if (!position) {                
+                const startX = Math.random() * (board.clientWidth - 330) + 20;                
+                const startY = Math.random() * (board.clientHeight - 280) + 20;                
+                el.style.left = `${Math.max(0, startX)}px`;                
+                el.style.top = `${Math.max(0, startY)}px`;            } else {                
+                el.style.left = position.left;                
+                el.style.top = position.top;            }
+
+            let badgeClass = 'badge-green';
+            if (category === 'Problem') badgeClass = 'badge-pink';
+            if (category === 'Try') badgeClass = 'badge-blue';
+
+            el.innerHTML = `
+                <button class="delete-card-btn" onclick="deleteCard('${cardId}')">×</button>
+                <div class="card-badge ${badgeClass}">${category}</div>
+                <textarea class="kpt-textarea" placeholder="Write your retrospective thought..." oninput="saveCardsToLocalStorage()">${contentText}</textarea>
+                <div class="comment-section">
+                    <div class="comment-box" id="comments-${cardId}"></div>
+                    <div class="comment-input-row">
+                        <input type="text" class="comment-input" id="input-${cardId}" placeholder="Add reply...">
+                        <button class="comment-add-btn" onclick="addComment('${cardId}')">Send</button>
+                    </div>
+                </div>
+            `;
+
+            el.addEventListener('mousedown', () => bringToFront(el));
+            initDragElement(el);            
+            board.appendChild(el);
+
+            const commentBox = document.getElementById(`comments-${cardId}`);
+            comments.forEach(c => appendCommentHTML(commentBox, c));
+
+            saveCardsToLocalStorage();        
+        }
+
+        function addComment(cardId) {
+            const input = document.getElementById(`input-${cardId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const currentAuthor = authorInput.value.trim() || 'Member';
+            const commentBox = document.getElementById(`comments-${cardId}`);
+            const commentData = { author: currentAuthor, text: text };
+            appendCommentHTML(commentBox, commentData);
+            input.value = '';
+            saveCardsToLocalStorage();
+        }
+
+        function appendCommentHTML(container, data) {
+            const div = document.createElement('div');
+            div.style.marginBottom = '2px';
+            div.innerHTML = `<b>${data.author}:</b> ${data.text}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function deleteCard(cardId) {            
+            const el = document.getElementById(cardId);            
+            if (el) {                
+                board.removeChild(el);                
+                saveCardsToLocalStorage();            }        }
+
+        function deleteAllCards() {            
+            if (confirm('Clear all KPT cards?')) {                
+                board.innerHTML = '';                
+                localStorage.removeItem('kpt_board_data');            }        }
+
+        function initDragElement(elmnt) {            
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;                                    
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {                
+                if (['TEXTAREA', 'INPUT', 'BUTTON'].includes(e.target.tagName)) return;
+
+                e.preventDefault();                
+                pos3 = e.clientX;                
+                pos4 = e.clientY;
+
+                document.onmouseup = closeDragElement;                
+                document.onmousemove = elementDrag;                                                
+                bringToFront(elmnt);            }
+
+            function elementDrag(e) {                
+                e.preventDefault();                
+                pos1 = pos3 - e.clientX;                
+                pos2 = pos4 - e.clientY;                
+                pos3 = e.clientX;                
+                pos4 = e.clientY;                                                
+                let newTop = elmnt.offsetTop - pos2;                
+                let newLeft = elmnt.offsetLeft - pos1;
+
+                const maxX = board.clientWidth - elmnt.offsetWidth;                
+                const maxY = board.clientHeight - elmnt.offsetHeight;                                                
+                newLeft = Math.max(0, Math.min(newLeft, maxX));                
+                newTop = Math.max(0, Math.min(newTop, maxY));
+
+                elmnt.style.top = newTop + "px";                
+                elmnt.style.left = newLeft + "px";            }
+
+            function closeDragElement() {                
+                document.onmouseup = null;                
+                document.onmousemove = null;                
+                saveCardsToLocalStorage();            }        }
+
+        function filterCards() {            
+            const keyword = document.getElementById('search-input').value.toLowerCase();            
+            const cards = document.querySelectorAll('.kpt-card');
+
+            cards.forEach(card => {                
+                const text = card.querySelector('.kpt-textarea').value.toLowerCase();                
+                const comments = card.querySelector('.comment-box').textContent.toLowerCase();
+                const badge = card.querySelector('.card-badge').textContent.toLowerCase();
+                if (text.includes(keyword) || comments.includes(keyword) || badge.includes(keyword) || keyword === '') {                    
+                    card.classList.remove('filtered-out');                } else {                    
+                    card.classList.add('filtered-out');                }            });        }
+
+        function exportData() {            
+            const data = localStorage.getItem('kpt_board_data');            
+            if (!data || JSON.parse(data).length === 0) {                
+                alert('No retrospective data to export.');                
+                return;            }            
+            const blob = new Blob([data], { type: 'application/json' });            
+            const url = URL.createObjectURL(blob);            
+            const a = document.createElement('a');            
+            a.href = url;            
+            a.download = 'kpt_retrospective.json';            
+            a.click();            
+            URL.revokeObjectURL(url);        }
+
+        function importData(event) {            
+            const file = event.target.files[0];            
+            if (!file) return;
+
+            const reader = new FileReader();            
+            reader.onload = function(e) {                
+                try {                    
+                    const imported = JSON.parse(e.target.result);                    
+                    if (Array.isArray(imported)) {                        
+                        board.innerHTML = '';                        
+                        localStorage.setItem('kpt_board_data', JSON.stringify(imported));                        
+                        location.reload();                    } else {                        
+                        alert('Invalid file format.');                    }                } catch (err) {                    
+                    alert('Error reading file.');                }            };            
+            reader.readAsText(file);        }
+
+        function saveCardsToLocalStorage() {            
+            const cards = document.querySelectorAll('.kpt-card');            
+            const data = [];            
+            cards.forEach(card => {                
+                const id = card.id;                
+                const left = card.style.left;                
+                const top = card.style.top;                
+                const contentText = card.querySelector('.kpt-textarea').value;
+                const category = card.querySelector('.card-badge').textContent;
+                const zIndex = parseInt(card.style.zIndex) || 1;                                                
+                const transformMatch = card.style.transform.match(/rotate\(([^)]+deg)\)/);                
+                const rotation = transformMatch ? parseFloat(transformMatch[1]) : 0;
+                const className = Array.from(card.classList).find(c => c.startsWith('card-'));
+
+                const commentDivs = card.querySelectorAll('.comment-box > div');
+                const comments = [];
+                commentDivs.forEach(div => {
+                    const parts = div.innerHTML.split(':</b> ');
+                    if (parts.length === 2) {
+                        comments.push({ author: parts[0].replace('<b>', ''), text: parts[1] });
+                    }
+                });
+
+                data.push({ id, left, top, category, contentText, comments, className, rotation, zIndex });            });            
+            localStorage.setItem('kpt_board_data', JSON.stringify(data));        }
+
+        function loadCards() {            
+            const saved = JSON.parse(localStorage.getItem('kpt_board_data'));            
+            if (saved) {                
+                saved.forEach(item => {                    
+                    cardCounter++;                    
+                    createCard(                        
+                        item.className || 'card-green',                        
+                        item.category || 'Keep',
+                        item.contentText || '',                        
+                        item.comments || [],
+                        { left: item.left, top: item.top },                        
+                        item.rotation || 0,                        
+                        item.zIndex || null                    );                });            }        }    
+    </script>
+</body>
+</html>
