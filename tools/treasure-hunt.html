@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compass Treasure Hunt</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                                
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 사이드바 스타일 */
+        .sidebar {                         
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         
+            background: rgba(16, 16, 16, 0.25);                         
+            backdrop-filter: blur(16px);                         
+            -webkit-backdrop-filter: blur(16px);                        
+            padding: 25px 20px; z-index: 1000;                         
+            display: flex; flex-direction: column; gap: 12px;                         
+            border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 24px;                        
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;                 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {                         
+            margin-left: 300px; padding: 40px; flex: 1;                         
+            display: flex; flex-direction: column; height: 100vh;                         
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;                         
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {                         
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        
+            display: flex; align-items: center; justify-content: center; line-height: 1;        
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 게임 상태판 */
+        .status-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .compass-hud {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ff9e40;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+        }
+        .compass-needle {
+            width: 4px;
+            height: 30px;
+            background: #ff5252;
+            position: absolute;
+            transform-origin: bottom center;
+            bottom: 25px;
+            border-radius: 2px;
+            transition: transform 0.1s ease-out;
+        }
+        .game-info {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #ddd;
+            text-align: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .content-card {                         
+            border: 2px solid #ff9e40;                         
+            border-radius: 16px;                         
+            flex: 1;                         
+            display: flex;                         
+            overflow: hidden;                         
+            background-color: #1a1a1a;
+            position: relative;             
+            transition: all 0.3s ease;        
+        }
+
+        /* Fullscreen button style */
+        .fullscreen-btn {                         
+            position: absolute;                         
+            top: 15px;                         
+            right: 15px;                         
+            z-index: 2001;                         
+            background: #202020;                         
+            color: #ff9e40;                         
+            border: 1px solid #ff9e40;                         
+            padding: 6px 14px;                         
+            border-radius: 8px;                         
+            cursor: pointer;                         
+            font-size: 0.8rem;                         
+            font-weight: bold;                         
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         
+            transition: all 0.3s;                 
+        }
+        .fullscreen-btn:hover {                         
+            background: #ff9e40;                         
+            color: #101010;         
+        }
+
+        /* 풀스크린 활성화 시 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 게임 캔버스 영역 */
+        #game-canvas {            
+            width: 100%;            
+            height: 100%;            
+            display: block;
+            background: #121212;
+        }
+
+        #import-file { display: none; }
+
+        /* 4. Theme (Light Mode) */                
+        body.light-mode { background-color: #f5f5f5; color: #202020; }                
+        body.light-mode .sidebar {                         
+            background: rgba(255, 255, 255, 0.85);                         
+            border-color: rgba(243, 128, 32, 0.35);                         
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 
+        }                        
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {                         
+            background: rgba(0, 0, 0, 0.02);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.5);         
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {                         
+            background: rgba(243, 128, 32, 0.15);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.4);         }                        
+        body.light-mode .status-panel { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .game-info { color: #404040; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-card { background-color: #eaeaea; }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {                         
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;                         
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         
+            font-weight: bold; cursor: pointer; color: #ffffff;         
+        }                        
+        @media (max-width: 900px) {                         
+            .menu-toggle-btn { display: block; }                         
+            .sidebar {                                 
+                transform: translateX(-320px);                                 
+                background: #101010 !important;                                 
+                backdrop-filter: none !important;                                
+                -webkit-backdrop-filter: none !important;                                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 
+                z-index: 3000;            
+            }                         
+            body.light-mode .sidebar {                                
+                background: #ffffff !important;                                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             
+            }
+            .sidebar.active { transform: translateX(0); }                         
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }                         
+            .content-card { min-height: 0; height: 100%; }        
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Compass Treasure Hunt</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                                
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+            <!-- 실시간 나침반 HUD 패널 -->
+            <div class="status-panel">
+                <div class="compass-hud">
+                    <div class="compass-needle" id="compass-needle"></div>
+                </div>
+                <div class="game-info" id="distance-text">Distance: --</div>
+            </div>
+
+            <div class="control-group">
+                <button class="menu-btn" onclick="restartGame()">New Game</button>
+            </div>        
+        </aside>
+
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>Compass Treasure Hunt</h1>                
+                <p>Use <b>Arrow Keys</b> or <b>WASD</b> to find the hidden treasure in the dark!</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                <canvas id="game-canvas"></canvas>            
+            </section>        
+        </main>    
+    </div>
+
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const needle = document.getElementById('compass-needle');
+        const distanceText = document.getElementById('distance-text');
+
+        let player = { x: 100, y: 100, size: 20, speed: 4 };
+        let treasure = { x: 500, y: 400, size: 24, found: false };
+        let keys = {};
+
+        window.onload = function() {
+            resizeCanvas();
+            restartGame();
+            requestAnimationFrame(gameLoop);
+        };
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function resizeCanvas() {
+            canvas.width = contentCard.clientWidth;
+            canvas.height = contentCard.clientHeight;
+        }
+
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            fullscreenBtn.textContent = contentCard.classList.contains('fullscreen') ? 'Minimize 🗗' : 'Maximize ⛶';
+            setTimeout(resizeCanvas, 100);
+        };
+
+        function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+        // 모바일에서 사이드바 내부 버튼 클릭 시 자동 닫힘
+        sidebar.querySelectorAll('button').forEach(element => {            
+            element.addEventListener('click', () => {                
+                if (window.innerWidth <= 900) {                    
+                    sidebar.classList.remove('active');                
+                }            });        
+        });
+
+        // 모바일에서 사이드바 바깥쪽(메인 콘텐츠 영역) 클릭 시 닫힘
+        mainContent.addEventListener('click', () => {             
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+                sidebar.classList.remove('active');             
+            }         
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+        function restartGame() {
+            treasure.x = Math.random() * (canvas.width - 100) + 50;
+            treasure.y = Math.random() * (canvas.height - 100) + 50;
+            player.x = 80;
+            player.y = 80;
+            treasure.found = false;
+        }
+
+        function update() {
+            if (treasure.found) return;
+
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) player.y -= player.speed;
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) player.y += player.speed;
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.x -= player.speed;
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) player.x += player.speed;
+
+            // 캔버스 벽 처리
+            player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
+            player.y = Math.max(player.size, Math.min(canvas.height - player.size, player.y));
+
+            // 거리 및 나침반 각도 계산
+            let dx = treasure.x - player.x;
+            let dy = treasure.y - player.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+
+            needle.style.transform = `rotate(${angle}deg)`;
+            distanceText.textContent = `Distance: ${Math.round(distance)}m`;
+
+            // 보물 찾기 판정
+            if (distance < 25) {
+                treasure.found = true;
+                alert('🎉 축하합니다! 숨겨진 보물을 찾았습니다!');
+                restartGame();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 플레이어 그리기
+            ctx.fillStyle = '#ff9e40';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 안개(Dark Fog) 효과 - 플레이어 주변만 밝게 뚫어줌
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.95)';
+            if (document.body.classList.contains('light-mode')) {
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.95)';
+            }
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.globalCompositeOperation = 'destination-out';
+            let gradient = ctx.createRadialGradient(player.x, player.y, 20, player.x, player.y, 140);
+            gradient.addColorStop(0, 'rgba(0,0,0,1)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 140, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // 보물 아이콘 표시 (안개 범위 내에 들어오면 살짝 보임)
+            let dx = treasure.x - player.x;
+            let dy = treasure.y - player.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 130) {
+                ctx.font = '24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🎁', treasure.x, treasure.y);
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+</html>
