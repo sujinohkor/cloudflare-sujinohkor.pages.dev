@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Board</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 사이드바 스타일 */
+        .sidebar {             
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
+            background: rgba(16, 16, 16, 0.25);             
+            backdrop-filter: blur(16px);             
+            -webkit-backdrop-filter: blur(16px);            
+            padding: 25px 20px; z-index: 1000;             
+            display: flex; flex-direction: column; gap: 12px;             
+            border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 24px;            
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
+            transition: transform 0.3s ease, opacity 0.3s ease;         
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {             
+            margin-left: 300px; padding: 40px; flex: 1;             
+            display: flex; flex-direction: column; height: 100vh;             
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;             
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {             
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;            
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;            
+            display: flex; align-items: center; justify-content: center; line-height: 1;        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 픽셀 팔레트 선택 버튼 그룹 */
+        .palette-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        .color-dot-btn { border: 2px solid rgba(255,255,255,0.3); }
+        .color-dot-btn.active { border-color: #ffffff !important; transform: scale(1.05); }
+
+        .btn-orange { color: #ff9e40 !important; border-color: rgba(255, 158, 64, 0.5) !important; }
+        .btn-orange:hover { background: #ff9e40 !important; color: #101010 !important; }
+        .btn-pink { color: #f8bbd0 !important; border-color: rgba(248, 187, 208, 0.5) !important; }
+        .btn-pink:hover { background: #f8bbd0 !important; color: #101010 !important; }
+        .btn-green { color: #c8e6c9 !important; border-color: rgba(200, 230, 201, 0.5) !important; }
+        .btn-green:hover { background: #c8e6c9 !important; color: #101010 !important; }
+        .btn-blue { color: #bbdefb !important; border-color: rgba(187, 222, 251, 0.5) !important; }
+        .btn-blue:hover { background: #bbdefb !important; color: #101010 !important; }
+
+        .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
+
+        .content-card {             
+            border: 2px solid #ff9e40;             
+            border-radius: 16px;             
+            flex: 1;             
+            display: flex;             
+            overflow: hidden;             
+            background-color: #151515;
+            position: relative;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* 풀스크린 버튼 */
+        .fullscreen-btn {             
+            position: absolute; top: 15px; right: 15px; z-index: 10;             
+            background: #202020; color: #ff9e40; border: 1px solid #ff9e40;             
+            padding: 6px 14px; border-radius: 8px; cursor: pointer;             
+            font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
+            transition: all 0.3s;         
+        }
+        .fullscreen-btn:hover { background: #ff9e40; color: #101010; }
+
+        /* 풀스크린 활성화 시: 사이드바 숨김 & 메인 영역 전체 확장 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            border: none !important;
+            border-radius: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+        }
+
+        /* 1px 정밀 캔버스 */
+        #pixel-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+            background: #1a1a1a;
+        }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.8); border-color: rgba(243, 128, 32, 0.35); }
+        body.light-mode .menu-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; }
+        body.light-mode .content-card { background-color: #f4f4f4; }
+        body.light-mode #pixel-canvas { background: #ffffff; }
+
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+
+        @media (max-width: 900px) {             
+            .menu-toggle-btn { display: block; }             
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                z-index: 3000; 
+            }
+            .sidebar.active { transform: translateX(0); }             
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; }             
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Pixel Board</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                    
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+                
+            <div class="palette-group">
+                <button class="menu-btn color-dot-btn btn-orange active" onclick="selectColor('#ff9e40', this)">Orange</button>
+                <button class="menu-btn color-dot-btn btn-pink" onclick="selectColor('#f8bbd0', this)">Pink</button>
+                <button class="menu-btn color-dot-btn btn-green" onclick="selectColor('#c8e6c9', this)">Green</button>
+                <button class="menu-btn color-dot-btn btn-blue" onclick="selectColor('#bbdefb', this)">Blue</button>
+            </div>
+
+            <div class="bottom-btns">                
+                <button class="menu-btn" onclick="clearCanvas()">Clear Canvas</button>
+                <button class="menu-btn" onclick="exportPixelArt()">Export PNG</button>
+            </div>        
+        </aside>
+
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>Pixel Board</h1>                
+                <p>Draw precisely with 1px x 1px precision</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                <canvas id="pixel-canvas"></canvas>            
+            </section>        
+        </main>    
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const canvas = document.getElementById('pixel-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let currentColor = '#ff9e40';
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        const PIXEL_SIZE = 1; // 1px x 1px 정밀 드로잉
+
+        window.onload = function() {
+            initCanvasSize();
+            loadCanvas();
+        };
+
+        function initCanvasSize() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.imageSmoothingEnabled = false;
+        }
+
+        window.addEventListener('resize', () => {
+            const tempURL = canvas.toDataURL();
+            initCanvasSize();
+            const img = new Image();
+            img.onload = () => ctx.drawImage(img, 0, 0);
+            img.src = tempURL;
+        });
+
+        // 1px 정밀 드로잉 이벤트
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = Math.floor(e.clientX - rect.left);
+            lastY = Math.floor(e.clientY - rect.top);
+            drawPixel(lastX, lastY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor(e.clientX - rect.left);
+            const y = Math.floor(e.clientY - rect.top);
+            
+            drawLine(lastX, lastY, x, y);
+            lastX = x;
+            lastY = y;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDrawing) {
+                isDrawing = false;
+                saveCanvas();
+            }
+        });
+
+        // 모바일 터치 지원
+        canvas.addEventListener('touchstart', (e) => {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            lastX = Math.floor(touch.clientX - rect.left);
+            lastY = Math.floor(touch.clientY - rect.top);
+            drawPixel(lastX, lastY);
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = Math.floor(touch.clientX - rect.left);
+            const y = Math.floor(touch.clientY - rect.top);
+            
+            drawLine(lastX, lastY, x, y);
+            lastX = x;
+            lastY = y;
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('touchend', () => {
+            if (isDrawing) {
+                isDrawing = false;
+                saveCanvas();
+            }
+        });
+
+        function drawPixel(x, y) {
+            ctx.fillStyle = currentColor;
+            ctx.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
+        }
+
+        function drawLine(x0, y0, x1, y1) {
+            const dx = Math.abs(x1 - x0);
+            const dy = Math.abs(y1 - y0);
+            const sx = (x0 < x1) ? 1 : -1;
+            const sy = (y0 < y1) ? 1 : -1;
+            let err = dx - dy;
+
+            while (true) {
+                drawPixel(x0, y0);
+                if (x0 === x1 && y0 === y1) break;
+                const e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x0 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        function selectColor(color, btn) {
+            currentColor = color;
+            document.querySelectorAll('.color-dot-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        }
+
+        function toggleFullscreen() {            
+            document.body.classList.toggle('is-fullscreen');
+            const isFull = document.body.classList.contains('is-fullscreen');
+            fullscreenBtn.textContent = isFull ? 'Minimize 🗗' : 'Maximize ⛶';
+            
+            setTimeout(() => {
+                const tempURL = canvas.toDataURL();
+                initCanvasSize();
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.src = tempURL;
+            }, 300);
+        }
+
+        function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+        // 모바일에서 사이드바 내부의 모든 버튼(테마 토글 포함)을 누를 때 사이드바 자동 닫힘
+        sidebar.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        function clearCanvas() {
+            if (confirm('Clear the canvas?')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                localStorage.removeItem('pixel_paint_data');
+            }
+        }
+
+        function saveCanvas() {
+            localStorage.setItem('pixel_paint_data', canvas.toDataURL());
+        }
+
+        function loadCanvas() {
+            const saved = localStorage.getItem('pixel_paint_data');
+            if (saved) {
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.src = saved;
+            }
+        }
+
+        function exportPixelArt() {
+            const link = document.createElement('a');
+            link.download = 'pixel_art.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
