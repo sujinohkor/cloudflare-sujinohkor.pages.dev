@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Canvas</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                                
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 사이드바 스타일 */
+        .sidebar {                         
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         
+            background: rgba(16, 16, 16, 0.25);                         
+            backdrop-filter: blur(16px);                         
+            -webkit-backdrop-filter: blur(16px);                        
+            padding: 25px 20px; z-index: 1000;                         
+            display: flex; flex-direction: column; gap: 12px;                         
+            border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 24px;                        
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;                 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {                         
+            margin-left: 300px; padding: 40px; flex: 1;                         
+            display: flex; flex-direction: column; height: 100vh;                         
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;                         
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {                         
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        
+            display: flex; align-items: center; justify-content: center; line-height: 1;        
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .search-container { margin-bottom: 10px; }
+        .search-input {            
+            width: 100%;            
+            padding: 11px 14px;             
+            background: rgba(255, 255, 255, 0.03);            
+            color: #fff;            
+            border: 1px solid rgba(255, 158, 64, 0.35);            
+            border-radius: 50px;            
+            outline: none;            
+            text-align: center;            
+            font-size: 0.85rem;            
+            font-weight: bold;        
+        }
+        .search-input::placeholder { color: #888; }
+
+        /* 추천 이모지 8개 그리드 */
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .emoji-select-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 12px;
+            padding: 8px 0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .emoji-select-btn:hover {
+            background: rgba(255, 158, 64, 0.2);
+            border-color: #ff9e40;
+            transform: scale(1.05);
+        }
+
+        /* 하단 유틸리티 버튼 그룹 */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .control-group .menu-btn {
+            margin-bottom: 0;
+        }
+
+        .content-card {                         
+            border: 2px solid #ff9e40;                         
+            border-radius: 16px;                         
+            flex: 1;                         
+            display: flex;                         
+            overflow: hidden;                         
+            background-color: #1a1a1a;
+            position: relative;             
+            transition: all 0.3s ease;        
+        }
+
+        /* Fullscreen button style */
+        .fullscreen-btn {                         
+            position: absolute;                         
+            top: 15px;                         
+            right: 15px;                         
+            z-index: 2001;                         
+            background: #202020;                         
+            color: #ff9e40;                         
+            border: 1px solid #ff9e40;                         
+            padding: 6px 14px;                         
+            border-radius: 8px;                         
+            cursor: pointer;                         
+            font-size: 0.8rem;                         
+            font-weight: bold;                         
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         
+            transition: all 0.3s;                 
+        }
+        .fullscreen-btn:hover {                         
+            background: #ff9e40;                         
+            color: #101010;         
+        }
+
+        /* 풀스크린 활성화 시 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 캔버스 보드 영역 */
+        #board {            
+            width: 100%;            
+            height: 100%;            
+            position: relative;            
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* 배치된 아이템 스티커 스타일 */
+        .canvas-emoji {            
+            position: absolute;            
+            cursor: grab;            
+            user-select: none;            
+            z-index: 1;            
+            display: inline-flex;            
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+            padding: 8px;
+        }                
+        .canvas-emoji:active {            
+            cursor: grabbing;        
+        }
+        .canvas-emoji.filtered-out {            
+            opacity: 0.2;            
+            pointer-events: none;        }
+
+        /* 삭제 버튼 */
+        .emoji-actions {            
+            position: absolute;            
+            top: -10px;            
+            right: -10px;            
+            display: none;            
+            background: rgba(0,0,0,0.7);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            z-index: 10;
+        }
+        .canvas-emoji:hover .emoji-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-mini-btn {
+            background: none;
+            border: none;
+            color: #ff5252;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 22px;
+            height: 22px;
+            line-height: 20px;
+            text-align: center;
+        }
+        .delete-mini-btn:hover { color: #ff1744; }
+
+        #import-file { display: none; }
+
+        /* 4. Theme (Light Mode) */                
+        body.light-mode { background-color: #f5f5f5; color: #202020; }                
+        body.light-mode .sidebar {                         
+            background: rgba(255, 255, 255, 0.85);                         
+            border-color: rgba(243, 128, 32, 0.35);                         
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 
+        }                        
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn, body.light-mode .emoji-select-btn {                         
+            background: rgba(0, 0, 0, 0.02);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.5);         
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover, body.light-mode .emoji-select-btn:hover {                         
+            background: rgba(243, 128, 32, 0.15);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.4);         }                        
+        body.light-mode .search-input {            
+            background: rgba(0, 0, 0, 0.02);            
+            color: #202020;            
+            border-color: rgba(243, 128, 32, 0.5);        }
+        body.light-mode .search-input::placeholder { color: #888; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-card { background-color: #ffffff; }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {                         
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;                         
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         
+            font-weight: bold; cursor: pointer; color: #ffffff;         
+        }                        
+        @media (max-width: 900px) {                         
+            .menu-toggle-btn { display: block; }                         
+            .sidebar {                                 
+                transform: translateX(-320px);                                 
+                background: #101010 !important;                                 
+                backdrop-filter: none !important;                                
+                -webkit-backdrop-filter: none !important;                                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 
+                z-index: 3000;            
+            }                         
+            body.light-mode .sidebar {                                
+                background: #ffffff !important;                                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             
+            }
+            .sidebar.active { transform: translateX(0); }                         
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }                         
+            .content-card { min-height: 0; height: 100%; }        
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Emoji Canvas</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                                
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+            <!-- 1. 검색창 -->
+            <div class="search-container">                
+                <input type="text" id="search-input" class="search-input" placeholder="Search canvas items..." oninput="filterEmojis()">            
+            </div>
+
+            <!-- 2. 추천 이모지 8개 -->
+            <div class="emoji-grid">
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('🎨')">🎨</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('✨')">✨</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('👾')">👾</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('🚀')">🚀</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('🔥')">🔥</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('⭐')">⭐</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('💻')">💻</button>
+                <button class="emoji-select-btn" onclick="addEmojiFromPreset('❤️')">❤️</button>
+            </div>
+
+            <!-- 3. Export / Import / Reset 버튼 -->
+            <div class="control-group">
+                <button class="menu-btn" onclick="exportData()" title="Export JSON">Export JSON</button>
+                <button class="menu-btn" onclick="document.getElementById('import-file').click()" title="Import JSON">Import</button>
+                <input type="file" id="import-file" accept=".json" onchange="importData(event)">
+                <button class="menu-btn" onclick="deleteAllEmojis()" title="Reset Canvas">Reset Canvas</button>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>Emoji Canvas</h1>                
+                <p>Click board to write • **Scroll** to resize • **Right-click drag** to rotate</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                <div id="board">                    
+                    <!-- Canvas items area -->                
+                </div>            
+            </section>        
+        </main>    
+    </div>
+
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const board = document.getElementById('board');
+        let emojiCounter = 0;
+        let highestZIndex = 10;
+
+        window.onload = function() {            
+            loadEmojis();        
+        };
+
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {                
+                fullscreenBtn.textContent = 'Minimize 🗗';            
+            } else {                
+                fullscreenBtn.textContent = 'Maximize ⛶';            
+            }        
+        };
+
+        function toggleSidebar() {             
+            sidebar.classList.toggle('active');         
+        }
+
+        sidebar.querySelectorAll('button').forEach(element => {            
+            element.addEventListener('click', () => {                
+                if (window.innerWidth <= 900) {                    
+                    if (element.id === 'import-file') return;                    
+                    sidebar.classList.remove('active');                
+                }            });        
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        mainContent.addEventListener('click', (e) => {             
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+                sidebar.classList.remove('active');             
+            }         
+        });
+
+        function addEmojiFromPreset(char) {
+            const startX = board.clientWidth / 2 - 25;
+            const startY = board.clientHeight / 2 - 25;
+            addEmoji(char, { left: `${Math.max(0, startX)}px`, top: `${Math.max(0, startY)}px` });
+            if (window.innerWidth <= 900) sidebar.classList.remove('active');
+        }
+
+        board.addEventListener('click', (e) => {
+            if (e.target !== board) return;
+
+            const text = prompt('Enter text or emoji:');
+            if (!text || text.trim() === '') return;
+
+            const rect = board.getBoundingClientRect();
+            const left = e.clientX - rect.left - 20;
+            const top = e.clientY - rect.top - 20;
+
+            addEmoji(text.trim(), { left: `${Math.max(0, left)}px`, top: `${Math.max(0, top)}px` });
+        });
+
+        function bringToFront(el) {            
+            highestZIndex++;            
+            el.style.zIndex = highestZIndex;            
+            saveEmojisToLocalStorage();        
+        }
+
+        function addEmoji(char, position = null, size = 48, rotation = 0, zIndex = null) {            
+            emojiCounter++;            
+            const emojiId = 'emoji-' + emojiCounter;                                    
+            const el = document.createElement('div');            
+            el.className = 'canvas-emoji';            
+            el.id = emojiId;            
+            el.style.fontSize = size + 'px';
+            el.innerHTML = char;
+
+            if (zIndex !== null) {                
+                el.style.zIndex = zIndex;                
+                if (zIndex > highestZIndex) highestZIndex = zIndex;            
+            } else {                
+                highestZIndex++;                
+                el.style.zIndex = highestZIndex;            
+            }
+
+            el.style.transform = `rotate(${rotation}deg)`;
+
+            if (!position) {                
+                const startX = board.clientWidth / 2 - 25;                
+                const startY = board.clientHeight / 2 - 25;                
+                el.style.left = `${Math.max(0, startX)}px`;                
+                el.style.top = `${Math.max(0, startY)}px`;            } else {                
+                el.style.left = position.left;                
+                el.style.top = position.top;            }
+
+            const actions = document.createElement('div');
+            actions.className = 'emoji-actions';
+            actions.innerHTML = `<button class="delete-mini-btn" onclick="deleteEmoji('${emojiId}')" title="Delete">×</button>`;
+            el.appendChild(actions);
+
+            el.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                bringToFront(el);
+            });
+
+            el.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                bringToFront(el);
+                let currentSize = parseInt(el.style.fontSize) || 48;
+                let delta = e.deltaY < 0 ? 4 : -4;
+                let newSize = Math.max(16, Math.min(200, currentSize + delta));
+                el.style.fontSize = newSize + 'px';
+                saveEmojisToLocalStorage();
+            }, { passive: false });
+
+            el.addEventListener('mousedown', (e) => {
+                if (e.button === 2) { 
+                    e.preventDefault();
+                    e.stopPropagation();
+                    bringToFront(el);
+
+                    const startX = e.clientX;
+                    const transformMatch = el.style.transform.match(/rotate\(([^)]+deg)\)/);
+                    let currentRot = transformMatch ? parseFloat(transformMatch[1]) : rotation;
+
+                    function onMouseMove(moveEvent) {
+                        const diffX = moveEvent.clientX - startX;
+                        let newRot = currentRot + diffX;
+                        el.style.transform = `rotate(${newRot}deg)`;
+                    }
+
+                    function onMouseUp() {
+                        window.removeEventListener('mousemove', onMouseMove);
+                        window.removeEventListener('mouseup', onMouseUp);
+                        saveEmojisToLocalStorage();
+                    }
+
+                    window.addEventListener('mousemove', onMouseMove);
+                    window.addEventListener('mouseup', onMouseUp);
+                    return;
+                }
+            });
+
+            initDragElement(el);            
+            board.appendChild(el);            
+            saveEmojisToLocalStorage();        
+        }
+
+        function deleteEmoji(emojiId) {            
+            const el = document.getElementById(emojiId);            
+            if (el) {                
+                board.removeChild(el);                
+                saveEmojisToLocalStorage();            }        }
+
+        function deleteAllEmojis() {            
+            if (confirm('Clear all canvas items?')) {                
+                board.innerHTML = '';                
+                localStorage.removeItem('emoji_canvas_data');            }        }
+
+        board.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        function initDragElement(elmnt) {            
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;                                    
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {                
+                if (e.button !== 0) return; 
+                if (e.target.tagName.toLowerCase() === 'button') return;
+
+                e.preventDefault();                
+                pos3 = e.clientX;                
+                pos4 = e.clientY;
+
+                document.onmouseup = closeDragElement;                
+                document.onmousemove = elementDrag;                                                
+                bringToFront(elmnt);            }
+
+            function elementDrag(e) {                
+                e.preventDefault();                
+                pos1 = pos3 - e.clientX;                
+                pos2 = pos4 - e.clientY;                
+                pos3 = e.clientX;                
+                pos4 = e.clientY;                                                
+                let newTop = elmnt.offsetTop - pos2;                
+                let newLeft = elmnt.offsetLeft - pos1;
+
+                const maxX = board.clientWidth - elmnt.offsetWidth;                
+                const maxY = board.clientHeight - elmnt.offsetHeight;                                                
+                newLeft = Math.max(0, Math.min(newLeft, maxX));                
+                newTop = Math.max(0, Math.min(newTop, maxY));
+
+                elmnt.style.top = newTop + "px";                
+                elmnt.style.left = newLeft + "px";            }
+
+            function closeDragElement() {                
+                document.onmouseup = null;                
+                document.onmousemove = null;                
+                saveEmojisToLocalStorage();            }        }
+
+        function filterEmojis() {            
+            const keyword = document.getElementById('search-input').value.toLowerCase();            
+            const items = document.querySelectorAll('.canvas-emoji');
+
+            items.forEach(item => {                
+                const text = item.textContent || '';                
+                if (text.toLowerCase().includes(keyword) || keyword === '') {                    
+                    item.classList.remove('filtered-out');                } else {                    
+                    item.classList.add('filtered-out');                }            });        }
+
+        function exportData() {            
+            const data = localStorage.getItem('emoji_canvas_data');            
+            if (!data || JSON.parse(data).length === 0) {                
+                alert('No items to export.');                
+                return;            }            
+            const blob = new Blob([data], { type: 'application/json' });            
+            const url = URL.createObjectURL(blob);            
+            const a = document.createElement('a');            
+            a.href = url;            
+            a.download = 'emoji_canvas.json';            
+            a.click();            
+            URL.revokeObjectURL(url);        }
+
+        function importData(event) {            
+            const file = event.target.files[0];            
+            if (!file) return;
+
+            const reader = new FileReader();            
+            reader.onload = function(e) {                
+                try {                    
+                    const imported = JSON.parse(e.target.result);                    
+                    if (Array.isArray(imported)) {                        
+                        board.innerHTML = '';                        
+                        localStorage.setItem('emoji_canvas_data', JSON.stringify(imported));                        
+                        location.reload();                    } else {                        
+                        alert('Invalid file format.');                    }                } catch (err) {                    
+                    alert('Error reading file.');                }            };            
+            reader.readAsText(file);        }
+
+        function saveEmojisToLocalStorage() {            
+            const items = document.querySelectorAll('.canvas-emoji');            
+            const data = [];            
+            items.forEach(el => {                
+                const id = el.id;                
+                const left = el.style.left;                
+                const top = el.style.top;                
+                const char = el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild.nodeValue.trim() : (el.innerText || '').replace(/×/g, '').trim();
+                const size = parseInt(el.style.fontSize) || 48;                
+                const zIndex = parseInt(el.style.zIndex) || 1;                                                
+                const transformMatch = el.style.transform.match(/rotate\(([^)]+deg)\)/);                
+                const rotation = transformMatch ? parseFloat(transformMatch[1]) : 0;
+
+                data.push({ id, left, top, char, size, rotation, zIndex });            });            
+            localStorage.setItem('emoji_canvas_data', JSON.stringify(data));        }
+
+        function loadEmojis() {            
+            const saved = JSON.parse(localStorage.getItem('emoji_canvas_data'));            
+            if (saved) {                
+                saved.forEach(item => {                    
+                    emojiCounter++;                    
+                    addEmoji(                        
+                        item.char || '✨',                        
+                        { left: item.left, top: item.top },                        
+                        item.size || 48,                        
+                        item.rotation || 0,                        
+                        item.zIndex || null                    );                });            }        }    
+    </script>
+</body>
+</html>
