@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Detect Code Formatter</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .content-card {
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            gap: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .content-card h3 {
+            font-size: 1.1rem;
+            color: #ff9e40;
+            border-bottom: 1px solid rgba(255, 158, 64, 0.2);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+        
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+            line-height: 1.4;
+        }
+        textarea:focus {
+            border-color: rgba(255, 158, 64, 0.8);
+        }
+        textarea[readonly] {
+            background: rgba(255, 255, 255, 0.01);
+            color: #aaa;
+            cursor: default;
+        }
+
+        .detected-badge {
+            background: rgba(255, 158, 64, 0.15);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            background: rgba(255, 158, 64, 0.1);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 158, 64, 0.25);
+            border-color: rgba(255, 158, 64, 0.7);
+        }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.3); border-color: rgba(243, 128, 32, 0.35); }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; }
+        body.light-mode .content-card { background: rgba(255, 255, 255, 0.5); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode textarea { background: #fff; color: #000; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode textarea[readonly] { background: rgba(0, 0, 0, 0.02); color: #666; }
+        body.light-mode .input-group label { color: #666; }
+        body.light-mode .detected-badge { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .copy-btn { background: rgba(243, 128, 32, 0.1); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+
+        /* Mobile */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { transform: translateX(-320px); background: #101010 !important; }
+            body.light-mode .sidebar { background: #ffffff !important; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; }
+            .cards-container { grid-template-columns: 1fr; }
+            .content-card { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Code Formatter</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <button class="menu-btn" onclick="resetAll()">Reset</button>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Auto-Detect Code Formatter</h1>
+                <p>Paste any code and it will automatically detect and format it.</p>
+            </header>
+
+            <div class="cards-container">
+                <!-- 입력 카드 -->
+                <section class="content-card">
+                    <h3>
+                        <span>Input Code</span>
+                        <span id="detected-lang" class="detected-badge">Auto</span>
+                    </h3>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label>Paste raw code here</label>
+                            <textarea id="code-input" placeholder="Paste JSON, HTML, XML, CSS, or JS..." oninput="autoDetectAndFormat()"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 결과 카드 -->
+                <section class="content-card">
+                    <h3>
+                        <span>Formatted Output</span>
+                        <button class="copy-btn" onclick="copyOutput()">Copy</button>
+                    </h3>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label>Result</label>
+                            <textarea id="code-output" readonly placeholder="Formatted result will appear here..."></textarea>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        sidebar.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 900) sidebar.classList.remove('active');
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+
+        mainContent.addEventListener('click', () => {
+            if (sidebar.classList.contains('active')) sidebar.classList.remove('active');
+        });
+
+        function copyOutput() {
+            const output = document.getElementById('code-output');
+            if (!output.value) {
+                alert('No text to copy.');
+                return;
+            }
+            navigator.clipboard.writeText(output.value).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function autoDetectAndFormat() {
+            const raw = document.getElementById('code-input').value.trim();
+            const output = document.getElementById('code-output');
+            const badge = document.getElementById('detected-lang');
+
+            if (!raw) {
+                output.value = '';
+                badge.textContent = 'Auto';
+                return;
+            }
+
+            const detected = detectLanguage(raw);
+            badge.textContent = detected.toUpperCase();
+
+            try {
+                if (detected === 'json') {
+                    const parsed = JSON.parse(raw);
+                    output.value = JSON.stringify(parsed, null, 4);
+                } 
+                else if (detected === 'html' || detected === 'xml') {
+                    output.value = formatHtmlXml(raw);
+                }
+                else if (detected === 'css') {
+                    output.value = formatCss(raw);
+                }
+                else if (detected === 'js') {
+                    output.value = formatJs(raw);
+                } else {
+                    output.value = raw;
+                }
+            } catch (e) {
+                output.value = 'Formatting Error: Invalid syntax.\n(' + e.message + ')';
+            }
+        }
+
+        function detectLanguage(text) {
+            const trimmed = text.trim();
+
+            if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+                try {
+                    JSON.parse(trimmed);
+                    return 'json';
+                } catch (e) {}
+            }
+
+            if (trimmed.startsWith('<?xml') || (trimmed.startsWith('<') && trimmed.endsWith('>'))) {
+                if (trimmed.includes('</') || trimmed.includes('/>')) {
+                    if (trimmed.toLowerCase().includes('html') || trimmed.includes('<!DOCTYPE html>')) {
+                        return 'html';
+                    }
+                    return 'xml';
+                }
+            }
+
+            if (trimmed.toLowerCase().includes('<html') || trimmed.toLowerCase().includes('<!doctype') || (trimmed.startsWith('<') && trimmed.includes('>'))) {
+                return 'html';
+            }
+
+            if (/[\w\-\.#]+\s*\{[^}]*[\w\-]+\s*:\s*[^;]+;/.test(trimmed)) {
+                return 'css';
+            }
+
+            if (/(function|const|let|var|console|return|if\s*\(|=>)/.test(trimmed) || trimmed.includes(';') || trimmed.includes('{')) {
+                return 'js';
+            }
+
+            return 'unknown';
+        }
+
+        function formatHtmlXml(html) {
+            let formatted = '';
+            let indent = '';
+            const tab = '    ';
+            html.split(/>\s*</).forEach(node => {
+                if (node.match(/^\/\w/)) {
+                    indent = indent.substring(tab.length);
+                }
+                formatted += indent + '<' + node + '>\r\n';
+                if (node.match(/^<?\w[^>]*[^\/]$/) && !node.startsWith('!--')) {
+                    indent += tab;
+                }
+            });
+            return formatted.substring(1, formatted.length - 3);
+        }
+
+        function formatCss(css) {
+            return css.replace(/\s+/g, ' ')
+                      .replace(/\s*\{\s*/g, ' {\n    ')
+                      .replace(/\s*;\s*/g, ';\n    ')
+                      .replace(/\s*\}\s*/g, '\n}\n\n')
+                      .trim();
+        }
+
+        function formatJs(js) {
+            let indent = 0;
+            let formatted = '';
+            for (let i = 0; i < js.length; i++) {
+                let char = js[i];
+                if (char === '{') {
+                    indent++;
+                    formatted += ' {\n' + '    '.repeat(indent);
+                } else if (char === '}') {
+                    indent = Math.max(0, indent - 1);
+                    formatted += '\n' + '    '.repeat(indent) + '}';
+                } else if (char === ';') {
+                    formatted += ';\n' + '    '.repeat(indent);
+                } else {
+                    formatted += char;
+                }
+            }
+            return formatted.replace(/\n\s*\n/g, '\n').trim();
+        }
+
+        function resetAll() {
+            document.getElementById('code-input').value = '';
+            document.getElementById('code-output').value = '';
+            document.getElementById('detected-lang').textContent = 'Auto';
+        }
+    </script>
+</body>
+</html>
