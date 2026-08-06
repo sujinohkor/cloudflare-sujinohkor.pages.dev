@@ -128,6 +128,8 @@
         body.light-mode .menu-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; }
         body.light-mode .content-card { background-color: #f4f4f4; }
         body.light-mode #pixel-canvas { background: #ffffff; }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
 
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
 
@@ -137,6 +139,9 @@
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 z-index: 3000; 
+            }
+            body.light-mode .sidebar {
+                background: #ffffff !important;
             }
             .sidebar.active { transform: translateX(0); }             
             .main-content { margin-left: 0; padding: 20px; width: 100vw; }             
