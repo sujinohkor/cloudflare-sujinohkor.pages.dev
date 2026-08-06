@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Solitaire</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                                
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 사이드바 스타일 */
+        .sidebar {                         
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         
+            background: rgba(16, 16, 16, 0.25);                         
+            backdrop-filter: blur(16px);                         
+            -webkit-backdrop-filter: blur(16px);                        
+            padding: 25px 20px; z-index: 1000;                         
+            display: flex; flex-direction: column; gap: 12px;                         
+            border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 24px;                        
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;                 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {                         
+            margin-left: 300px; padding: 40px; flex: 1;                         
+            display: flex; flex-direction: column; height: 100vh;                         
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;                         
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {                         
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        
+            display: flex; align-items: center; justify-content: center; line-height: 1;        
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 게임 스코어/상태 패널 */
+        .status-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #ddd;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .content-card {                         
+            border: 2px solid #ff9e40;                         
+            border-radius: 16px;                         
+            flex: 1;                         
+            display: flex;                         
+            overflow: hidden;                         
+            background-color: #0d4a22;
+            position: relative;             
+            transition: all 0.3s ease;        
+        }
+
+        /* Fullscreen button style */
+        .fullscreen-btn {                         
+            position: absolute;                         
+            top: 15px;                         
+            right: 15px;                         
+            z-index: 2001;                         
+            background: #202020;                         
+            color: #ff9e40;                         
+            border: 1px solid #ff9e40;                         
+            padding: 6px 14px;                         
+            border-radius: 8px;                         
+            cursor: pointer;                         
+            font-size: 0.8rem;                         
+            font-weight: bold;                         
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         
+            transition: all 0.3s;                 
+        }
+        .fullscreen-btn:hover {                         
+            background: #ff9e40;                         
+            color: #101010;         
+        }
+
+        /* 풀스크린 활성화 시 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 게임 보드 영역 */
+        #game-board {            
+            width: 100%;            
+            height: 100%;            
+            position: relative;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow: auto;
+        }
+
+        .solitaire-top-row, .solitaire-tableau {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* 카드 기본 스타일 */
+        .card {
+            width: 65px;
+            height: 95px;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            user-select: none;
+            cursor: grab;
+            position: relative;
+        }
+        .card:active { cursor: grabbing; }
+        .card.red { color: #d32f2f; }
+        .card.black { color: #212121; }
+        .card.back {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            border-color: #90caf9;
+            cursor: pointer;
+        }
+        .card.slot {
+            background: rgba(0, 0, 0, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .tableau-pile {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 250px;
+            width: 65px;
+        }
+        .tableau-pile .card {
+            position: absolute;
+        }
+
+        #import-file { display: none; }
+
+        /* 4. Theme (Light Mode) */                
+        body.light-mode { background-color: #f5f5f5; color: #202020; }                
+        body.light-mode .sidebar {                         
+            background: rgba(255, 255, 255, 0.85);                         
+            border-color: rgba(243, 128, 32, 0.35);                         
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 
+        }                        
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {                         
+            background: rgba(0, 0, 0, 0.02);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.5);         
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {                         
+            background: rgba(243, 128, 32, 0.15);                         
+            color: #F38020;                         
+            border-color: rgba(243, 128, 32, 0.4);         }                        
+        body.light-mode .status-panel { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.5); color: #404040; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-card { background-color: #1b5e20; }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {                         
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;                         
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         
+            font-weight: bold; cursor: pointer; color: #ffffff;         
+        }                        
+        @media (max-width: 900px) {                         
+            .menu-toggle-btn { display: block; }                         
+            .sidebar {                                 
+                transform: translateX(-320px);                                 
+                background: #101010 !important;                                 
+                backdrop-filter: none !important;                                
+                -webkit-backdrop-filter: none !important;                                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 
+                z-index: 3000;            
+            }                         
+            body.light-mode .sidebar {                                
+                background: #ffffff !important;                                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             
+            }
+            .sidebar.active { transform: translateX(0); }                         
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }                         
+            .content-card { min-height: 0; height: 100%; }        
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Windows Solitaire</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                                
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+            <!-- 게임 상태 패널 -->
+            <div class="status-panel">
+                <div>Score: <span id="score-val">0</span></div>
+                <div>Time: <span id="time-val">0s</span></div>
+            </div>
+
+            <div class="control-group">
+                <button class="menu-btn" onclick="startNewGame()">New Game</button>
+            </div>        
+        </aside>
+
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>Windows Solitaire</h1>                
+                <p>Drag and drop cards to stack them correctly!</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                <div id="game-board">
+                    <div class="solitaire-top-row" id="top-row"></div>
+                    <div class="solitaire-tableau" id="tableau-row"></div>
+                </div>            
+            </section>        
+        </main>    
+    </div>
+
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const topRow = document.getElementById('top-row');
+        const tableauRow = document.getElementById('tableau-row');
+
+        let score = 0;
+        let seconds = 0;
+        let timerInterval = null;
+
+        const suits = ['♠', '♣', '♥', '♦'];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        let deck = [];
+        let tableau = [[], [], [], [], [], [], []];
+        let foundations = [[], [], [], []];
+        let stock = [];
+        let waste = [];
+
+        window.onload = function() {
+            startNewGame();
+        };
+
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            fullscreenBtn.textContent = contentCard.classList.contains('fullscreen') ? 'Minimize 🗗' : 'Maximize ⛶';
+        };
+
+        function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+        sidebar.querySelectorAll('button').forEach(element => {            
+            element.addEventListener('click', () => {                
+                if (window.innerWidth <= 900) {                    
+                    sidebar.classList.remove('active');                
+                }            });        
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        mainContent.addEventListener('click', () => {             
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+                sidebar.classList.remove('active');             
+            }         
+        });
+
+        function startNewGame() {
+            score = 0;
+            seconds = 0;
+            document.getElementById('score-val').textContent = score;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                seconds++;
+                document.getElementById('time-val').textContent = seconds + 's';
+            }, 1000);
+
+            generateDeck();
+            shuffleDeck();
+            dealCards();
+            renderBoard();
+        }
+
+        function generateDeck() {
+            deck = [];
+            for (let s of suits) {
+                for (let i = 0; i < values.length; i++) {
+                    let color = (s === '♥' || s === '♦') ? 'red' : 'black';
+                    deck.push({ suit: s, value: values[i], num: i + 1, color: color, faceUp: false });
+                }
+            }
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function dealCards() {
+            tableau = [[], [], [], [], [], [], []];
+            foundations = [[], [], [], []];
+            waste = [];
+
+            for (let i = 0; i < 7; i++) {
+                for (let j = i; j < 7; j++) {
+                    let card = deck.pop();
+                    if (i === j) card.faceUp = true;
+                    tableau[j].push(card);
+                }
+            }
+            stock = [...deck];
+        }
+
+        function renderBoard() {
+            topRow.innerHTML = '';
+            tableauRow.innerHTML = '';
+
+            // 1. Stock (덱)
+            let stockEl = document.createElement('div');
+            stockEl.className = stock.length > 0 ? 'card back' : 'card slot';
+            stockEl.innerHTML = stock.length > 0 ? '' : '<span>Deck</span>';
+            stockEl.onclick = () => {
+                if (stock.length > 0) {
+                    let c = stock.pop();
+                    c.faceUp = true;
+                    waste.push(c);
+                } else {
+                    stock = waste.map(c => ({ ...c, faceUp: false })).reverse();
+                    waste = [];
+                }
+                renderBoard();
+            };
+            topRow.appendChild(stockEl);
+
+            // 2. Waste (폐기 더미)
+            let wasteEl = document.createElement('div');
+            wasteEl.className = waste.length > 0 ? `card ${waste[waste.length - 1].color}` : 'card slot';
+            if (waste.length > 0) {
+                let c = waste[waste.length - 1];
+                wasteEl.innerHTML = `<span>${c.value}${c.suit}</span><span style="align-self:flex-end;">${c.suit}</span>`;
+                wasteEl.draggable = true;
+                wasteEl.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'waste' }));
+                });
+            } else {
+                wasteEl.innerHTML = '<span>Waste</span>';
+            }
+            topRow.appendChild(wasteEl);
+
+            let spacer = document.createElement('div');
+            spacer.style.width = '30px';
+            topRow.appendChild(spacer);
+
+            // 3. Foundations (파운데이션 4칸)
+            foundations.forEach((pile, fIdx) => {
+                let fEl = document.createElement('div');
+                if (pile.length > 0) {
+                    let c = pile[pile.length - 1];
+                    fEl.className = `card ${c.color}`;
+                    fEl.innerHTML = `<span>${c.value}${c.suit}</span><span style="align-self:flex-end;">${c.suit}</span>`;
+                } else {
+                    fEl.className = 'card slot';
+                    fEl.innerHTML = `<span>${suits[fIdx]}</span>`;
+                }
+
+                // 파운데이션 드롭 영역 설정
+                fEl.addEventListener('dragover', (e) => e.preventDefault());
+                fEl.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    let data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    let cardToMove = null;
+
+                    if (data.type === 'waste' && waste.length > 0) {
+                        cardToMove = waste[waste.length - 1];
+                        if (isValidFoundationMove(cardToMove, pile)) {
+                            foundations[fIdx].push(waste.pop());
+                            score += 10;
+                            document.getElementById('score-val').textContent = score;
+                            renderBoard();
+                            checkWin();
+                        }
+                    } else if (data.type === 'tableau') {
+                        let sourcePile = tableau[data.tIdx];
+                        if (data.cIdx === sourcePile.length - 1) {
+                            cardToMove = sourcePile[data.cIdx];
+                            if (isValidFoundationMove(cardToMove, pile)) {
+                                foundations[fIdx].push(sourcePile.pop());
+                                if (sourcePile.length > 0 && !sourcePile[sourcePile.length - 1].faceUp) {
+                                    sourcePile[sourcePile.length - 1].faceUp = true;
+                                }
+                                score += 10;
+                                document.getElementById('score-val').textContent = score;
+                                renderBoard();
+                                checkWin();
+                            }
+                        }
+                    }
+                });
+
+                topRow.appendChild(fEl);
+            });
+
+            // 4. Tableau (하단 7열)
+            tableau.forEach((pile, tIdx) => {
+                let pileEl = document.createElement('div');
+                pileEl.className = 'tableau-pile';
+
+                // 타블로 열 자체에 드롭 이벤트 설정 (빈 공간이나 카드 위로 드롭)
+                pileEl.addEventListener('dragover', (e) => e.preventDefault());
+                pileEl.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    let data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    
+                    if (data.type === 'waste' && waste.length > 0) {
+                        let card = waste[waste.length - 1];
+                        if (isValidTableauMove(card, pile)) {
+                            pile.push(waste.pop());
+                            score += 5;
+                            document.getElementById('score-val').textContent = score;
+                            renderBoard();
+                        }
+                    } else if (data.type === 'tableau') {
+                        let sourcePile = tableau[data.tIdx];
+                        let movingCards = sourcePile.slice(data.cIdx);
+                        let targetCard = pile.length > 0 ? pile[pile.length - 1] : null;
+
+                        if (isValidTableauSequenceMove(movingCards[0], targetCard)) {
+                            sourcePile.splice(data.cIdx);
+                            tableau[tIdx].push(...movingCards);
+                            if (sourcePile.length > 0 && !sourcePile[sourcePile.length - 1].faceUp) {
+                                sourcePile[sourcePile.length - 1].faceUp = true;
+                            }
+                            renderBoard();
+                        }
+                    }
+                });
+
+                pile.forEach((c, cIdx) => {
+                    let cardEl = document.createElement('div');
+                    cardEl.style.top = (cIdx * 25) + 'px';
+                    if (c.faceUp) {
+                        cardEl.className = `card ${c.color}`;
+                        cardEl.innerHTML = `<span>${c.value}${c.suit}</span><span style="align-self:flex-end;">${c.suit}</span>`;
+                        cardEl.draggable = true;
+                        cardEl.addEventListener('dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'tableau', tIdx: tIdx, cIdx: cIdx }));
+                        });
+                    } else {
+                        cardEl.className = 'card back';
+                        cardEl.onclick = () => {
+                            if (cIdx === pile.length - 1) {
+                                c.faceUp = true;
+                                score += 5;
+                                document.getElementById('score-val').textContent = score;
+                                renderBoard();
+                            }
+                        };
+                    }
+                    pileEl.appendChild(cardEl);
+                });
+                tableauRow.appendChild(pileEl);
+            });
+        }
+
+        function isValidFoundationMove(card, foundationPile) {
+            if (foundationPile.length === 0) return card.value === 'A';
+            let topCard = foundationPile[foundationPile.length - 1];
+            return card.suit === topCard.suit && card.num === topCard.num + 1;
+        }
+
+        function isValidTableauMove(card, targetPile) {
+            if (targetPile.length === 0) return card.value === 'K';
+            let topCard = targetPile[targetPile.length - 1];
+            return card.color !== topCard.color && card.num === topCard.num - 1;
+        }
+
+        function isValidTableauSequenceMove(card, targetCard) {
+            if (!targetCard) return card.value === 'K';
+            return card.color !== targetCard.color && card.num === targetCard.num - 1;
+        }
+
+        function checkWin() {
+            let totalCardsInFoundations = foundations.reduce((acc, p) => acc + p.length, 0);
+            if (totalCardsInFoundations === 52) {
+                alert(`🎉 축하합니다! 솔리테어 승리! (점수: ${score}, 시간: ${seconds}초)`);
+                startNewGame();
+            }
+        }
+    </script>
+</body>
+</html>
