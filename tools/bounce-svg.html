@@ -11,9 +11,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
-
+        
         .app-container { display: flex; min-height: 100vh; width: 100%; }
-
+        
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
         .sidebar { 
             width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
@@ -30,14 +30,14 @@
         }
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 158, 64, 0.3); border-radius: 4px; }
-
+        
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
-
+        
         /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-
+        
         /* 메인 콘텐츠 영역 */
         .main-content { 
             margin-left: 300px; padding: 40px; flex: 1; 
@@ -45,14 +45,13 @@
             gap: 20px; transition: 0.3s; 
             width: calc(100% - 300px);
         }
-
         .workspace-container {
             display: flex;
             flex-direction: row;
             flex: 1;
             gap: 20px;
         }
-
+        
         /* 3. Components */
         .menu-btn { 
             width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
@@ -61,7 +60,7 @@
             display: flex; align-items: center; justify-content: center; line-height: 1;
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-
+        
         /* Generator Content Layouts */
         .content-left { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
@@ -72,41 +71,34 @@
         .parameters { display: flex; flex-direction: column; gap: 10px; }
         .field-group { display: flex; flex-direction: column; gap: 3px; }
         .field-group label { font-size: 0.8rem; color: #aaa; font-weight: 600; }
-
         .row-group { display: flex; gap: 10px; }
         .row-group .field-group { flex: 1; }
-
         input, select { 
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 16px; 
             padding: 8px 12px; color: #fff; font-family: inherit; font-size: 0.85rem; width: 100%; font-weight: bold;
         }
         input:focus, select:focus { outline: none; border-color: rgba(255, 158, 64, 0.8); }
         select option { background: #181818; color: #fff; }
-
         .color-row { display: flex; gap: 10px; align-items: center; }
         .color-row input[type="color"] { width: 50px; padding: 2px; cursor: pointer; height: 32px; background: transparent; }
         .color-row input[type="range"] { flex: 1; accent-color: #ff9e40; }
-
         .color-preview-box { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 0.8rem; font-family: monospace; color: #aaa; }
         .color-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(255, 158, 64, 0.4); display: inline-block; }
         .dimensions-group { display: flex; align-items: center; gap: 8px; }
         .dimensions-group input { width: 100px; text-align: center; }
-        
         .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #ccc; cursor: pointer; margin-top: 2px; }
         .checkbox-group input { accent-color: #ff9e40; width: 15px; height: 15px; cursor: pointer; width: auto; }
-
         .btn { 
             background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); 
             border-radius: 16px; padding: 11px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; margin-top: 5px; 
         }
         .btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.8); }
-
+        
         .content-right { 
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
             padding: 25px; background: rgba(0, 0, 0, 0.2); gap: 10px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
         .content-right h2 { font-size: 1.0rem; color: #ff9e40; margin-top: 5px; }
-
         .preview-box { 
             width: 100%; height: 160px; background: rgba(255, 255, 255, 0.02); border: 2px dashed rgba(255, 158, 64, 0.4); 
             border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; 
@@ -118,7 +110,7 @@
             overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; word-break: break-all; 
             border: 1px solid rgba(255, 158, 64, 0.3); 
         }
-
+        
         /* 4. Theme (Light Mode) */
         body.light-mode { background-color: #fff; color: #202020; }
         body.light-mode .sidebar { 
@@ -146,14 +138,14 @@
         body.light-mode .preview-box { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .code-container { background: #fff; color: #d35400; border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
-
+        
         /* 5. Mobile Responsive */
         .menu-toggle-btn { 
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
             font-weight: bold; cursor: pointer; color: #ffffff; 
         }
-
+        
         @media (max-width: 900px) { 
             .menu-toggle-btn { display: block; } 
             .sidebar { 
@@ -317,6 +309,15 @@
             sidebar.classList.toggle('active'); 
         }
 
+        // 모바일 화면에서 사이드바 내부의 버튼을 클릭하면 사이드바가 닫히도록 설정
+        sidebar.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
         document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode'); 
         });
@@ -401,29 +402,58 @@
 
                 const padding = 20; 
                 let startX = padding;
-                            
-                if (hAlign === 'center') { startX = (width - totalTextWidth) / 2; }
-                else if (hAlign === 'right') { startX = width - totalTextWidth - padding; }
-                else if (hAlign === 'left') { startX = 1; }
+                
+                if (hAlign === 'center') { 
+                    startX = (width - totalTextWidth) / 2; 
+                } else if (hAlign === 'right') { 
+                    startX = width - totalTextWidth - padding; 
+                } else if (hAlign === 'left') { 
+                    startX = 1; 
+                }
                 if (startX < 10) startX = 10;
 
                 let startY = height / 2 + fontSize / 3;
-                if (vAlign === 'top') startY = fontSize + 10;
-                else if (vAlign === 'bottom') startY = height - 15;
+                if (vAlign === 'top') {
+                    startY = fontSize + 10;
+                } else if (vAlign === 'bottom') {
+                    startY = height - 15;
+                }
 
                 let textElements = '';
                 let currentX = startX;
-
                 [...text].forEach((char, index) => {
                     const escapedChar = char === ' ' ? '&#160;' : escapeHtml(char);
                     const delay = (0.08 * (index + 1)).toFixed(2);
-                                
-                    textElements += `        <g class="bounce-char" style="animation-delay: ${delay}s;">            <text x="${currentX}" y="${startY}" class="bounce-text-svg">${escapedChar}</text>        </g>`;
+                    
+                    textElements += `        <g class="bounce-char" style="animation-delay: ${delay}s;">
+            <text x="${currentX}" y="${startY}" class="bounce-text-svg">${escapedChar}</text>
+        </g>`;
                     currentX += charWidth;
                 });
 
                 const borderCss = showBorder ? `stroke: ${fontColorHex}; stroke-width: 2px;` : `stroke: none;`;
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">    <style>        @keyframes bounce {            0%, 100% { transform: translateY(0); }            30% { transform: translateY(-${bounceHeight}px); }            50% { transform: translateY(0); }        }        .bg { fill: ${bgColorHex}; ${borderCss} rx: 8px; }        .bounce-text-svg {            font-family: '${fontName}', monospace;            font-size: ${fontSize}px;            font-weight: bold;            fill: ${fontColorHex};        }        .bounce-char {            display: inline-block;            animation: bounce 1.2s infinite ease-in-out;        }    </style>    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" class="bg" />    <g>${textElements}</g></svg>`;
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+    <style>
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-${bounceHeight}px); }
+            50% { transform: translateY(0); }
+        }
+        .bg { fill: ${bgColorHex}; ${borderCss} rx: 8px; }
+        .bounce-text-svg {
+            font-family: '${fontName}', monospace;
+            font-size: ${fontSize}px;
+            font-weight: bold;
+            fill: ${fontColorHex};
+        }
+        .bounce-char {
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+    </style>
+    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" class="bg" />
+    <g>${textElements}</g>
+</svg>`;
             },
 
             update() {
@@ -451,7 +481,7 @@
             copyCode(type) {
                 const sources = this.getSourceUrls();
                 const text = (type === 'html') ? sources.html : sources.markdown;
-                            
+                
                 navigator.clipboard.writeText(text).then(() => {
                     alert(`${type.toUpperCase()} source copied to clipboard!`);
                 });
