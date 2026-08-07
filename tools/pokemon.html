@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Pokémon Games</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                    
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar {            
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
+            background: rgba(16, 16, 16, 0.25);             
+            backdrop-filter: blur(16px);             
+            -webkit-backdrop-filter: blur(16px);            
+            padding: 25px 20px; z-index: 1000;             
+            display: flex; flex-direction: column; gap: 12px;             
+            border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 24px;           
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);           
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;         
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 모바일용 상단 카테고리/컨트롤 영역 (기본 숨김) */
+        .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .mobile-theme-row { display: none; width: 100%; justify-content: flex-end; margin-bottom: 10px; }
+        .theme-toggle-btn-mobile {           
+            padding: 6px 12px; font-size: 0.75rem; border-radius: 16px; width: auto;           
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5);           
+            font-weight: bold; cursor: pointer;       
+        }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {             
+            margin-left: 300px; padding: 40px; flex: 1;             
+            display: flex; flex-direction: column; height: 100vh;             
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;             
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn {             
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;           
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;           
+            display: flex; align-items: center; justify-content: center; line-height: 1;        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.active { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
+
+        .bottom-btns {           
+            display: flex;           
+            flex-direction: column;           
+            gap: 10px;       
+        }
+        .bottom-btns > .menu-btn {           
+            margin-bottom: 0;       
+        }
+
+        .content-card {             
+            border: 2px solid #ff9e40;             
+            border-radius: 16px;             
+            flex: 1;             
+            display: flex;             
+            overflow: hidden;             
+            background-color: #000; /* 게임 화면용 배경은 검은색으로 조정 */            
+            position: relative; 
+            transition: all 0.3s ease;       
+        }
+
+        /* Board area */
+        #board {           
+            width: 100%;           
+            height: 100%;           
+            position: relative;           
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #board iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 4. Theme (Light Mode) */        
+        body.light-mode { background-color: #fff; color: #202020; }        
+        body.light-mode .sidebar {             
+            background: rgba(255, 255, 255, 0.3);             
+            border-color: rgba(243, 128, 32, 0.35);             
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
+        }                
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
+            background: rgba(0, 0, 0, 0.02);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.5);         }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
+            background: rgba(243, 128, 32, 0.15);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.4);         }                
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {             
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;             
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
+            font-weight: bold; cursor: pointer; color: #ffffff;         }                        
+
+        @media (max-width: 900px) {             
+            .menu-toggle-btn { display: block; }             
+            .sidebar {                 
+                transform: translateX(-320px);                 
+                background: #101010 !important;                 
+                backdrop-filter: none !important;                
+                -webkit-backdrop-filter: none !important;                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+                z-index: 3000;             }             
+            body.light-mode .sidebar {                
+                background: #ffffff !important;                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }
+            .sidebar.active { transform: translateX(0); }             
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }             
+            .content-card { min-height: 0; height: 100%; }             
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Retro Pokémon Games</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                            
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <div class="bottom-btns">
+                <button class="menu-btn active" id="btn-red" onclick="switchGame('red')">Red</button>
+                <button class="menu-btn" id="btn-blue-normal" onclick="switchGame('blue-normal')">Blue (Normal)</button>
+                <button class="menu-btn" id="btn-blue-hard" onclick="switchGame('blue-hard')">Blue (Hard)</button>
+                <button class="menu-btn" id="btn-yellow" onclick="switchGame('yellow')">Yellow</button>
+                <button class="menu-btn" id="btn-team-rocket" onclick="switchGame('team-rocket')">Team Rocket</button>
+            </div>        
+        </aside>
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>Retro Pokémon Games</h1>                
+                <p>Play classic retro 1st-generation Pokémon games right in your browser.</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <div id="board">                    
+                    <!-- 동적으로 게임 iframe이 로드되는 영역 -->
+                </div>            
+            </section>        
+        </main>    
+    </div>
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const board = document.getElementById('board');
+
+        // 페이지 로드 시 기본값으로 Red 게임 실행
+        window.onload = function() {     
+            switchGame('red');
+        };
+
+        // 게임 전환 함수
+        function switchGame(gameType) {
+            // 버튼 활성화 상태(active) 갱신
+            document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active'));
+
+            let iframeHTML = '';
+            
+            if (gameType === 'red') {
+                document.getElementById('btn-red').classList.add('active');
+                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44577-pokemon-red-full-color-hack.html" width="100%" height="100%" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+            } else if (gameType === 'blue-normal') {
+                document.getElementById('btn-blue-normal').classList.add('active');
+                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44697-play-as-blue-normal.html" width="600" height="450" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+            } else if (gameType === 'blue-hard') {
+                document.getElementById('btn-blue-hard').classList.add('active');
+                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44696-play-as-blue-hard.html" width="600" height="450" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+            } else if (gameType === 'yellow') {
+                document.getElementById('btn-yellow').classList.add('active');
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="https://f.kbhgames.com/emujs/play.php?c=gba&f=pokemon-yellow.zip"></iframe>`;
+            } else if (gameType === 'team-rocket') {
+                document.getElementById('btn-team-rocket').classList.add('active');
+                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44678-pokemon-tre-team-rocket-edition.html" width="100%" height="100%" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+            }
+
+            board.innerHTML = iframeHTML;
+        }
+
+        function toggleSidebar() {             
+            sidebar.classList.toggle('active');         
+        }
+
+        sidebar.querySelectorAll('button').forEach(element => {            
+            element.addEventListener('click', () => {                
+                if (window.innerWidth <= 900) {                    
+                    sidebar.classList.remove('active');                
+                }            });        
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        mainContent.addEventListener('click', () => {             
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+                sidebar.classList.remove('active');             
+            }         });
+    </script>
+</body>
+</html>
