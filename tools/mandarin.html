@@ -7,6 +7,8 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <!-- OpenCC-JS (간체/번체 변환용) -->
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+    <!-- pinyin-pro (성조가 포함된 정확한 병음 변환용 라이브러리) -->
+    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.16.0/dist/index.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
@@ -46,6 +48,7 @@
             display: flex; align-items: center; justify-content: center; line-height: 1;
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.active-guide { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
 
         .bottom-btns .menu-btn { padding: 11px 14px; font-size: 0.85rem; }
 
@@ -105,7 +108,7 @@
         }
         .content-card.fullscreen .editor-wrapper { padding: 20px; width: 100%; height: 100%; }
 
-        .editor-wrapper { display: flex; width: 100%; flex: 1; overflow: hidden; }
+        .editor-wrapper { display: flex; width: 100%; flex: 1; overflow: hidden; position: relative; }
         .line-numbers { 
             width: 50px; padding: 40px 10px 40px 0; background: rgba(0, 0, 0, 0.2); 
             color: #666; font-family: 'Consolas', sans-serif; font-size: 1rem; 
@@ -115,6 +118,30 @@
             flex: 1; height: 100%; padding: 40px; background: transparent; border: none; 
             color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; 
             outline: none; line-height: 1.5; white-space: pre-wrap; word-break: break-all; overflow-y: auto; 
+        }
+
+        #ruby-viewer {
+            position: absolute; top: 0; left: 50px; right: 0; bottom: 0;
+            padding: 40px; background: #101010; color: #fff;
+            font-family: 'Segoe UI', sans-serif; font-size: 1.3rem;
+            line-height: 3.2; /* 상단 병음 공간 확보를 위한 넉넉한 줄간격 */
+            white-space: pre-wrap; word-break: break-all;
+            overflow-y: auto; display: none; z-index: 5;
+        }
+        
+        /* 루비 태그 상단 고정 강제 스타일 */
+        ruby { 
+            ruby-position: over; 
+            -webkit-ruby-position: over;
+            display: inline-ruby; 
+            text-align: center; 
+            margin: 0 3px; 
+        }
+        rt { 
+            font-size: 0.65rem; 
+            color: #ff9e40; 
+            font-family: 'Consolas', sans-serif; 
+            font-weight: normal;
         }
 
         body.light-mode { background-color: #fff; color: #202020; }
@@ -136,6 +163,8 @@
         body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
         body.light-mode .candidate-item { background: rgba(243, 128, 32, 0.1); border-color: rgba(243, 128, 32, 0.4); color: #202020; }
         body.light-mode .candidate-item:hover, body.light-mode .candidate-item.selected { background: #F38020; color: #fff; }
+        body.light-mode #ruby-viewer { background: #fff; color: #202020; }
+        body.light-mode rt { color: #F38020; }
 
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 3000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
 
@@ -164,6 +193,8 @@
                 <button class="mode-btn active" id="mode-simp" onclick="setMode('simplified')">简体 (Simp)</button>
                 <button class="mode-btn" id="mode-trad" onclick="setMode('traditional')">繁體 (Trad)</button>
             </div>
+
+            <button class="menu-btn" id="guide-toggle-btn" onclick="togglePinyinGuide()">Pinyin Guide View</button>
 
             <div class="info-panel">
                 <div class="info-row">
@@ -202,6 +233,7 @@
                 <div class="editor-wrapper">
                     <div id="line-numbers" class="line-numbers">1</div>
                     <textarea id="text-input" placeholder="Type Chinese pinyin or punctuation here..." autocomplete="off" spellcheck="false"></textarea>
+                    <div id="ruby-viewer"></div>
                 </div>
             </section>
         </main>
@@ -209,6 +241,8 @@
 
     <script>
         const textInput = document.getElementById('text-input');
+        const rubyViewer = document.getElementById('ruby-viewer');
+        const guideToggleBtn = document.getElementById('guide-toggle-btn');
         const candidatesContainer = document.getElementById('candidates-container');
         const pageIndicator = document.getElementById('page-indicator');
         const lineNumbers = document.getElementById('line-numbers');
@@ -223,7 +257,8 @@
         let currentPinyinToken = ''; 
         let currentPinyinStart = 0;  
         let currentPage = 0;
-        const pageSize = 9; // 한 페이지에 표시할 후보 개수 9개로 변경
+        let isGuideMode = false;
+        const pageSize = 9;
 
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
@@ -278,6 +313,54 @@
                 textInput.value = mode === 'traditional' ? toTraditional(text) : toSimplified(text);
                 textInput.dispatchEvent(new Event('input'));
             }
+            if (isGuideMode) updatePinyinGuide();
+        }
+
+        function togglePinyinGuide() {
+            isGuideMode = !isGuideMode;
+            guideToggleBtn.classList.toggle('active-guide', isGuideMode);
+            if (isGuideMode) {
+                textInput.style.display = 'none';
+                lineNumbers.style.display = 'none';
+                rubyViewer.style.display = 'block';
+                updatePinyinGuide();
+            } else {
+                textInput.style.display = 'block';
+                lineNumbers.style.display = 'block';
+                rubyViewer.style.display = 'none';
+                textInput.focus();
+            }
+        }
+
+        function updatePinyinGuide() {
+            const text = textInput.value;
+            if (!text.trim()) {
+                rubyViewer.innerHTML = '<span style="color: #666; font-size: 0.9rem;">No text to display...</span>';
+                return;
+            }
+
+            let htmlResult = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '\n') {
+                    htmlResult += '<br>';
+                    continue;
+                }
+                if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
+                    htmlResult += char;
+                    continue;
+                }
+
+                const pinyin = pinyinPro.pinyin(char, { toneType: 'symbol', type: 'string' });
+
+                if (pinyin) {
+                    htmlResult += `<ruby>${char}<rt>${pinyin}</rt></ruby>`;
+                } else {
+                    htmlResult += char;
+                }
+            }
+
+            rubyViewer.innerHTML = htmlResult;
         }
 
         let debounceTimer;
@@ -313,14 +396,14 @@
             statusText.textContent = "Searching...";
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(async () => {
+                if (!currentPinyinToken) return;
+
                 try {
                     const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(currentPinyinToken)}`);
                     const data = await res.json();
 
-                    // 프록시 응답 구조 전체를 탐색하여 모든 후보군을 수집
                     if (data && data[0] === 'SUCCESS' && data[1]) {
                         let matches = [];
-                        // data[1] 안에 있는 모든 하위 배열 및 후보군 리스트 병합
                         data[1].forEach(block => {
                             if (Array.isArray(block)) {
                                 block.forEach(sub => {
@@ -335,10 +418,8 @@
                             }
                         });
 
-                        // 중복 제거 및 유효 문자 필터링
-                        let uniqueMatches = [...new Set(matches.filter(item => typeof item === 'string' && item.length > 0))]
-                        
-                        // 기본 안전 장치: 만약 위 순회가 안 됐다면 기존 경로 시도
+                        let uniqueMatches = [...new Set(matches.filter(item => typeof item === 'string' && item.length > 0))];
+
                         if (uniqueMatches.length === 0 && data[1][0] && data[1][0][1]) {
                             uniqueMatches = data[1][0][1];
                         }
@@ -415,7 +496,6 @@
             updateEditorState();
         }
 
-        // 키보드 이벤트 처리 (Tab 또는 스페이스바를 누르면 다음 9개 후보 페이지로 순환)
         textInput.addEventListener('keydown', (e) => {
             if (currentMatches.length > 0) {
                 if (e.key === 'Tab' || e.key === ' ') {
@@ -448,6 +528,7 @@
             document.getElementById('char-count').innerText = text.length;
             updateLineNumbers();
             saveToLocal();
+            if (isGuideMode) updatePinyinGuide();
         }
 
         function updateLineNumbers() {
