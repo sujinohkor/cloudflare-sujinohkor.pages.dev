@@ -125,7 +125,7 @@
         }
         .node-inspect-panel .close-inspect:hover { color: #fff; }
 
-        #upload-html-input { display: none; }
+        #upload-folder-input { display: none; }
         .menu-toggle-btn { display: none; }
 
         /* Light Mode */
@@ -162,7 +162,7 @@
             <div class="sidebar-title">HTML Visualizer</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                
+            </div>                                        
             
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
@@ -177,8 +177,8 @@
             </div>
             
             <div class="bottom-btns">
-                <button class="menu-btn" onclick="document.getElementById('upload-html-input').click()">Upload HTML File</button>
-                <input type="file" id="upload-html-input" accept=".html,.htm" onchange="handleHtmlUpload(event)">
+                <button class="menu-btn" onclick="document.getElementById('upload-folder-input').click()">Upload Project Folder</button>
+                <input type="file" id="upload-folder-input" webkitdirectory directory multiple onchange="handleFolderUpload(event)">
                 <button class="menu-btn" onclick="loadSampleProject()">Load Sample Dashboard</button>
                 <button class="menu-btn" onclick="exportArchitectureData()">Export Analysis</button>
                 <button class="menu-btn" onclick="resetViewPort()">Reset View</button>
@@ -188,7 +188,7 @@
         <main class="main-content" id="main-content">
             <header class="top-section">
                 <h1>HTML Dependency Visualizer</h1>
-                <p>Upload any HTML file to inspect script tags, internal/external links, and asset dependencies</p>
+                <p>Upload your project folder to analyze cross-file imports, script tags, and assets</p>
             </header>
             
             <section class="content-card" id="content-card">
@@ -261,7 +261,7 @@
         sidebar.querySelectorAll('button').forEach(element => {
             element.addEventListener('click', () => {
                 if (window.innerWidth <= 900) {
-                    if (element.id === 'upload-html-input') return;
+                    if (element.id === 'upload-folder-input') return;
                     sidebar.classList.remove('active');
                 }
             });
@@ -278,82 +278,126 @@
             }
         });
 
-        function handleHtmlUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        async function handleFolderUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const htmlContent = e.target.result;
-                parseHtmlToDependencyGraph(file.name, htmlContent);
-            };
-            reader.readAsText(file);
-        }
-
-        function parseHtmlToDependencyGraph(fileName, htmlString) {
             nodes = [];
             edges = [];
+            const fileMap = new Map(); // 상대 경로/파일명 -> 파일 객체 및 텍스트 매핑
 
-            nodes.push({ id: fileName, type: 'html', details: 'Root HTML Document', x: 0, y: 0 });
+            // 1단계: 모든 파일 읽기 준비
+            for (let file of files) {
+                // webkitRelativePath가 있으면 폴더 구조 경로, 없으면 그냥 파일 이름
+                const relativePath = file.webkitRelativePath || file.name;
+                const text = await file.text();
+                fileMap.set(relativePath, { file, text, name: file.name });
+            }
 
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlString, 'text/html');
+            // 2단계: 파일들을 노드로 등록
+            fileMap.forEach((val, path) => {
+                let type = 'link';
+                if (path.endsWith('.html') || path.endsWith('.htm')) type = 'html';
+                else if (path.endsWith('.css')) type = 'css';
+                else if (path.endsWith('.js') || path.endsWith('.mjs')) type = 'script-external';
+                else if (path.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) type = 'image';
 
-            const links = doc.querySelectorAll('link[rel="stylesheet"]');
-            links.forEach((link, idx) => {
-                const href = link.getAttribute('href') || `stylesheet_${idx}.css`;
-                if (!nodes.some(n => n.id === href)) {
-                    nodes.push({ id: href, type: 'css', details: 'External Stylesheet Link', x: -250, y: -150 + idx * 70 });
-                }
-                edges.push({ from: fileName, to: href });
+                nodes.push({
+                    id: path,
+                    type: type,
+                    details: `Project File: ${path}`,
+                    x: (Math.random() - 0.5) * 400,
+                    y: (Math.random() - 0.5) * 400
+                });
             });
 
-            const scripts = doc.querySelectorAll('script');
-            scripts.forEach((script, idx) => {
-                const src = script.getAttribute('src');
-                const scriptId = src ? src : `inline-script-${idx + 1}`;
-                const type = src ? 'script-external' : 'script-inline';
-                
-                if (!nodes.some(n => n.id === scriptId)) {
-                    nodes.push({ id: scriptId, type: type, details: src ? `External JS: ${src}` : 'Inline JavaScript Block', x: -250, y: 150 + idx * 70 });
-                }
-                edges.push({ from: fileName, to: scriptId });
+            // 3단계: 파일 내부 코드 분석 (HTML 및 JS 파일 내부 의존성 추출)
+            fileMap.forEach((val, path) => {
+                const { text, name } = val;
 
-                if (!src && script.textContent) {
-                    const text = script.textContent;
-                    const importMatches = text.matchAll(/import\s+.*?from\s+['"]([^'"]+)['"]/g);
-                    for (const match of importMatches) {
-                        const importedModule = match[1];
-                        if (!nodes.some(n => n.id === importedModule)) {
-                            nodes.push({ id: importedModule, type: 'module', details: `ES Module Import`, x: -400 + Math.random()*50, y: 150 + idx * 70 });
+                if (path.endsWith('.html') || path.endsWith('.htm')) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+
+                    // CSS 링크
+                    doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href) resolveAndAddEdge(path, href, fileMap);
+                    });
+
+                    // Script 태그
+                    doc.querySelectorAll('script').forEach(script => {
+                        const src = script.getAttribute('src');
+                        if (src) {
+                            resolveAndAddEdge(path, src, fileMap);
+                        } else if (script.textContent) {
+                            extractJsImports(path, script.textContent, fileMap);
                         }
-                        edges.push({ from: scriptId, to: importedModule });
-                    }
-                }
-            });
+                    });
 
-            const images = doc.querySelectorAll('img');
-            images.forEach((img, idx) => {
-                const src = img.getAttribute('src') || `image_${idx}`;
-                if (!nodes.some(n => n.id === src)) {
-                    nodes.push({ id: src, type: 'image', details: 'Image Asset Reference', x: 250, y: -150 + idx * 70 });
-                }
-                edges.push({ from: fileName, to: src });
-            });
+                    // 이미지
+                    doc.querySelectorAll('img').forEach(img => {
+                        const src = img.getAttribute('src');
+                        if (src) resolveAndAddEdge(path, src, fileMap);
+                    });
 
-            const anchors = doc.querySelectorAll('a[href]');
-            anchors.forEach((a, idx) => {
-                const href = a.getAttribute('href');
-                if (href && !href.startsWith('#') && !nodes.some(n => n.id === href)) {
-                    nodes.push({ id: href, type: 'link', details: 'Hyperlink Destination', x: 250, y: 150 + idx * 70 });
-                    edges.push({ from: fileName, to: href });
+                    // a 태그 링크
+                    doc.querySelectorAll('a[href]').forEach(a => {
+                        const href = a.getAttribute('href');
+                        if (href && !href.startsWith('#') && !href.startsWith('http')) {
+                            resolveAndAddEdge(path, href, fileMap);
+                        }
+                    });
+                } else if (path.endsWith('.js') || path.endsWith('.mjs')) {
+                    // JS 파일 내부의 import 구문 추적 (예: import {x} from './utils.js')
+                    extractJsImports(path, text, fileMap);
                 }
             });
 
             analyzeArchitecture();
             resetViewPort();
             drawGraph();
-            alert(`HTML Successfully Parsed! Found ${nodes.length} connected resources.`);
+            alert(`Project Folder Successfully Parsed! Loaded ${nodes.length} files and discovered ${edges.length} dependencies.`);
+        }
+
+        // 경로를 상대적으로 매칭하여 엣지 추가
+        function resolveAndAddEdge(currentPath, targetRef, fileMap) {
+            if (targetRef.startsWith('http') || targetRef.startsWith('//')) return; // 외부 CDN은 무시하거나 별도 처리 가능
+
+            // 경로 정리 (간이 구현)
+            const cleanTarget = targetRef.split('?')[0].split('#')[0];
+            
+            // 일치하는 파일 찾기 (전체 경로 또는 파일명으로 검색)
+            let matchedKey = null;
+            for (let [path] of fileMap) {
+                if (path.endsWith(cleanTarget) || path === cleanTarget || path.endsWith('/' + cleanTarget)) {
+                    matchedKey = path;
+                    break;
+                }
+            }
+
+            if (matchedKey) {
+                if (!edges.some(e => e.from === currentPath && e.to === matchedKey)) {
+                    edges.push({ from: currentPath, to: matchedKey });
+                }
+            } else {
+                // 폴더 내에 명시적으로 없더라도 노드로 추가해줄 수 있음
+                if (!nodes.some(n => n.id === cleanTarget)) {
+                    nodes.push({ id: cleanTarget, type: 'external-ref', details: 'Unresolved Reference', x: Math.random()*200, y: Math.random()*200 });
+                }
+                if (!edges.some(e => e.from === currentPath && e.to === cleanTarget)) {
+                    edges.push({ from: currentPath, to: cleanTarget });
+                }
+            }
+        }
+
+        function extractJsImports(filePath, codeText, fileMap) {
+            const importRegex = /import\s+(?:[\w*\s{},]+from\s+)?['"]([^'"]+)['"]/g;
+            let match;
+            while ((match = importRegex.exec(codeText)) !== null) {
+                const importPath = match[1];
+                resolveAndAddEdge(filePath, importPath, fileMap);
+            }
         }
 
         function loadSampleProject() {
