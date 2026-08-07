@@ -118,7 +118,6 @@
             outline: none; line-height: 1.5; white-space: pre-wrap; word-break: break-all; overflow-y: auto; 
         }
 
-        /* 루비 병음 뷰어 스타일 (행간을 넓혀 상단 병음이 잘리지 않도록 조정) */
         #ruby-viewer {
             position: absolute; top: 0; left: 50px; right: 0; bottom: 0;
             padding: 40px; background: #101010; color: #fff;
@@ -317,7 +316,6 @@
             }
         }
 
-        // ⭐ 단일 글자 조회 시의 병음 추출 구조에 맞춘 가이드 생성 함수
         async function updatePinyinGuide() {
             const text = textInput.value;
             if (!text.trim()) {
@@ -326,42 +324,56 @@
             }
 
             rubyViewer.innerHTML = 'Generating pinyin guide...';
-            let htmlResult = '';
-            
-            for (let char of text) {
-                if (char === '\n') {
-                    htmlResult += '<br>';
-                    continue;
-                }
-                if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
-                    htmlResult += char;
-                    continue;
+
+            try {
+                const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(text)}`);
+                const data = await res.json();
+
+                let annotations = [];
+                if (data && data[0] === 'SUCCESS' && data[1] && data[1][0]) {
+                    if (data[1][0][2] && data[1][0][2].annotation) {
+                        annotations = data[1][0][2].annotation;
+                    }
                 }
 
-                try {
-                    const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(char)}`);
-                    const data = await res.json();
-                    let pinyin = '';
+                let charPinyinMap = {};
+                if (annotations.length > 0) {
+                    const bestHanzi = text;
+                    const bestAnnotation = annotations[0];
+                    const pinyinParts = bestAnnotation.split(' ');
                     
-                    // 단일 문자 검색 결과 구조에서 annotation 안전하게 추출
-                    if (data && data[0] === 'SUCCESS' && data[1] && data[1][0]) {
-                        // 대다수 단일 글자 응답의 메타데이터 위치 확인
-                        const metaObj = data[1][0][2];
-                        if (metaObj && metaObj.annotation && metaObj.annotation[0]) {
-                            pinyin = metaObj.annotation[0];
+                    if (pinyinParts.length === bestHanzi.length) {
+                        for (let i = 0; i < bestHanzi.length; i++) {
+                            charPinyinMap[i] = pinyinParts[i];
                         }
                     }
+                }
 
+                let htmlResult = '';
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    if (char === '\n') {
+                        htmlResult += '<br>';
+                        continue;
+                    }
+                    if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
+                        htmlResult += char;
+                        continue;
+                    }
+
+                    let pinyin = charPinyinMap[i] || '';
                     if (pinyin) {
                         htmlResult += `<ruby>${char}<rt>${pinyin}</rt></ruby>`;
                     } else {
                         htmlResult += char;
                     }
-                } catch (err) {
-                    htmlResult += char;
                 }
+
+                rubyViewer.innerHTML = htmlResult || text;
+            } catch (err) {
+                console.error("Pinyin guide fetch error:", err);
+                rubyViewer.innerHTML = text;
             }
-            rubyViewer.innerHTML = htmlResult;
         }
 
         let debounceTimer;
