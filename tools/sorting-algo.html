@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Algorithm Education</title>
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+        
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+        
+        /* 모바일 백드롭 오버레이 */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* 사이드바 */
+        .sidebar { 
+            width: 280px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
+            overflow-y: auto;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+        
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 320px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: all 0.3s ease; 
+            width: calc(100% - 320px);
+        }
+
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.active-mode { background: rgba(255, 158, 64, 0.35); color: #fff; }
+
+        .control-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .control-label { font-size: 0.8rem; color: #ff9e40; font-weight: bold; padding-left: 5px; }
+        
+        select.search-input, input.search-input { 
+            width: 100%; padding: 11px 14px; 
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; outline: none; text-align: center; 
+            font-size: 0.85rem; font-weight: bold; cursor: pointer;
+        }
+        select.search-input option { background: #101010; color: #fff; }
+
+        /* 콘텐츠 카드 (시각화 보드) */
+        .content-card { 
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden; 
+            background: rgba(20, 20, 20, 0.7);
+            position: relative; 
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        /* 모드별 컨테이너 영역 */
+        .workspace { width: 100%; height: 100%; display: none; position: relative; flex-direction: column; }
+        .workspace.active { display: flex; }
+
+        /* 시각화 및 코드 동기화 레이아웃 */
+        .algo-layout { display: flex; width: 100%; flex: 1; gap: 20px; min-height: 0; }
+        .visual-panel { flex: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; }
+        .code-panel { flex: 1; background: rgba(10,10,10,0.8); border: 1px solid rgba(255,158,64,0.2); border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.85rem; overflow-y: auto; color: #ccc; display: flex; flex-direction: column; gap: 4px; }
+        .code-line { padding: 2px 6px; border-radius: 4px; transition: background 0.2s; white-space: pre-wrap; }
+        .code-line.highlight { background: rgba(255, 158, 64, 0.3); color: #ff9e40; font-weight: bold; }
+
+        /* 코드 하이라이팅 색상 정의 */
+        .token-keyword { color: #ff7b72; font-weight: bold; }
+        .token-function { color: #d2a8ff; }
+        .token-number { color: #79c0ff; }
+
+        /* 바 그래프 컨테이너 */
+        .bars-container { width: 100%; height: 80%; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+        .bar { width: max(4px, calc(100% / var(--count))); background-color: #fff9c4; border-radius: 4px 4px 0 0; transition: height 0.1s ease, background-color 0.1s ease; }
+        
+        /* 레이스 모드 */
+        .race-container { display: flex; width: 100%; flex: 1; gap: 15px; min-height: 0; margin-top: 10px; }
+        .race-box { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; align-items: center; justify-content: flex-end; position: relative; }
+        .race-title { position: absolute; top: 15px; font-weight: bold; color: #ff9e40; font-size: 0.9rem; }
+
+        /* 상태 정보 바 */
+        .stats-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 5px 0 15px 0; font-size: 0.85rem; color: #ff9e40; font-weight: bold; flex-wrap: wrap; gap: 10px; }
+        .stats-left { display: flex; gap: 20px; align-items: center; }
+        .stats-right { background: rgba(255, 158, 64, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255, 158, 64, 0.3); font-size: 0.8rem; }
+
+        /* 라이트 모드 대응 */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.4); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn, body.light-mode select.search-input, body.light-mode input.search-input { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .menu-btn.active-mode { background: #F38020; color: #fff; }
+        body.light-mode select.search-input option { background: #fff; color: #202020; }
+        body.light-mode .content-card { background: rgba(245, 245, 245, 0.9); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .code-panel { background: rgba(255, 255, 255, 0.95); color: #333; border-color: rgba(243, 128, 32, 0.3); }
+        body.light-mode .code-line.highlight { background: rgba(243, 128, 32, 0.15); color: #d06000; }
+        body.light-mode .stats-right { background: rgba(243, 128, 32, 0.1); border-color: rgba(243, 128, 32, 0.3); color: #d06000; }
+        
+        /* 라이트 모드 코드 토큰 색상 조정 */
+        body.light-mode .token-keyword { color: #cf222e; }
+        body.light-mode .token-function { color: #8250df; }
+        body.light-mode .token-number { color: #0550ae; }
+        
+        body.light-mode .visual-panel, body.light-mode .race-box { background: #ffffff; border: 1px solid rgba(243, 128, 32, 0.25); }
+
+        /* 모바일 대응 */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; z-index: 3000; }
+            body.light-mode .sidebar { background: #ffffff !important; }
+            .sidebar.active { transform: translateX(0); }
+            .sidebar-backdrop.active { display: block; opacity: 1; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }
+            .algo-layout, .race-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+    <div class="app-container">
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Sorting Lab</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Education Mode</span>
+                <button class="menu-btn active-mode" onclick="switchMode(1)">Visualization & Code</button>
+                <button class="menu-btn" onclick="switchMode(2)">Algorithm Race</button>
+            </div>
+
+            <!-- 모드 1 전용 알고리즘 선택 -->
+            <div class="control-group" id="algo-select-group">
+                <span class="control-label">Algorithm</span>
+                <select id="algo-select" class="search-input" onchange="onAlgoChange()">
+                    <option value="bubble">Bubble Sort</option>
+                    <option value="selection">Selection Sort</option>
+                    <option value="insertion">Insertion Sort</option>
+                    <option value="merge">Merge Sort</option>
+                    <option value="quick">Quick Sort</option>
+                    <option value="heap">Heap Sort</option>
+                </select>
+            </div>
+
+            <!-- 모드 2 레이스 전용 알고리즘 선택 -->
+            <div class="control-group" id="race-select-group" style="display: none;">
+                <span class="control-label">Race Algorithm 1</span>
+                <select id="race-algo-1" class="search-input" onchange="resetVisualization()">
+                    <option value="bubble">Bubble Sort</option>
+                    <option value="selection">Selection Sort</option>
+                    <option value="insertion">Insertion Sort</option>
+                    <option value="merge">Merge Sort</option>
+                    <option value="quick">Quick Sort</option>
+                    <option value="heap">Heap Sort</option>
+                </select>
+                <span class="control-label" style="margin-top: 5px;">Race Algorithm 2</span>
+                <select id="race-algo-2" class="search-input" onchange="resetVisualization()">
+                    <option value="bubble">Bubble Sort</option>
+                    <option value="selection">Selection Sort</option>
+                    <option value="insertion">Insertion Sort</option>
+                    <option value="merge">Merge Sort</option>
+                    <option value="quick">Quick Sort</option>
+                    <option value="heap">Heap Sort</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Control Panel</span>
+                <button class="menu-btn" onclick="startVisualization()">Start</button>
+                <button class="menu-btn" onclick="pauseVisualization()">Pause</button>
+                <button class="menu-btn" onclick="resetVisualization()">Reset Data</button>
+            </div>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Sorting Algorithm Education</h1>
+                <p>Master sorting algorithms through visualization and head-to-head races.</p>
+            </header>
+
+            <section class="content-card" id="content-card">
+                <!-- 모드 1: 시각화 + 코드 동기화 -->
+                <div id="mode-1" class="workspace active">
+                    <div class="stats-bar">
+                        <div class="stats-left">
+                            <span id="m1-status">Status: Ready</span>
+                            <span id="m1-comps">Comparisons: 0</span>
+                        </div>
+                        <div class="stats-right" id="m1-bigo">
+                            Time Complexity: O(n²)
+                        </div>
+                    </div>
+                    <div class="algo-layout">
+                        <div class="visual-panel">
+                            <div class="bars-container" id="m1-bars"></div>
+                        </div>
+                        <div class="code-panel" id="m1-code">
+                            <!-- 동적으로 생성되는 알고리즘 소스 코드 영역 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 모드 2: 알고리즘 레이스 -->
+                <div id="mode-2" class="workspace">
+                    <div class="race-container">
+                        <div class="race-box">
+                            <span class="race-title" id="race-title-1">Algorithm 1</span>
+                            <div class="bars-container" id="race-bars-1"></div>
+                        </div>
+                        <div class="race-box">
+                            <span class="race-title" id="race-title-2">Algorithm 2</span>
+                            <div class="bars-container" id="race-bars-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        
+        let currentMode = 1;
+        let isRunning = false;
+
+        // 빅오 표기법 정보 정의
+        const bigOData = {
+            bubble: "Time Complexity: Best O(n) | Avg O(n²) | Worst O(n²)",
+            selection: "Time Complexity: Best O(n²) | Avg O(n²) | Worst O(n²)",
+            insertion: "Time Complexity: Best O(n) | Avg O(n²) | Worst O(n²)",
+            merge: "Time Complexity: Best O(n log n) | Avg O(n log n) | Worst O(n log n)",
+            quick: "Time Complexity: Best O(n log n) | Avg O(n log n) | Worst O(n²)",
+            heap: "Time Complexity: Best O(n log n) | Avg O(n log n) | Worst O(n log n)"
+        };
+
+        // 유틸리티 교환 함수 (가독성 개선)
+        function swap(arr, i, j) {
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+
+        // 알고리즘별 소스 코드 스니펫 정의
+        const codeSnippets = {
+            bubble: [
+                "function bubbleSort(arr) {",
+                "  let n = arr.length;",
+                "  for (let i = 0; i < n - 1; i++) {",
+                "    for (let j = 0; j < n - i - 1; j++) {",
+                "      if (arr[j] > arr[j + 1]) {",
+                "        swap(arr, j, j + 1);",
+                "      }",
+                "    }",
+                "  }",
+                "}"
+            ],
+            selection: [
+                "function selectionSort(arr) {",
+                "  let n = arr.length;",
+                "  for (let i = 0; i < n - 1; i++) {",
+                "    let minIdx = i;",
+                "    for (let j = i + 1; j < n; j++) {",
+                "      if (arr[j] < arr[minIdx]) minIdx = j;",
+                "    }",
+                "    swap(arr, i, minIdx);",
+                "  }",
+                "}"
+            ],
+            insertion: [
+                "function insertionSort(arr) {",
+                "  let n = arr.length;",
+                "  for (let i = 1; i < n; i++) {",
+                "    let key = arr[i], j = i - 1;",
+                "    while (j >= 0 && arr[j] > key) {",
+                "      arr[j + 1] = arr[j]; j--;",
+                "    }",
+                "    arr[j + 1] = key;",
+                "  }",
+                "}"
+            ],
+            merge: [
+                "function mergeSort(arr, start, end) {",
+                "  if (start >= end) return;",
+                "  const mid = Math.floor((start + end) / 2);",
+                "  mergeSort(arr, start, mid);",
+                "  mergeSort(arr, mid + 1, end);",
+                "  merge(arr, start, mid, end);",
+                "}"
+            ],
+            quick: [
+                "function quickSort(arr, low, high) {",
+                "  if (low < high) {",
+                "    let pi = partition(arr, low, high);",
+                "    quickSort(arr, low, pi - 1);",
+                "    quickSort(arr, pi + 1, high);",
+                "  }",
+                "}"
+            ],
+            heap: [
+                "function heapSort(arr) {",
+                "  let n = arr.length;",
+                "  for (let i = Math.floor(n / 2) - 1; i >= 0; i--)",
+                "    heapify(arr, n, i);",
+                "  for (let i = n - 1; i > 0; i--) {",
+                "    swap(arr, 0, i);",
+                "    heapify(arr, i, 0);",
+                "  }",
+                "}"
+            ]
+        };
+
+        // 간단한 신택스 하이라이팅 적용 함수
+        function highlightCode(line) {
+            let escaped = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            const keywords = /\b(function|let|const|for|if|else|while|return)\b/g;
+            escaped = escaped.replace(keywords, '<span class="token-keyword">$1</span>');
+
+            const functions = /\b(Math|floor|length|swap|partition|heapify|mergeSort|quickSort|heapSort|bubbleSort|selectionSort|insertionSort|merge)\b/g;
+            escaped = escaped.replace(functions, '<span class="token-function">$1</span>');
+
+            const numbers = /\b(\d+)\b/g;
+            escaped = escaped.replace(numbers, '<span class="token-number">$1</span>');
+
+            return escaped;
+        }
+
+        function renderCodePanel(algoType) {
+            const panel = document.getElementById('m1-code');
+            panel.innerHTML = '';
+            const lines = codeSnippets[algoType] || codeSnippets['bubble'];
+            lines.forEach((line, idx) => {
+                const div = document.createElement('div');
+                div.className = 'code-line';
+                div.id = `cl-${idx + 1}`;
+                div.innerHTML = highlightCode(line);
+                panel.appendChild(div);
+            });
+        }
+
+        function updateBigOInfo(algoType) {
+            const bigOElem = document.getElementById('m1-bigo');
+            if (bigOElem) {
+                bigOElem.textContent = bigOData[algoType] || "";
+            }
+        }
+
+        function onAlgoChange() {
+            const algo = document.getElementById('algo-select').value;
+            renderCodePanel(algo);
+            updateBigOInfo(algo);
+            resetVisualization();
+            checkCloseSidebar();
+        }
+
+        function toggleSidebar() { 
+            const isActive = sidebar.classList.toggle('active');
+            if (isActive) {
+                backdrop.classList.add('active');
+            } else {
+                backdrop.classList.remove('active');
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        }
+
+        function checkCloseSidebar() {
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            checkCloseSidebar();
+        });
+
+        function switchMode(modeNum) {
+            pauseVisualization();
+            currentMode = modeNum;
+            document.querySelectorAll('.workspace').forEach(el => el.classList.remove('active'));
+            document.getElementById(`mode-${modeNum}`).classList.add('active');
+            
+            document.querySelectorAll('.control-group .menu-btn').forEach((btn, idx) => {
+                if(idx < 2) btn.classList.toggle('active-mode', idx + 1 === modeNum);
+            });
+
+            document.getElementById('algo-select-group').style.display = (modeNum === 2) ? 'none' : 'flex';
+            document.getElementById('race-select-group').style.display = (modeNum === 2) ? 'flex' : 'none';
+
+            if (modeNum === 1) {
+                const currentAlgo = document.getElementById('algo-select').value;
+                renderCodePanel(currentAlgo);
+                updateBigOInfo(currentAlgo);
+            }
+            resetVisualization();
+            checkCloseSidebar();
+        }
+
+        let arraySize = 25;
+        let dataArray = [];
+        let raceArray1 = [];
+        let raceArray2 = [];
+
+        function generateRandomArray() {
+            dataArray = [];
+            for (let i = 0; i < arraySize; i++) {
+                dataArray.push(Math.floor(Math.random() * 85) + 15);
+            }
+            raceArray1 = [...dataArray];
+            raceArray2 = [...dataArray];
+        }
+
+        function renderBars(containerId, arr, highlightIndices = {}) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            container.style.setProperty('--count', arr.length);
+
+            arr.forEach((val, idx) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${val}%`;
+                
+                if (highlightIndices.compare === idx) {
+                    bar.style.backgroundColor = '#f8bbd0';
+                } else if (highlightIndices.swap === idx) {
+                    bar.style.backgroundColor = '#bbdefb';
+                } else if (highlightIndices.sorted && highlightIndices.sorted.includes(idx)) {
+                    bar.style.backgroundColor = '#c8e6c9';
+                } else {
+                    bar.style.backgroundColor = '#fff9c4';
+                }
+                container.appendChild(bar);
+            });
+        }
+
+        function resetVisualization() {
+            pauseVisualization();
+            generateRandomArray();
+            if (currentMode === 1) {
+                renderBars('m1-bars', dataArray);
+                document.getElementById('m1-status').textContent = "Status: Ready";
+                document.getElementById('m1-comps').textContent = "Comparisons: 0";
+            } else if (currentMode === 2) {
+                renderBars('race-bars-1', raceArray1);
+                renderBars('race-bars-2', raceArray2);
+                const sel1 = document.getElementById('race-algo-1');
+                const sel2 = document.getElementById('race-algo-2');
+                document.getElementById('race-title-1').textContent = sel1.options[sel1.selectedIndex].text;
+                document.getElementById('race-title-2').textContent = sel2.options[sel2.selectedIndex].text;
+            }
+            checkCloseSidebar();
+        }
+
+        async function startVisualization() {
+            if (isRunning) return;
+            isRunning = true;
+
+            if (currentMode === 1) {
+                const algo = document.getElementById('algo-select').value;
+                await runSortingAlgorithm([...dataArray], algo, 'm1-bars', 'm1-status', 'm1-comps', true);
+            } else if (currentMode === 2) {
+                await startRace();
+            }
+            isRunning = false;
+        }
+
+        function pauseVisualization() {
+            isRunning = false;
+            checkCloseSidebar();
+        }
+
+        async function runSortingAlgorithm(arr, algoType, containerId, statusId, compId, isCodeSync = false) {
+            let comps = 0;
+            let n = arr.length;
+            
+            const highlightLine = (lineNo) => {
+                if (!isCodeSync) return;
+                document.querySelectorAll('.code-line').forEach(el => el.classList.remove('highlight'));
+                const target = document.getElementById(`cl-${lineNo}`);
+                if(target) target.classList.add('highlight');
+            };
+
+            if (statusId) document.getElementById(statusId).textContent = "Status: Running...";
+            highlightLine(1);
+
+            if (algoType === 'bubble') {
+                highlightLine(3);
+                for (let i = 0; i < n - 1; i++) {
+                    highlightLine(4);
+                    for (let j = 0; j < n - i - 1; j++) {
+                        if (!isRunning) return;
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+
+                        renderBars(containerId, arr, { compare: j, swap: j + 1 });
+                        await new Promise(r => setTimeout(r, 25));
+
+                        if (arr[j] > arr[j + 1]) {
+                            highlightLine(6);
+                            swap(arr, j, j + 1);
+                            renderBars(containerId, arr, { swap: j + 1 });
+                            await new Promise(r => setTimeout(r, 25));
+                        }
+                    }
+                }
+            } else if (algoType === 'selection') {
+                highlightLine(3);
+                for (let i = 0; i < n - 1; i++) {
+                    let minIdx = i;
+                    highlightLine(5);
+                    for (let j = i + 1; j < n; j++) {
+                        if (!isRunning) return;
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+
+                        renderBars(containerId, arr, { compare: j, swap: minIdx });
+                        await new Promise(r => setTimeout(r, 25));
+
+                        if (arr[j] < arr[minIdx]) {
+                            minIdx = j;
+                        }
+                    }
+                    if (minIdx !== i) {
+                        highlightLine(8);
+                        swap(arr, i, minIdx);
+                        renderBars(containerId, arr, { swap: i });
+                        await new Promise(r => setTimeout(r, 25));
+                    }
+                }
+            } else if (algoType === 'insertion') {
+                highlightLine(3);
+                for (let i = 1; i < n; i++) {
+                    let key = arr[i];
+                    let j = i - 1;
+                    highlightLine(5);
+                    while (j >= 0 && arr[j] > key) {
+                        if (!isRunning) return;
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+
+                        highlightLine(6);
+                        arr[j + 1] = arr[j];
+                        j--;
+                        renderBars(containerId, arr, { compare: j + 1 });
+                        await new Promise(r => setTimeout(r, 25));
+                    }
+                    highlightLine(8);
+                    arr[j + 1] = key;
+                }
+            } else if (algoType === 'merge') {
+                highlightLine(2);
+                async function mergeSort(start, end) {
+                    if (start >= end) return;
+                    const mid = Math.floor((start + end) / 2);
+                    highlightLine(4);
+                    await mergeSort(start, mid);
+                    highlightLine(5);
+                    await mergeSort(mid + 1, end);
+                    highlightLine(6);
+                    await merge(start, mid, end);
+                }
+                async function merge(start, mid, end) {
+                    let temp = [];
+                    let i = start, j = mid + 1;
+                    while (i <= mid && j <= end) {
+                        if (!isRunning) return;
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+                        renderBars(containerId, arr, { compare: i, swap: j });
+                        await new Promise(r => setTimeout(r, 25));
+
+                        if (arr[i] <= arr[j]) {
+                            temp.push(arr[i++]);
+                        } else {
+                            temp.push(arr[j++]);
+                        }
+                    }
+                    while (i <= mid) temp.push(arr[i++]);
+                    while (j <= end) temp.push(arr[j++]);
+                    for (let k = 0; k < temp.length; k++) {
+                        if (!isRunning) return;
+                        arr[start + k] = temp[k];
+                        renderBars(containerId, arr, { swap: start + k });
+                        await new Promise(r => setTimeout(r, 20));
+                    }
+                }
+                await mergeSort(0, n - 1);
+            } else if (algoType === 'quick') {
+                highlightLine(2);
+                async function quickSort(low, high) {
+                    if (low < high) {
+                        highlightLine(3);
+                        let pi = await partition(low, high);
+                        highlightLine(4);
+                        await quickSort(low, pi - 1);
+                        highlightLine(5);
+                        await quickSort(pi + 1, high);
+                    }
+                }
+                async function partition(low, high) {
+                    let pivot = arr[high];
+                    let i = low - 1;
+                    for (let j = low; j < high; j++) {
+                        if (!isRunning) return;
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+                        renderBars(containerId, arr, { compare: j, swap: high });
+                        await new Promise(r => setTimeout(r, 25));
+
+                        if (arr[j] < pivot) {
+                            i++;
+                            swap(arr, i, j);
+                        }
+                    }
+                    swap(arr, i + 1, high);
+                    renderBars(containerId, arr, { swap: i + 1 });
+                    await new Promise(r => setTimeout(r, 25));
+                    return i + 1;
+                }
+                await quickSort(0, n - 1);
+            } else if (algoType === 'heap') {
+                highlightLine(3);
+                async function heapify(heapSize, i) {
+                    let largest = i;
+                    let left = 2 * i + 1;
+                    let right = 2 * i + 2;
+
+                    if (left < heapSize) {
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+                        if (arr[left] > arr[largest]) largest = left;
+                    }
+                    if (right < heapSize) {
+                        comps++;
+                        if(compId) document.getElementById(compId).textContent = `Comparisons: ${comps}`;
+                        if (arr[right] > arr[largest]) largest = right;
+                    }
+
+                    if (largest !== i) {
+                        if (!isRunning) return;
+                        swap(arr, i, largest);
+                        renderBars(containerId, arr, { compare: i, swap: largest });
+                        await new Promise(r => setTimeout(r, 25));
+                        await heapify(heapSize, largest);
+                    }
+                }
+                for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                    if (!isRunning) return;
+                    highlightLine(4);
+                    await heapify(n, i);
+                }
+                for (let i = n - 1; i > 0; i--) {
+                    if (!isRunning) return;
+                    highlightLine(5);
+                    swap(arr, 0, i);
+                    renderBars(containerId, arr, { swap: i });
+                    await new Promise(r => setTimeout(r, 25));
+                    highlightLine(7);
+                    await heapify(i, 0);
+                }
+            }
+
+            renderBars(containerId, arr, { sorted: Array.from({length: n}, (_, i) => i) });
+            if (statusId) document.getElementById(statusId).textContent = "Status: Completed!";
+            return comps;
+        }
+
+        async function startRace() {
+            checkCloseSidebar();
+            const algo1 = document.getElementById('race-algo-1').value;
+            const algo2 = document.getElementById('race-algo-2').value;
+
+            const sel1 = document.getElementById('race-algo-1');
+            const sel2 = document.getElementById('race-algo-2');
+            document.getElementById('race-title-1').textContent = sel1.options[sel1.selectedIndex].text;
+            document.getElementById('race-title-2').textContent = sel2.options[sel2.selectedIndex].text;
+
+            await Promise.all([
+                runSortingAlgorithm([...raceArray1], algo1, 'race-bars-1', null, null, false),
+                runSortingAlgorithm([...raceArray2], algo2, 'race-bars-2', null, null, false)
+            ]);
+        }
+
+        window.onload = function() {
+            renderCodePanel('bubble');
+            updateBigOInfo('bubble');
+            resetVisualization();
+        };
+    </script>
+</body>
+</html>
