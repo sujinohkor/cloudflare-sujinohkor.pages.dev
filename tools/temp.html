@@ -118,15 +118,15 @@
             outline: none; line-height: 1.5; white-space: pre-wrap; word-break: break-all; overflow-y: auto; 
         }
 
-        /* 루비 병음 뷰어 스타일 */
+        /* 루비 병음 뷰어 스타일 (행간을 넓혀 상단 병음이 잘리지 않도록 조정) */
         #ruby-viewer {
             position: absolute; top: 0; left: 50px; right: 0; bottom: 0;
             padding: 40px; background: #101010; color: #fff;
             font-family: 'Segoe UI', sans-serif; font-size: 1.3rem;
-            line-height: 2.5; white-space: pre-wrap; word-break: break-all;
+            line-height: 2.8; white-space: pre-wrap; word-break: break-all;
             overflow-y: auto; display: none; z-index: 5;
         }
-        ruby { display: inline-block; text-align: center; margin: 0 2px; }
+        ruby { display: inline-block; text-align: center; margin: 0 4px; }
         rt { font-size: 0.65rem; color: #ff9e40; font-family: 'Consolas', sans-serif; }
 
         body.light-mode { background-color: #fff; color: #202020; }
@@ -179,7 +179,6 @@
                 <button class="mode-btn" id="mode-trad" onclick="setMode('traditional')">繁體 (Trad)</button>
             </div>
 
-            <!-- ⭐ 병음 가이드 뷰어 토글 버튼 추가 -->
             <button class="menu-btn" id="guide-toggle-btn" onclick="togglePinyinGuide()">Pinyin Guide View</button>
 
             <div class="info-panel">
@@ -219,7 +218,6 @@
                 <div class="editor-wrapper">
                     <div id="line-numbers" class="line-numbers">1</div>
                     <textarea id="text-input" placeholder="Type Chinese pinyin or punctuation here..." autocomplete="off" spellcheck="false"></textarea>
-                    <!-- ⭐ 루비 병음 가이드 뷰어 레이어 -->
                     <div id="ruby-viewer"></div>
                 </div>
             </section>
@@ -244,7 +242,7 @@
         let currentPinyinToken = ''; 
         let currentPinyinStart = 0;  
         let currentPage = 0;
-        let isGuideMode = false; // 병음 가이드 모드 상태
+        let isGuideMode = false;
         const pageSize = 9;
 
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
@@ -303,7 +301,6 @@
             if (isGuideMode) updatePinyinGuide();
         }
 
-        // ⭐ 병음 가이드 뷰어 토글 및 업데이트 함수
         function togglePinyinGuide() {
             isGuideMode = !isGuideMode;
             guideToggleBtn.classList.toggle('active-guide', isGuideMode);
@@ -320,6 +317,7 @@
             }
         }
 
+        // ⭐ 단일 글자 조회 시의 병음 추출 구조에 맞춘 가이드 생성 함수
         async function updatePinyinGuide() {
             const text = textInput.value;
             if (!text.trim()) {
@@ -330,7 +328,6 @@
             rubyViewer.innerHTML = 'Generating pinyin guide...';
             let htmlResult = '';
             
-            // 한 글자씩 분해하여 병음 조회 (한자일 경우에만 워커를 통해 병음 추출)
             for (let char of text) {
                 if (char === '\n') {
                     htmlResult += '<br>';
@@ -345,9 +342,16 @@
                     const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(char)}`);
                     const data = await res.json();
                     let pinyin = '';
-                    if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][2] && data[1][0][2].annotation) {
-                        pinyin = data[1][0][2].annotation[0] || '';
+                    
+                    // 단일 문자 검색 결과 구조에서 annotation 안전하게 추출
+                    if (data && data[0] === 'SUCCESS' && data[1] && data[1][0]) {
+                        // 대다수 단일 글자 응답의 메타데이터 위치 확인
+                        const metaObj = data[1][0][2];
+                        if (metaObj && metaObj.annotation && metaObj.annotation[0]) {
+                            pinyin = metaObj.annotation[0];
+                        }
                     }
+
                     if (pinyin) {
                         htmlResult += `<ruby>${char}<rt>${pinyin}</rt></ruby>`;
                     } else {
