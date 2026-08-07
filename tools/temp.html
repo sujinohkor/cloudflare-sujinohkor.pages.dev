@@ -118,17 +118,19 @@
         textarea { 
             flex: 1; height: 100%; padding: 40px; background: transparent; border: none; 
             color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; 
-            outline: none; line-height: 1.5; white-space: pre-wrap; word-break: break-all; overflow-y: auto; 
+            outline: none; line-height: 1.5; 
+            white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; /* 줄바꿈 강제 */
+            overflow-y: auto; overflow-x: hidden; /* 세로 스크롤만 허용, 가로 스크롤 숨김 */
         }
 
         #ruby-viewer {
             position: absolute; top: 0; left: 50px; right: 0; bottom: 0;
             padding: 40px; background: #101010; color: #fff;
-            font-family: 'Segoe UI', sans-serif; 
-            font-size: 2rem; /* 기존 1.3rem에서 2rem으로 확대 */
-            line-height: 3.5; /* 글자가 커진 만큼 상단 병음 공간을 더 넉넉하게 확보 */
-            white-space: pre-wrap; word-break: break-all;
-            overflow-y: auto; display: none; z-index: 5;
+            font-family: 'Segoe UI', sans-serif; font-size: 2rem; 
+            line-height: 3.5; 
+            white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; /* 줄바꿈 강제 */
+            overflow-y: auto; overflow-x: hidden; /* 세로 스크롤만 허용, 가로 스크롤 숨김 */
+            display: none; z-index: 5;
         }
         
         ruby { 
