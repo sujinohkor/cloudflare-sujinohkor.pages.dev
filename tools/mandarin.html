@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -223,7 +224,7 @@
         let currentPinyinToken = ''; 
         let currentPinyinStart = 0;  
         let currentPage = 0;
-        const pageSize = 9; // 한 페이지에 표시할 후보 개수 9개
+        const pageSize = 9; // 한 페이지에 표시할 후보 개수 9개로 변경
 
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
@@ -305,7 +306,6 @@
             currentPinyinStart = start;
             currentPinyinToken = val.substring(start, cursorPos).toLowerCase();
 
-            // 빈 값일 경우 요청 방지 (400 Bad Request 방어)
             if (!currentPinyinToken) {
                 clearCandidates();
                 return;
@@ -314,15 +314,37 @@
             statusText.textContent = "Searching...";
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(async () => {
-                if (!currentPinyinToken) return;
-
                 try {
                     const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(currentPinyinToken)}`);
                     const data = await res.json();
 
-                    // ⭐ 워커 결과물 구조(data[1][0][1])에서 전체 한자 리스트를 정확하게 추출
-                    if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
-                        currentMatches = data[1][0][1];
+                    // 프록시 응답 구조 전체를 탐색하여 모든 후보군을 수집
+                    if (data && data[0] === 'SUCCESS' && data[1]) {
+                        let matches = [];
+                        // data[1] 안에 있는 모든 하위 배열 및 후보군 리스트 병합
+                        data[1].forEach(block => {
+                            if (Array.isArray(block)) {
+                                block.forEach(sub => {
+                                    if (Array.isArray(sub)) {
+                                        sub.forEach(val => {
+                                            if (Array.isArray(val)) {
+                                                matches = matches.concat(val);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+
+                        // 중복 제거 및 유효 문자 필터링
+                        let uniqueMatches = [...new Set(matches.filter(item => typeof item === 'string' && item.length > 0))]
+                        
+                        // 기본 안전 장치: 만약 위 순회가 안 됐다면 기존 경로 시도
+                        if (uniqueMatches.length === 0 && data[1][0] && data[1][0][1]) {
+                            uniqueMatches = data[1][0][1];
+                        }
+
+                        currentMatches = uniqueMatches.length > 0 ? uniqueMatches : [currentPinyinToken];
                         currentPage = 0;
                         renderCandidates();
                         statusText.textContent = "Ready";
