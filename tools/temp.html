@@ -7,6 +7,8 @@
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <!-- OpenCC-JS (간체/번체 변환용) -->
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+    <!-- pinyin-pro (성조가 포함된 정확한 병음 변환용 라이브러리) -->
+    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.16.0/dist/index.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
@@ -316,64 +318,38 @@
             }
         }
 
-        async function updatePinyinGuide() {
+        // ⭐ pinyin-pro 라이브러리를 활용해 성조가 포함된 병음을 정확하게 생성
+        function updatePinyinGuide() {
             const text = textInput.value;
             if (!text.trim()) {
                 rubyViewer.innerHTML = '<span style="color: #666; font-size: 0.9rem;">No text to display...</span>';
                 return;
             }
 
-            rubyViewer.innerHTML = 'Generating pinyin guide...';
-
-            try {
-                const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(text)}`);
-                const data = await res.json();
-
-                let annotations = [];
-                if (data && data[0] === 'SUCCESS' && data[1] && data[1][0]) {
-                    if (data[1][0][2] && data[1][0][2].annotation) {
-                        annotations = data[1][0][2].annotation;
-                    }
+            let htmlResult = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '\n') {
+                    htmlResult += '<br>';
+                    continue;
+                }
+                // 공백이나 영문, 특수문자, 숫자는 그대로 출력
+                if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
+                    htmlResult += char;
+                    continue;
                 }
 
-                let charPinyinMap = {};
-                if (annotations.length > 0) {
-                    const bestHanzi = text;
-                    const bestAnnotation = annotations[0];
-                    const pinyinParts = bestAnnotation.split(' ');
-                    
-                    if (pinyinParts.length === bestHanzi.length) {
-                        for (let i = 0; i < bestHanzi.length; i++) {
-                            charPinyinMap[i] = pinyinParts[i];
-                        }
-                    }
+                // pinyin-pro를 이용해 해당 한자의 성조가 포함된 병음 추출 (예: 我 -> wǒ)
+                const pinyin = pinyinPro.pinyin(char, { toneType: 'symbol', type: 'string' });
+
+                if (pinyin) {
+                    htmlResult += `<ruby>${char}<rt>${pinyin}</rt></ruby>`;
+                } else {
+                    htmlResult += char;
                 }
-
-                let htmlResult = '';
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    if (char === '\n') {
-                        htmlResult += '<br>';
-                        continue;
-                    }
-                    if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
-                        htmlResult += char;
-                        continue;
-                    }
-
-                    let pinyin = charPinyinMap[i] || '';
-                    if (pinyin) {
-                        htmlResult += `<ruby>${char}<rt>${pinyin}</rt></ruby>`;
-                    } else {
-                        htmlResult += char;
-                    }
-                }
-
-                rubyViewer.innerHTML = htmlResult || text;
-            } catch (err) {
-                console.error("Pinyin guide fetch error:", err);
-                rubyViewer.innerHTML = text;
             }
+
+            rubyViewer.innerHTML = htmlResult;
         }
 
         let debounceTimer;
