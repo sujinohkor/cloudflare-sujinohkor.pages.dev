@@ -117,28 +117,31 @@
         textarea { 
             flex: 1; height: 100%; padding: 40px; background: transparent; border: none; 
             color: #fff; font-family: 'Consolas', sans-serif; font-size: 1rem; resize: none; 
-            outline: none; line-height: 1.5; white-space: pre-wrap; word-break: break-all; overflow-y: auto; 
+            outline: none; line-height: 1.5; 
+            white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; /* 줄바꿈 강제 */
+            overflow-y: auto; overflow-x: hidden; /* 세로 스크롤만 허용, 가로 스크롤 숨김 */
         }
 
         #ruby-viewer {
             position: absolute; top: 0; left: 50px; right: 0; bottom: 0;
             padding: 40px; background: #101010; color: #fff;
-            font-family: 'Segoe UI', sans-serif; font-size: 1.3rem;
-            line-height: 3.2; /* 상단 병음 공간 확보를 위한 넉넉한 줄간격 */
-            white-space: pre-wrap; word-break: break-all;
-            overflow-y: auto; display: none; z-index: 5;
+            font-family: 'Segoe UI', sans-serif; font-size: 2rem; 
+            line-height: 3.5; 
+            white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; /* 줄바꿈 강제 */
+            overflow-y: auto; overflow-x: hidden; /* 세로 스크롤만 허용, 가로 스크롤 숨김 */
+            display: none; z-index: 5;
         }
         
-        /* 루비 태그 상단 고정 강제 스타일 */
         ruby { 
             ruby-position: over; 
             -webkit-ruby-position: over;
             display: inline-ruby; 
             text-align: center; 
-            margin: 0 3px; 
+            margin: 0 6px; /* 글자가 커진 만큼 간격도 살짝 넓힘 */
         }
+        
         rt { 
-            font-size: 0.65rem; 
+            font-size: 0.75rem; /* 병음 글자 크기 상향 조정 (기존 0.65rem) */
             color: #ff9e40; 
             font-family: 'Consolas', sans-serif; 
             font-weight: normal;
