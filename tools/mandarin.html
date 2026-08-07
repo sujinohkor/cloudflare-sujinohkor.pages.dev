@@ -47,7 +47,6 @@
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        /* ⭐ 처음 원본 코드와 동일하게 하단 버튼 전용 패딩 크기(11px 14px)로 복원 */
         .bottom-btns .menu-btn { padding: 11px 14px; font-size: 0.85rem; }
 
         .mode-group { display: flex; gap: 8px; }
@@ -79,14 +78,16 @@
         .candidate-box {
             min-height: 50px; background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid rgba(255, 158, 64, 0.25);
-            display: flex; flex-direction: column; padding: 10px 20px; gap: 8px; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; font-size: 0.9rem;
         }
-        .candidates-list { display: flex; gap: 10px; flex-wrap: wrap; min-height: 24px; align-items: center; }
+        .candidates-list { display: flex; gap: 8px; flex-wrap: wrap; min-height: 24px; align-items: center; flex: 1; }
         .candidate-item {
             background: rgba(255, 158, 64, 0.15); border: 1px solid rgba(255, 158, 64, 0.4);
             color: #fff; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; transition: 0.2s;
         }
         .candidate-item:hover, .candidate-item.selected { background: #ff9e40; color: #101010; }
+
+        .page-indicator { font-size: 0.8rem; color: #ff9e40; margin-left: 10px; white-space: nowrap; font-weight: bold; }
 
         .fullscreen-btn { 
             position: absolute; top: 15px; right: 15px; z-index: 10; 
@@ -195,6 +196,7 @@
                     <div id="candidates-container" class="candidates-list">
                         <span style="color: #666; font-size: 0.85rem;">Candidates will appear here as you type...</span>
                     </div>
+                    <div id="page-indicator" class="page-indicator" style="display: none;"></div>
                 </div>
 
                 <div class="editor-wrapper">
@@ -208,6 +210,7 @@
     <script>
         const textInput = document.getElementById('text-input');
         const candidatesContainer = document.getElementById('candidates-container');
+        const pageIndicator = document.getElementById('page-indicator');
         const lineNumbers = document.getElementById('line-numbers');
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('main-content');
@@ -219,6 +222,9 @@
         let currentMatches = [];
         let currentPinyinToken = ''; 
         let currentPinyinStart = 0;  
+        let currentPage = 0;
+        const pageSize = 9; // 한 페이지에 표시할 후보 개수 9개
+
         const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
         const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
 
@@ -284,7 +290,8 @@
                 currentPinyinStart = cursorPos - 1;
                 currentPinyinToken = charBeforeCursor;
                 currentMatches = punctuationMap[charBeforeCursor];
-                renderCandidates(currentMatches);
+                currentPage = 0;
+                renderCandidates();
                 statusText.textContent = "Ready";
                 updateEditorState();
                 return;
@@ -298,6 +305,7 @@
             currentPinyinStart = start;
             currentPinyinToken = val.substring(start, cursorPos).toLowerCase();
 
+            // 빈 값일 경우 요청 방지 (400 Bad Request 방어)
             if (!currentPinyinToken) {
                 clearCandidates();
                 return;
@@ -306,17 +314,22 @@
             statusText.textContent = "Searching...";
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(async () => {
+                if (!currentPinyinToken) return;
+
                 try {
                     const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(currentPinyinToken)}`);
                     const data = await res.json();
 
+                    // ⭐ 워커 결과물 구조(data[1][0][1])에서 전체 한자 리스트를 정확하게 추출
                     if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
                         currentMatches = data[1][0][1];
-                        renderCandidates(currentMatches);
+                        currentPage = 0;
+                        renderCandidates();
                         statusText.textContent = "Ready";
                     } else {
                         currentMatches = [currentPinyinToken];
-                        renderCandidates([currentPinyinToken]);
+                        currentPage = 0;
+                        renderCandidates();
                         statusText.textContent = "Ready";
                     }
                 } catch (err) {
@@ -331,14 +344,25 @@
         function clearCandidates() {
             currentMatches = [];
             currentPinyinToken = '';
+            currentPage = 0;
             candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear here as you type...</span>`;
+            pageIndicator.style.display = 'none';
             statusText.textContent = "Ready";
             updateEditorState();
         }
 
-        function renderCandidates(list) {
+        function renderCandidates() {
             candidatesContainer.innerHTML = '';
-            list.forEach((hanzi, index) => {
+            if (currentMatches.length === 0) {
+                pageIndicator.style.display = 'none';
+                return;
+            }
+
+            const totalPages = Math.ceil(currentMatches.length / pageSize);
+            const startIdx = currentPage * pageSize;
+            const pageItems = currentMatches.slice(startIdx, startIdx + pageSize);
+
+            pageItems.forEach((hanzi, index) => {
                 let converted = punctuationMap[currentPinyinToken] ? hanzi : (currentMode === 'traditional' ? toTraditional(hanzi) : toSimplified(hanzi));
                 let btn = document.createElement('div');
                 btn.className = 'candidate-item' + (index === 0 ? ' selected' : '');
@@ -346,6 +370,13 @@
                 btn.onclick = () => selectHanzi(converted);
                 candidatesContainer.appendChild(btn);
             });
+
+            if (totalPages > 1) {
+                pageIndicator.style.display = 'block';
+                pageIndicator.textContent = `${currentPage + 1}/${totalPages}`;
+            } else {
+                pageIndicator.style.display = 'none';
+            }
         }
 
         function selectHanzi(hanzi) {
@@ -363,14 +394,23 @@
             updateEditorState();
         }
 
+        // 키보드 이벤트 처리 (Tab 또는 스페이스바를 누르면 다음 9개 후보 페이지로 순환)
         textInput.addEventListener('keydown', (e) => {
-            if (currentPinyinToken) {
-                if (e.key === 'Enter') {
+            if (currentMatches.length > 0) {
+                if (e.key === 'Tab' || e.key === ' ') {
+                    e.preventDefault();
+                    const totalPages = Math.ceil(currentMatches.length / pageSize);
+                    if (totalPages > 1) {
+                        currentPage = (currentPage + 1) % totalPages;
+                        renderCandidates();
+                    }
+                    return;
+                } else if (e.key === 'Enter') {
                     e.preventDefault();
                     const firstCandidate = candidatesContainer.querySelector('.candidate-item');
                     if (firstCandidate) firstCandidate.click();
                     return;
-                } else if (/^[1-5]$/.test(e.key)) {
+                } else if (/^[1-9]$/.test(e.key)) {
                     const index = parseInt(e.key) - 1;
                     const candidateItems = candidatesContainer.querySelectorAll('.candidate-item');
                     if (candidateItems[index]) {
