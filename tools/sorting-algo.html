@@ -8,7 +8,7 @@
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
         
         .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
@@ -47,8 +47,8 @@
         /* 메인 콘텐츠 영역 */
         .main-content { 
             margin-left: 300px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; 
-            gap: 20px; overflow: hidden; transition: all 0.3s ease; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: all 0.3s ease; 
             width: calc(100% - 300px);
         }
 
@@ -78,6 +78,7 @@
             border: 2px solid #ff9e40; 
             border-radius: 16px; 
             flex: 1; 
+            min-height: 500px;
             display: flex; 
             flex-direction: column;
             overflow: hidden; 
@@ -93,9 +94,9 @@
         .workspace.active { display: flex; }
 
         /* 시각화 및 코드 동기화 레이아웃 */
-        .algo-layout { display: flex; width: 100%; flex: 1; gap: 20px; min-height: 0; }
-        .visual-panel { flex: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; }
-        .code-panel { flex: 1; background: rgba(10,10,10,0.8); border: 1px solid rgba(255,158,64,0.2); border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.85rem; overflow-y: auto; color: #ccc; display: flex; flex-direction: column; gap: 4px; }
+        .algo-layout { display: flex; width: 100%; flex: 1; gap: 20px; min-height: 350px; }
+        .visual-panel { flex: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; min-height: 250px; }
+        .code-panel { flex: 1; background: rgba(10,10,10,0.8); border: 1px solid rgba(255,158,64,0.2); border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.85rem; overflow-y: auto; color: #ccc; display: flex; flex-direction: column; gap: 4px; min-height: 250px; }
         .code-line { padding: 2px 6px; border-radius: 4px; transition: background 0.2s; white-space: pre-wrap; }
         .code-line.highlight { background: rgba(255, 158, 64, 0.3); color: #ff9e40; font-weight: bold; }
 
@@ -109,13 +110,13 @@
         .bar { width: max(4px, calc(100% / var(--count))); background-color: #fff9c4; border-radius: 4px 4px 0 0; transition: height 0.1s ease, background-color 0.1s ease; }
         
         /* 레이스 모드 */
-        .race-container { display: flex; width: 100%; flex: 1; gap: 15px; min-height: 0; margin-top: 10px; }
-        .race-box { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; align-items: center; justify-content: flex-end; position: relative; }
+        .race-container { display: flex; width: 100%; flex: 1; gap: 15px; min-height: 350px; margin-top: 10px; }
+        .race-box { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; align-items: center; justify-content: flex-end; position: relative; min-height: 250px; }
         .race-title { position: absolute; top: 15px; font-weight: bold; color: #ff9e40; font-size: 0.9rem; }
 
         /* 상태 정보 바 */
         .stats-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 5px 0 15px 0; font-size: 0.85rem; color: #ff9e40; font-weight: bold; flex-wrap: wrap; gap: 10px; }
-        .stats-left { display: flex; gap: 20px; align-items: center; }
+        .stats-left { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
         .stats-right { background: rgba(255, 158, 64, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255, 158, 64, 0.3); font-size: 0.8rem; }
 
         /* 라이트 모드 대응 */
@@ -138,14 +139,15 @@
         body.light-mode .visual-panel, body.light-mode .race-box { background: #ffffff; border: 1px solid rgba(243, 128, 32, 0.25); }
 
         /* 모바일 대응 */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         @media (max-width: 900px) {
+            body { overflow: auto; }
             .menu-toggle-btn { display: block; }
-            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; z-index: 3000; }
+            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; z-index: 3000; height: calc(100vh - 40px); }
             body.light-mode .sidebar { background: #ffffff !important; }
             .sidebar.active { transform: translateX(0); }
             .sidebar-backdrop.active { display: block; opacity: 1; }
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; min-height: 100vh; overflow: visible; }
             .algo-layout, .race-container { flex-direction: column; }
         }
     </style>
