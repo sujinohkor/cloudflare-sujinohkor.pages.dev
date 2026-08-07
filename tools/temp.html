@@ -124,11 +124,25 @@
             position: absolute; top: 0; left: 50px; right: 0; bottom: 0;
             padding: 40px; background: #101010; color: #fff;
             font-family: 'Segoe UI', sans-serif; font-size: 1.3rem;
-            line-height: 2.8; white-space: pre-wrap; word-break: break-all;
+            line-height: 3.2; /* 상단 병음 공간 확보를 위한 넉넉한 줄간격 */
+            white-space: pre-wrap; word-break: break-all;
             overflow-y: auto; display: none; z-index: 5;
         }
-        ruby { display: inline-block; text-align: center; margin: 0 4px; }
-        rt { font-size: 0.65rem; color: #ff9e40; font-family: 'Consolas', sans-serif; }
+        
+        /* 루비 태그 상단 고정 강제 스타일 */
+        ruby { 
+            ruby-position: over; 
+            -webkit-ruby-position: over;
+            display: inline-ruby; 
+            text-align: center; 
+            margin: 0 3px; 
+        }
+        rt { 
+            font-size: 0.65rem; 
+            color: #ff9e40; 
+            font-family: 'Consolas', sans-serif; 
+            font-weight: normal;
+        }
 
         body.light-mode { background-color: #fff; color: #202020; }
         body.light-mode .sidebar { background: rgba(255, 255, 255, 0.3); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }
@@ -318,7 +332,6 @@
             }
         }
 
-        // ⭐ pinyin-pro 라이브러리를 활용해 성조가 포함된 병음을 정확하게 생성
         function updatePinyinGuide() {
             const text = textInput.value;
             if (!text.trim()) {
@@ -333,13 +346,11 @@
                     htmlResult += '<br>';
                     continue;
                 }
-                // 공백이나 영문, 특수문자, 숫자는 그대로 출력
                 if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
                     htmlResult += char;
                     continue;
                 }
 
-                // pinyin-pro를 이용해 해당 한자의 성조가 포함된 병음 추출 (예: 我 -> wǒ)
                 const pinyin = pinyinPro.pinyin(char, { toneType: 'symbol', type: 'string' });
 
                 if (pinyin) {
