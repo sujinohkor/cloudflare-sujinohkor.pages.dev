@@ -187,19 +187,19 @@
             
             if (gameType === 'red') {
                 document.getElementById('btn-red').classList.add('active');
-                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44577-pokemon-red-full-color-hack.html" width="100%" height="100%" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-red-color-en.html"></iframe>`;
             } else if (gameType === 'blue-normal') {
                 document.getElementById('btn-blue-normal').classList.add('active');
-                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44697-play-as-blue-normal.html" width="600" height="450" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-blue-normal-en.html"></iframe>`;
             } else if (gameType === 'blue-hard') {
                 document.getElementById('btn-blue-hard').classList.add('active');
-                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44696-play-as-blue-hard.html" width="600" height="450" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-blue-hard-en.html"></iframe>`;
             } else if (gameType === 'yellow') {
                 document.getElementById('btn-yellow').classList.add('active');
-                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="https://f.kbhgames.com/emujs/play.php?c=gba&f=pokemon-yellow.zip"></iframe>`;
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-yellow-color-en.html"></iframe>`;
             } else if (gameType === 'team-rocket') {
                 document.getElementById('btn-team-rocket').classList.add('active');
-                iframeHTML = `<iframe src="https://www.retrogames.cc/embed/44678-pokemon-tre-team-rocket-edition.html" width="100%" height="100%" frameborder="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" allow="cross-origin-isolated"></iframe>`;
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-en.html"></iframe>`;
             }
 
             board.innerHTML = iframeHTML;
