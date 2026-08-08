@@ -311,6 +311,7 @@
         const sidebar = document.getElementById('sidebar');
         const contentCard = document.getElementById('content-card');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const mainContent = document.getElementById('main-content');
 
         window.toggleFullscreen = function() {
             contentCard.classList.toggle('fullscreen');
@@ -338,7 +339,7 @@
         });
 
         mainContent.addEventListener('click', () => { 
-            if (sidebar.classList.contains('active')) { 
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) { 
                 sidebar.classList.remove('active'); 
             } 
         });
