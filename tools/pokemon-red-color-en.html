@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <style>
+            body { background: #000; margin: 0; }
+        </style>
+        <meta name="robots" content="noindex, nofollow"/>
+    </head>
+    <body>
+        <div id="display" style="width:100%; height:100vh; max-width:100%">
+            <div id="game" style="width:100%; height:100%;"></div>
+        </div>
+        <script>
+            EJS_player = '#game';
+            EJS_core = 'gb'; // 포켓몬스터 옐로는 'gb'
+            EJS_startOnLoaded = true;
+            EJS_biosUrl = ''; 
+            EJS_gameUrl = '/assets/pokemon/pokemon-red-color-en.7z'; // 롬 파일 경로 (웹상에 올라와 있거나 같은 경로인 경우)
+            
+            // 핵심 데이터와 로더를 공식 CDN에서 직접 불러옴 (설치 불필요)
+            EJS_pathtodata = 'https://cdn.emulatorjs.org/latest/data/';
+        </script>
+        <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
+    </body>
+</html>
