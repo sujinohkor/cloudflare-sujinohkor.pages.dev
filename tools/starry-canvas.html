@@ -204,7 +204,7 @@
             </div>
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <div class="control-group">
-                <button class="menu-btn" id="btn-lock" onclick="toggleMode('lock')">별 고정 (Off)</button>
+                <button class="menu-btn" id="btn-lock" onclick="toggleMode('lock')">Pin Stars (Off)</button>
                 <button class="menu-btn" id="btn-reset" onclick="resetCanvas()">Reset</button>
             </div>
         </aside>
@@ -262,10 +262,10 @@
                 const btn = document.getElementById('btn-lock');
                 if (isStarLockActive) {
                     btn.classList.add('active');
-                    btn.textContent = '별 고정 (On)';
+                    btn.textContent = 'Pin Stars (On)';
                 } else {
                     btn.classList.remove('active');
-                    btn.textContent = '별 고정 (Off)';
+                    btn.textContent = 'Pin Stars (Off)';
                 }
             }
         }
@@ -276,7 +276,7 @@
             isStarLockActive = false;
             const btn = document.getElementById('btn-lock');
             btn.classList.remove('active');
-            btn.textContent = '별 고정 (Off)';
+            btn.textContent = 'Pin Stars (Off)';
         }
 
         canvas.addEventListener('mousedown', (e) => {
