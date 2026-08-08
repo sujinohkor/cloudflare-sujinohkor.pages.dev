@@ -44,7 +44,7 @@
             width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;            
             background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
             border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;            
-            display: flex; align-items: center; justify-content: center; line-height: 1;        }
+            display: flex; align-items: center; justify-content: center; line-height: 1;         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         /* 픽셀 팔레트 선택 버튼 그룹 */
@@ -155,7 +155,7 @@
             <div class="sidebar-title">Pixel Board</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                    
+            </div>                                
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
                 
             <div class="palette-group">
@@ -194,7 +194,7 @@
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
-        const PIXEL_SIZE = 1; // 1px x 1px 정밀 드로잉
+        const PIXEL_SIZE = 1;
 
         window.onload = function() {
             initCanvasSize();
@@ -216,7 +216,6 @@
             img.src = tempURL;
         });
 
-        // 1px 정밀 드로잉 이벤트
         canvas.addEventListener('mousedown', (e) => {
             isDrawing = true;
             const rect = canvas.getBoundingClientRect();
@@ -243,7 +242,6 @@
             }
         });
 
-        // 모바일 터치 지원
         canvas.addEventListener('touchstart', (e) => {
             isDrawing = true;
             const rect = canvas.getBoundingClientRect();
@@ -327,7 +325,7 @@
 
         function toggleSidebar() { sidebar.classList.toggle('active'); }
 
-        // 모바일에서 사이드바 내부의 모든 버튼(테마 토글 포함)을 누를 때 사이드바 자동 닫힘
+        // 사이드바 내부 버튼 클릭 시 자동 닫힘 (기존 유지)
         sidebar.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (window.innerWidth <= 900) {
@@ -336,9 +334,15 @@
             });
         });
 
-        mainContent.addEventListener('click', () => {
+        // 🌟 수정된 전역 클릭 이벤트
+        document.addEventListener('click', (e) => {
             if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
+                const menuToggleBtn = document.querySelector('.menu-toggle-btn');
+                
+                // 클릭한 대상이 사이드바 내부가 아니고, 메뉴 열기/닫기(MENU) 버튼도 아닐 때만 닫기
+                if (!sidebar.contains(e.target) && !menuToggleBtn.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
             }
         });
 
