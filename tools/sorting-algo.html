@@ -518,6 +518,8 @@
         async function startVisualization() {
             if (isRunning) return;
             isRunning = true;
+            
+            checkCloseSidebar(); // <-- 이 줄을 여기에 추가해주세요!
 
             if (currentMode === 1) {
                 const algo = document.getElementById('algo-select').value;
