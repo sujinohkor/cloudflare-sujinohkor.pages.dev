@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>Starry Canvas Lab</title>
-    <!-- Favicon settings -->
+    <title>Starry Canvas</title>
+    <!-- 파비콘 설정 추가 -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }                    
+        a { text-decoration: none; color: inherit; display: block; }
         .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
-
+        
         /* 모바일 전용 투명 배경 레이어 (사이드바가 열렸을 때만 활성화) */
         .sidebar-backdrop {
             display: none;
@@ -27,21 +26,20 @@
         }
 
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
-        .sidebar {           
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
-            background: rgba(16, 16, 16, 0.25);             
-            backdrop-filter: blur(16px);             
-            -webkit-backdrop-filter: blur(16px);            
-            padding: 25px 20px; z-index: 3000;             
-            display: flex; flex-direction: column; gap: 12px;             
-            border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 24px;            
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
+        .sidebar {
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
+            background: rgba(16, 16, 16, 0.25);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 3000;
+            display: flex; flex-direction: column; gap: 12px;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
-            overflow-y: auto;         
+            overflow-y: auto;
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
-
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
@@ -50,139 +48,146 @@
         .control-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
 
         /* 메인 콘텐츠 영역 */
-        .main-content {             
-            margin-left: 300px; padding: 40px; flex: 1;             
-            display: flex; flex-direction: column; height: 100vh;             
-            gap: 20px; overflow: hidden; transition: all 0.3s ease;             
+        .main-content {
+            margin-left: 300px; padding: 40px; flex: 1;
+            display: flex; flex-direction: column; height: 100vh;
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;
             width: calc(100% - 300px);
         }
-
-        .menu-btn {             
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;           
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;           
-            display: flex; align-items: center; justify-content: center; line-height: 1;         
+        .menu-btn {
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
         .menu-btn.active { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
 
-        .content-card {             
-            border: 2px solid #ff9e40;             
-            border-radius: 16px;             
-            flex: 1;             
-            display: flex;             
-            overflow: hidden;             
+        .content-card {
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
             background: radial-gradient(circle, #222 1px, transparent 1px) #101010;
             background-size: 20px 20px;
-            position: relative; 
-            transition: all 0.3s ease;         
+            position: relative;
+            transition: all 0.3s ease;
         }
 
         /* 전체화면 버튼 스타일 */
-        .fullscreen-btn {             
-            position: absolute;             
-            top: 15px;             
-            right: 15px;             
-            z-index: 10;             
-            background: rgba(255, 255, 255, 0.03);             
-            color: #ff9e40;             
-            border: 1px solid rgba(255, 158, 64, 0.5);             
-            padding: 6px 14px;             
-            border-radius: 8px;             
-            cursor: pointer;             
-            font-size: 0.8rem;             
-            font-weight: bold;             
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
-            transition: all 0.3s;         
+        .fullscreen-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.03);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.5);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
         }
-        .fullscreen-btn:hover {             
-            background: rgba(255, 158, 64, 0.2);             
-            color: #ff9e40;             
-            border-color: rgba(255, 158, 64, 0.8);        }
+        .fullscreen-btn:hover {
+            background: rgba(255, 158, 64, 0.2);
+            color: #ff9e40;
+            border-color: rgba(255, 158, 64, 0.8);
+        }
 
         /* 전체화면 활성화 클래스 */
-        .content-card.fullscreen {             
-            position: fixed !important;             
-            top: 0 !important;             
-            left: 0 !important;             
-            right: 0 !important;            
-            bottom: 0 !important;            
-            width: 100vw !important;             
-            height: 100vh !important;             
-            z-index: 9999 !important;             
-            border-radius: 0 !important;             
-            border: none !important;             
-            padding: 0 !important;             
-            margin: 0 !important;            
-            background: radial-gradient(circle, #222 1px, transparent 1px) #101010; 
+        .content-card.fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;
             background-size: 20px 20px;
         }
 
-        .board-container {           
-            width: 100%;           
-            height: 100%;           
-            position: relative;           
+        .board-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: crosshair;
         }
-
         .board-container canvas {
             width: 100%;
             height: 100%;
             display: block;
+            touch-action: none;
         }
 
         /* Light Mode Styling */
-        body.light-mode { background-color: #fff; color: #202020; }        
-        body.light-mode .sidebar {             
-            background: rgba(255, 255, 255, 0.3);             
-            border-color: rgba(243, 128, 32, 0.35);             
-            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
-        }                    
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
-            background: rgba(0, 0, 0, 0.02);             
-            color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.5);         }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
-            background: rgba(243, 128, 32, 0.15);             
-            color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.4);         }                
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(243, 128, 32, 0.35);
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.02);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.5);
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {
+            background: rgba(243, 128, 32, 0.15);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.4);
+        }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; }
         body.light-mode .content-card.fullscreen { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff !important; background-size: 20px 20px !important; }
-        body.light-mode .fullscreen-btn {             
-            background: rgba(0, 0, 0, 0.02);             
-            color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.5);         }
-        body.light-mode .fullscreen-btn:hover {             
-            background: rgba(243, 128, 32, 0.15);             
-            color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.4);         }
+        body.light-mode .fullscreen-btn {
+            background: rgba(0, 0, 0, 0.02);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.5);
+        }
+        body.light-mode .fullscreen-btn:hover {
+            background: rgba(243, 128, 32, 0.15);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.4);
+        }
 
-        .menu-toggle-btn {             
-            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;             
-            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
-            font-weight: bold; cursor: pointer; color: #ffffff;         }                
+        .menu-toggle-btn {
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;
+            font-weight: bold; cursor: pointer; color: #ffffff;
+        }
 
-        @media (max-width: 900px) {             
-            .menu-toggle-btn { display: block; }             
-            .sidebar {                 
-                transform: translateX(-320px);                 
-                background: #101010 !important;                 
-                backdrop-filter: none !important;                 
-                -webkit-backdrop-filter: none !important;                 
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-                z-index: 3000;             }             
-            body.light-mode .sidebar {                
-                background: #ffffff !important;                 
-                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }
-            .sidebar.active { transform: translateX(0); }             
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; }             
-            .content-card { min-height: 0; height: 100%; }             
+        @media (max-width: 900px) {
+            .menu-toggle-btn { display: block; }
+            .sidebar {
+                transform: translateX(-320px);
+                background: #101010 !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;
+                z-index: 3000;
+            }
+            body.light-mode .sidebar {
+                background: #ffffff !important;
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;
+            }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; }
+            .content-card { min-height: 0; height: 100%; }
         }
     </style>
 </head>
@@ -196,29 +201,30 @@
             <div class="sidebar-title">Starry Canvas</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                                                      
+            </div>
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            
             <div class="control-group">
                 <button class="menu-btn" id="btn-lock" onclick="toggleMode('lock')">별 고정 (Off)</button>
                 <button class="menu-btn" id="btn-reset" onclick="resetCanvas()">Reset</button>
             </div>
         </aside>
-        <main class="main-content" id="main-content">            
-            <header class="top-section">                
-                <h1>Starry Canvas</h1>                
+        
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Starry Canvas</h1>
                 <p>Interactive Starry Night & Constellation Playground</p>
-            </header>            
-            <section class="content-card" id="content-card">                
-                <!-- Maximize / Minimize 버튼 추가 -->
+            </header>
+            
+            <section class="content-card" id="content-card">
                 <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
-                <div class="board-container" id="board">                    
+                <div class="board-container" id="board">
                     <canvas id="starCanvas"></canvas>
-                </div>            
-            </section>        
-        </main>    
+                </div>
+            </section>
+        </main>
     </div>
-    <script>        
+
+    <script>
         const sidebar = document.getElementById('sidebar');
         const board = document.getElementById('board');
         const canvas = document.getElementById('starCanvas');
@@ -227,8 +233,8 @@
         const fullscreenBtn = document.getElementById('fullscreen-btn');
 
         let isStarLockActive = false;
-        let fadingStars = []; 
-        let lockedStars = []; 
+        let fadingStars = [];
+        let lockedStars = [];
         let isDrawing = false;
 
         function resizeCanvas() {
@@ -240,15 +246,13 @@
         });
         resizeCanvas();
 
-        // 전체화면 토글 함수
-        window.toggleFullscreen = function() {            
+        window.toggleFullscreen = function() {
             contentCard.classList.toggle('fullscreen');
-            if (contentCard.classList.contains('fullscreen')) {                
-                fullscreenBtn.textContent = 'Minimize 🗗';            
-            } else {                
-                fullscreenBtn.textContent = 'Maximize ⛶';            
+            if (contentCard.classList.contains('fullscreen')) {
+                fullscreenBtn.textContent = 'Minimize 🗗';
+            } else {
+                fullscreenBtn.textContent = 'Maximize ⛶';
             }
-            // 전체화면 전환 직후 캔버스 크기 재조정
             setTimeout(resizeCanvas, 50);
         };
 
@@ -275,15 +279,14 @@
             btn.textContent = '별 고정 (Off)';
         }
 
-        // 마우스 드래그 및 클릭 지원 이벤트
         canvas.addEventListener('mousedown', (e) => {
             isDrawing = true;
-            createStarsAtEvent(e);
+            createStarsAtCoords(e.clientX, e.clientY);
         });
 
         canvas.addEventListener('mousemove', (e) => {
             if (isDrawing) {
-                createStarsAtEvent(e);
+                createStarsAtCoords(e.clientX, e.clientY);
             }
         });
 
@@ -291,10 +294,29 @@
             isDrawing = false;
         });
 
-        function createStarsAtEvent(e) {
+        canvas.addEventListener('touchstart', (e) => {
+            isDrawing = true;
+            if (e.touches.length > 0) {
+                createStarsAtCoords(e.touches[0].clientX, e.touches[0].clientY);
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (isDrawing && e.touches.length > 0) {
+                createStarsAtCoords(e.touches[0].clientX, e.touches[0].clientY);
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            isDrawing = false;
+        });
+
+        function createStarsAtCoords(clientX, clientY) {
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
 
             if (isStarLockActive) {
                 lockedStars.push({
@@ -324,7 +346,6 @@
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. 고정된 별들 렌더링 (반짝임 효과)
             lockedStars.forEach(star => {
                 star.angle += star.pulseSpeed;
                 let currentAlpha = 0.6 + Math.sin(star.angle) * 0.4;
@@ -341,7 +362,6 @@
                 ctx.restore();
             });
 
-            // 2. 일시적 별들 렌더링 및 업데이트
             for (let i = fadingStars.length - 1; i >= 0; i--) {
                 let s = fadingStars[i];
                 s.x += s.vx;
@@ -369,8 +389,7 @@
 
         animate();
 
-        // 사이드바 토글 (열기/닫기)
-        function toggleSidebar() {             
+        function toggleSidebar() {
             sidebar.classList.toggle('active');
             document.body.classList.toggle('sidebar-is-active', sidebar.classList.contains('active'));
         }
@@ -380,16 +399,16 @@
             document.body.classList.remove('sidebar-is-active');
         }
 
-        sidebar.querySelectorAll('button').forEach(element => {            
-            element.addEventListener('click', () => {                
-                if (window.innerWidth <= 900) {                    
+        sidebar.querySelectorAll('button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
                     closeSidebar();
-                }            
-            });        
+                }
+            });
         });
 
-        document.getElementById('theme-toggle').addEventListener('click', () => {             
-            document.body.classList.toggle('light-mode');         
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
         });
     </script>
 </body>
