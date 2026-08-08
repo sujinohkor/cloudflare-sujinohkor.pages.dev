@@ -22,8 +22,8 @@
             padding: 25px 20px; z-index: 1000;             
             display: flex; flex-direction: column; gap: 12px;             
             border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 24px;            
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
+            border-radius: 24px;           
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);           
             transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;         
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
@@ -36,10 +36,10 @@
         /* 모바일용 상단 카테고리/컨트롤 영역 (기본 숨김) */
         .mobile-top-bar { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; width: 100%; }
         .mobile-theme-row { display: none; width: 100%; justify-content: flex-end; margin-bottom: 10px; }
-        .theme-toggle-btn-mobile {            
-            padding: 6px 12px; font-size: 0.75rem; border-radius: 16px; width: auto;            
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5);            
-            font-weight: bold; cursor: pointer;        
+        .theme-toggle-btn-mobile {           
+            padding: 6px 12px; font-size: 0.75rem; border-radius: 16px; width: auto;           
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5);           
+            font-weight: bold; cursor: pointer;       
         }
 
         /* 메인 콘텐츠 영역 */
@@ -52,19 +52,21 @@
 
         /* 3. Components */
         .menu-btn {             
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;            
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;           
             background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;            
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;           
             display: flex; align-items: center; justify-content: center; line-height: 1;        }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
         .menu-btn.active { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
 
-        .bottom-btns {            
-            display: flex;            
-            flex-direction: column;            
-            gap: 10px;        }
-        .bottom-btns > .menu-btn {            
-            margin-bottom: 0;        }
+        .bottom-btns {           
+            display: flex;           
+            flex-direction: column;           
+            gap: 10px;       
+        }
+        .bottom-btns > .menu-btn {           
+            margin-bottom: 0;       
+        }
 
         .content-card {             
             border: 2px solid #ff9e40;             
@@ -74,20 +76,21 @@
             overflow: hidden;             
             background-color: #000; /* 게임 화면용 배경은 검은색으로 조정 */            
             position: relative; 
-            transition: all 0.3s ease;        }
+            transition: all 0.3s ease;       
+        }
 
         /* Board area */
-        .board-container {            
-            width: 100%;            
-            height: 100%;            
-            position: relative;            
+        #board {           
+            width: 100%;           
+            height: 100%;           
+            position: relative;           
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .board-container iframe {
+        #board iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -116,7 +119,7 @@
         .menu-toggle-btn {             
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;             
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
-            font-weight: bold; cursor: pointer; color: #ffffff;         }                
+            font-weight: bold; cursor: pointer; color: #ffffff;         }                        
 
         @media (max-width: 900px) {             
             .menu-toggle-btn { display: block; }             
@@ -131,8 +134,7 @@
                 background: #ffffff !important;                 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }
             .sidebar.active { transform: translateX(0); }             
-            /* 모바일에서 높이 오차를 방지하기 위해 100svh 사용 */
-            .main-content { margin-left: 0; padding: 15px; width: 100vw; height: 100svh; }             
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }             
             .content-card { min-height: 0; height: 100%; }             
         }
     </style>
@@ -144,7 +146,7 @@
             <div class="sidebar-title">Retro Pokémon Games</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                                    
+            </div>                                            
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <div class="bottom-btns">
                 <button class="menu-btn active" id="btn-red" onclick="switchGame('red')">Red</button>
@@ -160,7 +162,7 @@
                 <p>Play classic retro 1st-generation Pokémon games right in your browser.</p>
             </header>            
             <section class="content-card" id="content-card">                
-                <div class="board-container" id="board">                    
+                <div id="board">                    
                     <!-- 동적으로 게임 iframe이 로드되는 영역 -->
                 </div>            
             </section>        
