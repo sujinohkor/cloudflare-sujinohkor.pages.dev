@@ -311,6 +311,7 @@
         const sidebar = document.getElementById('sidebar');
         const contentCard = document.getElementById('content-card');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const mainContent = document.getElementById('main-content');
 
         window.toggleFullscreen = function() {
             contentCard.classList.toggle('fullscreen');
@@ -338,7 +339,7 @@
         });
 
         mainContent.addEventListener('click', () => { 
-            if (sidebar.classList.contains('active')) { 
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) { 
                 sidebar.classList.remove('active'); 
             } 
         });
@@ -381,8 +382,8 @@
             const text = textInput.value;
             document.getElementById('char-count-all').innerText = text.length;
             document.getElementById('char-count-no-space').innerText = text.replace(/\s/g, '').length;
-            document.getElementById('word-count').innerText = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-            document.getElementById('para-count').innerText = text.split('\n').filter(p => p.trim().length > 0).length;
+            document.getElementById('word-count').innerText = text.trim() === '' ? 0 : text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('para-count').innerText = text.trim() === '' ? 0 : text.split('\n').filter(p => p.trim().length > 0).length;
             
             let bytes = 0;
             for (let i = 0; i < text.length; i++) {
