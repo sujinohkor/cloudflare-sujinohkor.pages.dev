@@ -1,211 +1,36 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>A4 라벨지 프린터 - 밀착 레드 프레임</title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        .no-print {
-            max-width: 1000px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        h2 { margin-top: 0; color: #1e293b; font-size: 20px; }
-        .controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-        .controls label {
-            font-weight: bold;
-            font-size: 13px;
-            color: #475569;
-        }
-        .controls select, .controls button {
-            padding: 8px 14px;
-            font-size: 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-        }
-        .controls select {
-            background: #fff;
-            cursor: pointer;
-        }
-        .controls button {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .controls button:hover { background: #1d4ed8; }
-        .btn-secondary { background: #64748b !important; }
-        .btn-secondary:hover { background: #475569 !important; }
 
-        .btn-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* A4 용지 규격 (210 x 297mm) - 여백을 최소화하여 빽빽하게 배치 */
-        .a4-sheet {
-            width: 210mm;
-            height: 297mm;
-            background: #fff;
-            margin: 0 auto;
-            padding: 8mm 10mm; /* 여백 대폭 축소 */
-            box-sizing: border-box;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-            display: grid;
-            position: relative;
-        }
-
-        /* 공통 라벨 박스 기본 스타일 (빨간색 라운드 프레임으로 통일) */
-        .label-cell {
-            outline: none;
-            font-size: 11px;
-            text-align: center;
-            word-break: break-all;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background-color: #fff;
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            padding: 4px;
-            /* 빨간색 라운드 이중선 SVG 통일 */
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100"><rect x="3" y="3" width="194" height="94" rx="10" ry="10" fill="none" stroke="%23ef4444" stroke-width="3"/><rect x="6" y="6" width="188" height="88" rx="7" ry="7" fill="none" stroke="%23ef4444" stroke-width="1.5"/></svg>');
-        }
-
-        .label-cell:focus {
-            background-color: #fef2f2;
-            outline: none;
-        }
-
-        @media print {
-            body { background: none; padding: 0; }
-            .no-print { display: none; }
-            .a4-sheet {
-                box-shadow: none;
-                margin: 0;
-                width: 210mm !important;
-                height: 297mm !important;
-                padding: 8mm 10mm;
-            }
-            .label-cell {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="no-print">
-        <h2>A4 라벨지 맞춤 프린터 (레드 라운드 & 빽빽한 배치)</h2>
-        <div class="controls">
-            <div>
-                <label>라벨 규격 선택: </label>
-                <select id="presetSelect" onchange="changePreset()">
-                    <option value="file_index">파일 인덱스 라벨 (3열 x 4그룹 = 24칸, 빨간 이중선)</option>
-                    <option value="grid_12">일반 12칸 (3열 x 4행, 레드 라운드)</option>
-                    <option value="grid_18">일반 18칸 (3열 x 6행, 레드 라운드)</option>
-                    <option value="grid_24">일반 24칸 (3열 x 8행, 레드 라운드 주소용)</option>
-                    <option value="grid_20">일반 20칸 (4열 x 5행, 레드 라운드)</option>
-                    <option value="grid_6">대형 6칸 (2열 x 3행, 레드 라운드)</option>
-                </select>
-            </div>
-            <div class="btn-group">
-                <button onclick="window.print()">🖨️ 인쇄하기</button>
-                <button class="btn-secondary" onclick="clearText()">전체 지우기</button>
-                <button class="btn-secondary" onclick="sampleText()">샘플 채우기</button>
-            </div>
+<html>
+    <head>
+        <style>
+		body{
+			background:#000;
+		}
+		</style>
+			<meta name="robots" content="noindex, nofollow"/>
+    </head>
+    <body>
+      <div id="display" style="width:100%;height:100%;max-width:100%">
+            <div id="game"></div>
         </div>
-        <p style="font-size: 12px; color: #64748b; margin: 0;">
-            • 모든 규격의 색상을 **빨간색 이중선 라운드 프레임**으로 통일하고, 여백을 최소화하여 빽빽하게 배치했습니다.<br>
-            • 각 라벨 칸을 클릭하여 내용을 입력하고 인쇄할 수 있습니다.
-        </p>
-    </div>
-
-    <div id="sheet" class="a4-sheet"></div>
-
-    <script>
-        const sheet = document.getElementById('sheet');
-
-        function changePreset() {
-            const type = document.getElementById('presetSelect').value;
-            sheet.innerHTML = '';
-
-            if (type === 'file_index') {
-                sheet.style.gridTemplateColumns = 'repeat(3, 1fr)';
-                sheet.style.gridTemplateRows = 'repeat(4, 1fr)';
-                sheet.style.gap = '2mm 4mm'; // 간격 최소화
-
-                for (let i = 0; i < 12; i++) {
-                    const group = document.createElement('div');
-                    group.style.display = 'flex';
-                    group.style.flexDirection = 'column';
-                    group.style.justifyContent = 'space-between';
-                    group.style.height = '100%';
-
-                    for (let j = 0; j < 2; j++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'label-cell';
-                        cell.contentEditable = true;
-                        cell.innerHTML = `인덱스 ${i*2 + j + 1}`;
-                        group.appendChild(cell);
-                    }
-                    sheet.appendChild(group);
-                }
-
-            } else {
-                let cols = 3, rows = 4, gap = '2mm';
-                if (type === 'grid_12') { cols = 3; rows = 4; gap = '2mm 4mm'; }
-                else if (type === 'grid_18') { cols = 3; rows = 6; gap = '2mm 4mm'; }
-                else if (type === 'grid_24') { cols = 3; rows = 8; gap = '1.5mm 3mm'; }
-                else if (type === 'grid_20') { cols = 4; rows = 5; gap = '2mm 3mm'; }
-                else if (type === 'grid_6') { cols = 2; rows = 3; gap = '4mm 6mm'; }
-
-                sheet.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                sheet.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-                sheet.style.gap = gap;
-
-                const total = cols * rows;
-                for (let i = 1; i <= total; i++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'label-cell';
-                    cell.contentEditable = true;
-                    cell.innerHTML = `라벨 ${i}`;
-                    sheet.appendChild(cell);
-                }
-            }
-        }
-
-        function clearText() {
-            document.querySelectorAll('.label-cell').forEach(cell => cell.innerHTML = '');
-        }
-
-        function sampleText() {
-            document.querySelectorAll('.label-cell').forEach((cell, idx) => {
-                cell.innerHTML = `품명: 샘플 ${idx+1}<br><span style="font-size:9px; color:#555;">연구실 비품</span>`;
-            });
-        }
-
-        changePreset();
-    </script>
-</body>
+        <script>
+    EJS_player = '#game';
+    EJS_core = 'gba';
+EJS_startOnLoaded = true;
+    EJS_biosUrl = ''; 
+    EJS_gameUrl = '/r/gba/pokemon-yellow.zip'; 
+    EJS_pathtodata = '4.2.3-10-30/data/';
+EJS_backgroundColor = '#000';
+EJS_Buttons = {
+    saveSavFiles: false,
+    loadSavFiles: false,
+    quickSave: false,
+    quickLoad: false,
+    screenshot: false,
+    cacheManager: false,
+    exitEmulation: false
+}
+        </script>
+<script src='4.2.1/data/loader.js'></script>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"de6c4c5e56cb4393a14233a7407d1c00"}' crossorigin="anonymous"></script>
+<script>window.__CF$cv$params={r:'a27b1b9c5edecb9e',t:'MTc4NjE1NjMxOA==',u:'019fdf166e737353bf8b6b9b80f7b12e',ut:'kPMJRZBfD0PVZI2TcJpZYvMvCvMdqfpE9h3Ql8Zyo5w-1786156318-1.2.1.1-e2Pa6MnJkDZ5SW0KZM9iGLcdtbUEXQf3dc6L_1aQPJ16xBUgrdNDDAUjXLZIiqN5WFP84PBRwcv0cc0f2Hx3i0KABLO2W71blwGPfYsyblE',i:60};(function(){if(!document.body)return;var s=document.createElement('script');s.src='/cdn-cgi/challenge-platform/scripts/precursor/main.js';document.head.appendChild(s);})();</script></body>
 </html>
