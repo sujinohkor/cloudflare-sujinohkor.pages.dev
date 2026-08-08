@@ -155,6 +155,9 @@
                 <button class="menu-btn active" id="btn-cnn" onclick="switchChannel('cnn')">CNN News Live</button>
                 <button class="menu-btn" id="btn-abc" onclick="switchChannel('abc')">ABC News Live</button>
                 <button class="menu-btn" id="btn-sky" onclick="switchChannel('sky')">Sky News Live</button>
+                <button class="menu-btn" id="btn-tvbs" onclick="switchChannel('tvbs')">TVBS News Live</button>
+                <button class="menu-btn" id="btn-formosa" onclick="switchChannel('formosa')">民視新聞網 News Live</button>
+                <button class="menu-btn" id="btn-ch52" onclick="switchChannel('ch52')">華視新聞 News Live</button>
             </div>      
         </aside>
         <main class="main-content" id="main-content">            
@@ -197,6 +200,18 @@
                 document.getElementById('btn-sky').classList.add('active');
                 // Sky News Live (YDvsBbKfLPA)
                 iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/YDvsBbKfLPA?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
+            } else if (channelType === 'tvbs') {
+                document.getElementById('btn-tvbs').classList.add('active');
+                // TVBS News Live (m_dhMSvUCIc)
+                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/m_dhMSvUCIc?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
+            } else if (channelType === 'formosa') {
+                document.getElementById('btn-formosa').classList.add('active');
+                // Formosa News Live (ylYJSBUgaMA)
+                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/ylYJSBUgaMA?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
+            } else if (channelType === 'ch52') {
+                document.getElementById('btn-ch52').classList.add('active');
+                // CTS News Live (wM0g8EoUZ_E)
+                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/wM0g8EoUZ_E?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
             }
 
             board.innerHTML = iframeHTML;
