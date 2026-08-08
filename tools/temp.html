@@ -2,112 +2,231 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>유튜브 영상 재생기</title>
+    <title>YT Live News</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
-        body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                    
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 모바일 전용 투명 배경 레이어 (사이드바가 열렸을 때만 활성화) */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: transparent;
+            z-index: 2500;
+        }
+        body.sidebar-is-active .sidebar-backdrop {
+            display: block;
+        }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar {           
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
+            background: rgba(16, 16, 16, 0.25);             
+            backdrop-filter: blur(16px);             
+            -webkit-backdrop-filter: blur(16px);            
+            padding: 25px 20px; z-index: 3000;             
+            display: flex; flex-direction: column; gap: 12px;             
+            border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 24px;            
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;         
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {             
+            margin-left: 300px; padding: 40px; flex: 1;             
+            display: flex; flex-direction: column; height: 100vh;             
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;             
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {             
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;           
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;           
+            display: flex; align-items: center; justify-content: center; line-height: 1;         
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.active { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
+
+        .bottom-btns {           
+            display: flex;           
+            flex-direction: column;           
+            gap: 10px;         
+        }
+        .bottom-btns > .menu-btn {           
+            margin-bottom: 0;         
+        }
+
+        .content-card {             
+            border: 2px solid #ff9e40;             
+            border-radius: 16px;             
+            flex: 1;             
+            display: flex;             
+            overflow: hidden;             
+            background-color: #000;  
+            position: relative; 
+            transition: all 0.3s ease;         
+        }
+
+        .board-container {           
+            width: 100%;           
+            height: 100%;           
+            position: relative;           
+            overflow: hidden;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
         }
 
-        h1 {
-            margin-bottom: 20px;
-            color: #ff0000;
-        }
-
-        .input-container {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background-color: #1e1e1e;
-            color: #ffffff;
-        }
-
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #ff0000;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #cc0000;
-        }
-
-        .player-container {
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 16 / 9;
-            background-color: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        iframe {
+        .board-container iframe {
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
+        }
+
+        body.light-mode { background-color: #fff; color: #202020; }        
+        body.light-mode .sidebar {             
+            background: rgba(255, 255, 255, 0.3);             
+            border-color: rgba(243, 128, 32, 0.35);             
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
+        }                    
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
+            background: rgba(0, 0, 0, 0.02);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.5);         }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
+            background: rgba(243, 128, 32, 0.15);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.4);         }                
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #000000; }
+
+        .menu-toggle-btn {             
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;             
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
+            font-weight: bold; cursor: pointer; color: #ffffff;         }                
+
+        @media (max-width: 900px) {             
+            .menu-toggle-btn { display: block; }             
+            .sidebar {                 
+                transform: translateX(-320px);                 
+                background: #101010 !important;                 
+                backdrop-filter: none !important;                 
+                -webkit-backdrop-filter: none !important;                 
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+                z-index: 3000;             }             
+            body.light-mode .sidebar {                
+                background: #ffffff !important;                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }
+            .sidebar.active { transform: translateX(0); }             
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; }             
+            .content-card { min-height: 0; height: 100%; }             
         }
     </style>
 </head>
 <body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    
+    <div class="sidebar-backdrop" onclick="closeSidebar()"></div>
 
-    <h1>YouTube Player</h1>
-
-    <div class="input-container">
-        <input type="text" id="urlInput" value="https://www.youtube.com/watch?v=GotlA1KKWoo" placeholder="유튜브 링크를 입력하세요">
-        <button onclick="loadVideo()">재생하기</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">YT Live News</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                                                                      
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <div class="bottom-btns">
+                <button class="menu-btn active" id="btn-cnn" onclick="switchChannel('cnn')">CNN News Live</button>
+                <button class="menu-btn" id="btn-abc" onclick="switchChannel('abc')">ABC News Live</button>
+                <button class="menu-btn" id="btn-sky" onclick="switchChannel('sky')">Sky News Live</button>
+            </div>      
+        </aside>
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>YT Live News</h1>                
+                <p>YouTube Live News</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <div class="board-container" id="board">                    
+                    <!-- 동적으로 유튜브 iframe이 로드되는 영역 -->
+                </div>            
+            </section>        
+        </main>    
     </div>
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const board = document.getElementById('board');
 
-    <div class="player-container">
-        <!-- youtube-nocookie 도메인 및 정밀 보안 속성 적용 -->
-        <iframe id="ytPlayer" 
-                src="https://www.youtube-nocookie.com/embed/GotlA1KKWoo?autoplay=1&enablejsapi=1" 
-                referrerpolicy="strict-origin-when-cross-origin"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>
-    </div>
+        // 페이지 로드 시 기본값으로 CNN 뉴스 실행
+        window.onload = function() {     
+            switchChannel('cnn');
+        };
 
-    <script>
-        function extractVideoID(url) {
-            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            let match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+        // 뉴스 채널 전환 함수
+        function switchChannel(channelType) {
+            document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active'));
 
-        function loadVideo() {
-            const url = document.getElementById('urlInput').value.trim();
-            const videoId = extractVideoID(url);
-            const iframe = document.getElementById('ytPlayer');
-
-            if (videoId) {
-                iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
-            } else {
-                alert('올바른 유튜브 링크가 아닙니다.');
+            let iframeHTML = '';
+            const currentOrigin = window.location.origin !== 'null' ? window.location.origin : 'http://localhost';
+            
+            if (channelType === 'cnn') {
+                document.getElementById('btn-cnn').classList.add('active');
+                // CNN News Live (GotlA1KKWoo)
+                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/GotlA1KKWoo?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
+            } else if (channelType === 'abc') {
+                document.getElementById('btn-abc').classList.add('active');
+                // ABC News Live (iipR5yUp36o)
+                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/iipR5yUp36o?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
+            } else if (channelType === 'sky') {
+                document.getElementById('btn-sky').classList.add('active');
+                // Sky News Live (YDvsBbKfLPA)
+                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/YDvsBbKfLPA?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;
             }
-        }
-    </script>
 
+            board.innerHTML = iframeHTML;
+        }
+
+        // 사이드바 토글 (열기/닫기)
+        function toggleSidebar() {             
+            sidebar.classList.toggle('active');
+            document.body.classList.toggle('sidebar-is-active', sidebar.classList.contains('active'));
+        }
+
+        // 사이드바 강제 닫기
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            document.body.classList.remove('sidebar-is-active');
+        }
+
+        // 사이드바 내부 버튼들을 눌렀을 때 모바일에서 닫히도록 설정
+        sidebar.querySelectorAll('button').forEach(element => {            
+            element.addEventListener('click', () => {                
+                if (window.innerWidth <= 900) {                    
+                    closeSidebar();
+                }            
+            });        
+        });
+
+        // 테마 토글 버튼
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+    </script>
 </body>
 </html>
