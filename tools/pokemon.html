@@ -220,12 +220,12 @@
             document.body.classList.toggle('light-mode');         
         });
 
-        // 기존의 mainContent.addEventListener 부분을 지우거나 아래 코드로 대체합니다.
-        document.addEventListener('click', (e) => {
+        // 기존의 document.addEventListener('click', ...) 코드를 지우고 아래 코드로 교체하세요.
+        document.addEventListener('pointerdown', (e) => {
             if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
                 const menuToggleBtn = document.querySelector('.menu-toggle-btn');
                 
-                // 클릭한 곳이 사이드바 내부도 아니고, MENU 버튼도 아닐 때만 닫기
+                // 터치한 곳이 사이드바 내부도 아니고, MENU 버튼도 아닐 때만 닫기
                 if (!sidebar.contains(e.target) && !menuToggleBtn.contains(e.target)) {
                     sidebar.classList.remove('active');
                 }
