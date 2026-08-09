@@ -12,14 +12,11 @@
         </div>
         <script>
             EJS_player = '#game';
-            // 내부에 GBA 파일이 들어있으므로 코어를 gba로 설정해야 합니다.
-            EJS_core = 'gba'; 
+            EJS_core = 'gba'; // GBA 기반이므로 gba 코어로 설정
             EJS_startOnLoaded = true;
             EJS_biosUrl = ''; 
-            // 서버에 위치한 롬 파일 경로 (압축 파일 그대로 지정 가능)
             EJS_gameUrl = '/assets/pokemon/gb/pokemon-rocket-johto-color-en.zip';
             
-            // 핵심 데이터와 로더를 공식 CDN에서 직접 불러옴
             EJS_pathtodata = 'https://cdn.emulatorjs.org/latest/data/';
         </script>
         <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
