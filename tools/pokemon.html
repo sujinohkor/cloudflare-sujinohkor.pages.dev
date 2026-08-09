@@ -177,7 +177,8 @@
             <div class="bottom-btns">
                 <span class="control-label">Team Rocket Edition</span>
                 <button class="menu-btn" id="btn-team-rocket" onclick="switchGame('team-rocket')">Team Rocket</button>
-                <button class="menu-btn" id="btn-team-rocket-color" onclick="switchGame('team-rocket-color')">Team Rocket (Color)</button>
+                <button class="menu-btn" id="btn-team-rocket-johto" onclick="switchGame('team-rocket-johto')">Team Rocket (Johto)</button>
+                <button class="menu-btn" id="btn-team-rocket-firered" onclick="switchGame('team-rocket-firered')">Team Rocket (FireRed)</button>
                 <button class="menu-btn" id="btn-team-rocket-science" onclick="switchGame('team-rocket-science')">Team Rocket (Science)</button>
             </div>        
         </aside>
@@ -228,9 +229,12 @@
             } else if (gameType === 'team-rocket') {
                 document.getElementById('btn-team-rocket').classList.add('active');
                 iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-en.html"></iframe>`;
-            } else if (gameType === 'team-rocket-color') {
-                document.getElementById('btn-team-rocket-color').classList.add('active');
+            } else if (gameType === 'team-rocket-johto') {
+                document.getElementById('btn-team-rocket-johto').classList.add('active');
                 iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-johto-color-en.html"></iframe>`;
+            } else if (gameType === 'team-rocket-firered') {
+                document.getElementById('btn-team-rocket-firered').classList.add('active');
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-firered-en.html"></iframe>`;
             } else if (gameType === 'team-rocket-science') {
                 document.getElementById('btn-team-rocket-science').classList.add('active');
                 iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-science-en.html"></iframe>`;
