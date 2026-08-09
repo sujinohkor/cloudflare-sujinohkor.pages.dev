@@ -54,6 +54,8 @@
             font-weight: bold; cursor: pointer;        
         }
 
+        .control-label { font-size: 0.8rem; color: #ff9e40; font-weight: bold; padding-left: 5px; }
+
         /* 메인 콘텐츠 영역 */
         .main-content {             
             margin-left: 300px; padding: 40px; flex: 1;             
@@ -162,11 +164,18 @@
             </div>                                                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <div class="bottom-btns">
+                <span class="control-label">The 1st Generation</span>
                 <button class="menu-btn active" id="btn-red" onclick="switchGame('red')">Red</button>
                 <button class="menu-btn" id="btn-blue-normal" onclick="switchGame('blue-normal')">Blue (Normal)</button>
                 <button class="menu-btn" id="btn-blue-hard" onclick="switchGame('blue-hard')">Blue (Hard)</button>
+            </div>
+            <div class="bottom-btns">
+                <span class="control-label">Yellow</span>
                 <button class="menu-btn" id="btn-yellow" onclick="switchGame('yellow')">Yellow</button>
                 <button class="menu-btn" id="btn-yellow-kr" onclick="switchGame('yellow-kr')">Yellow (KR)</button>
+            </div>
+            <div class="bottom-btns">
+                <span class="control-label">Team Rocket Edition</span>
                 <button class="menu-btn" id="btn-team-rocket" onclick="switchGame('team-rocket')">Team Rocket</button>
                 <button class="menu-btn" id="btn-team-rocket-color" onclick="switchGame('team-rocket-color')">Team Rocket (Color)</button>
                 <button class="menu-btn" id="btn-team-rocket-science" onclick="switchGame('team-rocket-science')">Team Rocket (Science)</button>
