@@ -215,7 +215,7 @@
                         
                         <!-- 파일 직접 업로드 -->
                         <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 400px;">
-                            <label style="font-size: 0.9rem; text-align: left;">Local ROM File (.gb, .gbc, .zip)</label>
+                            <label style="font-size: 0.9rem; text-align: left;">Local ROM File (.gb, .gbc, .gba, .zip)</label>
                             <input type="file" id="rom-file-input" accept=".gb,.gbc,.gba,.zip" style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,158,64,0.4); border-radius: 8px; color: #fff; cursor: pointer;">
                         </div>
 
@@ -223,9 +223,9 @@
 
                         <!-- URL 입력 방식 -->
                         <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 400px;">
-                            <label style="font-size: 0.9rem; text-align: left;">ROM URL / Emulator URL</label>
+                            <label style="font-size: 0.9rem; text-align: left;">ROM URL</label>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" id="rom-url-input" placeholder="https://example.com/game.gb" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,158,64,0.4); border-radius: 8px; color: #fff;">
+                                <input type="text" id="rom-url-input" placeholder="https://.../game.gba" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,158,64,0.4); border-radius: 8px; color: #fff;">
                                 <button onclick="loadCustomUrl()" style="padding: 0 20px; background: #ff9e40; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000;">Load</button>
                             </div>
                         </div>
@@ -244,7 +244,8 @@
                         if (!file) return;
 
                         const fileURL = URL.createObjectURL(file);
-                        board.innerHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" frameborder="0" src="${fileURL}"></iframe>`;
+                        // 에뮬레이터 뷰어 페이지로 롬 주소를 전달하여 iframe 실행
+                        board.innerHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" frameborder="0" src="/tools/pokemon-gba-viewer.html?rom=${encodeURIComponent(fileURL)}"></iframe>`;
                     });
                 }
             }
@@ -258,7 +259,8 @@
                 return;
             }
 
-            board.innerHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" frameborder="0" src="${urlInput}"></iframe>`;
+            // 에뮬레이터 뷰어 페이지로 입력받은 URL 전달하여 실행
+            board.innerHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" frameborder="0" src="/tools/pokemon-gba-viewer.html?rom=${encodeURIComponent(urlInput)}"></iframe>`;
         }
 
         // 사이드바 토글 (열기/닫기)
