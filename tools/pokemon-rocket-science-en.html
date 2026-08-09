@@ -1,4 +1,4 @@
-<!--<html>
+<html>
     <head>
         <style>
             body { background: #000; margin: 0; }
@@ -21,62 +21,4 @@
         </script>
         <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
     </body>
-</html> -->
-
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { background: #000; margin: 0; overflow: hidden; }
-        #loading { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100vh; 
-            background: #000; color: #ff9e40; display: flex; 
-            justify-content: center; align-items: center; font-family: 'Segoe UI', sans-serif; font-size: 1.1rem; z-index: 10; 
-        }
-    </style>
-    <meta name="robots" content="noindex, nofollow"/>
-</head>
-<body>
-    <div id="loading">Loading Game ROM...</div>
-    <div id="display" style="width:100%; height:100vh; max-width:100%">
-        <div id="game" style="width:100%; height:100%;"></div>
-    </div>
-    
-    <script>
-        // URL 쿼리스트링에서 rom과 core 값을 안전하게 추출
-        const urlParams = new URLSearchParams(window.location.search);
-        let romUrl = urlParams.get('rom');
-        const coreType = urlParams.get('core') || 'gba';
-
-        if (!romUrl) {
-            document.getElementById('loading').innerText = 'ROM 파일이 지정되지 않았습니다.';
-        } else {
-            // 절대 경로 혹은 상대 경로를 명확히 처리
-            if (romUrl.startsWith('/')) {
-                romUrl = window.location.origin + romUrl;
-            }
-
-            // EmulatorJS 설정
-            window.EJS_player = '#game';
-            window.EJS_core = coreType;
-            window.EJS_startOnLoaded = true;
-            window.EJS_biosUrl = ''; 
-            window.EJS_gameUrl = romUrl; 
-            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/latest/data/';
-
-            // 로딩 화면을 숨기고 에뮬레이터 구동 스크립트 주입
-            const script = document.createElement('script');
-            script.src = 'https://cdn.emulatorjs.org/latest/data/loader.js';
-            script.onload = () => {
-                // 로더가 로드된 후 로딩 메시지 제거
-                setTimeout(() => {
-                    const loaderEl = document.getElementById('loading');
-                    if (loaderEl) loaderEl.style.display = 'none';
-                }, 1500);
-            };
-            document.body.appendChild(script);
-        }
-    </script>
-</body>
 </html>
