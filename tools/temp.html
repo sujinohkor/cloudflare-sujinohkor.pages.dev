@@ -111,11 +111,21 @@
             border-color: #ff9e40;
         }
 
-        /* 에뮬레이터 화면 div */
-        #game {
+        /* 에뮬레이터 화면 컨테이너 (레이아웃 충돌 방지) */
+        #game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: none;
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        #game {
+            width: 100%;
+            height: 100%;
         }
 
         .card, .content-mid {
@@ -169,7 +179,6 @@
 <body>
 
 <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<!-- 지원하는 모든 확장자 수용 (.gba, .gb, .gbc, .nes, .snes) -->
 <input type="file" id="file-selector" accept=".gba,.gb,.gbc,.nes,.snes" style="display: none;">
 
 <div class="app-container">
@@ -199,8 +208,10 @@
                     <div style="font-size: 3rem;">🎮</div>
                     <div>Drag & Drop a ROM file (.gba, .gb, .gbc, .nes, .snes) here or click to upload.</div>
                 </div>
-                <!-- 에뮬레이터가 렌더링될 영역 -->
-                <div id="game"></div>
+                <!-- 에뮬레이터가 정상 구동되도록 독립된 컨테이너 구조 적용 -->
+                <div id="game-container">
+                    <div id="game"></div>
+                </div>
             </section>
         </div>
     </main>
@@ -213,7 +224,7 @@
     const defaultUI = document.getElementById('default-ui');
     const fileSelector = document.getElementById('file-selector');
     const fileNameLabel = document.getElementById('file-name-label');
-    const gameDiv = document.getElementById('game');
+    const gameContainer = document.getElementById('game-container');
 
     let loadedFile = null;
 
@@ -234,19 +245,17 @@
     function setInitialUI() {
         dropZone.classList.remove('has-file');
         defaultUI.style.display = 'block';
-        gameDiv.style.display = 'none';
+        gameContainer.style.display = 'none';
         fileNameLabel.innerText = 'No game loaded.';
     }
 
-    // 파일 핸들링 및 에뮬레이터 구동 로직
     function handleFile(file) {
         if (!file) return;
 
         loadedFile = file;
         const fileName = file.name.toLowerCase();
-        let core = 'gba'; // 기본값
+        let core = 'gba';
 
-        // 확장자별 코어 분기 처리
         if (fileName.endsWith('.nes')) {
             core = 'nes';
         } else if (fileName.endsWith('.snes') || fileName.endsWith('.smc')) {
@@ -260,13 +269,11 @@
 
         defaultUI.style.display = 'none';
         dropZone.classList.add('has-file');
-        gameDiv.style.display = 'block';
+        gameContainer.style.display = 'block';
         fileNameLabel.innerText = `Running: ${file.name}`;
 
-        // Blob URL 생성
         const fileUrl = URL.createObjectURL(file);
 
-        // EmulatorJS 환경 변수 주입
         window.EJS_player = '#game';
         window.EJS_core = core;
         window.EJS_startOnLoaded = true;
@@ -274,13 +281,11 @@
         window.EJS_gameUrl = fileUrl;
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/latest/data/';
 
-        // 동적으로 EmulatorJS 스크립트 로드
         const script = document.createElement('script');
         script.src = 'https://cdn.emulatorjs.org/latest/data/loader.js';
         document.body.appendChild(script);
     }
 
-    // 드래그 앤 드롭 이벤트
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', (e) => { 
@@ -291,7 +296,6 @@
         }
     });
 
-    // 클릭 시 파일 선택창 열기 (게임이 로드되지 않았을 때만)
     dropZone.addEventListener('click', () => { 
         if (!loadedFile) {
             fileSelector.click(); 
@@ -308,7 +312,6 @@
     });
 
     function resetAll() {
-        // 새로고침하여 에뮬레이터와 상태 초기화
         window.location.reload();
     }
 
