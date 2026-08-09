@@ -168,6 +168,8 @@
                 <button class="menu-btn" id="btn-yellow" onclick="switchGame('yellow')">Yellow</button>
                 <button class="menu-btn" id="btn-yellow-kr" onclick="switchGame('yellow-kr')">Yellow (KR)</button>
                 <button class="menu-btn" id="btn-team-rocket" onclick="switchGame('team-rocket')">Team Rocket</button>
+                <button class="menu-btn" id="btn-team-rocket-color" onclick="switchGame('team-rocket-color')">Team Rocket (Color)</button>
+                <button class="menu-btn" id="btn-team-rocket-science" onclick="switchGame('team-rocket-science')">Team Rocket (Science)</button>
             </div>        
         </aside>
         <main class="main-content" id="main-content">            
@@ -217,6 +219,12 @@
             } else if (gameType === 'team-rocket') {
                 document.getElementById('btn-team-rocket').classList.add('active');
                 iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-en.html"></iframe>`;
+            } else if (gameType === 'team-rocket-color') {
+                document.getElementById('btn-team-rocket-color').classList.add('active');
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-johto-color-en.html"></iframe>`;
+            } else if (gameType === 'team-rocket-science') {
+                document.getElementById('btn-team-rocket-science').classList.add('active');
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/pokemon-rocket-science-en.html"></iframe>`;
             }
 
             board.innerHTML = iframeHTML;
