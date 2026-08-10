@@ -949,26 +949,21 @@
                     }
                 }
 
-                // 0번(보통 공백/블랭크)이 아니고 유효한 사전 인덱스인 경우
                 if (maxIdx > 0 && maxIdx < dict.length) {
                     recognizedChar = dict[maxIdx];
                     console.log(`타임스텝 ${t}에서 인식된 글자: ${recognizedChar} (인덱스: ${maxIdx})`);
-                    // 글자를 하나 찾았으면 반복문을 탈출하여 사용 (단일 글자 인식 모드일 경우)
                     break; 
                 }
             }
 
             console.log("최종 인식된 글자:", recognizedChar);
-            
-            // 디버깅: 모델이 뭘 인식했는지 콘솔에 출력
-            console.log("모델 인식 인덱스:", maxIdx);
-            console.log("인식된 글자 데이터:", "'" + recognizedChar + "'");
 
             if (!recognizedChar) {
-                alert(`인덱스 ${maxIdx}번은 사전에 없습니다.`);
+                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
                 return;
             }
 
+            // 보유 중인 DB에서 검색
             const found = db.find(x => x.char === recognizedChar);
             if (found) {
                 alert(`ONNX 인식 결과: '${found.char}' (${found.meaning})`);
