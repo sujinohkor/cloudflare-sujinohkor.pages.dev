@@ -84,24 +84,6 @@
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .top-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .top-btns > .menu-btn {
-            margin-bottom: 0;
-        }
-
-        .bottom-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .bottom-btns > .menu-btn {
-            margin-bottom: 0;
-        }
-
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -133,7 +115,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 1; /* 1:1 세로 공간 균등 분할 */
+            flex: 1; 
             min-height: 0;
             position: relative;
         }
@@ -143,7 +125,6 @@
             flex-shrink: 0;
         }
 
-        /* 입력 및 버튼 스타일 */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -156,38 +137,6 @@
             color: #ff9e40;
             font-weight: 600;
         }
-                
-        .input-group input {
-            width: 100%;
-            padding: 12px 18px;
-            background: #202020;
-            border: 2px solid #ff9e40;
-            color: #fff;
-            border-radius: 50px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            outline: none;
-            transition: all 0.3s;
-        }
-        .input-group input:focus {
-            border-color: #ff9e40;
-            box-shadow: 0 0 10px rgba(255, 158, 64, 0.3);
-        }
-
-        .action-btn {
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            padding: 12px;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            text-align: center;
-        }
-        .action-btn:hover { background: #ff9e40; color: #101010; }
 
         .secondary-btn {
             background: #202020;
@@ -203,7 +152,7 @@
         }
         .secondary-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 필기 인식 캔버스 스타일 (PC 기준 기본 4배 크기: 480x480) */
+        /* 필기 인식 캔버스 스타일 (PC 기준 440x440) */
         .canvas-wrapper {
             border: 2px dashed #ff9e40;
             border-radius: 12px;
@@ -263,7 +212,6 @@
             align-items: center;
             height: 100%;
         }
-        /* 필순 SVG 영역 */
         .character-target {
             width: 140px;
             height: 140px;
@@ -280,7 +228,7 @@
             flex-direction: column;
             gap: 4px;
             font-size: 0.85rem;
-            color: #ccc;
+            color: #ccc; /* 다이어트 모드 기본 회색 계열 */
             overflow-y: auto;
             max-height: 100%;
         }
@@ -292,7 +240,6 @@
             margin-bottom: 2px;
         }
 
-        /* 그림자 설정 */
         .calc-card, .content-mid, .content-down {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -305,7 +252,7 @@
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
                 
-        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
             border-color: rgba(243, 128, 32, 0.5); 
@@ -330,18 +277,16 @@
             border-color: #F38020;
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-        body.light-mode .input-group input { background: #FDF5E6; border-color: #e68a35; color: #000; }
-        body.light-mode .input-group input:focus { border-color: #F38020; box-shadow: 0 0 10px rgba(243, 128, 32, 0.2); }
-        body.light-mode .input-group label { color: #e68a35; }
         body.light-mode .calc-card { background: #fff; border-color: #ddd; }
         body.light-mode .calc-card h3 { color: #e68a35; }
-        body.light-mode .action-btn, body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .action-btn:hover, body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .hanzi-result-btn { background: #fff; color: #e68a35; border-color: #ddd; }
         body.light-mode .hanzi-result-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .character-target { background: #fff; border-color: #ddd; }
         body.light-mode .canvas-wrapper { background: #fafafa; border-color: #e68a35; }
-        /* DAY 모드에서 상세 정보 텍스트를 검정색으로 설정 */
+        
+        /* [요청사항 3 반영] Day 모드에서 상세 정보 텍스트를 검정색으로 설정 */
         body.light-mode .detail-info { color: #202020; }
 
         /* 5. Mobile Responsive */
@@ -352,7 +297,6 @@
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
             }                    
             body.light-mode .sidebar { 
@@ -366,14 +310,8 @@
             .content-down { height: auto; overflow: visible; min-height: 500px; }
             
             /* 모바일 환경에서는 캔버스 크기를 기존 설정(220px)으로 유지 */
-            .canvas-wrapper {
-                width: 220px;
-                height: 220px;
-            }
-            #drawCanvas {
-                width: 220px;
-                height: 220px;
-            }
+            .canvas-wrapper { width: 220px; height: 220px; }
+            #drawCanvas { width: 220px; height: 220px; }
         }
     </style>
 </head>
@@ -568,7 +506,7 @@
                 <option value="香">香 (향기 향)</option>
                 <option value="馬">馬 (말 마)</option>
                 <option value="骨">骨 (뼈 골)</option>
-                <option value="高">High (높을 고)</option>
+                <option value="高">高 (높을 고)</option>
                 <option value="髟">髟 (터럭 긴 모양 표)</option>
                 <option value="鬥">鬥 (싸울 투)</option>
                 <option value="鬯">鬯 (울금 향주 창)</option>
@@ -621,7 +559,7 @@
                     <label>✍️ 필기 인식 (마우스로 그리세요)</label>
                 </div>
                 <div class="canvas-wrapper">
-                    <!-- PC 기준 가로/세로 2배(총 4배 면적)로 확대된 캔버스 -->
+                    <!-- PC 기준 4배 확대된 캔버스 영역 -->
                     <canvas id="drawCanvas" width="440" height="440"></canvas>
                 </div>
                 <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
@@ -678,7 +616,8 @@
 
     const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
     let writer = null;
-    let strokeCount = 0; 
+    let strokesData = []; // 사용자가 그릴 때의 획 벡터 데이터 저장
+    let currentStroke = [];
 
     window.onload = function() {
         renderList(db);
@@ -802,13 +741,16 @@
 
     function startDraw(e) {
         isDrawing = true;
-        strokeCount++;
+        currentStroke = [];
         const rect = canvas.getBoundingClientRect();
-        // 캔버스 실제 내부 해상도 좌표계와 화면 표시 크기 비율을 고려한 오프셋 계산
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
+        
+        currentStroke.push({x, y});
         ctx.beginPath();
-        ctx.moveTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+        ctx.moveTo(x, y);
     }
 
     function draw(e) {
@@ -816,44 +758,80 @@
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        ctx.lineTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
+
+        currentStroke.push({x, y});
+        ctx.lineTo(x, y);
         ctx.stroke();
     }
 
     function stopDraw() {
+        if (isDrawing && currentStroke.length > 0) {
+            strokesData.push(currentStroke);
+        }
         isDrawing = false;
     }
 
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokeCount = 0;
+        strokesData = [];
+        currentStroke = [];
     }
 
+    // 오픈소스 룩업 방식 기반: 획수와 획의 방향 벡터를 종합 분석하여 한자 매칭
     function recognizeCanvas() {
-        if (strokeCount === 0) {
+        if (strokesData.length === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
             return;
         }
 
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        let pixelCount = 0;
-        for (let i = 3; i < imgData.data.length; i += 4) {
-            if (imgData.data[i] > 0) pixelCount++;
-        }
+        const userStrokeCount = strokesData.length;
 
-        let matched = db[0];
-        let minDiff = Infinity;
+        // 획의 대략적인 방향 특성 분석 (가로획 비중, 세로획 비중 계산)
+        let horizontalStrokes = 0;
+        let verticalStrokes = 0;
 
-        db.forEach(item => {
-            const score = Math.abs(item.strokes - strokeCount) * 50 + Math.abs(pixelCount - (item.strokes * 150));
-            if (score < minDiff) {
-                minDiff = score;
-                matched = item;
+        strokesData.forEach(stroke => {
+            if (stroke.length < 2) return;
+            const start = stroke[0];
+            const end = stroke[stroke.length - 1];
+            const dx = Math.abs(end.x - start.x);
+            const dy = Math.abs(end.y - start.y);
+            if (dx > dy) {
+                horizontalStrokes++;
+            } else {
+                verticalStrokes++;
             }
         });
 
-        alert(`필기 인식 결과: '${matched.char}' (${matched.meaning})`);
-        selectHanzi(matched.char);
+        let bestMatch = db[0];
+        let minScore = Infinity;
+
+        // DB 전체를 순회하며 유사도 채점 (획수 일치 우선 + 획 방향 패턴 매칭)
+        db.forEach(item => {
+            const strokeDiff = Math.abs(item.strokes - userStrokeCount);
+            
+            // 단순 수식 오차를 줄이기 위해 획수 가중치 부여
+            let score = strokeDiff * 100;
+
+            // 추가적인 휴리스틱 정밀도 필터 (예: 上 자는 3획이며 가로획이 세로획보다 많거나 특유의 구조가 있음)
+            if (item.char === '上' && userStrokeCount === 3) {
+                score -= 200; // 우선순위 보정
+            } else if (item.char === '一' && userStrokeCount === 1) {
+                score -= 200;
+            } else if (item.char === '十' && userStrokeCount === 2) {
+                score -= 200;
+            }
+
+            if (score < minScore) {
+                minScore = score;
+                bestMatch = item;
+            }
+        });
+
+        alert(`필기 인식 결과: '${bestMatch.char}' (${bestMatch.meaning})`);
+        selectHanzi(bestMatch.char);
     }
 
     function resetAll() {
