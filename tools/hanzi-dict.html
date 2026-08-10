@@ -705,10 +705,11 @@
                 return await res.arrayBuffer();
             });
 
-            // 문자 사전 파일 로드 및 줄바꿈 단위 파싱
-            const dictPromise = fetch('/models/mandarin-onnx.txt').then(async (res) => {
+            // 문자 사전 파일 로드 및 빈 줄 완벽 제거 파싱
+            const dictPromise = fetch('./models/mandarin-onnx.txt').then(async (res) => {
                 if (!res.ok) throw new Error("사전 파일(mandarin-onnx.txt) 로드 실패");
                 const text = await res.text();
+                // 줄바꿈으로 쪼갠 후, 공백이거나 빈 문자열은 완전히 제외하여 정확한 인덱스 매핑 보장
                 return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
             });
 
