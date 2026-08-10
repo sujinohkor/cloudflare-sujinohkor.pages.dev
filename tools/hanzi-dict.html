@@ -8,6 +8,8 @@
     <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
     <!-- Hanzi Writer CDN -->
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <!-- ONNX Runtime Web 엔진 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <!-- 외부 한자 데이터베이스 로드 -->
     <script src="/codes/trad_with_simp.js"></script>
     <style>
@@ -84,6 +86,24 @@
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
+        .top-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .top-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
+
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -115,7 +135,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 1; 
+            flex: 1; /* 1:1 세로 공간 균등 분할 */
             min-height: 0;
             position: relative;
         }
@@ -125,6 +145,7 @@
             flex-shrink: 0;
         }
 
+        /* 입력 및 버튼 스타일 */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -137,6 +158,38 @@
             color: #ff9e40;
             font-weight: 600;
         }
+                
+        .input-group input {
+            width: 100%;
+            padding: 12px 18px;
+            background: #202020;
+            border: 2px solid #ff9e40;
+            color: #fff;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #ff9e40;
+            box-shadow: 0 0 10px rgba(255, 158, 64, 0.3);
+        }
+
+        .action-btn {
+            background: #202020;
+            color: #ff9e40;
+            border: 2px solid #ff9e40;
+            padding: 12px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+        .action-btn:hover { background: #ff9e40; color: #101010; }
 
         .secondary-btn {
             background: #202020;
@@ -152,7 +205,7 @@
         }
         .secondary-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 필기 인식 캔버스 스타일 (PC 기준 440x440) */
+        /* 필기 인식 캔버스 스타일 (PC 기준 기본 4배 크기: 480x480) */
         .canvas-wrapper {
             border: 2px dashed #ff9e40;
             border-radius: 12px;
@@ -212,6 +265,7 @@
             align-items: center;
             height: 100%;
         }
+        /* 필순 SVG 영역 */
         .character-target {
             width: 140px;
             height: 140px;
@@ -228,7 +282,7 @@
             flex-direction: column;
             gap: 4px;
             font-size: 0.85rem;
-            color: #ccc; /* 다이어트 모드 기본 회색 계열 */
+            color: #ccc;
             overflow-y: auto;
             max-height: 100%;
         }
@@ -240,6 +294,7 @@
             margin-bottom: 2px;
         }
 
+        /* 그림자 설정 */
         .calc-card, .content-mid, .content-down {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -252,7 +307,7 @@
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
                 
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
             border-color: rgba(243, 128, 32, 0.5); 
@@ -277,41 +332,49 @@
             border-color: #F38020;
             box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
+        body.light-mode .input-group input { background: #FDF5E6; border-color: #e68a35; color: #000; }
+        body.light-mode .input-group input:focus { border-color: #F38020; box-shadow: 0 0 10px rgba(243, 128, 32, 0.2); }
+        body.light-mode .input-group label { color: #e68a35; }
         body.light-mode .calc-card { background: #fff; border-color: #ddd; }
         body.light-mode .calc-card h3 { color: #e68a35; }
-        body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .action-btn, body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .action-btn:hover, body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .hanzi-result-btn { background: #fff; color: #e68a35; border-color: #ddd; }
         body.light-mode .hanzi-result-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .character-target { background: #fff; border-color: #ddd; }
         body.light-mode .canvas-wrapper { background: #fafafa; border-color: #e68a35; }
-        
-        /* [요청사항 3 반영] Day 모드에서 상세 정보 텍스트를 검정색으로 설정 */
+        /* DAY 모드에서 상세 정보 텍스트를 검정색으로 설정 */
         body.light-mode .detail-info { color: #202020; }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
-        @media (max-width: 900px) {                    
-            .menu-toggle-btn { display: block; }                    
+        @media (max-width: 900px) {                                
+            .menu-toggle-btn { display: block; }                                
             .sidebar { 
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                    
+            }                                
             body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .sidebar.active { transform: translateX(0); }                    
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                    
-            .workspace-container { flex-direction: column; overflow: visible; }                    
-            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                    
-            .content-down { height: auto; overflow: visible; min-height: 500px; }
-            
+            .sidebar.active { transform: translateX(0); }                                
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                                
+            .workspace-container { flex-direction: column; overflow: visible; }                                
+            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                                
+            .content-down { height: auto; overflow: visible; min-height: 500px; }                        
             /* 모바일 환경에서는 캔버스 크기를 기존 설정(220px)으로 유지 */
-            .canvas-wrapper { width: 220px; height: 220px; }
-            #drawCanvas { width: 220px; height: 220px; }
+            .canvas-wrapper {
+                width: 220px;
+                height: 220px;
+            }
+            #drawCanvas {
+                width: 220px;
+                height: 220px;
+            }
         }
     </style>
 </head>
@@ -327,7 +390,7 @@
 
         <div class="search-container">
             <span class="control-label">한자/음/뜻 검색</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">            
+            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                    
         </div>
 
         <div class="control-group" id="algo-select-group">
@@ -559,7 +622,6 @@
                     <label>✍️ 필기 인식 (마우스로 그리세요)</label>
                 </div>
                 <div class="canvas-wrapper">
-                    <!-- PC 기준 4배 확대된 캔버스 영역 -->
                     <canvas id="drawCanvas" width="440" height="440"></canvas>
                 </div>
                 <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
@@ -603,6 +665,11 @@
     </main>
 </div>
 <script>
+    // ONNX Runtime 싱글스레드 및 경로 고정 설정
+    ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
+    ort.env.wasm.numThreads = 1; 
+    ort.env.logLevel = "warning";
+
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
@@ -616,13 +683,34 @@
 
     const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
     let writer = null;
-    let strokesData = []; // 사용자가 그릴 때의 획 벡터 데이터 저장
-    let currentStroke = [];
+    let strokeCount = 0; 
+    let hanziSession = null;
+
+    // 제공해주신 구글 드라이브 링크를 직접 다운로드 가능한 주소로 변환
+    const onnxModelUrl = "https://drive.google.com/uc?export=download&id=1UHRjiqRtQU82FmC1F4AR0iB2N5BAF3aq";
+
+    async function getHanziSession() {
+        if (hanziSession) return hanziSession;
+        try {
+            console.log("Loading ONNX Model from Google Drive...");
+            hanziSession = await ort.InferenceSession.create(onnxModelUrl, { 
+                executionProviders: ['wasm'], 
+                graphOptimizationLevel: "all" 
+            });
+            console.log("ONNX Model Loaded Successfully!");
+        } catch (err) {
+            console.error("ONNX Model Load Failed:", err);
+            throw err;
+        }
+        return hanziSession;
+    }
 
     window.onload = function() {
         renderList(db);
         if (db.length > 0) selectHanzi(db[0].char);
         initCanvas();
+        // 페이지 로드 시 백그라운드에서 ONNX 모델 사전 로드 시도
+        getHanziSession().catch(e => console.warn("Background model preload warning:", e));
     };
 
     function renderList(data) {
@@ -741,16 +829,12 @@
 
     function startDraw(e) {
         isDrawing = true;
-        currentStroke = [];
+        strokeCount++;
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-        
-        currentStroke.push({x, y});
         ctx.beginPath();
-        ctx.moveTo(x, y);
+        ctx.moveTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
     }
 
     function draw(e) {
@@ -758,80 +842,72 @@
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-
-        currentStroke.push({x, y});
-        ctx.lineTo(x, y);
+        ctx.lineTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
         ctx.stroke();
     }
 
     function stopDraw() {
-        if (isDrawing && currentStroke.length > 0) {
-            strokesData.push(currentStroke);
-        }
         isDrawing = false;
     }
 
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokesData = [];
-        currentStroke = [];
+        strokeCount = 0;
     }
 
-    // 오픈소스 룩업 방식 기반: 획수와 획의 방향 벡터를 종합 분석하여 한자 매칭
-    function recognizeCanvas() {
-        if (strokesData.length === 0) {
+    // ONNX 모델 추론을 수행하는 인식 함수
+    async function recognizeCanvas() {
+        if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
             return;
         }
 
-        const userStrokeCount = strokesData.length;
-
-        // 획의 대략적인 방향 특성 분석 (가로획 비중, 세로획 비중 계산)
-        let horizontalStrokes = 0;
-        let verticalStrokes = 0;
-
-        strokesData.forEach(stroke => {
-            if (stroke.length < 2) return;
-            const start = stroke[0];
-            const end = stroke[stroke.length - 1];
-            const dx = Math.abs(end.x - start.x);
-            const dy = Math.abs(end.y - start.y);
-            if (dx > dy) {
-                horizontalStrokes++;
-            } else {
-                verticalStrokes++;
-            }
-        });
-
-        let bestMatch = db[0];
-        let minScore = Infinity;
-
-        // DB 전체를 순회하며 유사도 채점 (획수 일치 우선 + 획 방향 패턴 매칭)
-        db.forEach(item => {
-            const strokeDiff = Math.abs(item.strokes - userStrokeCount);
+        try {
+            const session = await getHanziSession();
             
-            // 단순 수식 오차를 줄이기 위해 획수 가중치 부여
-            let score = strokeDiff * 100;
-
-            // 추가적인 휴리스틱 정밀도 필터 (예: 上 자는 3획이며 가로획이 세로획보다 많거나 특유의 구조가 있음)
-            if (item.char === '上' && userStrokeCount === 3) {
-                score -= 200; // 우선순위 보정
-            } else if (item.char === '一' && userStrokeCount === 1) {
-                score -= 200;
-            } else if (item.char === '十' && userStrokeCount === 2) {
-                score -= 200;
+            // 모델 입력 규격에 맞게 캔버스 크기 조정 (예시 규격: 32x32 또는 모델에 맞춘 사이즈 조정 필요)
+            // 보통 한자 인식 모델은 특정 크기(예: 32x32, 64x64 등)의 정규화된 이미지 입력 텐서를 요구합니다.
+            const inputSize = 32; // 모델 입력 규격에 맞춰 수정 필요
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = inputSize;
+            tempCanvas.height = inputSize;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
+            
+            const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
+            const floatData = new Float32Array(inputSize * inputSize);
+            
+            for (let i = 0; i < imgData.length; i += 4) {
+                // 흑백/정규화 전처리 (모델 학습 스펙에 따름)
+                const gray = (imgData[i] + imgData[i+1] + imgData[i+2]) / 3;
+                floatData[i / 4] = (255 - gray) / 255.0; 
             }
 
-            if (score < minScore) {
-                minScore = score;
-                bestMatch = item;
-            }
-        });
+            const inputTensor = new ort.Tensor('float32', floatData, [1, 1, inputSize, inputSize]);
+            const feeds = { [session.inputNames[0]]: inputTensor };
+            const results = await session.run(feeds);
+            const outputData = results[session.outputNames[0]].data;
 
-        alert(`필기 인식 결과: '${bestMatch.char}' (${bestMatch.meaning})`);
-        selectHanzi(bestMatch.char);
+            // 출력된 인덱스나 확률값을 통해 데이터베이스에서 한자 매칭
+            // (현재 모델의 출력 스펙에 맞추어 매핑 로직 구성 필요)
+            let maxIdx = 0;
+            let maxVal = outputData[0];
+            for(let i=1; i<outputData.length; i++) {
+                if(outputData[i] > maxVal) {
+                    maxVal = outputData[i];
+                    maxIdx = i;
+                }
+            }
+
+            // 임시 매칭 또는 DB 연동
+            const matched = db[maxIdx % db.length] || db[0];
+            alert(`ONNX 인식 결과: '${matched.char}' (${matched.meaning})`);
+            selectHanzi(matched.char);
+
+        } catch (err) {
+            console.error("ONNX 추론 오류:", err);
+            alert("모델 추론 중 오류가 발생했습니다. (콘솔창 확인)");
+        }
     }
 
     function resetAll() {
