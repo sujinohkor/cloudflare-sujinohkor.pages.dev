@@ -569,7 +569,7 @@
                 <option value="香">香 (향기 향)</option>
                 <option value="馬">馬 (말 마)</option>
                 <option value="骨">骨 (뼈 골)</option>
-                <option value="高">高 (높을 고)</option>
+                <option value="高">High (높을 고)</option>
                 <option value="髟">髟 (터럭 긴 모양 표)</option>
                 <option value="鬥">鬥 (싸울 투)</option>
                 <option value="鬯">鬯 (울금 향주 창)</option>
@@ -684,12 +684,13 @@
     let writer = null;
     let strokeCount = 0; 
     let hanziSession = null;
+    let charDict = [];
 
-    // 분할된 모델 조각 파일 경로 설정 (part1 ~ part5)
+    // 조각 파일(part1~part5) 및 사전 파일(mandarin-onnx.txt)을 병행 로드하여 모델 구축
     async function getHanziSession() {
-        if (hanziSession) return hanziSession;
+        if (hanziSession && charDict.length > 0) return { session: hanziSession, dict: charDict };
         try {
-            console.log("Loading split ONNX model parts...");
+            console.log("Loading split ONNX model parts & dict file...");
             const partFiles = [
                 '/models/mandarin.onnx.part1',
                 '/models/mandarin.onnx.part2',
@@ -698,16 +699,25 @@
                 '/models/mandarin.onnx.part5'
             ];
 
-            // 모든 조각 파일을 병렬로 다운로드하여 ArrayBuffer로 변환
             const bufferPromises = partFiles.map(async (url) => {
                 const res = await fetch(url);
                 if (!res.ok) throw new Error(`모델 조각 로드 실패: ${url}`);
                 return await res.arrayBuffer();
             });
 
-            const arrays = await Promise.all(bufferPromises);
+            // 문자 사전 파일 로드 및 줄바꿈 단위 파싱
+            const dictPromise = fetch('/models/mandarin-onnx.txt').then(async (res) => {
+                if (!res.ok) throw new Error("사전 파일(mandarin-onnx.txt) 로드 실패");
+                const text = await res.text();
+                return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
+            });
 
-            // 전체 바이트 크기 계산 후 하나의 거대한 Uint8Array로 병합
+            const results = await Promise.all([...bufferPromises, dictPromise]);
+            charDict = results.pop();
+            const arrays = results;
+
+            console.log(`사전 로드 완료! 총 글자 수: ${charDict.length}개`);
+
             const totalLength = arrays.reduce((sum, buf) => sum + buf.byteLength, 0);
             const combinedArray = new Uint8Array(totalLength);
             let offset = 0;
@@ -718,24 +728,22 @@
 
             console.log(`모델 병합 완료! 총 크기: ${(combinedArray.byteLength / (1024 * 1024)).toFixed(2)} MB`);
 
-            // 합쳐진 메모리 버퍼로 ONNX 세션 생성
             hanziSession = await ort.InferenceSession.create(combinedArray.buffer, { 
                 executionProviders: ['wasm'], 
                 graphOptimizationLevel: "all" 
             });
             console.log("ONNX Model Loaded Successfully from parts!");
         } catch (err) {
-            console.error("ONNX Model Load Failed:", err);
+            console.error("ONNX Model 또는 사전 로드 실패:", err);
             throw err;
         }
-        return hanziSession;
+        return { session: hanziSession, dict: charDict };
     }
 
     window.onload = function() {
         renderList(db);
         if (db.length > 0) selectHanzi(db[0].char);
         initCanvas();
-        // 페이지 로드 시 백그라운드에서 ONNX 모델 사전 로드 시도
         getHanziSession().catch(e => console.warn("Background model preload warning:", e));
     };
 
@@ -881,7 +889,7 @@
         strokeCount = 0;
     }
 
-    // ONNX 모델 추론을 수행하는 인식 함수
+    // ONNX 모델 추론 및 사전 매핑을 수행하는 인식 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -889,23 +897,19 @@
         }
 
         try {
-            const session = await getHanziSession();
+            const { session, dict } = await getHanziSession();
             
-            // 모델이 요구하는 규격 (에러 메시지에 나온 Expected 값에 맞춤)
-            const inputSize = 48; // 에러 메시지에서 Expected: 48 확인됨
+            const inputSize = 48; // 모델 입력 규격 (48x48)
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = inputSize;
             tempCanvas.height = inputSize;
             const tempCtx = tempCanvas.getContext('2d');
             
-            // 캔버스 배경을 흰색으로 채우고 그림을 그립니다 (흑백 반전 모델인 경우 대비)
             tempCtx.fillStyle = "#FFFFFF";
             tempCtx.fillRect(0, 0, inputSize, inputSize);
             tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
             
             const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
-            
-            // 모델이 요구하는 3채널(RGB) 크기에 맞춘 Float32Array 생성 ([1, 3, 48, 48])
             const floatData = new Float32Array(3 * inputSize * inputSize);
             
             for (let i = 0; i < inputSize * inputSize; i++) {
@@ -913,13 +917,11 @@
                 const g = imgData[i * 4 + 1];
                 const b = imgData[i * 4 + 2];
                 
-                // 정규화 (0~1 사이 값으로 변환, 필요에 따라 표준화 계수 적용)
-                floatData[i] = r / 255.0;                          // R 채널
-                floatData[inputSize * inputSize + i] = g / 255.0;     // G 채널
-                floatData[inputSize * inputSize * 2 + i] = b / 255.0; // B 채널
+                floatData[i] = r / 255.0;
+                floatData[inputSize * inputSize + i] = g / 255.0;
+                floatData[inputSize * inputSize * 2 + i] = b / 255.0;
             }
 
-            // 3채널 [1, 3, 48, 48] 텐서 생성
             const inputTensor = new ort.Tensor('float32', floatData, [1, 3, inputSize, inputSize]);
             const feeds = { [session.inputNames[0]]: inputTensor };
             const results = await session.run(feeds);
@@ -927,16 +929,32 @@
 
             let maxIdx = 0;
             let maxVal = outputData[0];
-            for(let i=1; i<outputData.length; i++) {
+            for(let i = 1; i < outputData.length; i++) {
                 if(outputData[i] > maxVal) {
                     maxVal = outputData[i];
                     maxIdx = i;
                 }
             }
 
-            const matched = db[maxIdx % db.length] || db[0];
-            alert(`ONNX 인식 결과: '${matched.char}' (${matched.meaning})`);
-            selectHanzi(matched.char);
+            // dict.txt를 통한 정확한 한자 문자 매핑
+            const recognizedChar = dict[maxIdx];
+            if (!recognizedChar) {
+                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
+                return;
+            }
+
+            const found = db.find(x => x.char === recognizedChar);
+            if (found) {
+                alert(`ONNX 인식 결과: '${found.char}' (${found.meaning})`);
+                selectHanzi(found.char);
+            } else {
+                alert(`ONNX 인식 결과: '${recognizedChar}' (DB에 상세 정보 없음)`);
+                document.getElementById('detailChar').innerText = recognizedChar;
+                document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
+                document.getElementById('detailChinese').innerText = '-';
+                document.getElementById('detailBusu').innerText = '-';
+                document.getElementById('detailStrokes').innerText = '-';
+            }
 
         } catch (err) {
             console.error("ONNX 추론 오류:", err);
