@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24 Solar Terms</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                    
+        
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar {             
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
+            background: rgba(16, 16, 16, 0.25);             
+            backdrop-filter: blur(16px);             
+            -webkit-backdrop-filter: blur(16px);            
+            padding: 25px 20px; z-index: 1000;             
+            display: flex; flex-direction: column; gap: 12px;             
+            border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 24px;           
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;         
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {             
+            margin-left: 300px; padding: 40px; flex: 1;             
+            display: flex; flex-direction: column; height: 100vh;             
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;             
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn {             
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;           
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;           
+            display: flex; align-items: center; justify-content: center; line-height: 1;         }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .search-container {           
+            margin-bottom: 10px;        }
+        .search-input {           
+            width: 100%;           
+            padding: 11px 14px;              
+            background: rgba(255, 255, 255, 0.03);           
+            color: #fff;           
+            border: 1px solid rgba(255, 158, 64, 0.35);           
+            border-radius: 50px;           
+            outline: none;           
+            text-align: center;           
+            font-size: 0.85rem;           
+            font-weight: bold;        }
+        .search-input::placeholder { color: #888; }
+
+        .bottom-btns {           
+            display: flex;           
+            flex-direction: column;           
+            gap: 10px;        }
+        .bottom-btns > .menu-btn {           
+            margin-bottom: 0;        }
+
+        .content-card {             
+            border: 2px solid #ff9e40;             
+            border-radius: 16px;             
+            flex: 1;             
+            display: flex;             
+            overflow: hidden;             
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            position: relative; 
+            transition: background 1.2s ease, all 0.3s ease;        }
+
+        /* Fullscreen button style */
+        .fullscreen-btn {             
+            position: absolute;             
+            top: 15px;             
+            right: 15px;             
+            z-index: 2001;             
+            background: #202020;             
+            color: #ff9e40;             
+            border: 1px solid #ff9e40;             
+            padding: 6px 14px;             
+            border-radius: 8px;             
+            cursor: pointer;             
+            font-size: 0.8rem;             
+            font-weight: bold;             
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
+            transition: all 0.3s;         }
+        .fullscreen-btn:hover {             
+            background: #ff9e40;             
+            color: #101010;         }
+
+        /* 풀스크린 활성화 시: 사이드바 숨김 & 메인 콘텐츠 영역 전체 확장 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 24절기 휠 영역 스타일 */
+        #board {           
+            width: 100%;           
+            height: 100%;           
+            position: relative;           
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container-wheel {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* 중앙 정보 박스 */
+        .center-info {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            background-color: rgba(30, 41, 59, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .center-info h2 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #38bdf8;
+            transition: color 0.5s ease;
+        }
+
+        .center-info p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* 휠 컨테이너 */
+        .wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            animation: rotateWheel 40s linear infinite;
+        }
+
+        .wheel:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes rotateWheel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 개별 절기 아이템 스타일 */
+        .season-item {
+            position: absolute;
+            width: 65px;
+            height: 65px;
+            background-color: rgba(51, 65, 85, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            padding: 4px;
+        }
+
+        .season-item span {
+            display: inline-block;
+            animation: counterRotate 40s linear infinite;
+        }
+
+        .wheel:hover .season-item span {
+            animation-play-state: paused;
+        }
+
+        @keyframes counterRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+
+        .season-item:hover {
+            background-color: #38bdf8;
+            color: #0f172a;
+            transform: scale(1.15);
+        }
+
+        /* 하늘에서 떨어지는 이모지 애니메이션 스타일 */
+        .falling-emoji {
+            position: absolute;
+            top: -50px;
+            font-size: 2rem;
+            user-select: none;
+            pointer-events: none;
+            z-index: 2;
+            animation: fallAnimation linear forwards;
+        }
+
+        @keyframes fallAnimation {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0.4;
+            }
+        }
+
+        /* 4. Theme (Light Mode) */        
+        body.light-mode { background-color: #fff; color: #202020; }        
+        body.light-mode .sidebar {             
+            background: rgba(255, 255, 255, 0.3);             
+            border-color: rgba(243, 128, 32, 0.35);             
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
+        }                
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
+            background: rgba(0, 0, 0, 0.02);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.5);         }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
+            background: rgba(243, 128, 32, 0.15);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.4);         }                
+        body.light-mode .search-input {           
+            background: rgba(0, 0, 0, 0.02);           
+            color: #202020;           
+            border-color: rgba(243, 128, 32, 0.5);         }
+        body.light-mode .search-input::placeholder { color: #888; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn {             
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;             
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
+            font-weight: bold; cursor: pointer; color: #ffffff;         }                    
+
+        @media (max-width: 900px) {             
+            .menu-toggle-btn { display: block; }             
+            .sidebar {                 
+                transform: translateX(-320px);                 
+                background: #101010 !important;                 
+                backdrop-filter: none !important;                
+                -webkit-backdrop-filter: none !important;                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+                z-index: 3000;             }             
+            body.light-mode .sidebar {                
+                background: #ffffff !important;                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }
+            .sidebar.active { transform: translateX(0); }             
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; }             
+            .content-card { min-height: 0; height: 100%; }         }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">24 Solar Terms</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                            
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <div class="search-container">           
+                <input type="text" id="search-input" class="search-input" placeholder="Search term..." oninput="filterNotes()">           
+            </div>
+            <div class="bottom-btns">           
+                <button class="menu-btn" onclick="resetDefaultBackground()">Reset Background</button>
+            </div>        
+        </aside>
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1>24 Solar Terms</h1>                
+                <p>Interactive 24 Solar Terms Wheel</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                <div id="board">                    
+                    <!-- 24절기 원형 휠 컨테이너 -->
+                    <div class="container-wheel">
+                        <div class="center-info">
+                            <h2 id="season-title">24 Solar Terms</h2>
+                            <p id="season-desc">Click or hover over a term.</p>
+                        </div>
+                        <div class="wheel" id="wheel"></div>
+                    </div>
+                </div>            
+            </section>        
+        </main>    
+    </div>
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const board = document.getElementById('board');
+        const wheel = document.getElementById('wheel');
+        const seasonTitle = document.getElementById('season-title');
+        const seasonDesc = document.getElementById('season-desc');
+
+        let fallingInterval = null;
+
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {                
+                fullscreenBtn.textContent = 'Minimize 🗗';            
+            } else {                
+                fullscreenBtn.textContent = 'Maximize ⛶';            
+            }        
+        };
+
+        function toggleSidebar() {             
+            sidebar.classList.toggle('active');         
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {             
+            document.body.classList.toggle('light-mode');         
+        });
+
+        mainContent.addEventListener('click', () => {             
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+                sidebar.classList.remove('active');             
+            }         
+        });
+
+        // 24절기 데이터 배열 (영어 번역 적용)
+        const terms = [
+            // Spring
+            { name: "입춘", desc: "Start of Spring (Feb 4)", season: "spring", color: "#4ade80", gradient: "linear-gradient(135deg, #064e3b, #022c22)" },
+            { name: "우수", desc: "Rain Water & Melting Ice (Feb 19)", season: "spring", color: "#34d399", gradient: "linear-gradient(135deg, #065f46, #042f2e)" },
+            { name: "경칩", desc: "Awakening of Insects (Mar 5)", season: "spring", color: "#22c55e", gradient: "linear-gradient(135deg, #14532d, #052e16)" },
+            { name: "춘분", desc: "Vernal Equinox (Mar 20)", season: "spring", color: "#10b981", gradient: "linear-gradient(135deg, #047857, #064e3b)" },
+            { name: "청명", desc: "Clear and Bright (Apr 4)", season: "spring", color: "#06b6d4", gradient: "linear-gradient(135deg, #0e7490, #083344)" },
+            { name: "곡우", desc: "Grain Rain (Apr 20)", season: "spring", color: "#38bdf8", gradient: "linear-gradient(135deg, #0369a1, #0c4a6e)" },
+
+            // Summer
+            { name: "입하", desc: "Start of Summer (May 5)", season: "summer", color: "#84cc16", gradient: "linear-gradient(135deg, #365314, #1a2e05)" },
+            { name: "소만", desc: "Lesser Fullness (May 21)", season: "summer", color: "#a3e635", gradient: "linear-gradient(135deg, #3f6212, #1e3a0a)" },
+            { name: "망종", desc: "Grain in Ear (Jun 5)", season: "summer", color: "#facc15", gradient: "linear-gradient(135deg, #713f12, #422006)" },
+            { name: "하지", desc: "Summer Solstice (Jun 21)", season: "summer", color: "#eab308", gradient: "linear-gradient(135deg, #854d0e, #451a03)" },
+            { name: "소서", desc: "Lesser Heat (Jul 7)", season: "summer", color: "#f59e0b", gradient: "linear-gradient(135deg, #9a3412, #431407)" },
+            { name: "대서", desc: "Greater Heat (Jul 22)", season: "summer", color: "#f97316", gradient: "linear-gradient(135deg, #c2410c, #5c1d06)" },
+
+            // Autumn
+            { name: "입추", desc: "Start of Autumn (Aug 7)", season: "autumn", color: "#fb923c", gradient: "linear-gradient(135deg, #7c2d12, #2c0b02)" },
+            { name: "처서", desc: "Limit of Heat (Aug 23)", season: "autumn", color: "#fbbf24", gradient: "linear-gradient(135deg, #78350f, #291104)" },
+            { name: "백로", desc: "White Dew (Sep 7)", season: "autumn", color: "#fcd34d", gradient: "linear-gradient(135deg, #854d0e, #271705)" },
+            { name: "추분", desc: "Autumnal Equinox (Sep 23)", season: "autumn", color: "#f87171", gradient: "linear-gradient(135deg, #991b1b, #450a0a)" },
+            { name: "한로", desc: "Cold Dew (Oct 8)", season: "autumn", color: "#f43f5e", gradient: "linear-gradient(135deg, #881337, #4c0519)" },
+            { name: "상강", desc: "Descent of Frost (Oct 23)", season: "autumn", color: "#fb7185", gradient: "linear-gradient(135deg, #9f1239, #500724)" },
+
+            // Winter
+            { name: "입동", desc: "Start of Winter (Nov 7)", season: "winter", color: "#c084fc", gradient: "linear-gradient(135deg, #581c87, #2e1065)" },
+            { name: "소설", desc: "Lesser Snow (Nov 22)", season: "winter", color: "#a78bfa", gradient: "linear-gradient(135deg, #4c1d95, #1e1b4b)" },
+            { name: "대설", desc: "Greater Snow (Dec 7)", season: "winter", color: "#818cf8", gradient: "linear-gradient(135deg, #3730a3, #1e1b4b)" },
+            { name: "동지", desc: "Winter Solstice (Dec 21)", season: "winter", color: "#60a5fa", gradient: "linear-gradient(135deg, #1e40af, #0f172a)" },
+            { name: "소한", desc: "Lesser Cold (Jan 5)", season: "winter", color: "#93c5fd", gradient: "linear-gradient(135deg, #1d4ed8, #082f49)" },
+            { name: "대한", desc: "Greater Cold (Jan 20)", season: "winter", color: "#e0f2fe", gradient: "linear-gradient(135deg, #0369a1, #020617)" }
+        ];
+
+        const radius = 220; 
+        const total = terms.length;
+
+        // 하늘에서 이모지가 무한히 반복해서 내리는 함수
+        function startFallingEmojis(season) {
+            let emoji = '';
+            if (season === 'spring') emoji = '🐸';
+            else if (season === 'summer') emoji = '🍨';
+            else if (season === 'autumn') emoji = '🍁';
+            else if (season === 'winter') emoji = '⛄';
+
+            if (fallingInterval) clearInterval(fallingInterval);
+            document.querySelectorAll('.falling-emoji').forEach(el => el.remove());
+
+            fallingInterval = setInterval(() => {
+                const span = document.createElement('span');
+                span.className = 'falling-emoji';
+                span.textContent = emoji;
+                span.style.left = `${Math.random() * 100}%`;
+                span.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                span.style.fontSize = `${Math.random() * 1.5 + 1.2}rem`;
+                span.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                board.appendChild(span);
+
+                span.addEventListener('animationend', () => {
+                    span.remove();
+                });
+            }, 300);
+        }
+
+        // 절기 아이템 동적 생성 및 배치
+        terms.forEach((term, index) => {
+            const angle = (index / total) * (2 * Math.PI);
+            const x = 300 + radius * Math.cos(angle) - 32.5; // 아이템 너비(65px)의 절반 보정
+            const y = 300 + radius * Math.sin(angle) - 32.5;
+
+            const item = document.createElement('div');
+            item.className = 'season-item';
+            item.style.left = `${x}px`;
+            item.style.top = `${y}px`;
+
+            const span = document.createElement('span');
+            span.textContent = term.name;
+            item.appendChild(span);
+
+            // 마우스 호버 시 중앙 정보 변경
+            item.addEventListener('mouseenter', () => {
+                seasonTitle.textContent = term.name;
+                seasonDesc.textContent = term.desc;
+                seasonTitle.style.color = term.color;
+            });
+
+            // 클릭 시 카드 배경 그라데이션 전환 및 무한 이모지 효과 실행
+            item.addEventListener('click', () => {
+                contentCard.style.background = term.gradient;
+                startFallingEmojis(term.season);
+            });
+
+            wheel.appendChild(item);
+        });
+
+        // 검색 기능 (영문 검색어 지원)
+        function filterNotes() {
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            const items = document.querySelectorAll('.season-item');
+
+            items.forEach((item, index) => {
+                const term = terms[index];
+                const match = term.name.toLowerCase().includes(keyword) || term.desc.toLowerCase().includes(keyword);
+                if (match || keyword === '') {
+                    item.style.opacity = '1';
+                    item.style.pointerEvents = 'auto';
+                } else {
+                    item.style.opacity = '0.2';
+                    item.style.pointerEvents = 'none';
+                }
+            });
+        }
+
+        // 배경 초기화 버튼 기능
+        function resetDefaultBackground() {
+            if (fallingInterval) clearInterval(fallingInterval);
+            contentCard.style.background = 'linear-gradient(135deg, #0f172a, #1e293b)';
+            seasonTitle.textContent = "24 Solar Terms";
+            seasonTitle.style.color = "#38bdf8";
+            seasonDesc.textContent = "Click or hover over a term.";
+            document.querySelectorAll('.falling-emoji').forEach(el => el.remove());
+        }
+    </script>
+</body>
+</html>
