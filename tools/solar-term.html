@@ -11,7 +11,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
         a { text-decoration: none; color: inherit; display: block; }                    
-        
+       
         .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
 
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
@@ -23,7 +23,7 @@
             padding: 25px 20px; z-index: 1000;             
             display: flex; flex-direction: column; gap: 12px;             
             border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 24px;           
+            border-radius: 24px;            
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
             transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;         
         }
@@ -44,32 +44,32 @@
 
         /* 3. Components */
         .menu-btn {             
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;           
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;            
             background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;           
-            display: flex; align-items: center; justify-content: center; line-height: 1;         }
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;            
+            display: flex; align-items: center; justify-content: center; line-height: 1;       }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .search-container {           
+        .search-container {            
             margin-bottom: 10px;        }
-        .search-input {           
-            width: 100%;           
-            padding: 11px 14px;              
-            background: rgba(255, 255, 255, 0.03);           
-            color: #fff;           
-            border: 1px solid rgba(255, 158, 64, 0.35);           
-            border-radius: 50px;           
-            outline: none;           
-            text-align: center;           
-            font-size: 0.85rem;           
+        .search-input {            
+            width: 100%;            
+            padding: 11px 14px;                
+            background: rgba(255, 255, 255, 0.03);            
+            color: #fff;            
+            border: 1px solid rgba(255, 158, 64, 0.35);            
+            border-radius: 50px;            
+            outline: none;            
+            text-align: center;            
+            font-size: 0.85rem;            
             font-weight: bold;        }
         .search-input::placeholder { color: #888; }
 
-        .bottom-btns {           
-            display: flex;           
-            flex-direction: column;           
+        .bottom-btns {            
+            display: flex;            
+            flex-direction: column;            
             gap: 10px;        }
-        .bottom-btns > .menu-btn {           
+        .bottom-btns > .menu-btn {            
             margin-bottom: 0;        }
 
         .content-card {             
@@ -78,7 +78,7 @@
             flex: 1;             
             display: flex;             
             overflow: hidden;             
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: linear-gradient(135deg, #1e293b, #334155);
             position: relative; 
             transition: background 1.2s ease, all 0.3s ease;        }
 
@@ -97,10 +97,10 @@
             font-size: 0.8rem;             
             font-weight: bold;             
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
-            transition: all 0.3s;         }
+            transition: all 0.3s;       }
         .fullscreen-btn:hover {             
             background: #ff9e40;             
-            color: #101010;         }
+            color: #101010;       }
 
         /* 풀스크린 활성화 시: 사이드바 숨김 & 메인 콘텐츠 영역 전체 확장 */
         body.is-fullscreen .sidebar {
@@ -133,10 +133,10 @@
         }
 
         /* 24절기 휠 영역 스타일 */
-        #board {           
-            width: 100%;           
-            height: 100%;           
-            position: relative;           
+        #board {            
+            width: 100%;            
+            height: 100%;            
+            position: relative;            
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -158,8 +158,8 @@
             position: absolute;
             width: 220px;
             height: 220px;
-            background-color: rgba(30, 41, 59, 0.85);
-            border: 2px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(15, 23, 42, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.25);
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -168,7 +168,7 @@
             text-align: center;
             padding: 20px;
             z-index: 10;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
         }
 
@@ -181,7 +181,7 @@
 
         .center-info p {
             font-size: 0.85rem;
-            color: #94a3b8;
+            color: #e2e8f0;
             line-height: 1.4;
         }
 
@@ -207,8 +207,8 @@
             position: absolute;
             width: 65px;
             height: 65px;
-            background-color: rgba(51, 65, 85, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(30, 41, 59, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.25);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -217,7 +217,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.2s, color 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             text-align: center;
             padding: 4px;
             color: #fff;
@@ -271,7 +271,7 @@
             background: rgba(255, 255, 255, 0.3);             
             border-color: rgba(243, 128, 32, 0.35);             
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
-        }                
+        }                 
         body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
             background: rgba(0, 0, 0, 0.02);             
             color: #F38020;             
@@ -279,10 +279,10 @@
         body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
             background: rgba(243, 128, 32, 0.15);             
             color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.4);         }                
-        body.light-mode .search-input {           
-            background: rgba(0, 0, 0, 0.02);           
-            color: #202020;           
+            border-color: rgba(243, 128, 32, 0.4);         }                 
+        body.light-mode .search-input {            
+            background: rgba(0, 0, 0, 0.02);            
+            color: #202020;            
             border-color: rgba(243, 128, 32, 0.5);         }
         body.light-mode .search-input::placeholder { color: #888; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
@@ -291,7 +291,7 @@
 
         /* Light mode에서 휠 아이템 및 중앙 박스 글자색 하양으로 변경 */
         body.light-mode .season-item {
-            background-color: rgba(30, 41, 59, 0.85);
+            background-color: rgba(30, 41, 59, 0.95);
             color: #ffffff !important;
         }
         body.light-mode .season-item:hover {
@@ -299,11 +299,11 @@
             color: #0f172a !important;
         }
         body.light-mode .center-info {
-            background-color: rgba(15, 23, 42, 0.9);
-            border-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(15, 23, 42, 0.95);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         body.light-mode .center-info p {
-            color: #cbd5e1;
+            color: #e2e8f0;
         }
 
         /* 5. Mobile Responsive */
@@ -336,12 +336,12 @@
             <div class="sidebar-title">Solar Terms Wheel</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                            
+            </div>                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <div class="search-container">           
-                <input type="text" id="search-input" class="search-input" placeholder="Search term..." oninput="filterNotes()">           
+            <div class="search-container">            
+                <input type="text" id="search-input" class="search-input" placeholder="Search term..." oninput="filterNotes()">            
             </div>
-            <div class="bottom-btns">           
+            <div class="bottom-btns">            
                 <button class="menu-btn" onclick="resetDefaultBackground()">Reset Background</button>
             </div>        
         </aside>
@@ -381,59 +381,53 @@
             contentCard.classList.toggle('fullscreen');
             document.body.classList.toggle('is-fullscreen');
             if (contentCard.classList.contains('fullscreen')) {                
-                fullscreenBtn.textContent = 'Minimize 🗗';            
-            } else {                
-                fullscreenBtn.textContent = 'Maximize ⛶';            
-            }        
+                fullscreenBtn.textContent = 'Minimize 🗗';            } else {                
+                fullscreenBtn.textContent = 'Maximize ⛶';            }        
         };
 
         function toggleSidebar() {             
-            sidebar.classList.toggle('active');         
-        }
+            sidebar.classList.toggle('active');         }
 
         document.getElementById('theme-toggle').addEventListener('click', () => {             
-            document.body.classList.toggle('light-mode');         
-        });
+            document.body.classList.toggle('light-mode');         });
 
         mainContent.addEventListener('click', () => {             
             if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
-                sidebar.classList.remove('active');             
-            }         
-        });
+                sidebar.classList.remove('active');             }         });
 
-        // 24절기 데이터 배열 (절기 이름은 한국어 유지)
+        // 24절기 데이터 배열 (밝고 생동감 있는 그라데이션으로 업그레이드)
         const terms = [
-            // 봄
-            { name: "입춘", desc: "Start of Spring (Feb 4)", season: "spring", color: "#4ade80", gradient: "linear-gradient(135deg, #064e3b, #022c22)" },
-            { name: "우수", desc: "Rain Water & Melting Ice (Feb 19)", season: "spring", color: "#34d399", gradient: "linear-gradient(135deg, #065f46, #042f2e)" },
-            { name: "경칩", desc: "Awakening of Insects (Mar 5)", season: "spring", color: "#22c55e", gradient: "linear-gradient(135deg, #14532d, #052e16)" },
-            { name: "춘분", desc: "Vernal Equinox (Mar 20)", season: "spring", color: "#10b981", gradient: "linear-gradient(135deg, #047857, #064e3b)" },
-            { name: "청명", desc: "Clear and Bright (Apr 4)", season: "spring", color: "#06b6d4", gradient: "linear-gradient(135deg, #0e7490, #083344)" },
-            { name: "곡우", desc: "Grain Rain (Apr 20)", season: "spring", color: "#38bdf8", gradient: "linear-gradient(135deg, #0369a1, #0c4a6e)" },
+            // 봄 (상쾌한 에메랄드/그린 톤)
+            { name: "입춘", desc: "Start of Spring (Feb 4)", season: "spring", color: "#34d399", gradient: "linear-gradient(135deg, #065f46, #0d9488)" },
+            { name: "우수", desc: "Rain Water & Melting Ice (Feb 19)", season: "spring", color: "#2dd4bf", gradient: "linear-gradient(135deg, #0f766e, #0284c7)" },
+            { name: "경칩", desc: "Awakening of Insects (Mar 5)", season: "spring", color: "#4ade80", gradient: "linear-gradient(135deg, #15803d, #0d9488)" },
+            { name: "춘분", desc: "Vernal Equinox (Mar 20)", season: "spring", color: "#22c55e", gradient: "linear-gradient(135deg, #16a34a, #059669)" },
+            { name: "청명", desc: "Clear and Bright (Apr 4)", season: "spring", color: "#38bdf8", gradient: "linear-gradient(135deg, #0284c7, #0d9488)" },
+            { name: "곡우", desc: "Grain Rain (Apr 20)", season: "spring", color: "#0ea5e9", gradient: "linear-gradient(135deg, #0369a1, #2563eb)" },
 
-            // 여름
-            { name: "입하", desc: "Start of Summer (May 5)", season: "summer", color: "#84cc16", gradient: "linear-gradient(135deg, #365314, #1a2e05)" },
-            { name: "소만", desc: "Lesser Fullness (May 21)", season: "summer", color: "#a3e635", gradient: "linear-gradient(135deg, #3f6212, #1e3a0a)" },
-            { name: "망종", desc: "Grain in Ear (Jun 5)", season: "summer", color: "#facc15", gradient: "linear-gradient(135deg, #713f12, #422006)" },
-            { name: "하지", desc: "Summer Solstice (Jun 21)", season: "summer", color: "#eab308", gradient: "linear-gradient(135deg, #854d0e, #451a03)" },
-            { name: "소서", desc: "Lesser Heat (Jul 7)", season: "summer", color: "#f59e0b", gradient: "linear-gradient(135deg, #9a3412, #431407)" },
-            { name: "대서", desc: "Greater Heat (Jul 22)", season: "summer", color: "#f97316", gradient: "linear-gradient(135deg, #c2410c, #5c1d06)" },
+            // 여름 (화창하고 뜨거운 선셋/블루밍 톤)
+            { name: "입하", desc: "Start of Summer (May 5)", season: "summer", color: "#84cc16", gradient: "linear-gradient(135deg, #4d7c0f, #0284c7)" },
+            { name: "소만", desc: "Lesser Fullness (May 21)", season: "summer", color: "#bef264", gradient: "linear-gradient(135deg, #65a30d, #d97706)" },
+            { name: "망종", desc: "Grain in Ear (Jun 5)", season: "summer", color: "#facc15", gradient: "linear-gradient(135deg, #ca8a04, #ea580c)" },
+            { name: "하지", desc: "Summer Solstice (Jun 21)", season: "summer", color: "#fbbf24", gradient: "linear-gradient(135deg, #d97706, #dc2626)" },
+            { name: "소서", desc: "Lesser Heat (Jul 7)", season: "summer", color: "#fb923c", gradient: "linear-gradient(135deg, #ea580c, #9333ea)" },
+            { name: "대서", desc: "Greater Heat (Jul 22)", season: "summer", color: "#f97316", gradient: "linear-gradient(135deg, #c2410c, #e11d48)" },
 
-            // 가을
-            { name: "입추", desc: "Start of Autumn (Aug 7)", season: "autumn", color: "#fb923c", gradient: "linear-gradient(135deg, #7c2d12, #2c0b02)" },
-            { name: "처서", desc: "Limit of Heat (Aug 23)", season: "autumn", color: "#fbbf24", gradient: "linear-gradient(135deg, #78350f, #291104)" },
-            { name: "백로", desc: "White Dew (Sep 7)", season: "autumn", color: "#fcd34d", gradient: "linear-gradient(135deg, #854d0e, #271705)" },
-            { name: "추분", desc: "Autumnal Equinox (Sep 23)", season: "autumn", color: "#f87171", gradient: "linear-gradient(135deg, #991b1b, #450a0a)" },
-            { name: "한로", desc: "Cold Dew (Oct 8)", season: "autumn", color: "#f43f5e", gradient: "linear-gradient(135deg, #881337, #4c0519)" },
-            { name: "상강", desc: "Descent of Frost (Oct 23)", season: "autumn", color: "#fb7185", gradient: "linear-gradient(135deg, #9f1239, #500724)" },
+            // 가을 (따스하고 풍성한 오렌지/골드 톤)
+            { name: "입추", desc: "Start of Autumn (Aug 7)", season: "autumn", color: "#fb923c", gradient: "linear-gradient(135deg, #c2410c, #b45309)" },
+            { name: "처서", desc: "Limit of Heat (Aug 23)", season: "autumn", color: "#fbbf24", gradient: "linear-gradient(135deg, #b45309, #78716c)" },
+            { name: "백로", desc: "White Dew (Sep 7)", season: "autumn", color: "#fde047", gradient: "linear-gradient(135deg, #a16207, #0f766e)" },
+            { name: "추분", desc: "Autumnal Equinox (Sep 23)", season: "autumn", color: "#f87171", gradient: "linear-gradient(135deg, #b91c1c, #7c2d12)" },
+            { name: "한로", desc: "Cold Dew (Oct 8)", season: "autumn", color: "#fb7185", gradient: "linear-gradient(135deg, #be123c, #4f46e5)" },
+            { name: "상강", desc: "Descent of Frost (Oct 23)", season: "autumn", color: "#f43f5e", gradient: "linear-gradient(135deg, #9f1239, #701a75)" },
 
-            // 겨울
-            { name: "입동", desc: "Start of Winter (Nov 7)", season: "winter", color: "#c084fc", gradient: "linear-gradient(135deg, #581c87, #2e1065)" },
-            { name: "소설", desc: "Lesser Snow (Nov 22)", season: "winter", color: "#a78bfa", gradient: "linear-gradient(135deg, #4c1d95, #1e1b4b)" },
-            { name: "대설", desc: "Greater Snow (Dec 7)", season: "winter", color: "#818cf8", gradient: "linear-gradient(135deg, #3730a3, #1e1b4b)" },
-            { name: "동지", desc: "Winter Solstice (Dec 21)", season: "winter", color: "#60a5fa", gradient: "linear-gradient(135deg, #1e40af, #0f172a)" },
-            { name: "소한", desc: "Lesser Cold (Jan 5)", season: "winter", color: "#93c5fd", gradient: "linear-gradient(135deg, #1d4ed8, #082f49)" },
-            { name: "대한", desc: "Greater Cold (Jan 20)", season: "winter", color: "#e0f2fe", gradient: "linear-gradient(135deg, #0369a1, #020617)" }
+            // 겨울 (시원하고 신비로운 블루/퍼플 톤)
+            { name: "입동", desc: "Start of Winter (Nov 7)", season: "winter", color: "#c084fc", gradient: "linear-gradient(135deg, #7e22ce, #1e1b4b)" },
+            { name: "소설", desc: "Lesser Snow (Nov 22)", season: "winter", color: "#a78bfa", gradient: "linear-gradient(135deg, #6d28d9, #0369a1)" },
+            { name: "대설", desc: "Greater Snow (Dec 7)", season: "winter", color: "#818cf8", gradient: "linear-gradient(135deg, #4f46e5, #0f172a)" },
+            { name: "동지", desc: "Winter Solstice (Dec 21)", season: "winter", color: "#60a5fa", gradient: "linear-gradient(135deg, #2563eb, #312e81)" },
+            { name: "소한", desc: "Lesser Cold (Jan 5)", season: "winter", color: "#38bdf8", gradient: "linear-gradient(135deg, #0284c7, #1e1b4b)" },
+            { name: "대한", desc: "Greater Cold (Jan 20)", season: "winter", color: "#7dd3fc", gradient: "linear-gradient(135deg, #0284c7, #09090b)" }
         ];
 
         const radius = 220; 
@@ -519,7 +513,7 @@
         // 배경 초기화 버튼 기능
         function resetDefaultBackground() {
             if (fallingInterval) clearInterval(fallingInterval);
-            contentCard.style.background = 'linear-gradient(135deg, #0f172a, #1e293b)';
+            contentCard.style.background = 'linear-gradient(135deg, #1e293b, #334155)';
             seasonTitle.textContent = "24 Solar Terms";
             seasonTitle.style.color = "#38bdf8";
             seasonDesc.textContent = "Click or hover over a term.";
