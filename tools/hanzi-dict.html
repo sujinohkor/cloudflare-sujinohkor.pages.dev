@@ -234,7 +234,6 @@
             body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }
             .sidebar.active { transform: translateX(0); }                                            
             
-            /* 1. 전체 화면(바디와 메인)이 스크롤될 수 있도록 높이 고정 해제 및 스크롤 허용 */
             body {
                 overflow: auto;
                 height: auto;
@@ -244,14 +243,13 @@
                 padding: 20px; 
                 width: 100vw; 
                 height: auto; 
-                overflow: visible; /* 전체 화면 스크롤 방해 요소 제거 */
+                overflow: visible; 
             }                                            
             
             .workspace-container { flex-direction: column; overflow: visible; }                                            
             
-            /* 2. Results List 박스 높이를 1/4 수준으로 고정하되, 내부 리스트만 스크롤되도록 분리 */
             .content-left { 
-                height: 220px; /* 원하시는 1/4 높이값 */
+                height: 220px; 
                 min-height: unset; 
                 overflow: hidden; 
                 padding: 12px;
@@ -263,11 +261,10 @@
                 padding: 0;
             }
             .content-left .history-list {
-                max-height: 140px; /* 버튼들이 안으로 들어오게 제한 */
-                overflow-y: auto; /* 리스트 내부만 개별 스크롤 */
+                max-height: 140px; 
+                overflow-y: auto; 
             }
         
-            /* 3. 번체/간체 세로 정렬 유지 */
             .detail-top-svg-box {
                 flex-direction: column;
                 gap: 15px;
@@ -279,7 +276,6 @@
                 height: 200px;
             }
         
-            /* 4. 우측 상세 정보 박스도 전체 페이지 스크롤을 탈 수 있게 유연하게 풀기 */
             .content-right { 
                 height: auto; 
                 overflow: visible; 
@@ -547,7 +543,7 @@
                 <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:12px; height:100%;">
                     <!-- 제목과 필순 다시보기 버튼을 한 줄에 배치 -->
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-                        <h3>Details & Stroke Order</h3>
+                        <h3>Details & Stroke Order (Traditional / Simplified)</h3>
                         <button class="mini-action-btn" onclick="animateWriters()">Replay Strokes</button>
                     </div>
                     
@@ -597,8 +593,22 @@
         document.body.classList.toggle('light-mode'); 
     });
 
-    document.querySelector('.main-content').addEventListener('click', (e) => { 
-        if (sidebar.classList.contains('active')) { sidebar.classList.remove('active'); }
+    // 모바일에서 사이드바 내부(버튼, 콤보박스 등)를 누르거나 바깥쪽(메인 콘텐츠)을 누를 때 사이드바 자동 닫힘 처리
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
+            // 사이드바 내부 요소를 클릭했거나, 메뉴 토글 버튼을 클릭한 경우가 아닐 때 닫기
+            const isClickInsideSidebar = sidebar.contains(e.target);
+            const isClickMenuBtn = e.target.closest('.menu-toggle-btn');
+            
+            if (!isClickInsideSidebar && !isClickMenuBtn) {
+                sidebar.classList.remove('active');
+            } else if (isClickInsideSidebar && (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION')) {
+                // 사이드바 내부의 버튼이나 콤보박스를 조작한 경우 선택 동작 수행 후 닫히도록 약간의 딜레이 부여 혹은 즉시 닫기
+                setTimeout(() => {
+                    sidebar.classList.remove('active');
+                }, 150);
+            }
+        }
     });
 
     const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
