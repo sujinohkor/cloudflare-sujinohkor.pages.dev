@@ -236,31 +236,32 @@
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; }                                            
             .workspace-container { flex-direction: column; overflow: visible; }                                            
             
-            /* 1. 왼쪽 결과 박스 전체 높이 고정 (예: 280px 또는 30vh) */
+            /* 모바일에서 결과 목록 박스를 화면 높이의 약 1/3로 축소 및 내부 스크롤 고정 */
             .content-left { 
-                height: 280px; 
+                height: 250px; 
                 min-height: unset; 
                 overflow: hidden; 
             } 
-        
-            /* 2. 박스 내부의 카드에서 flex: 1 성질 제거 */
             .content-left .calc-card {
                 flex: none;
                 height: 100%;
             }
-        
-            /* 3. 실제 한자 버튼들이 나열되는 리스트 영역에 높이와 스크롤 부여 */
             .content-left .history-list {
-                max-height: 190px; /* 타이틀 공간을 제외한 순수 리스트 높이 */
+                max-height: 160px;
                 overflow-y: auto;
             }
-            
-            /* 상세 정보(오른쪽)는 기존처럼 유연하게 출력 */
+
+            /* 모바일에서 320px 한자 캔버스가 화면을 넘지 않도록 크기 축소 반응형 처리 */
+            .character-target {
+                width: 200px;
+                height: 200px;
+            }
+
             .content-right { 
                 height: auto; 
                 overflow: visible; 
                 min-height: 400px; 
-            }
+            }                                    
         }
     </style>
 </head>
@@ -641,15 +642,18 @@
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
 
+        // 모바일 화면 폭을 감지하여 캔버스 크기를 동적으로 설정 (모바일에서는 200px, 데스크톱에서는 320px)
+        const writerSize = window.innerWidth <= 900 ? 200 : 320;
+
         try {
             tradWriter = HanziWriter.create('tradTarget', tradChar, {
-                width: 320, height: 320, padding: 18,
+                width: writerSize, height: writerSize, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             tradWriter.animateCharacter();
 
             simpWriter = HanziWriter.create('simpTarget', simpChar, {
-                width: 320, height: 320, padding: 18,
+                width: writerSize, height: writerSize, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             simpWriter.animateCharacter();
@@ -663,7 +667,6 @@
         if (simpWriter) simpWriter.animateCharacter();
     }
 
-    // 1. 검색창을 건드렸을 때: 부수, 획수 필터 초기화
     function onSearchInput() {
         document.getElementById('filterBusu').value = '';
         document.getElementById('filterStrokes').value = '';
@@ -678,7 +681,6 @@
         if(filtered.length > 0) selectHanzi(filtered[0].char);
     }
 
-    // 2. 부수 필터를 건드렸을 때: 검색창, 획수 필터 초기화
     function onBusuChange() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterStrokes').value = '';
@@ -688,7 +690,6 @@
         if(busu) {
             filtered = filtered.filter(x => x.busu === busu);
         } else {
-            // 부수를 'All Radicals'로 되돌린 경우 전체 목록 표시
             renderList(db);
             if(db.length > 0) selectHanzi(db[0].char);
             return;
@@ -698,7 +699,6 @@
         if(filtered.length > 0) selectHanzi(filtered[0].char);
     }
 
-    // 3. 획수 필터를 건드렸을 때: 검색창, 부수 필터 초기화
     function onStrokesChange() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterBusu').value = '';
@@ -708,7 +708,6 @@
         if(strokes) {
             filtered = filtered.filter(x => x.strokes == strokes);
         } else {
-            // 획수를 'All Strokes'로 되돌린 경우 전체 목록 표시
             renderList(db);
             if(db.length > 0) selectHanzi(db[0].char);
             return;
@@ -723,7 +722,7 @@
         document.getElementById('filterBusu').value = '';
         document.getElementById('filterStrokes').value = '';
         renderList(db);
-        if (db.length > 0) selectHanzi(db[0].char);
+        if (db.length > 0) selectHanzi(db[0].size);
     }
 </script>
 </body>
