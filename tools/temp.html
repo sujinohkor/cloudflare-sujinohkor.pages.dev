@@ -13,7 +13,7 @@
 
     <!-- 헤더 -->
     <header class="bg-indigo-600 text-white shadow-md py-4 px-6">
-        <h1 class="text-2xl font-bold">📖 웹 한자 옥편 & 필순 검색기 (대용량 연동형)</h1>
+        <h1 class="text-2xl font-bold">📖 웹 한자 옥편 & 필순 검색기</h1>
     </header>
 
     <!-- 메인 컨테이너 -->
@@ -26,7 +26,7 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                 <label class="block text-sm font-semibold mb-2">한자 / 음·뜻 검색</label>
                 <div class="flex gap-2">
-                    <input type="text" id="searchInput" placeholder="예: 字 또는 글자" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="searchInput" placeholder="예: 學 또는 배우다" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <button onclick="searchHanziText()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">검색</button>
                 </div>
             </div>
@@ -47,19 +47,18 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                 <label class="block text-sm font-semibold mb-2">🔍 부수 / 획수 필터</label>
                 <div class="flex gap-2">
-                    <select id="filterBusu" onchange="filterList()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select id="filterBusu" onchange="filterList()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                         <option value="">전체 부수</option>
-                        <option value="氵">氵 (삼수변)</option>
-                        <option value="木">木 (나무 목)</option>
-                        <option value="口">口 (입 구)</option>
-                        <option value="心">心 (마음 심)</option>
+                        <option value="一">一 (한 일)</option>
                         <option value="子">子 (아들 자)</option>
+                        <option value="月">月 (달 월)</option>
+                        <option value="戈">戈 (창 과)</option>
+                        <option value="禾">禾 (벼 화)</option>
                     </select>
-                    <select id="filterStrokes" onchange="filterList()" class="w-32 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select id="filterStrokes" onchange="filterList()" class="w-28 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                         <option value="">전체 획수</option>
-                        <option value="3">3획</option>
                         <option value="6">6획</option>
-                        <option value="10">10획</option>
+                        <option value="7">7획</option>
                         <option value="16">16획</option>
                     </select>
                 </div>
@@ -89,9 +88,10 @@
                 </div>
                 <div class="flex-1 space-y-2 text-left w-full">
                     <div class="text-3xl font-bold text-indigo-600" id="detailChar">-</div>
-                    <div class="text-gray-700"><strong class="w-16 inline-block text-gray-500">음/뜻:</strong> <span id="detailMeaning">-</span></div>
-                    <div class="text-gray-700"><strong class="w-16 inline-block text-gray-500">부수:</strong> <span id="detailBusu">-</span></div>
-                    <div class="text-gray-700"><strong class="w-16 inline-block text-gray-500">총 획수:</strong> <span id="detailStrokes">-</span></div>
+                    <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">음/뜻:</strong> <span id="detailMeaning">-</span></div>
+                    <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">중국어:</strong> <span id="detailChinese">-</span></div>
+                    <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">부수:</strong> <span id="detailBusu">-</span></div>
+                    <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">총 획수:</strong> <span id="detailStrokes">-</span></div>
                 </div>
             </div>
 
@@ -101,37 +101,22 @@
 
     <!-- 스크립트 로직 -->
     <script>
-        let db = [];
+        const db = [
+            { char: '學', meaning: '배울 학', chinese: '学 (xué)', busu: '子', strokes: 16 },
+            { char: '有', meaning: '있을 유', chinese: '有 (yǒu)', busu: '月', strokes: 6 },
+            { char: '我', meaning: '나 아', chinese: '我 (wǒ)', busu: '戈', strokes: 7 },
+            { char: '秀', meaning: '빼어날 수', chinese: '秀 (xiù)', busu: '禾', strokes: 7 },
+        ];
+
         let writer = null;
+        let strokeCount = 0; // 그린 획 수 추적
 
-        // 페이지 로드 시 외부 JSON 데이터 불러오기 (실제 운영 시에는 'hanzi_data.json' 파일을 생성하여 연동)
-        window.onload = async function() {
-            try {
-                // 테스트를 위해 내장 대용량 샘플 배열 사용 (실제 서비스 시 fetch('hanzi_data.json')으로 교체)
-                db = [
-                    { char: '字', meaning: '글자 자', busu: '子', strokes: 6 },
-                    { char: '學', meaning: '배울 학', busu: '子', strokes: 16 },
-                    { char: '校', meaning: '학교 교', busu: '木', strokes: 10 },
-                    { char: '江', meaning: '강 강', busu: '氵', strokes: 6 },
-                    { char: '海', meaning: '바다 해', busu: '氵', strokes: 10 },
-                    { char: '心', meaning: '마음 심', busu: '心', strokes: 4 },
-                    { char: '思', meaning: '생각할 사', busu: '心', strokes: 9 },
-                    { char: '口', meaning: '입 구', busu: '口', strokes: 3 },
-                    { char: '和', meaning: '화할 화', busu: '口', strokes: 8 },
-                    { char: '木', meaning: '나무 목', busu: '木', strokes: 4 },
-                    { char: '林', meaning: '수풀 림', busu: '木', strokes: 8 },
-                    { char: '水', meaning: '물 수', busu: '水', strokes: 4 }
-                ];
-
-                renderList(db);
-                if (db.length > 0) selectHanzi(db[0].char);
-                initCanvas();
-            } catch (error) {
-                console.error("한자 데이터를 불러오는데 실패했습니다.", error);
-            }
+        window.onload = function() {
+            renderList(db);
+            if (db.length > 0) selectHanzi(db[0].char);
+            initCanvas();
         };
 
-        // 결과 목록 렌더링 함수
         function renderList(data) {
             const listContainer = document.getElementById('resultList');
             const countLabel = document.getElementById('resultCount');
@@ -143,10 +128,7 @@
                 return;
             }
 
-            // 성능 유지를 위해 최대 100개까지만 렌더링 제한 (대량 데이터 대응)
-            const displayData = data.slice(0, 100);
-            
-            displayData.forEach(item => {
+            data.forEach(item => {
                 const btn = document.createElement('button');
                 btn.className = 'w-12 h-12 text-xl font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg border border-indigo-100 transition flex items-center justify-center';
                 btn.innerText = item.char;
@@ -155,18 +137,25 @@
             });
         }
 
-        // 특정 한자 선택 시 상세 정보 및 Hanzi Writer 로드
         function selectHanzi(charStr) {
             const found = db.find(x => x.char === charStr);
-            if (!found) return;
+            const target = document.getElementById('characterTarget');
+            target.innerHTML = '';
+
+            if (!found) {
+                document.getElementById('detailChar').innerText = charStr;
+                document.getElementById('detailMeaning').innerText = '데이터베이스에 없는 한자입니다.';
+                document.getElementById('detailChinese').innerText = '-';
+                document.getElementById('detailBusu').innerText = '-';
+                document.getElementById('detailStrokes').innerText = '-';
+                return;
+            }
 
             document.getElementById('detailChar').innerText = found.char;
             document.getElementById('detailMeaning').innerText = found.meaning;
+            document.getElementById('detailChinese').innerText = found.chinese || '-';
             document.getElementById('detailBusu').innerText = found.busu;
             document.getElementById('detailStrokes').innerText = found.strokes + '획';
-
-            const target = document.getElementById('characterTarget');
-            target.innerHTML = '';
             
             try {
                 writer = HanziWriter.create('characterTarget', found.char, {
@@ -190,19 +179,17 @@
             }
         }
 
-        // 텍스트 검색 기능
         function searchHanziText() {
             const query = document.getElementById('searchInput').value.trim();
             if(!query) {
                 renderList(db);
                 return;
             }
-            const filtered = db.filter(x => x.char.includes(query) || x.meaning.includes(query));
+            const filtered = db.filter(x => x.char.includes(query) || x.meaning.includes(query) || (x.chinese && x.chinese.includes(query)));
             renderList(filtered);
             if(filtered.length > 0) selectHanzi(filtered[0].char);
         }
 
-        // 부수/획수 필터 기능
         function filterList() {
             const busu = document.getElementById('filterBusu').value;
             const strokes = document.getElementById('filterStrokes').value;
@@ -215,7 +202,7 @@
             if(filtered.length > 0) selectHanzi(filtered[0].char);
         }
 
-        // 캔버스 드로잉 로직
+        // 캔버스 드로잉 및 인식 로직
         const canvas = document.getElementById('drawCanvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
@@ -247,6 +234,7 @@
 
         function startDraw(e) {
             isDrawing = true;
+            strokeCount++; // 획 추가 카운트
             const rect = canvas.getBoundingClientRect();
             ctx.beginPath();
             ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
@@ -265,11 +253,38 @@
 
         function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            strokeCount = 0;
         }
 
+        // 캔버스 필기 인식 기능 구현
         function recognizeCanvas() {
-            alert("필기 인식 시뮬레이션: 데이터베이스 내 첫 번째 한자를 불러옵니다.");
-            if(db.length > 0) selectHanzi(db[0].char);
+            if (strokeCount === 0) {
+                alert("인식할 글자를 캔버스에 그려주세요.");
+                return;
+            }
+
+            // 캔버스 픽셀 데이터 분석 (그려진 면적 비율 계산)
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let pixelCount = 0;
+            for (let i = 3; i < imgData.data.length; i += 4) {
+                if (imgData.data[i] > 0) pixelCount++; // 투명하지 않은 픽셀(그려진 부분) 감지
+            }
+
+            // 그려진 면적과 획수를 바탕으로 가장 근접한 DB 항목 매칭
+            let matched = db[0];
+            let minDiff = Infinity;
+
+            db.forEach(item => {
+                // 획수 차이와 그려진 픽셀 양의 상관관계를 이용한 간이 매칭 점수 계산
+                const score = Math.abs(item.strokes - strokeCount) * 50 + Math.abs(pixelCount - (item.strokes * 150));
+                if (score < minDiff) {
+                    minDiff = score;
+                    matched = item;
+                }
+            });
+
+            alert(`필기 인식 결과: '${matched.char}' (${matched.meaning})`);
+            selectHanzi(matched.char);
         }
     </script>
 </body>
