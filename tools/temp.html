@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Hanzi Writer CDN -->
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <!-- 외부 한자 데이터베이스 로드 -->
+    <script src="./codes/trad_with_simp.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -26,7 +28,7 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                 <label class="block text-sm font-semibold mb-2">한자 / 음·뜻 검색</label>
                 <div class="flex gap-2">
-                    <input type="text" id="searchInput" placeholder="예: 學 또는 배우다" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="searchInput" placeholder="예: 的 또는 one" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <button onclick="searchHanziText()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">검색</button>
                 </div>
             </div>
@@ -49,17 +51,14 @@
                 <div class="flex gap-2">
                     <select id="filterBusu" onchange="filterList()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                         <option value="">전체 부수</option>
+                        <option value="白">白 (흰 백)</option>
                         <option value="一">一 (한 일)</option>
-                        <option value="子">子 (아들 자)</option>
-                        <option value="月">月 (달 월)</option>
-                        <option value="戈">戈 (창 과)</option>
-                        <option value="禾">禾 (벼 화)</option>
+                        <!-- 필요한 부수 옵션을 추가로 구성할 수 있습니다 -->
                     </select>
                     <select id="filterStrokes" onchange="filterList()" class="w-28 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                         <option value="">전체 획수</option>
-                        <option value="6">6획</option>
-                        <option value="7">7획</option>
-                        <option value="16">16획</option>
+                        <option value="1">1획</option>
+                        <option value="8">8획</option>
                     </select>
                 </div>
             </div>
@@ -88,7 +87,7 @@
                 </div>
                 <div class="flex-1 space-y-2 text-left w-full">
                     <div class="text-3xl font-bold text-indigo-600" id="detailChar">-</div>
-                    <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">음/뜻:</strong> <span id="detailMeaning">-</span></div>
+                    <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">뜻:</strong> <span id="detailMeaning">-</span></div>
                     <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">중국어:</strong> <span id="detailChinese">-</span></div>
                     <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">부수:</strong> <span id="detailBusu">-</span></div>
                     <div class="text-gray-700"><strong class="w-24 inline-block text-gray-500">총 획수:</strong> <span id="detailStrokes">-</span></div>
@@ -101,12 +100,8 @@
 
     <!-- 스크립트 로직 -->
     <script>
-        const db = [
-            { char: '學', meaning: '배울 학', chinese: '学 (xué)', busu: '子', strokes: 16 },
-            { char: '有', meaning: '있을 유', chinese: '有 (yǒu)', busu: '月', strokes: 6 },
-            { char: '我', meaning: '나 아', chinese: '我 (wǒ)', busu: '戈', strokes: 7 },
-            { char: '秀', meaning: '빼어날 수', chinese: '秀 (xiù)', busu: '禾', strokes: 7 },
-        ];
+        // trad_with_simp 데이터를 db 변수로 안전하게 참조
+        const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
 
         let writer = null;
         let strokeCount = 0; // 그린 획 수 추적
@@ -185,7 +180,7 @@
                 renderList(db);
                 return;
             }
-            const filtered = db.filter(x => x.char.includes(query) || x.meaning.includes(query) || (x.chinese && x.chinese.includes(query)));
+            const filtered = db.filter(x => x.char.includes(query) || x.meaning.toLowerCase().includes(query.toLowerCase()) || (x.chinese && x.chinese.includes(query)));
             renderList(filtered);
             if(filtered.length > 0) selectHanzi(filtered[0].char);
         }
@@ -234,7 +229,7 @@
 
         function startDraw(e) {
             isDrawing = true;
-            strokeCount++; // 획 추가 카운트
+            strokeCount++;
             const rect = canvas.getBoundingClientRect();
             ctx.beginPath();
             ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
@@ -256,26 +251,22 @@
             strokeCount = 0;
         }
 
-        // 캔버스 필기 인식 기능 구현
         function recognizeCanvas() {
             if (strokeCount === 0) {
                 alert("인식할 글자를 캔버스에 그려주세요.");
                 return;
             }
 
-            // 캔버스 픽셀 데이터 분석 (그려진 면적 비율 계산)
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             let pixelCount = 0;
             for (let i = 3; i < imgData.data.length; i += 4) {
-                if (imgData.data[i] > 0) pixelCount++; // 투명하지 않은 픽셀(그려진 부분) 감지
+                if (imgData.data[i] > 0) pixelCount++;
             }
 
-            // 그려진 면적과 획수를 바탕으로 가장 근접한 DB 항목 매칭
             let matched = db[0];
             let minDiff = Infinity;
 
             db.forEach(item => {
-                // 획수 차이와 그려진 픽셀 양의 상관관계를 이용한 간이 매칭 점수 계산
                 const score = Math.abs(item.strokes - strokeCount) * 50 + Math.abs(pixelCount - (item.strokes * 150));
                 if (score < minDiff) {
                     minDiff = score;
