@@ -928,26 +928,37 @@
             
             const results = await session.run(feeds);
             const outputTensor = results[session.outputNames[0]];
-            
-            // 디버깅용 로그: 텐서 구조와 길이 확인
-            console.log("출력 텐서 차원(dims):", outputTensor.dims);
-            console.log("출력 데이터 전체 길이(length):", outputTensor.data.length);
-
+            const dims = outputTensor.dims; // [1, 6, 18385]
             const outputData = outputTensor.data;
 
-            // 최고 확률 인덱스 구하기
-            let maxIdx = 0;
-            let maxVal = outputData[0];
-            for(let i = 1; i < outputData.length; i++) {
-                if(outputData[i] > maxVal) {
-                    maxVal = outputData[i];
-                    maxIdx = i;
+            const seqLen = dims[1];    // 6 (시간축/타임스텝)
+            const numClasses = dims[2]; // 18385 (글자 종류)
+
+            let recognizedChar = "";
+
+            // 6개의 칸(타임스텝)을 하나씩 돌면서 가장 확실하게 인식된 글자 찾기
+            for (let t = 0; t < seqLen; t++) {
+                let maxIdx = 0;
+                let maxVal = outputData[t * numClasses];
+
+                for (let i = 1; i < numClasses; i++) {
+                    const val = outputData[t * numClasses + i];
+                    if (val > maxVal) {
+                        maxVal = val;
+                        maxIdx = i;
+                    }
+                }
+
+                // 0번(보통 공백/블랭크)이 아니고 유효한 사전 인덱스인 경우
+                if (maxIdx > 0 && maxIdx < dict.length) {
+                    recognizedChar = dict[maxIdx];
+                    console.log(`타임스텝 ${t}에서 인식된 글자: ${recognizedChar} (인덱스: ${maxIdx})`);
+                    // 글자를 하나 찾았으면 반복문을 탈출하여 사용 (단일 글자 인식 모드일 경우)
+                    break; 
                 }
             }
 
-            console.log("모델 인식 인덱스:", maxIdx);
-
-            const recognizedChar = dict[maxIdx];
+            console.log("최종 인식된 글자:", recognizedChar);
             
             // 디버깅: 모델이 뭘 인식했는지 콘솔에 출력
             console.log("모델 인식 인덱스:", maxIdx);
