@@ -8,8 +8,6 @@
     <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
     <!-- Hanzi Writer CDN -->
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
-    <!-- ONNX Runtime Web 엔진 로드 -->
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <!-- 외부 한자 데이터베이스 로드 -->
     <script src="/codes/trad_with_simp.js"></script>
     <style>
@@ -36,37 +34,21 @@
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
-        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .search-container {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            margin-bottom: 5px;
-        }
+        .search-container { display: flex; flex-direction: column; gap: 3px; margin-bottom: 5px; }
         .search-input {
-            width: 100%;
-            padding: 11px 14px;
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
-            border: 1px solid rgba(255, 158, 64, 0.35);
-            border-radius: 50px;
-            outline: none;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: bold;
+            width: 100%; padding: 11px 14px; background: rgba(255, 255, 255, 0.03); color: #fff;
+            border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 50px; outline: none; text-align: center; font-size: 0.85rem; font-weight: bold;
         }
         .search-input::placeholder { color: #888; }
 
         .control-group { display: flex; flex-direction: column; gap: 3px; margin-top: 5px; }
         .control-label { font-size: 0.8rem; color: #ff9e40; font-weight: bold; padding-left: 5px; }
 
-        select.search-input {
-            cursor: pointer;
-        }
+        select.search-input { cursor: pointer; }
         select.search-input option { background: #101010; color: #fff; }
 
         /* 메인 콘텐츠 영역 */
@@ -77,7 +59,6 @@
             width: calc(100% - 300px);
         }
 
-        /* 3. Components */
         .menu-btn { 
             width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
             background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
@@ -86,24 +67,10 @@
         }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
-        .top-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .top-btns > .menu-btn {
-            margin-bottom: 0;
-        }
+        .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
+        .bottom-btns > .menu-btn { margin-bottom: 0; }
 
-        .bottom-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .bottom-btns > .menu-btn {
-            margin-bottom: 0;
-        }
-
+        /* 작업 영역: 좌우 1:1 배치 (결과 목록 / 상세 정보) */
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -113,162 +80,60 @@
             position: relative;
         }
 
-        /* 왼쪽 박스: 필기 인식 영역 */
-        .content-mid { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
-            padding: 25px; background: transparent; flex-direction: column; 
-            align-items: center; justify-content: flex-start;
-            gap: 20px; overflow-y: auto;
+        /* 왼쪽 박스: 결과 목록 영역 */
+        .content-left { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            overflow: hidden; padding: 20px; background: transparent; gap: 15px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
                 
-        /* 오른쪽 박스: 결과 목록 & 상세 정보 영역 (1:1 세로 분할) */
-        .content-down { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow: hidden; padding: 20px; background: transparent; gap: 15px; position: relative;
+        /* 오른쪽 박스: 상세 정보 & 번체/간체 애니메이션 영역 */
+        .content-right { 
+            flex: 1.2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            overflow-y: auto; padding: 25px; background: transparent; gap: 20px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .calc-card {
+            background: #1c1c1c; border: 1px solid #333; border-radius: 12px; padding: 15px;
+            display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; position: relative;
+        }
+        .calc-card h3 { font-size: 0.9rem; color: #ff9e40; flex-shrink: 0; }
+
+        /* 결과 목록 스타일 */
+        .history-list {
+            flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
+        }
+        .hanzi-result-btn {
+            width: 44px; height: 44px; font-size: 1.1rem; font-weight: bold; background: #252525; color: #ff9e40;
+            border: 1px solid #333; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .hanzi-result-btn:hover { background: #ff9e40; color: #101010; border-color: #ff9e40; }
+
+        /* 상세 정보 및 번체/간체 SVG 나란히 배치 */
+        .detail-top-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
             background: #1c1c1c;
             border: 1px solid #333;
             border-radius: 12px;
             padding: 15px;
+        }
+        .writer-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            flex: 1; /* 1:1 세로 공간 균등 분할 */
-            min-height: 0;
-            position: relative;
-        }
-        .calc-card h3 {
-            font-size: 0.9rem;
-            color: #ff9e40;
-            flex-shrink: 0;
-        }
-
-        /* 입력 및 버튼 스타일 */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            position: relative;
-            width: 100%;
-        }
-        .input-group label {
-            font-size: 0.85rem;
-            color: #ff9e40;
-            font-weight: 600;
-        }
-                
-        .input-group input {
-            width: 100%;
-            padding: 12px 18px;
-            background: #202020;
-            border: 2px solid #ff9e40;
-            color: #fff;
-            border-radius: 50px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            outline: none;
-            transition: all 0.3s;
-        }
-        .input-group input:focus {
-            border-color: #ff9e40;
-            box-shadow: 0 0 10px rgba(255, 158, 64, 0.3);
-        }
-
-        .action-btn {
-            background: #202020;
-            color: #ff9e40;
-            border: 2px solid #ff9e40;
-            padding: 12px;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            text-align: center;
-        }
-        .action-btn:hover { background: #ff9e40; color: #101010; }
-
-        .secondary-btn {
-            background: #202020;
-            color: #ff9e40;
-            border: 1px solid #ff9e40;
-            padding: 8px 12px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        .secondary-btn:hover { background: #ff9e40; color: #101010; }
-
-        /* 필기 인식 캔버스 스타일 (PC 기준 기본 4배 크기: 480x480) */
-        .canvas-wrapper {
-            border: 2px dashed #ff9e40;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #202020;
-            position: relative;
-            cursor: crosshair;
-            width: 480px;
-            height: 480px;
-            display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
         }
-        #drawCanvas {
-            touch-action: none;
-            background: #fff;
-            border-radius: 8px;
-            width: 440px;
-            height: 440px;
-        }
-
-        /* 결과 목록 스타일 */
-        .history-list {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-content: flex-start;
-        }
-        .hanzi-result-btn {
-            width: 44px;
-            height: 44px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            background: #252525;
+        .writer-label {
+            font-size: 0.75rem;
             color: #ff9e40;
-            border: 1px solid #333;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: bold;
         }
-        .hanzi-result-btn:hover {
-            background: #ff9e40;
-            color: #101010;
-            border-color: #ff9e40;
-        }
-
-        /* 상세 정보 스타일 */
-        .detail-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            height: 100%;
-        }
-        /* 필순 SVG 영역 */
         .character-target {
-            width: 140px;
-            height: 140px;
+            width: 110px;
+            height: 110px;
             border: 1px solid #333;
             border-radius: 8px;
             background: #202020;
@@ -280,101 +145,56 @@
         .detail-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             font-size: 0.85rem;
             color: #ccc;
-            overflow-y: auto;
-            max-height: 100%;
+            flex: 1;
         }
         .detail-char-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #ff9e40;
             line-height: 1.2;
             margin-bottom: 2px;
         }
 
-        /* 그림자 설정 */
-        .calc-card, .content-mid, .content-down {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        .secondary-btn {
+            background: #202020; color: #ff9e40; border: 1px solid #ff9e40; padding: 8px 12px;
+            border-radius: 50px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.3s; text-align: center; width: fit-content;
         }
+        .secondary-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 4. Theme (Light Mode) */
+        /* Light Mode Styles */
         body.light-mode { background-color: #fff; color: #202020; }
-        body.light-mode .sidebar { 
-            background: rgba(255, 255, 255, 0.3); 
-            border-color: rgba(243, 128, 32, 0.35); 
-            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
-        }
-                
-        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
-            background: rgba(0, 0, 0, 0.02); 
-            color: #F38020; 
-            border-color: rgba(243, 128, 32, 0.5); 
-        }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
-            background: rgba(243, 128, 32, 0.15); 
-            color: #F38020; 
-            border-color: rgba(243, 128, 32, 0.4); 
-        }
-
-        body.light-mode .search-input {
-            background: rgba(0, 0, 0, 0.02);
-            color: #202020;
-            border-color: rgba(243, 128, 32, 0.5);
-        }
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.3); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .search-input { background: rgba(0, 0, 0, 0.02); color: #202020; border-color: rgba(243, 128, 32, 0.5); }
         body.light-mode .search-input::placeholder { color: #888; }
         body.light-mode select.search-input option { background: #fff; color: #202020; }
-
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-mid, body.light-mode .content-down, body.light-mode .calc-card {
-            background-color: #fafafa;
-            border-color: #F38020;
-            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card, body.light-mode .detail-top-box {
+            background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
-        body.light-mode .input-group input { background: #FDF5E6; border-color: #e68a35; color: #000; }
-        body.light-mode .input-group input:focus { border-color: #F38020; box-shadow: 0 0 10px rgba(243, 128, 32, 0.2); }
-        body.light-mode .input-group label { color: #e68a35; }
         body.light-mode .calc-card { background: #fff; border-color: #ddd; }
         body.light-mode .calc-card h3 { color: #e68a35; }
-        body.light-mode .action-btn, body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .action-btn:hover, body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .hanzi-result-btn { background: #fff; color: #e68a35; border-color: #ddd; }
         body.light-mode .hanzi-result-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .character-target { background: #fff; border-color: #ddd; }
-        body.light-mode .canvas-wrapper { background: #fafafa; border-color: #e68a35; }
-        /* DAY 모드에서 상세 정보 텍스트를 검정색으로 설정 */
         body.light-mode .detail-info { color: #202020; }
 
-        /* 5. Mobile Responsive */
+        /* Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
         @media (max-width: 900px) {                                            
             .menu-toggle-btn { display: block; }                                            
-            .sidebar { 
-                transform: translateX(-320px); 
-                background: #101010 !important; 
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                                            
-            body.light-mode .sidebar { 
-                background: #ffffff !important; 
-                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
-            }
+            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; }                                            
+            body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }
             .sidebar.active { transform: translateX(0); }                                            
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                                            
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; }                                            
             .workspace-container { flex-direction: column; overflow: visible; }                                            
-            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                                            
-            .content-down { height: auto; overflow: visible; min-height: 500px; }                                    
-            /* 모바일 환경에서는 캔버스 크기를 기존 설정(220px)으로 유지 */
-            .canvas-wrapper {
-                width: 220px;
-                height: 220px;
-            }
-            #drawCanvas {
-                width: 220px;
-                height: 220px;
-            }
+            .content-left, .content-right { height: auto; overflow: visible; min-height: 400px; }                                    
         }
     </style>
 </head>
@@ -615,25 +435,10 @@
         </header>
 
         <div class="workspace-container">
-            <!-- 왼쪽 박스: 필기 인식 영역 -->
-            <section class="content-mid">
-                <div class="input-group">
-                    <label>✍️ 필기 인식 (마우스로 그리세요)</label>
-                </div>
-                <div class="canvas-wrapper">
-                    <canvas id="drawCanvas" width="440" height="440"></canvas>
-                </div>
-                <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
-                    <button class="secondary-btn" style="flex: 1;" onclick="clearCanvas()">지우기</button>
-                    <button class="secondary-btn" style="flex: 1;" onclick="recognizeCanvas()">인식하기</button>
-                </div>
-            </section>
-
-            <!-- 오른쪽 박스: 결과 목록 및 상세 정보 영역 (1:1 세로 분할) -->
-            <section class="content-down">
-                <!-- 결과 목록 카드 -->
-                <div class="calc-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <!-- 왼쪽 박스: 결과 목록 영역 -->
+            <section class="content-left">
+                <div class="calc-card" style="border:none; padding:0; background:transparent;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; margin-bottom: 10px;">
                         <h3>결과 목록</h3>
                         <span id="resultCount" style="font-size: 0.75rem; color: #ff9e40; font-weight: bold;">0개 검색됨</span>
                     </div>
@@ -641,13 +446,26 @@
                         <div style="font-size: 0.8rem; color: #888; text-align: center; padding: 20px 0; width: 100%;">검색 결과가 없습니다.</div>
                     </div>
                 </div>
+            </section>
 
-                <!-- 상세 정보 및 필순 카드 -->
-                <div class="calc-card">
-                    <h3>상세 정보 & 필순</h3>
-                    <div class="detail-container">
-                        <div class="character-target" id="characterTarget">
-                            <span style="font-size: 0.8rem; color: #888;">선택 없음</span>
+            <!-- 오른쪽 박스: 상세 정보 & 번체/간체 SVG 필순 영역 -->
+            <section class="content-right">
+                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:15px;">
+                    <h3>상세 정보 & 필순 (번체 / 간체)</h3>
+                    
+                    <!-- 번체 & 간체 SVG를 나란히 배치할 박스 -->
+                    <div class="detail-top-box">
+                        <div class="writer-group">
+                            <span class="writer-label">번체 (Traditional)</span>
+                            <div class="character-target" id="tradTarget">
+                                <span style="font-size: 0.75rem; color: #888;">-</span>
+                            </div>
+                        </div>
+                        <div class="writer-group">
+                            <span class="writer-label">간체 (Simplified)</span>
+                            <div class="character-target" id="simpTarget">
+                                <span style="font-size: 0.75rem; color: #888;">-</span>
+                            </div>
                         </div>
                         <div class="detail-info">
                             <div class="detail-char-title" id="detailChar">-</div>
@@ -655,8 +473,11 @@
                             <div><strong>중국어:</strong> <span id="detailChinese">-</span></div>
                             <div><strong>부수:</strong> <span id="detailBusu">-</span></div>
                             <div><strong>총 획수:</strong> <span id="detailStrokes">-</span></div>
-                            <button class="secondary-btn" style="margin-top: 6px; padding: 4px 10px; font-size: 0.75rem; width: fit-content;" onclick="animateWriter()">필순 다시보기</button>
                         </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <button class="secondary-btn" onclick="animateWriters()">필순 다시보기</button>
                     </div>
                 </div>
             </section>
@@ -664,11 +485,6 @@
     </main>
 </div>
 <script>
-    // ONNX Runtime 싱글스레드 및 경로 고정 설정
-    ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
-    ort.env.wasm.numThreads = 1; 
-    ort.env.logLevel = "warning";
-
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
@@ -681,71 +497,12 @@
     });
 
     const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
-    let writer = null;
-    let strokeCount = 0; 
-    let hanziSession = null;
-    let charDict = [];
-
-    // 조각 파일(part1~part5) 및 사전 파일(mandarin-onnx.txt)을 병행 로드하여 모델 구축
-    async function getHanziSession() {
-        if (hanziSession && charDict.length > 0) return { session: hanziSession, dict: charDict };
-        try {
-            console.log("Loading split ONNX model parts & dict file...");
-            const partFiles = [
-                '/models/mandarin.onnx.part1',
-                '/models/mandarin.onnx.part2',
-                '/models/mandarin.onnx.part3',
-                '/models/mandarin.onnx.part4',
-                '/models/mandarin.onnx.part5'
-            ];
-
-            const bufferPromises = partFiles.map(async (url) => {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`모델 조각 로드 실패: ${url}`);
-                return await res.arrayBuffer();
-            });
-
-            // 문자 사전 파일 로드 및 빈 줄 완벽 제거 파싱
-            const dictPromise = fetch('/models/mandarin-onnx.txt').then(async (res) => {
-                if (!res.ok) throw new Error("사전 파일(mandarin-onnx.txt) 로드 실패");
-                const text = await res.text();
-                // 줄바꿈으로 쪼갠 후, 공백이거나 빈 문자열은 완전히 제외하여 정확한 인덱스 매핑 보장
-                return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
-            });
-
-            const results = await Promise.all([...bufferPromises, dictPromise]);
-            charDict = results.pop();
-            const arrays = results;
-
-            console.log(`사전 로드 완료! 총 글자 수: ${charDict.length}개`);
-
-            const totalLength = arrays.reduce((sum, buf) => sum + buf.byteLength, 0);
-            const combinedArray = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const buf of arrays) {
-                combinedArray.set(new Uint8Array(buf), offset);
-                offset += buf.byteLength;
-            }
-
-            console.log(`모델 병합 완료! 총 크기: ${(combinedArray.byteLength / (1024 * 1024)).toFixed(2)} MB`);
-
-            hanziSession = await ort.InferenceSession.create(combinedArray.buffer, { 
-                executionProviders: ['wasm'], 
-                graphOptimizationLevel: "all" 
-            });
-            console.log("ONNX Model Loaded Successfully from parts!");
-        } catch (err) {
-            console.error("ONNX Model 또는 사전 로드 실패:", err);
-            throw err;
-        }
-        return { session: hanziSession, dict: charDict };
-    }
+    let tradWriter = null;
+    let simpWriter = null;
 
     window.onload = function() {
         renderList(db);
         if (db.length > 0) selectHanzi(db[0].char);
-        initCanvas();
-        getHanziSession().catch(e => console.warn("Background model preload warning:", e));
     };
 
     function renderList(data) {
@@ -770,8 +527,11 @@
 
     function selectHanzi(charStr) {
         const found = db.find(x => x.char === charStr);
-        const target = document.getElementById('characterTarget');
-        target.innerHTML = '';
+        const tradTarget = document.getElementById('tradTarget');
+        const simpTarget = document.getElementById('simpTarget');
+        
+        tradTarget.innerHTML = '';
+        simpTarget.innerHTML = '';
 
         if (!found) {
             document.getElementById('detailChar').innerText = charStr;
@@ -788,26 +548,33 @@
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + '획';
         
+        // 데이터베이스 구조에 맞추어 번체와 간체 문자 가져오기 (필드명이 다를 경우를 대비해 안전하게 처리)
+        const tradChar = found.char; // 번체 (기본 char 필드)
+        // 만약 데이터베이스에 간체 필드가 존재한다면 그것을 쓰고, 없으면 번체와 동일하게 처리
+        const simpChar = found.chinese || found.simp || found.char; 
+
         try {
-            writer = HanziWriter.create('characterTarget', found.char, {
-                width: 130,
-                height: 130,
-                padding: 5,
-                showOutline: true,
-                strokeAnimationSpeed: 1,
-                delayBetweenStrokes: 300,
-                strokeColor: '#ff9e40'
+            // 1. 번체 Writer 생성
+            tradWriter = HanziWriter.create('tradTarget', tradChar, {
+                width: 100, height: 100, padding: 5,
+                showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
-            writer.animateCharacter();
+            tradWriter.animateCharacter();
+
+            // 2. 간체 Writer 생성
+            simpWriter = HanziWriter.create('simpTarget', simpChar, {
+                width: 100, height: 100, padding: 5,
+                showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
+            });
+            simpWriter.animateCharacter();
         } catch (e) {
             console.error("Hanzi Writer 렌더링 실패:", e);
         }
     }
 
-    function animateWriter() {
-        if (writer) {
-            writer.animateCharacter();
-        }
+    function animateWriters() {
+        if (tradWriter) tradWriter.animateCharacter();
+        if (simpWriter) simpWriter.animateCharacter();
     }
 
     function searchHanziText() {
@@ -833,165 +600,10 @@
         if(filtered.length > 0) selectHanzi(filtered[0].char);
     }
 
-    const canvas = document.getElementById('drawCanvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
-
-    function initCanvas() {
-        ctx.lineWidth = 12;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#101010';
-
-        canvas.addEventListener('mousedown', startDraw);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDraw);
-        canvas.addEventListener('mouseleave', stopDraw);
-
-        canvas.addEventListener('touchstart', (e) => { handleTouch(e, startDraw); });
-        canvas.addEventListener('touchmove', (e) => { handleTouch(e, draw); });
-        canvas.addEventListener('touchend', stopDraw);
-    }
-
-    function handleTouch(e, callback) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        canvas.dispatchEvent(mouseEvent);
-    }
-
-    function startDraw(e) {
-        isDrawing = true;
-        strokeCount++;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        ctx.beginPath();
-        ctx.moveTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
-    }
-
-    function draw(e) {
-        if (!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        ctx.lineTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
-        ctx.stroke();
-    }
-
-    function stopDraw() {
-        isDrawing = false;
-    }
-
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokeCount = 0;
-    }
-
-    // ONNX 모델 추론 및 사전 매핑을 수행하는 인식 함수
-    async function recognizeCanvas() {
-        if (strokeCount === 0) {
-            alert("인식할 글자를 캔버스에 그려주세요.");
-            return;
-        }
-
-        try {
-            const { session, dict } = await getHanziSession();
-            
-            const inputSize = 48; // 모델 입력 규격 (48x48)
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = inputSize;
-            tempCanvas.height = inputSize;
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            tempCtx.fillStyle = "#FFFFFF";
-            tempCtx.fillRect(0, 0, inputSize, inputSize);
-            tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
-            
-            // 캔버스 이미지 가져오기
-            const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
-            const floatData = new Float32Array(3 * inputSize * inputSize);
-            
-            for (let i = 0; i < inputSize * inputSize; i++) {
-                // 원본: 흰 배경(255), 검정 글씨(0)
-                // 변환: 검정 배경(0), 흰 글씨(255)로 반전
-                const r = 255 - imgData[i * 4];
-                const g = 255 - imgData[i * 4 + 1];
-                const b = 255 - imgData[i * 4 + 2];
-                
-                // 정규화 (0~1 사이 값)
-                floatData[i] = r / 255.0;
-                floatData[inputSize * inputSize + i] = g / 255.0;
-                floatData[inputSize * inputSize * 2 + i] = b / 255.0;
-            }
-
-            const inputTensor = new ort.Tensor('float32', floatData, [1, 3, inputSize, inputSize]);
-            const feeds = { [session.inputNames[0]]: inputTensor };
-            
-            const results = await session.run(feeds);
-            const outputTensor = results[session.outputNames[0]];
-            const dims = outputTensor.dims; // [1, 6, 18385]
-            const outputData = outputTensor.data;
-
-            const seqLen = dims[1];    // 6 (시간축/타임스텝)
-            const numClasses = dims[2]; // 18385 (글자 종류)
-
-            let recognizedChar = "";
-
-            // 6개의 칸(타임스텝)을 하나씩 돌면서 가장 확실하게 인식된 글자 찾기
-            for (let t = 0; t < seqLen; t++) {
-                let maxIdx = 0;
-                let maxVal = outputData[t * numClasses];
-
-                for (let i = 1; i < numClasses; i++) {
-                    const val = outputData[t * numClasses + i];
-                    if (val > maxVal) {
-                        maxVal = val;
-                        maxIdx = i;
-                    }
-                }
-
-                if (maxIdx > 0 && maxIdx < dict.length) {
-                    recognizedChar = dict[maxIdx];
-                    console.log(`타임스텝 ${t}에서 인식된 글자: ${recognizedChar} (인덱스: ${maxIdx})`);
-                    break; 
-                }
-            }
-
-            console.log("최종 인식된 글자:", recognizedChar);
-
-            if (!recognizedChar) {
-                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
-                return;
-            }
-
-            // 보유 중인 DB에서 검색
-            const found = db.find(x => x.char === recognizedChar);
-            if (found) {
-                alert(`ONNX 인식 결과: '${found.char}' (${found.meaning})`);
-                selectHanzi(found.char);
-            } else {
-                alert(`ONNX 인식 결과: '${recognizedChar}' (DB에 상세 정보 없음)`);
-                document.getElementById('detailChar').innerText = recognizedChar;
-                document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
-                document.getElementById('detailChinese').innerText = '-';
-                document.getElementById('detailBusu').innerText = '-';
-                document.getElementById('detailStrokes').innerText = '-';
-            }
-
-        } catch (err) {
-            console.error("ONNX 추론 오류:", err);
-            alert("모델 추론 중 오류가 발생했습니다. (콘솔창 확인)");
-        }
-    }
-
     function resetAll() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterBusu').value = '';
         document.getElementById('filterStrokes').value = '';
-        clearCanvas();
         renderList(db);
         if (db.length > 0) selectHanzi(db[0].char);
     }
