@@ -928,6 +928,7 @@
             const results = await session.run(feeds);
             const outputData = results[session.outputNames[0]].data;
 
+            // 최고 확률 인덱스 구하기
             let maxIdx = 0;
             let maxVal = outputData[0];
             for(let i = 1; i < outputData.length; i++) {
@@ -937,10 +938,14 @@
                 }
             }
 
-            // dict.txt를 통한 정확한 한자 문자 매핑
             const recognizedChar = dict[maxIdx];
+            
+            // 디버깅: 모델이 뭘 인식했는지 콘솔에 출력
+            console.log("모델 인식 인덱스:", maxIdx);
+            console.log("인식된 글자 데이터:", "'" + recognizedChar + "'");
+
             if (!recognizedChar) {
-                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
+                alert(`인덱스 ${maxIdx}번은 사전에 없습니다.`);
                 return;
             }
 
