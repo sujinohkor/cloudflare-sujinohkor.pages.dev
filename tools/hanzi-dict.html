@@ -233,12 +233,25 @@
             .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; }                                            
             body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }
             .sidebar.active { transform: translateX(0); }                                            
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; }                                            
+            
+            /* 1. 전체 화면(바디와 메인)이 스크롤될 수 있도록 높이 고정 해제 및 스크롤 허용 */
+            body {
+                overflow: auto;
+                height: auto;
+            }
+            .main-content { 
+                margin-left: 0; 
+                padding: 20px; 
+                width: 100vw; 
+                height: auto; 
+                overflow: visible; /* 전체 화면 스크롤 방해 요소 제거 */
+            }                                            
+            
             .workspace-container { flex-direction: column; overflow: visible; }                                            
             
-            /* 1. 모바일에서 Results List 박스를 화면 높이의 1/4 수준으로 압축 및 내부 여백/스크롤 최적화 */
+            /* 2. Results List 박스 높이를 1/4 수준으로 고정하되, 내부 리스트만 스크롤되도록 분리 */
             .content-left { 
-                height: 180px; 
+                height: 220px; /* 원하시는 1/4 높이값 */
                 min-height: unset; 
                 overflow: hidden; 
                 padding: 12px;
@@ -250,34 +263,32 @@
                 padding: 0;
             }
             .content-left .history-list {
-                max-height: 110px;
-                overflow-y: auto;
+                max-height: 140px; /* 버튼들이 안으로 들어오게 제한 */
+                overflow-y: auto; /* 리스트 내부만 개별 스크롤 */
             }
-
-            /* 2. 모바일에서 번체와 간체 SVG를 가로가 아닌 세로(column)로 정렬 */
+        
+            /* 3. 번체/간체 세로 정렬 유지 */
             .detail-top-svg-box {
                 flex-direction: column;
                 gap: 15px;
                 padding: 10px;
             }
-
-            /* 모바일에서 한자 캔버스 크기 축소 */
+        
             .character-target {
                 width: 200px;
                 height: 200px;
             }
-
+        
+            /* 4. 우측 상세 정보 박스도 전체 페이지 스크롤을 탈 수 있게 유연하게 풀기 */
             .content-right { 
                 height: auto; 
-                overflow-y: visible; 
+                overflow: visible; 
                 min-height: unset; 
             }
-
-            /* 상세 정보 박스 내부의 카드도 높이를 유연하게 풀어줌 */
             .content-right .calc-card {
                 flex: none;
                 height: auto;
-            }                                
+            }
         }
     </style>
 </head>
