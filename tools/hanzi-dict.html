@@ -203,7 +203,7 @@
         }
         .secondary-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 필기 인식 캔버스 스타일 */
+        /* 필기 인식 캔버스 스타일 (크기 확대) */
         .canvas-wrapper {
             border: 2px dashed #ff9e40;
             border-radius: 12px;
@@ -211,8 +211,8 @@
             background: #202020;
             position: relative;
             cursor: crosshair;
-            width: 200px;
-            height: 200px;
+            width: 240px;
+            height: 240px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -261,9 +261,10 @@
             align-items: center;
             height: 100%;
         }
+        /* 필순 SVG 영역 (크기 확대) */
         .character-target {
-            width: 110px;
-            height: 110px;
+            width: 140px;
+            height: 140px;
             border: 1px solid #333;
             border-radius: 8px;
             background: #202020;
@@ -600,13 +601,13 @@
         </header>
 
         <div class="workspace-container">
-            <!-- 왼쪽 박스: 캔버스 필기 영역 -->
+            <!-- 왼쪽 박스: 필기 인식 영역 -->
             <section class="content-mid">
                 <div class="input-group">
                     <label>✍️ 필기 인식 (마우스로 그리세요)</label>
                 </div>
                 <div class="canvas-wrapper">
-                    <canvas id="drawCanvas" width="160" height="160"></canvas>
+                    <canvas id="drawCanvas" width="220" height="220"></canvas>
                 </div>
                 <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
                     <button class="secondary-btn" style="flex: 1;" onclick="clearCanvas()">지우기</button>
@@ -614,7 +615,7 @@
                 </div>
             </section>
 
-            <!-- 오른쪽 박스: 검색 결과 목록 및 상세 정보 영역 (1:1 세로 분할) -->
+            <!-- 오른쪽 박스: 결과 목록 및 상세 정보 영역 (1:1 세로 분할) -->
             <section class="content-down">
                 <!-- 결과 목록 카드 -->
                 <div class="calc-card">
@@ -712,8 +713,8 @@
         
         try {
             writer = HanziWriter.create('characterTarget', found.char, {
-                width: 100,
-                height: 100,
+                width: 130,
+                height: 130,
                 padding: 5,
                 showOutline: true,
                 strokeAnimationSpeed: 1,
@@ -760,7 +761,7 @@
     let isDrawing = false;
 
     function initCanvas() {
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 8;
         ctx.lineCap = 'round';
         ctx.strokeStyle = '#101010';
 
@@ -777,6 +778,7 @@
     function handleTouch(e, callback) {
         e.preventDefault();
         const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
         const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
             clientX: touch.clientX,
             clientY: touch.clientY
