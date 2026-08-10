@@ -8,6 +8,8 @@
     <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
     <!-- Hanzi Writer CDN -->
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <!-- ONNX Runtime Web 엔진 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <!-- 외부 한자 데이터베이스 로드 -->
     <script src="/codes/trad_with_simp.js"></script>
     <style>
@@ -346,25 +348,24 @@
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
-        @media (max-width: 900px) {                    
-            .menu-toggle-btn { display: block; }                    
+        @media (max-width: 900px) {                                            
+            .menu-toggle-btn { display: block; }                                            
             .sidebar { 
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                    
+            }                                            
             body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .sidebar.active { transform: translateX(0); }                    
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                    
-            .workspace-container { flex-direction: column; overflow: visible; }                    
-            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                    
-            .content-down { height: auto; overflow: visible; min-height: 500px; }
-            
+            .sidebar.active { transform: translateX(0); }                                            
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                                            
+            .workspace-container { flex-direction: column; overflow: visible; }                                            
+            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                                            
+            .content-down { height: auto; overflow: visible; min-height: 500px; }                                    
             /* 모바일 환경에서는 캔버스 크기를 기존 설정(220px)으로 유지 */
             .canvas-wrapper {
                 width: 220px;
@@ -389,7 +390,7 @@
 
         <div class="search-container">
             <span class="control-label">한자/음/뜻 검색</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">            
+            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                            
         </div>
 
         <div class="control-group" id="algo-select-group">
@@ -603,7 +604,6 @@
                 </script>
             </select>
         </div>
-
         <div class="bottom-btns" style="width: 100%;">
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
@@ -621,7 +621,6 @@
                     <label>✍️ 필기 인식 (마우스로 그리세요)</label>
                 </div>
                 <div class="canvas-wrapper">
-                    <!-- PC 기준 가로/세로 2배(총 4배 면적)로 확대된 캔버스 -->
                     <canvas id="drawCanvas" width="440" height="440"></canvas>
                 </div>
                 <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
@@ -665,6 +664,11 @@
     </main>
 </div>
 <script>
+    // ONNX Runtime 싱글스레드 및 경로 고정 설정
+    ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
+    ort.env.wasm.numThreads = 1; 
+    ort.env.logLevel = "warning";
+
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
@@ -679,11 +683,69 @@
     const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
     let writer = null;
     let strokeCount = 0; 
+    let hanziSession = null;
+    let charDict = [];
+
+    // 조각 파일(part1~part5) 및 사전 파일(mandarin-onnx.txt)을 병행 로드하여 모델 구축
+    async function getHanziSession() {
+        if (hanziSession && charDict.length > 0) return { session: hanziSession, dict: charDict };
+        try {
+            console.log("Loading split ONNX model parts & dict file...");
+            const partFiles = [
+                '/models/mandarin.onnx.part1',
+                '/models/mandarin.onnx.part2',
+                '/models/mandarin.onnx.part3',
+                '/models/mandarin.onnx.part4',
+                '/models/mandarin.onnx.part5'
+            ];
+
+            const bufferPromises = partFiles.map(async (url) => {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`모델 조각 로드 실패: ${url}`);
+                return await res.arrayBuffer();
+            });
+
+            // 문자 사전 파일 로드 및 빈 줄 완벽 제거 파싱
+            const dictPromise = fetch('/models/mandarin-onnx.txt').then(async (res) => {
+                if (!res.ok) throw new Error("사전 파일(mandarin-onnx.txt) 로드 실패");
+                const text = await res.text();
+                // 줄바꿈으로 쪼갠 후, 공백이거나 빈 문자열은 완전히 제외하여 정확한 인덱스 매핑 보장
+                return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
+            });
+
+            const results = await Promise.all([...bufferPromises, dictPromise]);
+            charDict = results.pop();
+            const arrays = results;
+
+            console.log(`사전 로드 완료! 총 글자 수: ${charDict.length}개`);
+
+            const totalLength = arrays.reduce((sum, buf) => sum + buf.byteLength, 0);
+            const combinedArray = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const buf of arrays) {
+                combinedArray.set(new Uint8Array(buf), offset);
+                offset += buf.byteLength;
+            }
+
+            console.log(`모델 병합 완료! 총 크기: ${(combinedArray.byteLength / (1024 * 1024)).toFixed(2)} MB`);
+
+            hanziSession = await ort.InferenceSession.create(combinedArray.buffer, { 
+                executionProviders: ['wasm'], 
+                graphOptimizationLevel: "all" 
+            });
+            console.log("ONNX Model Loaded Successfully from parts!");
+        } catch (err) {
+            console.error("ONNX Model 또는 사전 로드 실패:", err);
+            throw err;
+        }
+        return { session: hanziSession, dict: charDict };
+    }
 
     window.onload = function() {
         renderList(db);
         if (db.length > 0) selectHanzi(db[0].char);
         initCanvas();
+        getHanziSession().catch(e => console.warn("Background model preload warning:", e));
     };
 
     function renderList(data) {
@@ -804,7 +866,6 @@
         isDrawing = true;
         strokeCount++;
         const rect = canvas.getBoundingClientRect();
-        // 캔버스 실제 내부 해상도 좌표계와 화면 표시 크기 비율을 고려한 오프셋 계산
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         ctx.beginPath();
@@ -829,31 +890,101 @@
         strokeCount = 0;
     }
 
-    function recognizeCanvas() {
+    // ONNX 모델 추론 및 사전 매핑을 수행하는 인식 함수
+    async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
             return;
         }
 
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        let pixelCount = 0;
-        for (let i = 3; i < imgData.data.length; i += 4) {
-            if (imgData.data[i] > 0) pixelCount++;
-        }
-
-        let matched = db[0];
-        let minDiff = Infinity;
-
-        db.forEach(item => {
-            const score = Math.abs(item.strokes - strokeCount) * 50 + Math.abs(pixelCount - (item.strokes * 150));
-            if (score < minDiff) {
-                minDiff = score;
-                matched = item;
+        try {
+            const { session, dict } = await getHanziSession();
+            
+            const inputSize = 48; // 모델 입력 규격 (48x48)
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = inputSize;
+            tempCanvas.height = inputSize;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCtx.fillStyle = "#FFFFFF";
+            tempCtx.fillRect(0, 0, inputSize, inputSize);
+            tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
+            
+            // 캔버스 이미지 가져오기
+            const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
+            const floatData = new Float32Array(3 * inputSize * inputSize);
+            
+            for (let i = 0; i < inputSize * inputSize; i++) {
+                // 원본: 흰 배경(255), 검정 글씨(0)
+                // 변환: 검정 배경(0), 흰 글씨(255)로 반전
+                const r = 255 - imgData[i * 4];
+                const g = 255 - imgData[i * 4 + 1];
+                const b = 255 - imgData[i * 4 + 2];
+                
+                // 정규화 (0~1 사이 값)
+                floatData[i] = r / 255.0;
+                floatData[inputSize * inputSize + i] = g / 255.0;
+                floatData[inputSize * inputSize * 2 + i] = b / 255.0;
             }
-        });
 
-        alert(`필기 인식 결과: '${matched.char}' (${matched.meaning})`);
-        selectHanzi(matched.char);
+            const inputTensor = new ort.Tensor('float32', floatData, [1, 3, inputSize, inputSize]);
+            const feeds = { [session.inputNames[0]]: inputTensor };
+            
+            const results = await session.run(feeds);
+            const outputTensor = results[session.outputNames[0]];
+            const dims = outputTensor.dims; // [1, 6, 18385]
+            const outputData = outputTensor.data;
+
+            const seqLen = dims[1];    // 6 (시간축/타임스텝)
+            const numClasses = dims[2]; // 18385 (글자 종류)
+
+            let recognizedChar = "";
+
+            // 6개의 칸(타임스텝)을 하나씩 돌면서 가장 확실하게 인식된 글자 찾기
+            for (let t = 0; t < seqLen; t++) {
+                let maxIdx = 0;
+                let maxVal = outputData[t * numClasses];
+
+                for (let i = 1; i < numClasses; i++) {
+                    const val = outputData[t * numClasses + i];
+                    if (val > maxVal) {
+                        maxVal = val;
+                        maxIdx = i;
+                    }
+                }
+
+                if (maxIdx > 0 && maxIdx < dict.length) {
+                    recognizedChar = dict[maxIdx];
+                    console.log(`타임스텝 ${t}에서 인식된 글자: ${recognizedChar} (인덱스: ${maxIdx})`);
+                    break; 
+                }
+            }
+
+            console.log("최종 인식된 글자:", recognizedChar);
+
+            if (!recognizedChar) {
+                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
+                return;
+            }
+
+            // 보유 중인 DB에서 검색
+            const found = db.find(x => x.char === recognizedChar);
+            if (found) {
+                alert(`ONNX 인식 결과: '${found.char}' (${found.meaning})`);
+                selectHanzi(found.char);
+            } else {
+                alert(`ONNX 인식 결과: '${recognizedChar}' (DB에 상세 정보 없음)`);
+                document.getElementById('detailChar').innerText = recognizedChar;
+                document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
+                document.getElementById('detailChinese').innerText = '-';
+                document.getElementById('detailBusu').innerText = '-';
+                document.getElementById('detailStrokes').innerText = '-';
+            }
+
+        } catch (err) {
+            console.error("ONNX 추론 오류:", err);
+            alert("모델 추론 중 오류가 발생했습니다. (콘솔창 확인)");
+        }
     }
 
     function resetAll() {
