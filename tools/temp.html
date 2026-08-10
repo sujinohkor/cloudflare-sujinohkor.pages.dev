@@ -2,258 +2,275 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>YT Live News</title>
-    <!-- Favicon settings -->
-    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
-    <style>
-        /* 1. Reset & Base */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; width: 100vw; height: 100vh; overflow: hidden; position: fixed; }
-        a { text-decoration: none; color: inherit; display: block; }                            
-
-        .app-container { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
-
-        /* 모바일 전용 투명 배경 레이어 (사이드바가 열렸을 때만 활성화) */        
-        .sidebar-backdrop {            
-            display: none;            
-            position: fixed;            
-            top: 0; left: 0; width: 100vw; height: 100vh;            
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 2500;        
-        }
-        body.sidebar-is-active .sidebar-backdrop {            
-            display: block;        
-        }
-
-        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
-        .sidebar {                       
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         
-            background: rgba(16, 16, 16, 0.25);                         
-            backdrop-filter: blur(16px);                         
-            -webkit-backdrop-filter: blur(16px);                        
-            padding: 25px 20px; z-index: 3000;                         
-            display: flex; flex-direction: column; gap: 12px;                         
-            border: 1px solid rgba(255, 158, 64, 0.35);                         
-            border-radius: 24px;                        
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        
-            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
-            overflow-y: auto;                 
-        }
-        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
-
-        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }        
-        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
-        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-
-        /* 그룹 라벨 스타일 */
-        .control-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }        
-        .control-label { font-size: 0.8rem; color: #ff9e40; font-weight: bold; padding-left: 5px; }
-
-        /* 메인 콘텐츠 영역 */
-        .main-content {                         
-            margin-left: 300px; padding: 40px; flex: 1;                         
-            display: flex; flex-direction: column; height: 100vh;                         
-            gap: 20px; overflow: hidden; transition: all 0.3s ease;                         
-            width: calc(100% - 300px);
-        }
-
-        .top-section { flex-shrink: 0; }
-
-        .menu-btn {                         
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                       
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                       
-            display: flex; align-items: center; justify-content: center; line-height: 1;                 
-        }
-        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-        .menu-btn.active { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
-
-        .content-card {                         
-            border: 2px solid #ff9e40;                         
-            border-radius: 16px;                         
-            flex: 1;                         
-            display: flex;                         
-            overflow: hidden;                         
-            background-color: #000;              
-            position: relative;             
-            transition: all 0.3s ease;                 
-        }
-        .board-container {                       
-            width: 100%;                       
-            height: 100%;                       
-            position: relative;                       
-            overflow: hidden;            
-            display: flex;            
-            justify-content: center;            
-            align-items: center;        }
-        .board-container iframe {            
-            width: 100%;            
-            height: 100%;            
-            border: none;            
-            display: block;        }
-
-        body.light-mode { background-color: #fff; color: #202020; }                
-        body.light-mode .sidebar {                         
-            background: rgba(255, 255, 255, 0.85);                         
-            border-color: rgba(243, 128, 32, 0.35);                         
-            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 
-        }                            
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {                         
-            background: rgba(0, 0, 0, 0.02);                         
-            color: #F38020;                         
-            border-color: rgba(243, 128, 32, 0.5);         
-        }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {                         
-            background: rgba(243, 128, 32, 0.15);                         
-            color: #F38020;                         
-            border-color: rgba(243, 128, 32, 0.4);         
-        }                        
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .menu-toggle-btn { color: #ffffff; }
-
-        .menu-toggle-btn {                         
-            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;                         
-            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         
-            font-weight: bold; cursor: pointer; color: #ffffff;         }                
-
-        @media (max-width: 900px) {                         
-            .menu-toggle-btn { display: block; }                         
-            .sidebar {                                 
-                transform: translateX(-320px);                                 
-                background: #101010 !important;                                 
-                backdrop-filter: none !important;                                 
-                -webkit-backdrop-filter: none !important;                                 
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 
-                z-index: 3000;             
-            }                         
-            body.light-mode .sidebar {                                
-                background: #ffffff !important;                                 
-                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             
-            }
-            .sidebar.active { transform: translateX(0); }                         
-            
-            /* 모바일 환경에서 패딩 및 레이아웃을 화면에 완전히 밀착 */
-            .main-content { 
-                margin-left: 0 !important; 
-                padding: 10px !important; 
-                width: 100vw !important; 
-                height: 100vh !important; 
-            }                         
-            .top-section {
-                display: none; /* 모바일 화면 공간 확보를 위해 상단 타이틀 영역 숨김 처리 (필요시 복구 가능) */
-            }
-            .content-card { 
-                min-height: 0 !important; 
-                height: 100% !important; 
-                border-radius: 12px;
-                border: 1px solid #ff9e40;
-            }                     
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹 한자 옥편 & 필순 검색기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Hanzi Writer CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 </head>
-<body>    
-    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>        
-    <div class="sidebar-backdrop" onclick="closeSidebar()"></div>
-    
-    <div class="app-container">        
-        <aside class="sidebar" id="sidebar">            
-            <div class="sidebar-title">YT Live News</div>            
-            <div class="sidebar-top">                
-                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>            
-            </div>                                                                                  
-            <button class="menu-btn" onclick="location.href='../index'">Home</button>                        
-            <div class="control-group">                
-                <span class="control-label">English</span>                
-                <button class="menu-btn active" id="btn-cnn" onclick="switchChannel('cnn')">CNN News Live</button>                
-                <button class="menu-btn" id="btn-abc" onclick="switchChannel('abc')">ABC News Live</button>                
-                <button class="menu-btn" id="btn-sky" onclick="switchChannel('sky')">Sky News Live</button>            
-            </div>                        
-            <div class="control-group">                
-                <span class="control-label">Mandarin</span>                
-                <button class="menu-btn" id="btn-tvbs" onclick="switchChannel('tvbs')">TVBS News Live</button>                
-                <button class="menu-btn" id="btn-formosa" onclick="switchChannel('formosa')">民視新聞網 News Live</button>                
-                <button class="menu-btn" id="btn-ch52" onclick="switchChannel('ch52')">華視新聞 News Live</button>            
-            </div>              
-        </aside>        
-        
-        <main class="main-content" id="main-content">                        
-            <header class="top-section">                                
-                <h1>YT Live News</h1>                                
-                <p>YouTube Live News</p>            
-            </header>                        
-            <section class="content-card" id="content-card">                                
-                <div class="board-container" id="board">                                        
-                    <!-- 동적으로 유튜브 iframe이 로드되는 영역 -->                
-                </div>                        
-            </section>                
-        </main>        
-    </div>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-    <script>                
-        const sidebar = document.getElementById('sidebar');
-        const board = document.getElementById('board');
+    <!-- 헤더 -->
+    <header class="bg-indigo-600 text-white shadow-md py-4 px-6">
+        <h1 class="text-2xl font-bold">📖 웹 한자 옥편 & 필순 검색기 (대용량 연동형)</h1>
+    </header>
 
-        // 페이지 로드 시 기본값으로 CNN 뉴스 실행        
-        window.onload = function() {                 
-            switchChannel('cnn');        
+    <!-- 메인 컨테이너 -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+
+        <!-- 좌측: 입력 및 필터 영역 (5 컬럼) -->
+        <section class="md:col-span-5 flex flex-col gap-6">
+            
+            <!-- 텍스트 검색 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <label class="block text-sm font-semibold mb-2">한자 / 음·뜻 검색</label>
+                <div class="flex gap-2">
+                    <input type="text" id="searchInput" placeholder="예: 字 또는 글자" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="searchHanziText()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">검색</button>
+                </div>
+            </div>
+
+            <!-- 캔버스 필기 영역 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center">
+                <label class="block text-sm font-semibold mb-2 w-full text-left">✍️ 필기 인식 (마우스로 그리세요)</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative cursor-crosshair" style="width: 200px; height: 200px;">
+                    <canvas id="drawCanvas" width="200" height="200" class="touch-none"></canvas>
+                </div>
+                <div class="flex gap-2 mt-3 w-full">
+                    <button onclick="clearCanvas()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition">지우기</button>
+                    <button onclick="recognizeCanvas()" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition">인식하기</button>
+                </div>
+            </div>
+
+            <!-- 부수 및 획수별 빠른 필터 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <label class="block text-sm font-semibold mb-2">🔍 부수 / 획수 필터</label>
+                <div class="flex gap-2">
+                    <select id="filterBusu" onchange="filterList()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">전체 부수</option>
+                        <option value="氵">氵 (삼수변)</option>
+                        <option value="木">木 (나무 목)</option>
+                        <option value="口">口 (입 구)</option>
+                        <option value="心">心 (마음 심)</option>
+                        <option value="子">子 (아들 자)</option>
+                    </select>
+                    <select id="filterStrokes" onchange="filterList()" class="w-32 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">전체 획수</option>
+                        <option value="3">3획</option>
+                        <option value="6">6획</option>
+                        <option value="10">10획</option>
+                        <option value="16">16획</option>
+                    </select>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 우측: 결과 목록 및 상세 정보 영역 (7 컬럼) -->
+        <section class="md:col-span-7 flex flex-col gap-6">
+
+            <!-- 검색 결과 목록 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-semibold text-gray-600">결과 목록 (클릭하여 상세 보기)</h2>
+                    <span id="resultCount" class="text-xs text-indigo-600 font-bold">0개 검색됨</span>
+                </div>
+                <div id="resultList" class="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1">
+                    <!-- 자바스크립트로 동적 생성 -->
+                </div>
+            </div>
+
+            <!-- 선택된 한자 상세 정보 & 필순 애니메이션 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center gap-6">
+                <div class="flex flex-col items-center">
+                    <div id="characterTarget" class="w-36 h-36 border border-gray-200 rounded-lg bg-gray-50 flex items-center justify-center shadow-inner"></div>
+                    <button onclick="animateWriter()" class="mt-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-lg transition font-medium">필순 다시보기</button>
+                </div>
+                <div class="flex-1 space-y-2 text-left w-full">
+                    <div class="text-3xl font-bold text-indigo-600" id="detailChar">-</div>
+                    <div class="text-gray-700"><strong class="w-16 inline-block text-gray-500">음/뜻:</strong> <span id="detailMeaning">-</span></div>
+                    <div class="text-gray-700"><strong class="w-16 inline-block text-gray-500">부수:</strong> <span id="detailBusu">-</span></div>
+                    <div class="text-gray-700"><strong class="w-16 inline-block text-gray-500">총 획수:</strong> <span id="detailStrokes">-</span></div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- 스크립트 로직 -->
+    <script>
+        let db = [];
+        let writer = null;
+
+        // 페이지 로드 시 외부 JSON 데이터 불러오기 (실제 운영 시에는 'hanzi_data.json' 파일을 생성하여 연동)
+        window.onload = async function() {
+            try {
+                // 테스트를 위해 내장 대용량 샘플 배열 사용 (실제 서비스 시 fetch('hanzi_data.json')으로 교체)
+                db = [
+                    { char: '字', meaning: '글자 자', busu: '子', strokes: 6 },
+                    { char: '學', meaning: '배울 학', busu: '子', strokes: 16 },
+                    { char: '校', meaning: '학교 교', busu: '木', strokes: 10 },
+                    { char: '江', meaning: '강 강', busu: '氵', strokes: 6 },
+                    { char: '海', meaning: '바다 해', busu: '氵', strokes: 10 },
+                    { char: '心', meaning: '마음 심', busu: '心', strokes: 4 },
+                    { char: '思', meaning: '생각할 사', busu: '心', strokes: 9 },
+                    { char: '口', meaning: '입 구', busu: '口', strokes: 3 },
+                    { char: '和', meaning: '화할 화', busu: '口', strokes: 8 },
+                    { char: '木', meaning: '나무 목', busu: '木', strokes: 4 },
+                    { char: '林', meaning: '수풀 림', busu: '木', strokes: 8 },
+                    { char: '水', meaning: '물 수', busu: '水', strokes: 4 }
+                ];
+
+                renderList(db);
+                if (db.length > 0) selectHanzi(db[0].char);
+                initCanvas();
+            } catch (error) {
+                console.error("한자 데이터를 불러오는데 실패했습니다.", error);
+            }
         };
 
-        // 뉴스 채널 전환 함수        
-        function switchChannel(channelType) {            
-            document.querySelectorAll('.sidebar .menu-btn').forEach(btn => btn.classList.remove('active'));
+        // 결과 목록 렌더링 함수
+        function renderList(data) {
+            const listContainer = document.getElementById('resultList');
+            const countLabel = document.getElementById('resultCount');
+            listContainer.innerHTML = '';
+            countLabel.innerText = `${data.length}개 검색됨`;
 
-            let iframeHTML = '';            
-            const currentOrigin = window.location.origin !== 'null' ? window.location.origin : 'http://localhost';                        
-
-            if (channelType === 'cnn') {                
-                document.getElementById('btn-cnn').classList.add('active');                
-                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/GotlA1KKWoo?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;            
-            } else if (channelType === 'abc') {                
-                document.getElementById('btn-abc').classList.add('active');                
-                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/iipR5yUp36o?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;            
-            } else if (channelType === 'sky') {                
-                document.getElementById('btn-sky').classList.add('active');                
-                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/YDvsBbKfLPA?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;            
-            } else if (channelType === 'tvbs') {                
-                document.getElementById('btn-tvbs').classList.add('active');                
-                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/m_dhMSvUCIc?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;            
-            } else if (channelType === 'formosa') {                
-                document.getElementById('btn-formosa').classList.add('active');                
-                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocanggil... / embed/ylYJSBUgaMA?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;            
-            } else if (channelType === 'ch52') {                
-                document.getElementById('btn-ch52').classList.add('active');                
-                iframeHTML = `<iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/wM0g8EoUZ_E?autoplay=1&origin=${encodeURIComponent(currentOrigin)}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe>`;            
+            if(data.length === 0) {
+                listContainer.innerHTML = '<p class="text-sm text-gray-400 py-2">검색 결과가 없습니다.</p>';
+                return;
             }
 
-            board.innerHTML = iframeHTML;        
+            // 성능 유지를 위해 최대 100개까지만 렌더링 제한 (대량 데이터 대응)
+            const displayData = data.slice(0, 100);
+            
+            displayData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'w-12 h-12 text-xl font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg border border-indigo-100 transition flex items-center justify-center';
+                btn.innerText = item.char;
+                btn.onclick = () => selectHanzi(item.char);
+                listContainer.appendChild(btn);
+            });
         }
 
-        // 사이드바 토글 (열기/닫기)        
-        function toggleSidebar() {                         
-            sidebar.classList.toggle('active');            
-            document.body.classList.toggle('sidebar-is-active', sidebar.classList.contains('active'));        
+        // 특정 한자 선택 시 상세 정보 및 Hanzi Writer 로드
+        function selectHanzi(charStr) {
+            const found = db.find(x => x.char === charStr);
+            if (!found) return;
+
+            document.getElementById('detailChar').innerText = found.char;
+            document.getElementById('detailMeaning').innerText = found.meaning;
+            document.getElementById('detailBusu').innerText = found.busu;
+            document.getElementById('detailStrokes').innerText = found.strokes + '획';
+
+            const target = document.getElementById('characterTarget');
+            target.innerHTML = '';
+            
+            try {
+                writer = HanziWriter.create('characterTarget', found.char, {
+                    width: 140,
+                    height: 140,
+                    padding: 5,
+                    showOutline: true,
+                    strokeAnimationSpeed: 1,
+                    delayBetweenStrokes: 300,
+                    strokeColor: '#4f46e5'
+                });
+                writer.animateCharacter();
+            } catch (e) {
+                console.error("Hanzi Writer 렌더링 실패:", e);
+            }
         }
 
-        // 사이드바 강제 닫기        
-        function closeSidebar() {            
-            sidebar.classList.remove('active');            
-            document.body.classList.remove('sidebar-is-active');        }
+        function animateWriter() {
+            if (writer) {
+                writer.animateCharacter();
+            }
+        }
 
-        // 사이드바 내부 버튼들을 눌렀을 때 모바일에서 닫히도록 설정        
-        sidebar.querySelectorAll('button').forEach(element => {                        
-            element.addEventListener('click', () => {                                
-                if (window.innerWidth <= 900) {                                        
-                    closeSidebar();                
-                }                        
-            });                
-        });
+        // 텍스트 검색 기능
+        function searchHanziText() {
+            const query = document.getElementById('searchInput').value.trim();
+            if(!query) {
+                renderList(db);
+                return;
+            }
+            const filtered = db.filter(x => x.char.includes(query) || x.meaning.includes(query));
+            renderList(filtered);
+            if(filtered.length > 0) selectHanzi(filtered[0].char);
+        }
 
-        // 테마 토글 버튼        
-        document.getElementById('theme-toggle').addEventListener('click', () => {                         
-            document.body.classList.toggle('light-mode');                 
-        });    
+        // 부수/획수 필터 기능
+        function filterList() {
+            const busu = document.getElementById('filterBusu').value;
+            const strokes = document.getElementById('filterStrokes').value;
+
+            let filtered = db;
+            if(busu) filtered = filtered.filter(x => x.busu === busu);
+            if(strokes) filtered = filtered.filter(x => x.strokes == strokes);
+
+            renderList(filtered);
+            if(filtered.length > 0) selectHanzi(filtered[0].char);
+        }
+
+        // 캔버스 드로잉 로직
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function initCanvas() {
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#1f2937';
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mouseleave', stopDraw);
+
+            canvas.addEventListener('touchstart', (e) => { handleTouch(e, startDraw); });
+            canvas.addEventListener('touchmove', (e) => { handleTouch(e, draw); });
+            canvas.addEventListener('touchend', stopDraw);
+        }
+
+        function handleTouch(e, callback) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function recognizeCanvas() {
+            alert("필기 인식 시뮬레이션: 데이터베이스 내 첫 번째 한자를 불러옵니다.");
+            if(db.length > 0) selectHanzi(db[0].char);
+        }
     </script>
 </body>
 </html>
