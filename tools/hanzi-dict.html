@@ -70,7 +70,7 @@
         .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
         .bottom-btns > .menu-btn { margin-bottom: 0; }
 
-        /* 작업 영역: 좌우 1:1 배치 (결과 목록 / 상세 정보) */
+        /* 작업 영역: 좌우 배치 (결과 목록 / 상세 정보) */
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -87,10 +87,10 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
                 
-        /* 오른쪽 박스: 상세 정보 & 번체/간체 애니메이션 영역 */
+        /* 오른쪽 박스: 상세 정보 영역 */
         .content-right { 
-            flex: 1.2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow-y: auto; padding: 25px; background: transparent; gap: 20px; 
+            flex: 1.6; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            overflow-y: auto; padding: 25px; background: transparent; gap: 15px; 
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -110,15 +110,25 @@
         }
         .hanzi-result-btn:hover { background: #ff9e40; color: #101010; border-color: #ff9e40; }
 
-        /* 상세 정보 및 번체/간체 SVG 나란히 배치 */
-        .detail-top-box {
+        /* 오른쪽 영역 수직 2:1 분할 구조 */
+        .detail-vertical-wrapper {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+        }
+
+        /* 상단: 번체 & 간체 SVG 크게 배치 (flex: 2로 확대) */
+        .detail-top-svg-box {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
             align-items: center;
             background: #1c1c1c;
             border: 1px solid #333;
             border-radius: 12px;
             padding: 15px;
+            flex: 2; 
         }
         .writer-group {
             display: flex;
@@ -127,42 +137,59 @@
             gap: 6px;
         }
         .writer-label {
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             color: #ff9e40;
             font-weight: bold;
         }
         .character-target {
-            width: 110px;
-            height: 110px;
+            width: 320px;
+            height: 320px;
             border: 1px solid #333;
-            border-radius: 8px;
+            border-radius: 12px;
             background: #202020;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
-        .detail-info {
+
+        /* 하단: 정보 영역 (flex: 1로 컴팩트하게 구성) */
+        .detail-bottom-info-box {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px 20px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            font-size: 0.85rem;
-            color: #ccc;
+            justify-content: center;
+            gap: 8px;
             flex: 1;
+            font-size: 1.1rem;
+            color: #ddd;
         }
-        .detail-char-title {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .detail-info-row {
+            display: flex;
+            gap: 12px;
+            align-items: baseline;
+        }
+        .detail-info-row strong {
             color: #ff9e40;
-            line-height: 1.2;
-            margin-bottom: 2px;
+            min-width: 75px;
         }
 
-        .secondary-btn {
-            background: #202020; color: #ff9e40; border: 1px solid #ff9e40; padding: 8px 12px;
-            border-radius: 50px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.3s; text-align: center; width: fit-content;
+        /* 조그마한 필순 다시보기 버튼 스타일 */
+        .mini-action-btn {
+            background: #202020; 
+            color: #ff9e40; 
+            border: 1px solid #ff9e40; 
+            padding: 4px 10px;
+            border-radius: 50px; 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s; 
         }
-        .secondary-btn:hover { background: #ff9e40; color: #101010; }
+        .mini-action-btn:hover { background: #ff9e40; color: #101010; }
 
         /* Light Mode Styles */
         body.light-mode { background-color: #fff; color: #202020; }
@@ -173,17 +200,18 @@
         body.light-mode .search-input::placeholder { color: #888; }
         body.light-mode select.search-input option { background: #fff; color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card, body.light-mode .detail-top-box {
+        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card, body.light-mode .detail-top-svg-box, body.light-mode .detail-bottom-info-box {
             background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
         }
         body.light-mode .calc-card { background: #fff; border-color: #ddd; }
         body.light-mode .calc-card h3 { color: #e68a35; }
-        body.light-mode .secondary-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .secondary-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .mini-action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .hanzi-result-btn { background: #fff; color: #e68a35; border-color: #ddd; }
         body.light-mode .hanzi-result-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .character-target { background: #fff; border-color: #ddd; }
-        body.light-mode .detail-info { color: #202020; }
+        body.light-mode .detail-bottom-info-box { color: #202020; }
+        body.light-mode .detail-info-row strong { color: #e68a35; }
 
         /* Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
@@ -425,7 +453,6 @@
             </select>
         </div>
         <div class="bottom-btns" style="width: 100%;">
-	    <button class="menu-btn" onclick="animateWriters()">필순 다시보기</button>
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
     </aside>
@@ -449,31 +476,46 @@
                 </div>
             </section>
 
-            <!-- 오른쪽 박스: 상세 정보 & 번체/간체 SVG 필순 영역 -->
+            <!-- 오른쪽 박스: 상세 정보 영역 -->
             <section class="content-right">
-                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:15px;">
-                    <h3>상세 정보 & 필순 (번체 / 간체)</h3>
+                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:12px; height:100%;">
+                    <!-- 제목과 필순 다시보기 버튼을 한 줄에 배치 -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <h3>상세 정보 & 필순 (번체 / 간체)</h3>
+                        <button class="mini-action-btn" onclick="animateWriters()">필순 다시보기</button>
+                    </div>
                     
-                    <!-- 번체 & 간체 SVG를 나란히 배치할 박스 -->
-                    <div class="detail-top-box">
-                        <div class="writer-group">
-                            <span class="writer-label">번체 (Traditional)</span>
-                            <div class="character-target" id="tradTarget">
-                                <span style="font-size: 0.75rem; color: #888;">-</span>
+                    <div class="detail-vertical-wrapper">
+                        <!-- 상단: 번체 & 간체 SVG 거대하게 배치 (2배 크기 320px 및 flex: 2) -->
+                        <div class="detail-top-svg-box">
+                            <div class="writer-group">
+                                <span class="writer-label">번체 (Traditional)</span>
+                                <div class="character-target" id="tradTarget">
+                                    <span style="font-size: 0.85rem; color: #888;">-</span>
+                                </div>
+                            </div>
+                            <div class="writer-group">
+                                <span class="writer-label">간체 (Simplified)</span>
+                                <div class="character-target" id="simpTarget">
+                                    <span style="font-size: 0.85rem; color: #888;">-</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="writer-group">
-                            <span class="writer-label">간체 (Simplified)</span>
-                            <div class="character-target" id="simpTarget">
-                                <span style="font-size: 0.75rem; color: #888;">-</span>
+
+                        <!-- 하단: 뜻 / 중국어 / 부수 / 총획수 정보 (flex: 1) -->
+                        <div class="detail-bottom-info-box">
+                            <div class="detail-info-row">
+                                <strong>뜻:</strong> <span id="detailMeaning">-</span>
                             </div>
-                        </div>
-                        <div class="detail-info">
-                            <div class="detail-char-title" id="detailChar">-</div>
-                            <div><strong>뜻:</strong> <span id="detailMeaning">-</span></div>
-                            <div><strong>중국어:</strong> <span id="detailChinese">-</span></div>
-                            <div><strong>부수:</strong> <span id="detailBusu">-</span></div>
-                            <div><strong>총 획수:</strong> <span id="detailStrokes">-</span></div>
+                            <div class="detail-info-row">
+                                <strong>중국어:</strong> <span id="detailChinese">-</span>
+                            </div>
+                            <div class="detail-info-row">
+                                <strong>부수:</strong> <span id="detailBusu">-</span>
+                            </div>
+                            <div class="detail-info-row">
+                                <strong>총 획수:</strong> <span id="detailStrokes">-</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -531,7 +573,6 @@
         simpTarget.innerHTML = '';
 
         if (!found) {
-            document.getElementById('detailChar').innerText = charStr;
             document.getElementById('detailMeaning').innerText = '데이터베이스에 없는 한자입니다.';
             document.getElementById('detailChinese').innerText = '-';
             document.getElementById('detailBusu').innerText = '-';
@@ -539,19 +580,14 @@
             return;
         }
 
-        document.getElementById('detailChar').innerText = found.char;
         document.getElementById('detailMeaning').innerText = found.meaning;
         document.getElementById('detailChinese').innerText = found.chinese || '-';
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + '획';
         
-        // 1. 번체 문자 (예: '的')
         const tradChar = found.char; 
-
-        // 2. 간체 문자 추출: '的 (de)' 형태에서 맨 앞의 한 글자만 깔끔하게 정규식으로 추출
-        let simpChar = tradChar; // 기본값은 번체로 설정
+        let simpChar = tradChar; 
         if (found.chinese) {
-            // 괄호 앞의 첫 번째 글자(간체자)만 매칭
             const match = found.chinese.match(/^([\u4e00-\u9fa5])/);
             if (match) {
                 simpChar = match[1];
@@ -559,16 +595,16 @@
         }
 
         try {
-            // 번체 Writer 생성
+            // 번체 Writer 크기를 320x320으로 대폭 확대
             tradWriter = HanziWriter.create('tradTarget', tradChar, {
-                width: 100, height: 100, padding: 5,
+                width: 320, height: 320, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             tradWriter.animateCharacter();
 
-            // 간체 Writer 생성 (순수 간체자 한 글자 전달)
+            // 간체 Writer 크기를 320x320으로 대폭 확대
             simpWriter = HanziWriter.create('simpTarget', simpChar, {
-                width: 100, height: 100, padding: 5,
+                width: 320, height: 320, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             simpWriter.animateCharacter();
