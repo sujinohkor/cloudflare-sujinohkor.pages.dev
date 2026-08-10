@@ -548,20 +548,28 @@
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + '획';
         
-        // 데이터베이스 구조에 맞추어 번체와 간체 문자 가져오기 (필드명이 다를 경우를 대비해 안전하게 처리)
-        const tradChar = found.char; // 번체 (기본 char 필드)
-        // 만약 데이터베이스에 간체 필드가 존재한다면 그것을 쓰고, 없으면 번체와 동일하게 처리
-        const simpChar = found.chinese || found.simp || found.char; 
+        // 1. 번체 문자 (예: '的')
+        const tradChar = found.char; 
+
+        // 2. 간체 문자 추출: '的 (de)' 형태에서 맨 앞의 한 글자만 깔끔하게 정규식으로 추출
+        let simpChar = tradChar; // 기본값은 번체로 설정
+        if (found.chinese) {
+            // 괄호 앞의 첫 번째 글자(간체자)만 매칭
+            const match = found.chinese.match(/^([\u4e00-\u9fa5])/);
+            if (match) {
+                simpChar = match[1];
+            }
+        }
 
         try {
-            // 1. 번체 Writer 생성
+            // 번체 Writer 생성
             tradWriter = HanziWriter.create('tradTarget', tradChar, {
                 width: 100, height: 100, padding: 5,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             tradWriter.animateCharacter();
 
-            // 2. 간체 Writer 생성
+            // 간체 Writer 생성 (순수 간체자 한 글자 전달)
             simpWriter = HanziWriter.create('simpTarget', simpChar, {
                 width: 100, height: 100, padding: 5,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
