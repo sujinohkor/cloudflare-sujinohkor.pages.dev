@@ -251,12 +251,12 @@
 
         <div class="search-container">
             <span class="control-label">Search Character / Meaning</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                            
+            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="onSearchInput()">                            
         </div>
 
         <div class="control-group" id="algo-select-group">
             <span class="control-label">Radical Filter</span>
-            <select id="filterBusu" class="search-input" onchange="filterList()">
+            <select id="filterBusu" class="search-input" onchange="onBusuChange()">
                 <option value="">All Radicals (214)</option>
                 <option value="一">一 (One)</option>
                 <option value="丨">丨 (Line)</option>
@@ -456,7 +456,7 @@
                 <option value="龠">龠 (Flute)</option>
             </select>
             <span class="control-label" style="margin-top: 3px;">Strokes Filter</span>
-            <select id="filterStrokes" class="search-input" onchange="filterList()">
+            <select id="filterStrokes" class="search-input" onchange="onStrokesChange()">
                 <option value="">All Strokes</option>
                 <script>
                     for(let i=1; i<=30; i++) {
@@ -595,7 +595,6 @@
 
         document.getElementById('detailMeaning').innerText = found.meaning;
         
-        // Mandarin 부분에 무조건 '번체 / 간체 (병음)' 형태로 가공해서 출력
         const tradChar = found.char; 
         let simpChar = tradChar; 
         let pinyin = '';
@@ -605,7 +604,6 @@
             if (match) {
                 simpChar = match[1];
             }
-            // 병음 부분 추출 (예: '的 (de)'에서 '(de)' 또는 내용 추출)
             const pinyinMatch = found.chinese.match(/\(.*\)/);
             if (pinyinMatch) {
                 pinyin = pinyinMatch[0];
@@ -614,21 +612,17 @@
             }
         }
         
-        // 무조건 중복 표기: 번체 / 간체 (병음)
         document.getElementById('detailChinese').innerText = `${tradChar} / ${simpChar} ${pinyin}`;
-
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
 
         try {
-            // 번체 Writer 크기를 320x320으로 대폭 확대
             tradWriter = HanziWriter.create('tradTarget', tradChar, {
                 width: 320, height: 320, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             tradWriter.animateCharacter();
 
-            // 간체 Writer 크기를 320x320으로 대폭 확대
             simpWriter = HanziWriter.create('simpTarget', simpChar, {
                 width: 320, height: 320, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
@@ -644,7 +638,11 @@
         if (simpWriter) simpWriter.animateCharacter();
     }
 
-    function searchHanziText() {
+    // 1. 검색창을 건드렸을 때: 부수, 획수 필터 초기화
+    function onSearchInput() {
+        document.getElementById('filterBusu').value = '';
+        document.getElementById('filterStrokes').value = '';
+        
         const query = document.getElementById('searchInput').value.trim();
         if(!query) {
             renderList(db);
@@ -655,13 +653,41 @@
         if(filtered.length > 0) selectHanzi(filtered[0].char);
     }
 
-    function filterList() {
-        const busu = document.getElementById('filterBusu').value;
-        const strokes = document.getElementById('filterStrokes').value;
+    // 2. 부수 필터를 건드렸을 때: 검색창, 획수 필터 초기화
+    function onBusuChange() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterStrokes').value = '';
 
+        const busu = document.getElementById('filterBusu').value;
         let filtered = db;
-        if(busu) filtered = filtered.filter(x => x.busu === busu);
-        if(strokes) filtered = filtered.filter(x => x.strokes == strokes);
+        if(busu) {
+            filtered = filtered.filter(x => x.busu === busu);
+        } else {
+            // 부수를 'All Radicals'로 되돌린 경우 전체 목록 표시
+            renderList(db);
+            if(db.length > 0) selectHanzi(db[0].char);
+            return;
+        }
+
+        renderList(filtered);
+        if(filtered.length > 0) selectHanzi(filtered[0].char);
+    }
+
+    // 3. 획수 필터를 건드렸을 때: 검색창, 부수 필터 초기화
+    function onStrokesChange() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterBusu').value = '';
+
+        const strokes = document.getElementById('filterStrokes').value;
+        let filtered = db;
+        if(strokes) {
+            filtered = filtered.filter(x => x.strokes == strokes);
+        } else {
+            // 획수를 'All Strokes'로 되돌린 경우 전체 목록 표시
+            renderList(db);
+            if(db.length > 0) selectHanzi(db[0].char);
+            return;
+        }
 
         renderList(filtered);
         if(filtered.length > 0) selectHanzi(filtered[0].char);
