@@ -213,13 +213,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s;
+            transition: background-color 0.2s, transform 0.2s, color 0.3s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             text-align: center;
             padding: 4px;
+            color: #fff;
         }
 
         .season-item span {
@@ -288,6 +289,23 @@
         body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
         body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
 
+        /* Light mode에서 휠 아이템 및 중앙 박스 글자색 하양으로 변경 */
+        body.light-mode .season-item {
+            background-color: rgba(30, 41, 59, 0.85);
+            color: #ffffff !important;
+        }
+        body.light-mode .season-item:hover {
+            background-color: #38bdf8;
+            color: #0f172a !important;
+        }
+        body.light-mode .center-info {
+            background-color: rgba(15, 23, 42, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        body.light-mode .center-info p {
+            color: #cbd5e1;
+        }
+
         /* 5. Mobile Responsive */
         .menu-toggle-btn {             
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;             
@@ -315,7 +333,7 @@
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">24 Solar Terms</div>
+            <div class="sidebar-title">Solar Terms Wheel</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>                            
@@ -383,9 +401,9 @@
             }         
         });
 
-        // 24절기 데이터 배열 (영어 번역 적용)
+        // 24절기 데이터 배열 (절기 이름은 한국어 유지)
         const terms = [
-            // Spring
+            // 봄
             { name: "입춘", desc: "Start of Spring (Feb 4)", season: "spring", color: "#4ade80", gradient: "linear-gradient(135deg, #064e3b, #022c22)" },
             { name: "우수", desc: "Rain Water & Melting Ice (Feb 19)", season: "spring", color: "#34d399", gradient: "linear-gradient(135deg, #065f46, #042f2e)" },
             { name: "경칩", desc: "Awakening of Insects (Mar 5)", season: "spring", color: "#22c55e", gradient: "linear-gradient(135deg, #14532d, #052e16)" },
@@ -393,7 +411,7 @@
             { name: "청명", desc: "Clear and Bright (Apr 4)", season: "spring", color: "#06b6d4", gradient: "linear-gradient(135deg, #0e7490, #083344)" },
             { name: "곡우", desc: "Grain Rain (Apr 20)", season: "spring", color: "#38bdf8", gradient: "linear-gradient(135deg, #0369a1, #0c4a6e)" },
 
-            // Summer
+            // 여름
             { name: "입하", desc: "Start of Summer (May 5)", season: "summer", color: "#84cc16", gradient: "linear-gradient(135deg, #365314, #1a2e05)" },
             { name: "소만", desc: "Lesser Fullness (May 21)", season: "summer", color: "#a3e635", gradient: "linear-gradient(135deg, #3f6212, #1e3a0a)" },
             { name: "망종", desc: "Grain in Ear (Jun 5)", season: "summer", color: "#facc15", gradient: "linear-gradient(135deg, #713f12, #422006)" },
@@ -401,7 +419,7 @@
             { name: "소서", desc: "Lesser Heat (Jul 7)", season: "summer", color: "#f59e0b", gradient: "linear-gradient(135deg, #9a3412, #431407)" },
             { name: "대서", desc: "Greater Heat (Jul 22)", season: "summer", color: "#f97316", gradient: "linear-gradient(135deg, #c2410c, #5c1d06)" },
 
-            // Autumn
+            // 가을
             { name: "입추", desc: "Start of Autumn (Aug 7)", season: "autumn", color: "#fb923c", gradient: "linear-gradient(135deg, #7c2d12, #2c0b02)" },
             { name: "처서", desc: "Limit of Heat (Aug 23)", season: "autumn", color: "#fbbf24", gradient: "linear-gradient(135deg, #78350f, #291104)" },
             { name: "백로", desc: "White Dew (Sep 7)", season: "autumn", color: "#fcd34d", gradient: "linear-gradient(135deg, #854d0e, #271705)" },
@@ -409,7 +427,7 @@
             { name: "한로", desc: "Cold Dew (Oct 8)", season: "autumn", color: "#f43f5e", gradient: "linear-gradient(135deg, #881337, #4c0519)" },
             { name: "상강", desc: "Descent of Frost (Oct 23)", season: "autumn", color: "#fb7185", gradient: "linear-gradient(135deg, #9f1239, #500724)" },
 
-            // Winter
+            // 겨울
             { name: "입동", desc: "Start of Winter (Nov 7)", season: "winter", color: "#c084fc", gradient: "linear-gradient(135deg, #581c87, #2e1065)" },
             { name: "소설", desc: "Lesser Snow (Nov 22)", season: "winter", color: "#a78bfa", gradient: "linear-gradient(135deg, #4c1d95, #1e1b4b)" },
             { name: "대설", desc: "Greater Snow (Dec 7)", season: "winter", color: "#818cf8", gradient: "linear-gradient(135deg, #3730a3, #1e1b4b)" },
@@ -452,7 +470,7 @@
         // 절기 아이템 동적 생성 및 배치
         terms.forEach((term, index) => {
             const angle = (index / total) * (2 * Math.PI);
-            const x = 300 + radius * Math.cos(angle) - 32.5; // 아이템 너비(65px)의 절반 보정
+            const x = 300 + radius * Math.cos(angle) - 32.5;
             const y = 300 + radius * Math.sin(angle) - 32.5;
 
             const item = document.createElement('div');
@@ -480,7 +498,7 @@
             wheel.appendChild(item);
         });
 
-        // 검색 기능 (영문 검색어 지원)
+        // 검색 기능 (한국어 및 영문 검색어 지원)
         function filterNotes() {
             const keyword = document.getElementById('search-input').value.toLowerCase();
             const items = document.querySelectorAll('.season-item');
