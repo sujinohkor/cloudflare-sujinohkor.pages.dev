@@ -891,22 +891,36 @@
         try {
             const session = await getHanziSession();
             
-            const inputSize = 32; // 모델 입력 규격에 맞춰 수정 필요
+            // 모델이 요구하는 규격 (에러 메시지에 나온 Expected 값에 맞춤)
+            const inputSize = 48; // 에러 메시지에서 Expected: 48 확인됨
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = inputSize;
             tempCanvas.height = inputSize;
             const tempCtx = tempCanvas.getContext('2d');
+            
+            // 캔버스 배경을 흰색으로 채우고 그림을 그립니다 (흑백 반전 모델인 경우 대비)
+            tempCtx.fillStyle = "#FFFFFF";
+            tempCtx.fillRect(0, 0, inputSize, inputSize);
             tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
             
             const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
-            const floatData = new Float32Array(inputSize * inputSize);
             
-            for (let i = 0; i < imgData.length; i += 4) {
-                const gray = (imgData[i] + imgData[i+1] + imgData[i+2]) / 3;
-                floatData[i / 4] = (255 - gray) / 255.0; 
+            // 모델이 요구하는 3채널(RGB) 크기에 맞춘 Float32Array 생성 ([1, 3, 48, 48])
+            const floatData = new Float32Array(3 * inputSize * inputSize);
+            
+            for (let i = 0; i < inputSize * inputSize; i++) {
+                const r = imgData[i * 4];
+                const g = imgData[i * 4 + 1];
+                const b = imgData[i * 4 + 2];
+                
+                // 정규화 (0~1 사이 값으로 변환, 필요에 따라 표준화 계수 적용)
+                floatData[i] = r / 255.0;                          // R 채널
+                floatData[inputSize * inputSize + i] = g / 255.0;     // G 채널
+                floatData[inputSize * inputSize * 2 + i] = b / 255.0; // B 채널
             }
 
-            const inputTensor = new ort.Tensor('float32', floatData, [1, 1, inputSize, inputSize]);
+            // 3채널 [1, 3, 48, 48] 텐서 생성
+            const inputTensor = new ort.Tensor('float32', floatData, [1, 3, inputSize, inputSize]);
             const feeds = { [session.inputNames[0]]: inputTensor };
             const results = await session.run(feeds);
             const outputData = results[session.outputNames[0]].data;
