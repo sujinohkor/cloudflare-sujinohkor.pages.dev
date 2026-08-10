@@ -687,7 +687,9 @@
     let hanziSession = null;
 
     // 제공해주신 구글 드라이브 링크를 직접 다운로드 가능한 주소로 변환
-    const onnxModelUrl = "https://drive.google.com/uc?export=download&id=1UHRjiqRtQU82FmC1F4AR0iB2N5BAF3aq";
+    // corsproxy.io 같은 공공 CORS 우회 서비스를 앞에 붙입니다.
+    const rawDriveUrl = "https://drive.google.com/uc?export=download&id=1UHRjiqRtQU82FmC1F4AR0iB2N5BAF3aq";
+    const onnxModelUrl = "https://corsproxy.io/?" + encodeURIComponent(rawDriveUrl);
 
     async function getHanziSession() {
         if (hanziSession) return hanziSession;
