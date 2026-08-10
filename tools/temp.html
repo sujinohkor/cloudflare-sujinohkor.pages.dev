@@ -9,7 +9,7 @@
     <!-- Hanzi Writer CDN -->
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <!-- 외부 한자 데이터베이스 로드 -->
-    <script src="/codes/trad_with_simp.js"></script>
+    <script src="./codes/trad_with_simp.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -49,7 +49,7 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                 <label class="block text-sm font-semibold mb-2">🔍 부수 / 획수 필터</label>
                 <div class="flex gap-2">
-<select id="filterBusu" onchange="filterList()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    <select id="filterBusu" onchange="filterList()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                         <option value="">전체 부수 (214개)</option>
                         <option value="一">一 (한 일)</option>
                         <option value="丨">丨 (뚫을 곤)</option>
@@ -256,7 +256,7 @@
                                 document.write(`<option value="${i}">${i}획</option>`);
                             }
                         </script>
-                    </script>
+                    </select>
                 </div>
             </div>
 
@@ -297,11 +297,10 @@
 
     <!-- 스크립트 로직 -->
     <script>
-        // trad_with_simp 데이터를 db 변수로 안전하게 참조
         const db = typeof trad_with_simp !== 'undefined' ? trad_with_simp : [];
 
         let writer = null;
-        let strokeCount = 0; // 그린 획 수 추적
+        let strokeCount = 0; 
 
         window.onload = function() {
             renderList(db);
@@ -394,7 +393,6 @@
             if(filtered.length > 0) selectHanzi(filtered[0].char);
         }
 
-        // 캔버스 드로잉 및 인식 로직
         const canvas = document.getElementById('drawCanvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
