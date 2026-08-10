@@ -348,24 +348,24 @@
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
-        @media (max-width: 900px) {                                
-            .menu-toggle-btn { display: block; }                                
+        @media (max-width: 900px) {                                            
+            .menu-toggle-btn { display: block; }                                            
             .sidebar { 
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                                
+            }                                            
             body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .sidebar.active { transform: translateX(0); }                                
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                                
-            .workspace-container { flex-direction: column; overflow: visible; }                                
-            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                                
-            .content-down { height: auto; overflow: visible; min-height: 500px; }                        
+            .sidebar.active { transform: translateX(0); }                                            
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                                            
+            .workspace-container { flex-direction: column; overflow: visible; }                                            
+            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                                            
+            .content-down { height: auto; overflow: visible; min-height: 500px; }                                    
             /* 모바일 환경에서는 캔버스 크기를 기존 설정(220px)으로 유지 */
             .canvas-wrapper {
                 width: 220px;
@@ -390,7 +390,7 @@
 
         <div class="search-container">
             <span class="control-label">한자/음/뜻 검색</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                    
+            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                            
         </div>
 
         <div class="control-group" id="algo-select-group">
@@ -604,7 +604,6 @@
                 </script>
             </select>
         </div>
-
         <div class="bottom-btns" style="width: 100%;">
             <button class="menu-btn" onclick="resetAll()">Reset</button>
         </div>
@@ -686,20 +685,45 @@
     let strokeCount = 0; 
     let hanziSession = null;
 
-    // 제공해주신 구글 드라이브 링크를 직접 다운로드 가능한 주소로 변환
-    // corsproxy.io 같은 공공 CORS 우회 서비스를 앞에 붙입니다.
-    const rawDriveUrl = "https://drive.google.com/uc?export=download&id=1UHRjiqRtQU82FmC1F4AR0iB2N5BAF3aq";
-    const onnxModelUrl = "https://corsproxy.io/?" + encodeURIComponent(rawDriveUrl);
-
+    // 분할된 모델 조각 파일 경로 설정 (part1 ~ part5)
     async function getHanziSession() {
         if (hanziSession) return hanziSession;
         try {
-            console.log("Loading ONNX Model from Google Drive...");
-            hanziSession = await ort.InferenceSession.create(onnxModelUrl, { 
+            console.log("Loading split ONNX model parts...");
+            const partFiles = [
+                './models/mandarin.onnx.part1',
+                './models/mandarin.onnx.part2',
+                './models/mandarin.onnx.part3',
+                './models/mandarin.onnx.part4',
+                './models/mandarin.onnx.part5'
+            ];
+
+            // 모든 조각 파일을 병렬로 다운로드하여 ArrayBuffer로 변환
+            const bufferPromises = partFiles.map(async (url) => {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`모델 조각 로드 실패: ${url}`);
+                return await res.arrayBuffer();
+            });
+
+            const arrays = await Promise.all(bufferPromises);
+
+            // 전체 바이트 크기 계산 후 하나의 거대한 Uint8Array로 병합
+            const totalLength = arrays.reduce((sum, buf) => sum + buf.byteLength, 0);
+            const combinedArray = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const buf of arrays) {
+                combinedArray.set(new Uint8Array(buf), offset);
+                offset += buf.byteLength;
+            }
+
+            console.log(`모델 병합 완료! 총 크기: ${(combinedArray.byteLength / (1024 * 1024)).toFixed(2)} MB`);
+
+            // 합쳐진 메모리 버퍼로 ONNX 세션 생성
+            hanziSession = await ort.InferenceSession.create(combinedArray.buffer, { 
                 executionProviders: ['wasm'], 
                 graphOptimizationLevel: "all" 
             });
-            console.log("ONNX Model Loaded Successfully!");
+            console.log("ONNX Model Loaded Successfully from parts!");
         } catch (err) {
             console.error("ONNX Model Load Failed:", err);
             throw err;
@@ -867,8 +891,6 @@
         try {
             const session = await getHanziSession();
             
-            // 모델 입력 규격에 맞게 캔버스 크기 조정 (예시 규격: 32x32 또는 모델에 맞춘 사이즈 조정 필요)
-            // 보통 한자 인식 모델은 특정 크기(예: 32x32, 64x64 등)의 정규화된 이미지 입력 텐서를 요구합니다.
             const inputSize = 32; // 모델 입력 규격에 맞춰 수정 필요
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = inputSize;
@@ -880,7 +902,6 @@
             const floatData = new Float32Array(inputSize * inputSize);
             
             for (let i = 0; i < imgData.length; i += 4) {
-                // 흑백/정규화 전처리 (모델 학습 스펙에 따름)
                 const gray = (imgData[i] + imgData[i+1] + imgData[i+2]) / 3;
                 floatData[i / 4] = (255 - gray) / 255.0; 
             }
@@ -890,8 +911,6 @@
             const results = await session.run(feeds);
             const outputData = results[session.outputNames[0]].data;
 
-            // 출력된 인덱스나 확률값을 통해 데이터베이스에서 한자 매칭
-            // (현재 모델의 출력 스펙에 맞추어 매핑 로직 구성 필요)
             let maxIdx = 0;
             let maxVal = outputData[0];
             for(let i=1; i<outputData.length; i++) {
@@ -901,7 +920,6 @@
                 }
             }
 
-            // 임시 매칭 또는 DB 연동
             const matched = db[maxIdx % db.length] || db[0];
             alert(`ONNX 인식 결과: '${matched.char}' (${matched.meaning})`);
             selectHanzi(matched.char);
