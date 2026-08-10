@@ -236,19 +236,31 @@
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; }                                            
             .workspace-container { flex-direction: column; overflow: visible; }                                            
             
-            /* 결과 목록(왼쪽)은 화면 높이의 약 1/3(예: 30vh) 또는 고정 px(예: 250px)로 제한 */
+            /* 1. 왼쪽 결과 박스 전체 높이 고정 (예: 280px 또는 30vh) */
             .content-left { 
-                height: 30vh; 
-                min-height: 200px; 
+                height: 280px; 
+                min-height: unset; 
                 overflow: hidden; 
             } 
+        
+            /* 2. 박스 내부의 카드에서 flex: 1 성질 제거 */
+            .content-left .calc-card {
+                flex: none;
+                height: 100%;
+            }
+        
+            /* 3. 실제 한자 버튼들이 나열되는 리스트 영역에 높이와 스크롤 부여 */
+            .content-left .history-list {
+                max-height: 190px; /* 타이틀 공간을 제외한 순수 리스트 높이 */
+                overflow-y: auto;
+            }
             
             /* 상세 정보(오른쪽)는 기존처럼 유연하게 출력 */
             .content-right { 
                 height: auto; 
                 overflow: visible; 
                 min-height: 400px; 
-            }                          
+            }
         }
     </style>
 </head>
