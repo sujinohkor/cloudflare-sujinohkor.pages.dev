@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Effects Canvas</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                    
+       
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
+        /* 모바일 백드롭 오버레이 */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar {             
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
+            background: rgba(16, 16, 16, 0.25);             
+            backdrop-filter: blur(16px);             
+            -webkit-backdrop-filter: blur(16px);            
+            padding: 25px 20px; z-index: 1000;             
+            display: flex; flex-direction: column; gap: 12px;             
+            border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 24px;            
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);            
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
+            overflow-y: auto;         
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+
+        .main-content {             
+            margin-left: 300px; padding: 40px; flex: 1;             
+            display: flex; flex-direction: column; height: 100vh;             
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;             
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn {             
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;            
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;            
+            display: flex; align-items: center; justify-content: center; line-height: 1;       }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.active-mode { background: rgba(255, 158, 64, 0.35); color: #fff; }
+
+        .bottom-btns {           
+            display: flex;           
+            flex-direction: column;           
+            gap: 10px;        }
+        .bottom-btns > .menu-btn {           
+            margin-bottom: 0;        }
+
+        .content-card {             
+            border: 2px solid #ff9e40;             
+            border-radius: 16px;             
+            flex: 1;             
+            display: flex;             
+            overflow: hidden;             
+            background: #0f172a;
+            position: relative; 
+            transition: background 1.2s ease, all 0.3s ease;       }
+
+        .card-btn-group {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2001;
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {             
+            background: #202020;             
+            color: #ff9e40;             
+            border: 1px solid #ff9e40;             
+            padding: 6px 14px;             
+            border-radius: 8px;             
+            cursor: pointer;             
+            font-size: 0.8rem;             
+            font-weight: bold;             
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
+            transition: all 0.3s;       }
+        .action-btn:hover {             
+            background: #ff9e40;             
+            color: #101010;       }
+
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 뷰어 영역 스타일 */
+        .effect-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #0f172a;
+            z-index: 15;
+        }
+        .effect-view.active {
+            display: block;
+        }
+        .effect-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Water Drop 전용 블러 & 그라데이션 배경 스타일 */
+        #water-drop-view {
+            background: radial-gradient(circle at 30% 30%, #1e293b 0%, #0f172a 50%, #020617 100%);
+            overflow: hidden;
+        }
+        .ambient-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(56, 189, 248, 0.15);
+            border-radius: 50%;
+            filter: blur(80px);
+            top: 20%;
+            left: 30%;
+            z-index: 1;
+            pointer-events: none;
+            animation: floatGlow 8s ease-in-out infinite alternate;
+        }
+        .ambient-glow-2 {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(243, 128, 32, 0.1);
+            border-radius: 50%;
+            filter: blur(90px);
+            bottom: 15%;
+            right: 25%;
+            z-index: 1;
+            pointer-events: none;
+            animation: floatGlow 10s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.2); }
+        }
+        #water-drop-canvas {
+            position: relative;
+            z-index: 2;
+        }
+
+        body.light-mode { background-color: #fff; color: #202020; }        
+        body.light-mode .sidebar {             
+            background: rgba(255, 255, 255, 0.4);             
+            border-color: rgba(243, 128, 32, 0.35);             
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         
+        }                 
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
+            background: rgba(0, 0, 0, 0.02);             
+            color: #F38020;             
+            border-color: rgba(243, 128, 32, 0.5);         }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
+            background: rgba(243, 128, 32, 0.15);             
+            border-color: rgba(243, 128, 32, 0.4);         }                 
+        body.light-mode .menu-btn.active-mode { background: #F38020; color: #fff; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }
+        body.light-mode .content-card { background: rgba(245, 245, 245, 0.9); border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .effect-view { background: #f1f5f9; }
+        body.light-mode #water-drop-view { background: radial-gradient(circle at 30% 30%, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%); }
+
+        .menu-toggle-btn {             
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;             
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
+            font-weight: bold; cursor: pointer; color: #ffffff;         }                 
+
+        @media (max-width: 900px) {             
+            .menu-toggle-btn { display: block; }             
+            .sidebar {                 
+                transform: translateX(-320px);                 
+                background: #101010 !important;                 
+                backdrop-filter: none !important;                
+                -webkit-backdrop-filter: none !important;                
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+                z-index: 3000;             }             
+            body.light-mode .sidebar {                
+                background: #ffffff !important;                 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }
+            .sidebar.active { transform: translateX(0); }             
+            .sidebar-backdrop.active { display: block; opacity: 1; }
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }             
+            .content-card { min-height: 0; height: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Canvas Effects</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                    
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <div class="bottom-btns">           
+                <button class="menu-btn active-mode" onclick="switchEffect('particle', this)">Particle Effect</button>
+                <button class="menu-btn" onclick="switchEffect('mesh', this)">Elastic Mesh Effect</button>
+                <button class="menu-btn" onclick="switchEffect('water-drop', this)">Water Drop Effect</button>
+            </div>        
+        </aside>
+        <main class="main-content" id="main-content">            
+            <header class="top-section">                
+                <h1 id="effect-title">Interactive Particle Simulation</h1>                
+                <p id="effect-desc">Move mouse or click to interact</p>
+            </header>            
+            <section class="content-card" id="content-card">                
+                <div class="card-btn-group">
+                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                
+                </div>
+
+                <!-- 파티클 시뮬레이션 뷰어 -->
+                <div id="particle-view" class="effect-view active">
+                    <canvas id="particle-canvas" class="effect-canvas"></canvas>
+                </div>
+
+                <!-- 탄성 메시 시뮬레이션 뷰어 -->
+                <div id="mesh-view" class="effect-view">
+                    <canvas id="mesh-canvas" class="effect-canvas"></canvas>
+                </div>
+
+                <!-- 빗방울 흘러내림 효과 뷰어 -->
+                <div id="water-drop-view" class="effect-view">
+                    <div class="ambient-glow"></div>
+                    <div class="ambient-glow-2"></div>
+                    <canvas id="water-drop-canvas" class="effect-canvas"></canvas>
+                </div>
+            </section>        
+        </main>    
+    </div>
+    <script>        
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const effectTitle = document.getElementById('effect-title');
+        const effectDesc = document.getElementById('effect-desc');
+
+        let currentEffect = 'particle';
+
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {                
+                fullscreenBtn.textContent = 'Minimize 🗗';            } else {                
+                fullscreenBtn.textContent = 'Maximize ⛶';            }        
+        };
+
+        function toggleSidebar() {              
+            const isActive = sidebar.classList.toggle('active');
+            if (isActive) {
+                backdrop.classList.add('active');
+            } else {
+                backdrop.classList.remove('active');
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {              
+            document.body.classList.toggle('light-mode');
+            if (window.innerWidth <= 900) closeSidebar();
+        });
+
+        mainContent.addEventListener('click', () => {              
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                  
+                closeSidebar();
+            }         
+        });
+
+        /* --- 1. 파티클 시뮬레이션 로직 --- */
+        const pCanvas = document.getElementById('particle-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let pAnimationId = null;
+        let particles = [];
+        const mouse = { x: null, y: null, radius: 130 };
+
+        pCanvas.addEventListener('mousemove', (e) => {
+            const rect = pCanvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+
+        pCanvas.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+        pCanvas.addEventListener('click', (e) => {
+            const rect = pCanvas.getBoundingClientRect();
+            const cx = e.clientX - rect.left;
+            const cy = e.clientY - rect.top;
+            for (let i = 0; i < 8; i++) {
+                particles.push(new Particle(cx, cy, true));
+            }
+        });
+
+        class Particle {
+            constructor(x, y, isBurst = false) {
+                this.x = x || Math.random() * pCanvas.width;
+                this.y = y || Math.random() * pCanvas.height;
+                this.size = Math.random() * 2.5 + 1.5;
+                const speed = isBurst ? Math.random() * 6 + 2 : Math.random() * 1.5 - 0.75;
+                const angle = Math.random() * Math.PI * 2;
+                this.vx = isBurst ? Math.cos(angle) * speed : Math.random() * 1 - 0.5;
+                this.vy = isBurst ? Math.sin(angle) * speed : Math.random() * 1 - 0.5;
+                this.color = '#38bdf8';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > pCanvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > pCanvas.height) this.vy *= -1;
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        this.x -= (dx / distance) * force * 3;
+                        this.y -= (dy / distance) * force * 3;
+                    }
+                }
+            }
+            draw() {
+                pCtx.fillStyle = this.color;
+                pCtx.beginPath();
+                pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                pCtx.fill();
+            }
+        }
+
+        function initParticles() {
+            pCanvas.width = pCanvas.offsetWidth;
+            pCanvas.height = pCanvas.offsetHeight;
+            particles = [];
+            const count = Math.floor((pCanvas.width * pCanvas.height) / 12000);
+            for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+
+        function connectParticles() {
+            let maxDistance = 110;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < maxDistance) {
+                        let opacity = 1 - (distance / maxDistance);
+                        pCtx.strokeStyle = `rgba(56, 189, 248, ${opacity * 0.25})`;
+                        pCtx.lineWidth = 1;
+                        pCtx.beginPath();
+                        pCtx.moveTo(particles[i].x, particles[i].y);
+                        pCtx.lineTo(particles[j].x, particles[j].y);
+                        pCtx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            connectParticles();
+            pAnimationId = requestAnimationFrame(animateParticles);
+        }
+
+        /* --- 2. 탄성 메시 시뮬레이션 로직 --- */
+        const mCanvas = document.getElementById('mesh-canvas');
+        const mCtx = mCanvas.getContext('2d');
+        let mAnimationId = null;
+        let meshPoints = [];
+        const cols = 35;
+        const rows = 22;
+        let isDragging = false;
+        let dragRadius = 40;
+
+        class MeshPoint {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.ox = x;
+                this.oy = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.pinned = false;
+            }
+            update() {
+                if (this.pinned) return;
+                const friction = 0.94;
+                const gravity = 0.2;
+                
+                let dx = this.ox - this.x;
+                let dy = this.oy - this.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                
+                let force = (dist - 0) * 0.02;
+                this.vx += (dx / (dist || 1)) * force;
+                this.vy += (dy / (dist || 1)) * force + gravity;
+                
+                this.vx *= friction;
+                this.vy *= friction;
+                
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+        }
+
+        function initMesh() {
+            mCanvas.width = mCanvas.offsetWidth;
+            mCanvas.height = mCanvas.offsetHeight;
+            meshPoints = [];
+            
+            let cellWidth = mCanvas.width / (cols - 1);
+            let cellHeight = mCanvas.height / (rows - 1);
+
+            for (let r = 0; r < rows; r++) {
+                let row = [];
+                for (let c = 0; c < cols; c++) {
+                    let p = new MeshPoint(c * cellWidth, r * cellHeight);
+                    if (r === 0) p.pinned = true;
+                    row.push(p);
+                }
+                meshPoints.push(row);
+            }
+        }
+
+        mCanvas.addEventListener('mousedown', (e) => { isDragging = true; pullMesh(e); });
+        mCanvas.addEventListener('mousemove', (e) => { if (isDragging) pullMesh(e); });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        function pullMesh(e) {
+            const rect = mCanvas.getBoundingClientRect();
+            let mx = e.clientX - rect.left;
+            let my = e.clientY - rect.top;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    let p = meshPoints[r][c];
+                    let dx = p.x - mx;
+                    let dy = p.y - my;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < dragRadius) {
+                        let force = (dragRadius - dist) / dragRadius;
+                        p.vx += (dx / (dist || 1)) * force * 15;
+                        p.vy += (dy / (dist || 1)) * force * 15;
+                    }
+                }
+            }
+        }
+
+        function animateMesh() {
+            mCtx.clearRect(0, 0, mCanvas.width, mCanvas.height);
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    meshPoints[r][c].update();
+                }
+            }
+
+            for (let r = 0; r < rows - 1; r++) {
+                for (let c = 0; c < cols - 1; c++) {
+                    let p1 = meshPoints[r][c];
+                    let p2 = meshPoints[r][c+1];
+                    let p3 = meshPoints[r+1][c+1];
+                    let p4 = meshPoints[r+1][c];
+
+                    mCtx.beginPath();
+                    mCtx.moveTo(p1.x, p1.y);
+                    mCtx.lineTo(p2.x, p2.y);
+                    mCtx.lineTo(p3.x, p3.y);
+                    mCtx.lineTo(p4.x, p4.y);
+                    mCtx.closePath();
+
+                    let shade = Math.floor(25 + (r / rows) * 35);
+                    mCtx.fillStyle = `rgb(${shade}, ${shade + 10}, ${shade + 35})`;
+                    mCtx.fill();
+                    mCtx.strokeStyle = 'rgba(255, 158, 64, 0.1)';
+                    mCtx.stroke();
+                }
+            }
+            mAnimationId = requestAnimationFrame(animateMesh);
+        }
+
+        /* --- 3. Water Drop Effect (빗방울 흘러내림 효과) 로직 --- */
+        const wCanvas = document.getElementById('water-drop-canvas');
+        const wCtx = wCanvas.getContext('2d');
+        let wAnimationId = null;
+        let raindrops = [];
+
+        class RainDrop {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * wCanvas.width;
+                this.y = Math.random() * -wCanvas.height;
+                this.radius = Math.random() * 2.5 + 1.5;
+                this.speed = Math.random() * 2 + 1;
+                this.trail = [];
+                this.maxTrailLength = Math.random() * 30 + 20;
+            }
+            update() {
+                this.y += this.speed;
+                this.x += (Math.random() - 0.5) * 0.4;
+
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > this.maxTrailLength) {
+                    this.trail.shift();
+                }
+
+                if (this.y > wCanvas.height + 50) {
+                    this.reset();
+                }
+            }
+            draw() {
+                const isLight = document.body.classList.contains('light-mode');
+                // 라이트 모드일 때는 화이트/은은한 글래스 톤, 다크 모드일 때는 하늘빛 톤 적용
+                wCtx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(56, 189, 248, 0.75)';
+                wCtx.beginPath();
+                wCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                wCtx.fill();
+
+                if (this.trail.length > 1) {
+                    wCtx.strokeStyle = isLight ? 'rgba(255, 255, 255, 0.35)' : 'rgba(56, 189, 248, 0.25)';
+                    wCtx.lineWidth = this.radius * 1.2;
+                    wCtx.beginPath();
+                    wCtx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) {
+                        wCtx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                    wCtx.stroke();
+                }
+            }
+        }
+
+        wCanvas.addEventListener('click', (e) => {
+            const rect = wCanvas.getBoundingClientRect();
+            let drop = new RainDrop();
+            drop.x = e.clientX - rect.left;
+            drop.y = e.clientY - rect.top;
+            drop.radius = Math.random() * 4 + 3;
+            drop.speed = Math.random() * 3 + 2;
+            raindrops.push(drop);
+        });
+
+        function initWaterDrop() {
+            wCanvas.width = wCanvas.offsetWidth;
+            wCanvas.height = wCanvas.offsetHeight;
+            raindrops = [];
+            const count = Math.floor((wCanvas.width * wCanvas.height) / 15000);
+            for (let i = 0; i < count; i++) {
+                let drop = new RainDrop();
+                drop.y = Math.random() * wCanvas.height;
+                raindrops.push(drop);
+            }
+        }
+
+        function animateWaterDrop() {
+            wCtx.clearRect(0, 0, wCanvas.width, wCanvas.height);
+
+            raindrops.forEach(drop => {
+                drop.update();
+                drop.draw();
+            });
+
+            wAnimationId = requestAnimationFrame(animateWaterDrop);
+        }
+
+        /* --- 전환 함수 --- */
+        window.switchEffect = function(type, btnElement) {
+            currentEffect = type;
+            document.querySelectorAll('.effect-view').forEach(el => el.classList.remove('active'));
+            
+            // 버튼 활성화 상태(active-mode) 관리 토글
+            document.querySelectorAll('.bottom-btns .menu-btn').forEach(btn => btn.classList.remove('active-mode'));
+            if (btnElement) {
+                btnElement.classList.add('active-mode');
+            }
+
+            if (pAnimationId) cancelAnimationFrame(pAnimationId);
+            if (mAnimationId) cancelAnimationFrame(mAnimationId);
+            if (wAnimationId) cancelAnimationFrame(wAnimationId);
+
+            if (type === 'particle') {
+                document.getElementById('particle-view').classList.add('active');
+                effectTitle.textContent = 'Interactive Particle Simulation';
+                effectDesc.textContent = 'Move mouse or click to interact';
+                initParticles();
+                animateParticles();
+            } else if (type === 'mesh') {
+                document.getElementById('mesh-view').classList.add('active');
+                effectTitle.textContent = 'Interactive Mesh Simulation';
+                effectDesc.textContent = 'Click and drag across the mesh to pull it';
+                initMesh();
+                animateMesh();
+            } else if (type === 'water-drop') {
+                document.getElementById('water-drop-view').classList.add('active');
+                effectTitle.textContent = 'Water Drop Effect Simulation';
+                effectDesc.textContent = 'Raindrops sliding down the window pane';
+                initWaterDrop();
+                animateWaterDrop();
+            }
+
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        };
+
+        window.addEventListener('load', () => {
+            initParticles();
+            animateParticles();
+        });
+
+        window.addEventListener('resize', () => {
+            if (currentEffect === 'particle') {
+                pCanvas.width = pCanvas.offsetWidth;
+                pCanvas.height = pCanvas.offsetHeight;
+                initParticles();
+            } else if (currentEffect === 'mesh') {
+                mCanvas.width = mCanvas.offsetWidth;
+                mCanvas.height = mCanvas.offsetHeight;
+                initMesh();
+            } else if (currentEffect === 'water-drop') {
+                wCanvas.width = wCanvas.offsetWidth;
+                wCanvas.height = wCanvas.offsetHeight;
+                initWaterDrop();
+            }
+        });
+    </script>
+</body>
+</html>
