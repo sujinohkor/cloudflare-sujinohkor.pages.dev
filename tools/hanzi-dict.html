@@ -910,14 +910,18 @@
             tempCtx.fillRect(0, 0, inputSize, inputSize);
             tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
             
+            // 캔버스 이미지 가져오기
             const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
             const floatData = new Float32Array(3 * inputSize * inputSize);
             
             for (let i = 0; i < inputSize * inputSize; i++) {
-                const r = imgData[i * 4];
-                const g = imgData[i * 4 + 1];
-                const b = imgData[i * 4 + 2];
+                // 원본: 흰 배경(255), 검정 글씨(0)
+                // 변환: 검정 배경(0), 흰 글씨(255)로 반전
+                const r = 255 - imgData[i * 4];
+                const g = 255 - imgData[i * 4 + 1];
+                const b = 255 - imgData[i * 4 + 2];
                 
+                // 정규화 (0~1 사이 값)
                 floatData[i] = r / 255.0;
                 floatData[inputSize * inputSize + i] = g / 255.0;
                 floatData[inputSize * inputSize * 2 + i] = b / 255.0;
