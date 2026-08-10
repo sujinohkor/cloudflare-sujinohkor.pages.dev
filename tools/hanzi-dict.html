@@ -236,31 +236,48 @@
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; }                                            
             .workspace-container { flex-direction: column; overflow: visible; }                                            
             
-            /* 1. 왼쪽 결과 박스 전체 높이 고정 (예: 280px 또는 30vh) */
+            /* 1. 모바일에서 Results List 박스를 화면 높이의 1/4 수준으로 압축 및 내부 여백/스크롤 최적화 */
             .content-left { 
-                height: 280px; 
+                height: 180px; 
                 min-height: unset; 
                 overflow: hidden; 
+                padding: 12px;
+                gap: 5px;
             } 
-        
-            /* 2. 박스 내부의 카드에서 flex: 1 성질 제거 */
             .content-left .calc-card {
                 flex: none;
                 height: 100%;
+                padding: 0;
             }
-        
-            /* 3. 실제 한자 버튼들이 나열되는 리스트 영역에 높이와 스크롤 부여 */
             .content-left .history-list {
-                max-height: 190px; /* 타이틀 공간을 제외한 순수 리스트 높이 */
+                max-height: 110px;
                 overflow-y: auto;
             }
-            
-            /* 상세 정보(오른쪽)는 기존처럼 유연하게 출력 */
+
+            /* 2. 모바일에서 번체와 간체 SVG를 가로가 아닌 세로(column)로 정렬 */
+            .detail-top-svg-box {
+                flex-direction: column;
+                gap: 15px;
+                padding: 10px;
+            }
+
+            /* 모바일에서 한자 캔버스 크기 축소 */
+            .character-target {
+                width: 200px;
+                height: 200px;
+            }
+
             .content-right { 
                 height: auto; 
-                overflow: visible; 
-                min-height: 400px; 
+                overflow-y: visible; 
+                min-height: unset; 
             }
+
+            /* 상세 정보 박스 내부의 카드도 높이를 유연하게 풀어줌 */
+            .content-right .calc-card {
+                flex: none;
+                height: auto;
+            }                                
         }
     </style>
 </head>
@@ -641,15 +658,18 @@
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
 
+        // 모바일 화면 폭에 따라 SVG 캔버스 크기 조절 (모바일 200px, 데스크톱 320px)
+        const writerSize = window.innerWidth <= 900 ? 200 : 320;
+
         try {
             tradWriter = HanziWriter.create('tradTarget', tradChar, {
-                width: 320, height: 320, padding: 18,
+                width: writerSize, height: writerSize, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             tradWriter.animateCharacter();
 
             simpWriter = HanziWriter.create('simpTarget', simpChar, {
-                width: 320, height: 320, padding: 18,
+                width: writerSize, height: writerSize, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             simpWriter.animateCharacter();
@@ -688,7 +708,6 @@
         if(busu) {
             filtered = filtered.filter(x => x.busu === busu);
         } else {
-            // 부수를 'All Radicals'로 되돌린 경우 전체 목록 표시
             renderList(db);
             if(db.length > 0) selectHanzi(db[0].char);
             return;
@@ -708,7 +727,6 @@
         if(strokes) {
             filtered = filtered.filter(x => x.strokes == strokes);
         } else {
-            // 획수를 'All Strokes'로 되돌린 경우 전체 목록 표시
             renderList(db);
             if(db.length > 0) selectHanzi(db[0].char);
             return;
