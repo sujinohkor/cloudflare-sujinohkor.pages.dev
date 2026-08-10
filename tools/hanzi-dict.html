@@ -126,7 +126,7 @@
             align-items: center;
             background: #1c1c1c;
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 15px;
             flex: 2; 
         }
@@ -151,30 +151,37 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        /* 하단: 정보 영역 (flex: 1로 컴팩트하게 구성) */
+        /* 하단: 정보 영역 세련된 카드 스타일 적용 */
         .detail-bottom-info-box {
-            background: #1c1c1c;
+            background: linear-gradient(145deg, #1e1e1e, #171717);
             border: 1px solid #333;
-            border-radius: 12px;
-            padding: 15px 20px;
+            border-radius: 16px;
+            padding: 18px 24px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 8px;
+            justify-content: space-around;
+            gap: 10px;
             flex: 1;
-            font-size: 1.4rem;
-            color: #ddd;
+            font-size: 1.15rem;
+            color: #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .detail-info-row {
             display: flex;
-            gap: 12px;
+            gap: 15px;
             align-items: baseline;
         }
         .detail-info-row strong {
             color: #ff9e40;
-            min-width: 95px;
+            min-width: 130px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .detail-info-row span {
+            color: #f5f5f5;
         }
 
         /* 조그마한 필순 다시보기 버튼 스타일 */
@@ -182,9 +189,9 @@
             background: #202020; 
             color: #ff9e40; 
             border: 1px solid #ff9e40; 
-            padding: 4px 10px;
+            padding: 5px 14px;
             border-radius: 50px; 
-            font-size: 0.75rem; 
+            font-size: 0.8rem; 
             font-weight: bold; 
             cursor: pointer; 
             transition: all 0.3s; 
@@ -200,8 +207,14 @@
         body.light-mode .search-input::placeholder { color: #888; }
         body.light-mode select.search-input option { background: #fff; color: #202020; }
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card, body.light-mode .detail-top-svg-box, body.light-mode .detail-bottom-info-box {
+        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card, body.light-mode .detail-top-svg-box {
             background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode .detail-bottom-info-box {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-color: #ddd;
+            color: #202020;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         body.light-mode .calc-card { background: #fff; border-color: #ddd; }
         body.light-mode .calc-card h3 { color: #e68a35; }
@@ -209,9 +222,9 @@
         body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .hanzi-result-btn { background: #fff; color: #e68a35; border-color: #ddd; }
         body.light-mode .hanzi-result-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
-        body.light-mode .character-target { background: #fff; border-color: #ddd; }
-        body.light-mode .detail-bottom-info-box { color: #202020; }
+        body.light-mode .character-target { background: #fff; border-color: #ddd; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); }
         body.light-mode .detail-info-row strong { color: #e68a35; }
+        body.light-mode .detail-info-row span { color: #333; }
 
         /* Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
@@ -581,18 +594,31 @@
         }
 
         document.getElementById('detailMeaning').innerText = found.meaning;
-        document.getElementById('detailChinese').innerText = found.chinese || '-';
-        document.getElementById('detailBusu').innerText = found.busu;
-        document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
         
+        // Mandarin 부분에 무조건 '번체 / 간체 (병음)' 형태로 가공해서 출력
         const tradChar = found.char; 
         let simpChar = tradChar; 
+        let pinyin = '';
+
         if (found.chinese) {
             const match = found.chinese.match(/^([\u4e00-\u9fa5])/);
             if (match) {
                 simpChar = match[1];
             }
+            // 병음 부분 추출 (예: '的 (de)'에서 '(de)' 또는 내용 추출)
+            const pinyinMatch = found.chinese.match(/\(.*\)/);
+            if (pinyinMatch) {
+                pinyin = pinyinMatch[0];
+            } else {
+                pinyin = `(${found.chinese})`;
+            }
         }
+        
+        // 무조건 중복 표기: 번체 / 간체 (병음)
+        document.getElementById('detailChinese').innerText = `${tradChar} / ${simpChar} ${pinyin}`;
+
+        document.getElementById('detailBusu').innerText = found.busu;
+        document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
 
         try {
             // 번체 Writer 크기를 320x320으로 대폭 확대
