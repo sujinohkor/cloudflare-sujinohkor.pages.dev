@@ -934,7 +934,7 @@
         });
     }
 
-    // ONNX 모델 추론 및 0번 인덱스(공백/패딩) 제거 후 순수 한자 Top-5 추출 함수
+    // ONNX 모델 추론 및 타임스텝 디버깅 로그 적용 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -984,13 +984,27 @@
             const dims = outputTensor.dims; 
             const outputData = outputTensor.data;
 
+            console.log("=== 텐서 차원 ===", dims);
+            // 💡 6개의 타임스텝 각각에서 출력이 어떻게 나오는지 확인하는 디버깅 로그
+            for (let t = 0; t < dims[1]; t++) {
+                let maxIdx = -1;
+                let maxVal = -999;
+                const offset = t * dims[2];
+                for (let i = 0; i < dims[2]; i++) {
+                    if (outputData[offset + i] > maxVal) {
+                        maxVal = outputData[offset + i];
+                        maxIdx = i;
+                    }
+                }
+                console.log(`타임스텝 [${t}] -> 최고 인덱스: ${maxIdx}, 점수: ${maxVal.toFixed(4)}, 글자: ${dict[maxIdx] || '알수없음'}`);
+            }
+
             const seqLen = dims[1];    
             const numClasses = dims[2]; 
 
             const t = 0; 
             const stepOffset = t * numClasses;
             
-            // 💡 0번 인덱스(공백/패딩 토큰)는 원천 배제하기 위해 i=1부터 시작
             let scoredClasses = [];
             for (let i = 1; i < numClasses; i++) {
                 scoredClasses.push({ index: i, score: outputData[stepOffset + i] });
