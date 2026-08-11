@@ -629,7 +629,7 @@
                     <canvas id="drawCanvas" width="300" height="300"></canvas>
                 </div>
                 <div class="input-group">
-                    <label>🎯 인식 후보군 (Top 5)</label>
+                    <label>🎯 인식 후보군 (Top 5 - 순수 한자)</label>
                     <div id="candidateList">
                         <span style="font-size: 0.8rem; color: #888;">글씨를 그린 후 '인식하기'를 누르세요.</span>
                     </div>
@@ -906,7 +906,7 @@
         container.innerHTML = '';
 
         if (candidates.length === 0) {
-            container.innerHTML = '<span style="font-size: 0.8rem; color: #888;">인식된 후보가 없습니다.</span>';
+            container.innerHTML = '<span style="font-size: 0.8rem; color: #888;">인식된 순수 한자 후보가 없습니다.</span>';
             return;
         }
 
@@ -934,7 +934,7 @@
         });
     }
 
-    // ONNX 모델 추론 및 Top-5 후보군 추출 함수
+    // ONNX 모델 추론 및 순수 한자 Top-5 후보군 필터링 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -986,40 +986,57 @@
                 scoredClasses.push({ index: i, score: outputData[stepOffset + i] });
             }
 
+            // 점수 기준 내림차순 정렬
             scoredClasses.sort((a, b) => b.score - a.score);
-            const top5 = scoredClasses.slice(0, 5);
 
-            const maxScore = top5[0].score;
-            const expScores = top5.map(item => Math.exp(item.score - maxScore));
+            // 💡 순수 한자(CJK Unified Ideographs)만 필터링하여 상위 5개 추출
+            let filteredTop5 = [];
+            for (let item of scoredClasses) {
+                if (filteredTop5.length >= 5) break;
+                
+                let idx = item.index;
+                if (idx > 0 && idx < dict.length) {
+                    let char = dict[idx];
+                    // 정규식을 이용해 순수 한자 여부 검사 (\u4e00-\u9fa5 영역)
+                    const isHanzi = /^[\u4e00-\u9fa5]+$/.test(char);
+                    if (isHanzi) {
+                        filteredTop5.push(item);
+                    }
+                }
+            }
+
+            if (filteredTop5.length === 0) {
+                alert("인식된 순수 한자가 없습니다.");
+                return;
+            }
+
+            // 소프트맥스를 통한 상대적 확률 계산
+            const maxScore = filteredTop5[0].score;
+            const expScores = filteredTop5.map(item => Math.exp(item.score - maxScore));
             const sumExp = expScores.reduce((a, b) => a + b, 0);
             const confidences = expScores.map(exp => (exp / sumExp) * 100);
 
             let candidateList = [];
-            top5.forEach((item, idx) => {
-                if (item.index > 0 && item.index < dict.length) {
-                    candidateList.push({
-                        char: dict[item.index],
-                        confidence: confidences[idx].toFixed(1)
-                    });
-                }
+            filteredTop5.forEach((item, idx) => {
+                candidateList.push({
+                    char: dict[item.index],
+                    confidence: confidences[idx].toFixed(1)
+                });
             });
 
             renderCandidates(candidateList);
 
-            if (candidateList.length > 0) {
-                const bestChar = candidateList[0].char;
-                const found = db.find(x => x.char === bestChar);
-                if (found) {
-                    selectHanzi(found.char);
-                } else {
-                    document.getElementById('detailChar').innerText = bestChar;
-                    document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
-                    document.getElementById('detailChinese').innerText = '-';
-                    document.getElementById('detailBusu').innerText = '-';
-                    document.getElementById('detailStrokes').innerText = '-';
-                }
+            // 1위 후보 자동 선택
+            const bestChar = candidateList[0].char;
+            const found = db.find(x => x.char === bestChar);
+            if (found) {
+                selectHanzi(found.char);
             } else {
-                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
+                document.getElementById('detailChar').innerText = bestChar;
+                document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
+                document.getElementById('detailChinese').innerText = '-';
+                document.getElementById('detailBusu').innerText = '-';
+                document.getElementById('detailStrokes').innerText = '-';
             }
 
         } catch (err) {
