@@ -778,7 +778,11 @@
 
     // 이체자 상호 매핑 맵 (앞으로 이런 글자가 또 생기면 여기에 추가하면 됩니다)
     const charNormalizationMap = {
-        "為": "爲"
+        "為": "爲", /*trad_with_simp.js에 없는애, 있는애 */
+        "歎": "嘆",
+        "払": "拂",
+        "錬": "鍊",
+        "鴎": "鷗"
     };
     function normalizeChar(charStr) {
         return charNormalizationMap[charStr] || charStr;
