@@ -99,15 +99,6 @@
             border-color: #ff9e40;
         }
 
-        .bottom-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .bottom-btns > .menu-btn {
-            margin-bottom: 0;
-        }
-
         .workspace-container {
             display: flex;
             flex-direction: row;
@@ -427,6 +418,9 @@
         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
             <button class="mode-btn active-mode" id="btnModeList" onclick="switchMode('list')">Search from the List</button>
             <button class="mode-btn" id="btnModeDrawing" onclick="switchMode('drawing')">Search through Drawing</button>
+            
+            <!-- Search through Drawing 바로 밑에 위치할 Reset 버튼 -->
+            <button class="menu-btn" id="resetDrawingBtn" onclick="resetAll()" style="display: none; margin-top: 4px;">Reset</button>
         </div>
 
         <!-- 1) Search from the List용 필터 컨테이너 -->
@@ -646,11 +640,10 @@
                         }
                     </script>
                 </select>
-            </div>
-        </div>
 
-        <div class="bottom-btns" style="width: 100%; margin-top: auto;">
-            <button class="menu-btn" onclick="resetAll()">Reset</button>
+                <!-- All Strokes 바로 밑에 위치할 Reset 버튼 -->
+                <button class="menu-btn" id="resetListBtn" onclick="resetAll()" style="margin-top: 12px; width: 100%;">Reset</button>
+            </div>
         </div>
     </aside>
     <main class="main-content">
@@ -776,6 +769,8 @@
         const listFilterContainer = document.getElementById('listFilterContainer');
         const panelList = document.getElementById('panelList');
         const panelDrawing = document.getElementById('panelDrawing');
+        const resetListBtn = document.getElementById('resetListBtn');
+        const resetDrawingBtn = document.getElementById('resetDrawingBtn');
 
         if (mode === 'list') {
             btnList.classList.add('active-mode');
@@ -783,12 +778,16 @@
             listFilterContainer.style.display = 'block';
             panelList.style.display = 'flex';
             panelDrawing.style.display = 'none';
+            resetListBtn.style.display = 'block';
+            resetDrawingBtn.style.display = 'none';
         } else {
             btnDrawing.classList.add('active-mode');
             btnList.classList.remove('active-mode');
             listFilterContainer.style.display = 'none';
             panelList.style.display = 'none';
             panelDrawing.style.display = 'flex';
+            resetListBtn.style.display = 'none';
+            resetDrawingBtn.style.display = 'block';
 
             if (!canvasInitialized) {
                 initCanvas();
