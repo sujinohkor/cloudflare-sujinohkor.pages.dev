@@ -719,7 +719,11 @@
             const dictPromise = fetch('/models/mandarin-onnx.txt').then(async (res) => {
                 if (!res.ok) throw new Error("사전 파일(mandarin-onnx.txt) 로드 실패");
                 const text = await res.text();
-                return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
+                let dict = text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
+                
+                // 💡 모델의 0번 인덱스(공백 토큰) 밀림 현상을 맞추기 위해 맨 앞에 공백 플레이스홀더 강제 삽입
+                dict.unshift("<blank>");
+                return dict;
             });
 
             const results = await Promise.all([...bufferPromises, dictPromise]);
@@ -934,7 +938,7 @@
         });
     }
 
-    // ONNX 모델 추론 및 타임스텝 디버깅 로그 적용 함수
+    // ONNX 모델 추론 및 타임스텝 연쇄 복호화(CTC Decoding) 적용 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -981,51 +985,73 @@
             
             const inferenceResults = await session.run(feeds);
             const outputTensor = inferenceResults[session.outputNames[0]];
-            const dims = outputTensor.dims; 
+            const dims = outputTensor.dims; // [1, 6, 18385]
             const outputData = outputTensor.data;
 
-            console.log("=== 텐서 차원 ===", dims);
-            // 💡 6개의 타임스텝 각각에서 출력이 어떻게 나오는지 확인하는 디버깅 로그
-            for (let t = 0; t < dims[1]; t++) {
-                let maxIdx = -1;
+            const seqLen = dims[1];    
+            const numClasses = dims[2]; 
+
+            // 💡 시퀀스(타임스텝 0 ~ 5) 전체를 순회하며 가장 점수가 높은 클래스들을 수집 (CTC Greedy Decoding 방식)
+            let rawPredictions = [];
+            for (let t = 0; t < seqLen; t++) {
+                let maxIdx = 0;
                 let maxVal = -999;
-                const offset = t * dims[2];
-                for (let i = 0; i < dims[2]; i++) {
+                const offset = t * numClasses;
+                
+                for (let i = 0; i < numClasses; i++) {
                     if (outputData[offset + i] > maxVal) {
                         maxVal = outputData[offset + i];
                         maxIdx = i;
                     }
                 }
-                console.log(`타임스텝 [${t}] -> 최고 인덱스: ${maxIdx}, 점수: ${maxVal.toFixed(4)}, 글자: ${dict[maxIdx] || '알수없음'}`);
+                rawPredictions.push({ index: maxIdx, score: maxVal });
             }
 
-            const seqLen = dims[1];    
-            const numClasses = dims[2]; 
-
-            const t = 0; 
-            const stepOffset = t * numClasses;
-            
+            // 점수 기준으로 전체 클래스 정렬 (중복 제거 및 순수 한자 필터링)
             let scoredClasses = [];
-            for (let i = 1; i < numClasses; i++) {
-                scoredClasses.push({ index: i, score: outputData[stepOffset + i] });
-            }
+            let seenChars = new Set();
 
-            scoredClasses.sort((a, b) => b.score - a.score);
+            // 타임스텝별로 나온 결과들을 점수순으로 정렬
+            rawPredictions.sort((a, b) => b.score - a.score);
 
-            // 순수 한자(CJK Unified Ideographs)만 필터링하여 상위 5개 추출
-            let filteredTop5 = [];
-            for (let item of scoredClasses) {
-                if (filteredTop5.length >= 5) break;
-                
+            for (let item of rawPredictions) {
                 let idx = item.index;
-                if (idx < dict.length) {
+                // 0번(공백/패딩)은 제외하고 사전 범위 내의 인덱스만 취급
+                if (idx > 0 && idx < dict.length) {
                     let char = dict[idx];
                     const isHanzi = /^[\u4e00-\u9fa5]+$/.test(char);
-                    if (isHanzi) {
-                        filteredTop5.push(item);
+                    if (isHanzi && !seenChars.has(char)) {
+                        seenChars.add(char);
+                        scoredClasses.push(item);
                     }
                 }
             }
+
+            // 만약 타임스텝 결과에서 한자가 충분히 안 잡혔다면 전체 클래스에서 상위권 보충
+            if (scoredClasses.length < 5) {
+                let allSorted = [];
+                // 타임스텝 0 기준 전체 클래스 스캔
+                const t0Offset = 0;
+                for (let i = 1; i < numClasses; i++) {
+                    allSorted.push({ index: i, score: outputData[t0Offset + i] });
+                }
+                allSorted.sort((a, b) => b.score - a.score);
+
+                for (let item of allSorted) {
+                    if (scoredClasses.length >= 5) break;
+                    let idx = item.index;
+                    if (idx < dict.length) {
+                        let char = dict[idx];
+                        const isHanzi = /^[\u4e00-\u9fa5]+$/.test(char);
+                        if (isHanzi && !seenChars.has(char)) {
+                            seenChars.add(char);
+                            scoredClasses.push(item);
+                        }
+                    }
+                }
+            }
+
+            let filteredTop5 = scoredClasses.slice(0, 5);
 
             if (filteredTop5.length === 0) {
                 alert("인식된 순수 한자가 없습니다.");
