@@ -934,7 +934,7 @@
         });
     }
 
-    // ONNX 모델 추론 및 동적 비율(Dynamic Width, Height 48, RGB 3채널) 전처리 적용 함수
+    // ONNX 모델 추론 및 0번 인덱스(공백/패딩) 제거 후 순수 한자 Top-5 추출 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -984,17 +984,15 @@
             const dims = outputTensor.dims; 
             const outputData = outputTensor.data;
 
-            console.log("모델 출력 텐서 형태(Dims):", dims);
-            console.log("출력 데이터 상위 20개:", outputData.slice(0, 20));
-
             const seqLen = dims[1];    
             const numClasses = dims[2]; 
 
             const t = 0; 
             const stepOffset = t * numClasses;
             
+            // 💡 0번 인덱스(공백/패딩 토큰)는 원천 배제하기 위해 i=1부터 시작
             let scoredClasses = [];
-            for (let i = 0; i < numClasses; i++) {
+            for (let i = 1; i < numClasses; i++) {
                 scoredClasses.push({ index: i, score: outputData[stepOffset + i] });
             }
 
@@ -1006,7 +1004,7 @@
                 if (filteredTop5.length >= 5) break;
                 
                 let idx = item.index;
-                if (idx > 0 && idx < dict.length) {
+                if (idx < dict.length) {
                     let char = dict[idx];
                     const isHanzi = /^[\u4e00-\u9fa5]+$/.test(char);
                     if (isHanzi) {
