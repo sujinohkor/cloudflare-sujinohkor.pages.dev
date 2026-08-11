@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Logic Circuit Builder</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                                   .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+        
+        /* 모바일 백드롭 오버레이 */        
+        .sidebar-backdrop {            display: none;            position: fixed;            top: 0; left: 0; width: 100vw; height: 100vh;            background: rgba(0, 0, 0, 0.5);            z-index: 999;            opacity: 0;            transition: opacity 0.3s ease;        }
+
+        /* 플로팅 사이드바 */        .sidebar {                         width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         background: rgba(16, 16, 16, 0.25);                         backdrop-filter: blur(16px);                         -webkit-backdrop-filter: blur(16px);                        padding: 25px 20px; z-index: 1000;                         display: flex; flex-direction: column; gap: 12px;                         border: 1px solid rgba(255, 158, 64, 0.35);                         border-radius: 24px;                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;            overflow-y: auto;                 }        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        
+        .main-content {                         margin-left: 300px; padding: 40px; flex: 1;                         display: flex; flex-direction: column; height: 100vh;                         gap: 20px; overflow: hidden; transition: all 0.3s ease;                         width: calc(100% - 300px);        }
+        
+        .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; }
+        .menu-btn {                         width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        display: flex; align-items: center; justify-content: center; line-height: 1;       }        
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }        
+        .menu-btn.active-tool { background: rgba(255, 158, 64, 0.35); color: #fff; border-color: #ff9e40; }
+        
+        .menu-btn.delete-tool { background: rgba(255, 255, 255, 0.03); color: #ff9e40; border-color: rgba(255, 158, 64, 0.35); }
+        .menu-btn.delete-tool:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        .menu-btn.delete-tool.active-tool { background: #dc3545; color: #fff; border-color: #dc3545; }
+
+        .bottom-btns {                       display: flex;                       flex-direction: column;                       gap: 10px;        }
+
+        /* 도트무늬 배경 적용 카드 */
+        .content-card {                         
+            border: 2px solid #ff9e40;                         
+            border-radius: 16px;                         
+            flex: 1;                         
+            display: flex;                         
+            overflow: hidden;                         
+            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;
+            background-size: 20px 20px;
+            position: relative;             
+            transition: all 0.3s ease;       }
+        
+        .card-btn-group {            position: absolute;            top: 15px;            right: 15px;            z-index: 2001;            display: flex;            gap: 8px;        }
+        .action-btn {                         background: #202020;                         color: #ff9e40;                         border: 1px solid #ff9e40;                         padding: 6px 14px;                         border-radius: 8px;                         cursor: pointer;                         font-size: 0.8rem;                         font-weight: bold;                         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         transition: all 0.3s;       }        .action-btn:hover {                         background: #ff9e40;                         color: #101010;       }
+
+        body.is-fullscreen .sidebar {            transform: translateX(-120%);            opacity: 0;            pointer-events: none;        }        body.is-fullscreen .main-content {            margin-left: 0 !important;            width: 100vw !important;            padding: 0 !important;            height: 100vh !important;        }        body.is-fullscreen .top-section {            display: none !important;        }        body.is-fullscreen .content-card {            position: fixed !important;            top: 0 !important;            left: 0 !important;            right: 0 !important;            bottom: 0 !important;            width: 100vw !important;            height: 100vh !important;            z-index: 9999 !important;            border-radius: 0 !important;            border: none !important;            padding: 0 !important;            margin: 0 !important;        }
+
+        /* 뷰어 영역 스타일 */        .effect-view {            display: block;            width: 100%;            height: 100%;            position: absolute;            top: 0;            left: 0;            background: transparent;            z-index: 15;        }
+        .effect-canvas {            display: block;            width: 100%;            height: 100%;            cursor: crosshair;        }
+
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #202020; }                
+        body.light-mode .sidebar {                         background: rgba(255, 255, 255, 0.4);                         border-color: rgba(243, 128, 32, 0.35);                         box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 }                         
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {                         background: rgba(0, 0, 0, 0.02);                         color: #F38020;                         border-color: rgba(243, 128, 32, 0.5);         }        
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {                         background: rgba(243, 128, 32, 0.15);                         border-color: rgba(243, 128, 32, 0.4);         }                         
+        body.light-mode .menu-btn.active-tool { background: #F38020; color: #fff; }        
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }        
+        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }        
+        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }        
+        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }        
+        body.light-mode .content-card.fullscreen { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff !important; background-size: 20px 20px !important; }
+
+        .menu-toggle-btn {                         display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;                         padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         font-weight: bold; cursor: pointer; color: #ffffff;         }                 
+        @media (max-width: 900px) {                         
+            .menu-toggle-btn { display: block; }                         
+            .sidebar {                                 transform: translateX(-320px);                                 background: #101010 !important;                                 backdrop-filter: none !important;                                -webkit-backdrop-filter: none !important;                                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 z-index: 3000;             }                         
+            body.light-mode .sidebar {                                background: #ffffff !important;                                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }            
+            .sidebar.active { transform: translateX(0); }                         
+            .sidebar-backdrop.active { display: block; opacity: 1; }            
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                         
+            .content-card { min-height: 0; height: 100%; }        
+        }    
+    </style>
+</head>
+<body>    
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+    
+    <div class="app-container">
+        <!-- 사이드바 (부품 팔레트 및 설정) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Logic Builder</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>                
+            
+            <a href="../index" class="menu-btn" style="margin-bottom: 5px;">Home</a>
+            
+            <div class="menu-section-title">Components</div>
+            <button class="menu-btn" onclick="selectTool('SWITCH', this)">INPUT</button>
+            <button class="menu-btn" onclick="selectTool('LED', this)">OUTPUT (LED)</button>
+            <button class="menu-btn" onclick="selectTool('AND', this)">AND</button>
+            <button class="menu-btn" onclick="selectTool('OR', this)">OR</button>
+            <button class="menu-btn" onclick="selectTool('NOT', this)">NOT</button>
+            
+            <div class="menu-section-title" style="margin-top: 10px;">Editing</div>
+            <div class="bottom-btns">                           
+                <button class="menu-btn delete-tool" onclick="selectTool('DELETE', this)">Delete</button>
+                <button class="menu-btn" onclick="clearCanvas()">Reset</button>
+            </div>                
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="main-content" id="main-content">                        
+            <header class="top-section">                                
+                <h1 id="effect-title">Logic Builder</h1>
+                <p id="effect-desc">Select a component from the sidebar and click on the canvas to place it. (Drag to move)</p>
+            </header>                        
+            <section class="content-card" id="content-card">                                
+                <div class="card-btn-group">                    
+                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                                
+                </div>
+
+                <!-- 회로 캔버스 뷰어 -->                
+                <div class="effect-view">                    
+                    <canvas id="circuitCanvas" class="effect-canvas"></canvas>                </div>
+            </section>                
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+        window.toggleFullscreen = function() {                        
+            contentCard.classList.toggle('fullscreen');            
+            document.body.classList.toggle('is-fullscreen');            
+            if (contentCard.classList.contains('fullscreen')) {                                
+                fullscreenBtn.textContent = 'Minimize 🗗';            
+            } else {                                
+                fullscreenBtn.textContent = 'Maximize ⛶';            
+            }
+            // CSS 트랜지션 및 레이아웃 재배치가 끝나는 시점에 맞춰 여유 있게 리사이즈 반복 실행
+            setTimeout(resizeCanvas, 50);
+            setTimeout(resizeCanvas, 300);
+        };
+
+        function toggleSidebar() {                          
+            const isActive = sidebar.classList.toggle('active');            
+            if (isActive) {                
+                backdrop.classList.add('active');            
+            } else {                
+                backdrop.classList.remove('active');            
+            }
+        }
+
+        function closeSidebar() {            
+            sidebar.classList.remove('active');            
+            backdrop.classList.remove('active');        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {                          
+            document.body.classList.toggle('light-mode');            
+            if (window.innerWidth <= 900) closeSidebar();        });
+
+        mainContent.addEventListener('click', () => {                          
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                                  
+                closeSidebar();            }                 
+        });
+
+        /* --- 논리회로 시뮬레이터 로직 --- */
+        const canvas = document.getElementById('circuitCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let components = [];
+        let wires = [];
+        let currentTool = null;
+        let connectingSource = null;
+        let draggedComponent = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        class Component {
+            constructor(type, x, y) {
+                this.type = type;
+                this.x = x;
+                this.y = y;
+                this.width = 70;
+                this.height = 50;
+                this.state = 0;
+                this.inputs = [];
+                this.outputs = [];
+                this.initPins();
+            }
+
+            initPins() {
+                if (this.type === 'SWITCH') {
+                    this.outputs = [{ x: this.x + this.width, y: this.y + this.height/2, val: 0, parent: this }];
+                } else if (this.type === 'LED') {
+                    this.inputs = [{ x: this.x, y: this.y + this.height/2, val: 0, parent: this }];
+                } else if (this.type === 'NOT') {
+                    this.inputs = [{ x: this.x, y: this.y + this.height/2, val: 0, parent: this }];
+                    this.outputs = [{ x: this.x + this.width, y: this.y + this.height/2, val: 0, parent: this }];
+                } else {
+                    this.inputs = [
+                        { x: this.x, y: this.y + 15, val: 0, parent: this },
+                        { x: this.x, y: this.y + 35, val: 0, parent: this }
+                    ];
+                    this.outputs = [{ x: this.x + this.width, y: this.y + this.height/2, val: 0, parent: this }];
+                }
+            }
+
+            updatePinPositions() {
+                if (this.type === 'SWITCH') {
+                    this.outputs[0].x = this.x + this.width;
+                    this.outputs[0].y = this.y + this.height/2;
+                } else if (this.type === 'LED') {
+                    this.inputs[0].x = this.x;
+                    this.inputs[0].y = this.y + this.height/2;
+                } else if (this.type === 'NOT') {
+                    this.inputs[0].x = this.x;
+                    this.inputs[0].y = this.y + this.height/2;
+                    this.outputs[0].x = this.x + this.width;
+                    this.outputs[0].y = this.y + this.height/2;
+                } else {
+                    this.inputs[0].x = this.x;
+                    this.inputs[0].y = this.y + 15;
+                    this.inputs[1].x = this.x;
+                    this.inputs[1].y = this.y + 35;
+                    this.outputs[0].x = this.x + this.width;
+                    this.outputs[0].y = this.y + this.height/2;
+                }
+            }
+
+            draw() {
+                const isLight = document.body.classList.contains('light-mode');
+                ctx.fillStyle = isLight ? '#ffffff' : '#1e293b';
+                ctx.strokeStyle = '#ff9e40';
+                ctx.lineWidth = 2;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+                ctx.fillStyle = isLight ? '#202020' : '#ffffff';
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                let label = this.type;
+                if (this.type === 'SWITCH') label = `SW (${this.state})`;
+                if (this.type === 'LED') {
+                    ctx.fillStyle = this.state === 1 ? '#ff3333' : (isLight ? '#cbd5e1' : '#334155');
+                    ctx.beginPath();
+                    ctx.arc(this.x + this.width/2, this.y + this.height/2, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    label = '';
+                }
+
+                if (label) {
+                    ctx.fillText(label, this.x + this.width/2, this.y + this.height/2);
+                }
+
+                this.inputs.forEach(pin => {
+                    ctx.fillStyle = pin.val === 1 ? '#ff4d4d' : '#cc0000';
+                    ctx.beginPath(); ctx.arc(pin.x, pin.y, 4, 0, Math.PI*2); ctx.fill();
+                });
+                this.outputs.forEach(pin => {
+                    ctx.fillStyle = pin.val === 1 ? '#2ecc71' : '#27ae60';
+                    ctx.beginPath(); ctx.arc(pin.x, pin.y, 4, 0, Math.PI*2); ctx.fill();
+                });
+            }
+        }
+
+        function selectTool(tool, btnElement) {
+            currentTool = tool;
+            connectingSource = null;
+
+            document.querySelectorAll('.sidebar .menu-btn').forEach(btn => {
+                if (!btn.classList.contains('delete-tool') && btn.innerText !== '전체 초기화' && btn.innerText !== 'Home') {
+                    btn.classList.remove('active-tool');
+                }
+            });
+            if (tool === 'DELETE') {
+                document.querySelector('.delete-tool').classList.add('active-tool');
+            } else if (btnElement) {
+                document.querySelectorAll('.delete-tool').forEach(b => b.classList.remove('active-tool'));
+                btnElement.classList.add('active-tool');
+            }
+            if (window.innerWidth <= 900) closeSidebar();
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (currentTool === 'DELETE') {
+                const targetComp = components.find(c => x >= c.x && x <= c.x + c.width && y >= c.y && y <= c.y + c.height);
+                if (targetComp) {
+                    wires = wires.filter(w => {
+                        let isConnectedToTarget = targetComp.inputs.includes(w.to) || targetComp.outputs.includes(w.from);
+                        return !isConnectedToTarget;
+                    });
+                    components = components.filter(c => c !== targetComp);
+                } else {
+                    wires = wires.filter(w => {
+                        let hit1 = (Math.abs(w.from.x - x) < 10 && Math.abs(w.from.y - y) < 10);
+                        let hit2 = (Math.abs(w.to.x - x) < 10 && Math.abs(w.to.y - y) < 10);
+                        return !hit1 && !hit2;
+                    });
+                }
+                evaluateCircuit();
+                drawAll();
+                return;
+            }
+
+            if (currentTool && currentTool !== 'DELETE') {
+                components.push(new Component(currentTool, x - 35, y - 25));
+                currentTool = null;
+                document.querySelectorAll('.sidebar .menu-btn').forEach(b => b.classList.remove('active-tool'));
+                drawAll();
+                return;
+            }
+
+            let clickedPin = false;
+            components.forEach(c => {
+                c.outputs.forEach(pin => {
+                    if (Math.hypot(pin.x - x, pin.y - y) < 8) {
+                        connectingSource = pin;
+                        clickedPin = true;
+                    }
+                });
+                c.inputs.forEach(pin => {
+                    if (Math.hypot(pin.x - x, pin.y - y) < 8 && connectingSource) {
+                        wires.push({ from: connectingSource, to: pin });
+                        connectingSource = null;
+                        evaluateCircuit();
+                        drawAll();
+                        clickedPin = true;
+                    }
+                });
+            });
+
+            if (clickedPin) return;
+
+            for (let i = components.length - 1; i >= 0; i--) {
+                let c = components[i];
+                if (x >= c.x && x <= c.x + c.width && y >= c.y && y <= c.y + c.height) {
+                    if (c.type === 'SWITCH' && Math.abs(x - (c.x + c.width/2)) < 25 && Math.abs(y - (c.y + c.height/2)) < 25) {
+                        c.state = c.state === 1 ? 0 : 1;
+                        c.outputs[0].val = c.state;
+                        evaluateCircuit();
+                        drawAll();
+                        return;
+                    }
+                    draggedComponent = c;
+                    dragOffsetX = x - c.x;
+                    dragOffsetY = y - c.y;
+                    break;
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!draggedComponent) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            draggedComponent.x = x - dragOffsetX;
+            draggedComponent.y = y - dragOffsetY;
+            draggedComponent.updatePinPositions();
+            drawAll();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            draggedComponent = null;
+        });
+
+        function evaluateCircuit() {
+            wires.forEach(w => { w.to.val = w.from.val; });
+
+            for (let i = 0; i < 3; i++) {
+                components.forEach(c => {
+                    if (c.type === 'AND') {
+                        c.outputs[0].val = (c.inputs[0].val & c.inputs[1].val);
+                    } else if (c.type === 'OR') {
+                        c.outputs[0].val = (c.inputs[0].val | c.inputs[1].val);
+                    } else if (c.type === 'NOT') {
+                        c.outputs[0].val = c.inputs[0].val === 0 ? 1 : 0;
+                    } else if (c.type === 'LED') {
+                        c.state = c.inputs[0].val;
+                    }
+                });
+                wires.forEach(w => { w.to.val = w.from.val; });
+            }
+        }
+
+        function drawAll() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            wires.forEach(w => {
+                ctx.beginPath();
+                ctx.moveTo(w.from.x, w.from.y);
+                ctx.bezierCurveTo(w.from.x + 40, w.from.y, w.to.x - 40, w.to.y, w.to.x, w.to.y);
+                ctx.strokeStyle = w.from.val === 1 ? '#ff4d4d' : '#64748b';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            });
+
+            components.forEach(c => {
+                c.updatePinPositions();
+                c.draw();
+            });
+        }
+
+        function clearCanvas() {
+            components = [];
+            wires = [];
+            drawAll();
+            if (window.innerWidth <= 900) closeSidebar();
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            drawAll();
+        }
+
+        window.addEventListener('load', () => {
+            resizeCanvas();
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+    </script>
+</body>
+</html>
