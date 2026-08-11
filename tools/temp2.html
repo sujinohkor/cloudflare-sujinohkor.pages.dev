@@ -395,7 +395,16 @@
             .sidebar.active { transform: translateX(0); }                            
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }                            
             .workspace-container { flex-direction: column; overflow: visible; }                            
-            .content-left, .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                            
+            
+            /* 모바일에서 Results List 높이를 화면의 1/4(25vh)로 설정 및 스크롤 활성화 */
+            .content-left { 
+                height: 25vh; 
+                min-height: 150px; 
+                overflow-y: auto; 
+                flex: none; 
+            }
+            
+            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                            
             .content-right { height: auto; overflow: visible; min-height: unset; }                            
             .detail-top-svg-box { flex-direction: column; gap: 15px; padding: 10px; }
             .character-target { width: 180px; height: 180px; }
@@ -1215,8 +1224,6 @@
             });
 
             renderCandidates(candidateList);
-            
-            // 1순위 인식 글자 자동 상세 조회 실행
             if (candidateList.length > 0) {
                 selectHanzi(candidateList[0].char);
             }
