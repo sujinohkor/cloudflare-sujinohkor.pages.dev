@@ -10,18 +10,53 @@
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }                                   .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+        a { text-decoration: none; color: inherit; display: block; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
         
         /* 모바일 백드롭 오버레이 */        
-        .sidebar-backdrop {            display: none;            position: fixed;            top: 0; left: 0; width: 100vw; height: 100vh;            background: rgba(0, 0, 0, 0.5);            z-index: 999;            opacity: 0;            transition: opacity 0.3s ease;        }
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-        /* 플로팅 사이드바 */        .sidebar {                         width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         background: rgba(16, 16, 16, 0.25);                         backdrop-filter: blur(16px);                         -webkit-backdrop-filter: blur(16px);                        padding: 25px 20px; z-index: 1000;                         display: flex; flex-direction: column; gap: 12px;                         border: 1px solid rgba(255, 158, 64, 0.35);                         border-radius: 24px;                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;            overflow-y: auto;                 }        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
-        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        /* 플로팅 사이드바 */
+        .sidebar {
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
+            background: rgba(16, 16, 16, 0.25);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 12px;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
+            overflow-y: auto;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
         
-        .main-content {                         margin-left: 300px; padding: 40px; flex: 1;                         display: flex; flex-direction: column; height: 100vh;                         gap: 20px; overflow: hidden; transition: all 0.3s ease;                         width: calc(100% - 300px);        }
+        .main-content {
+            margin-left: 300px; padding: 40px; flex: 1;
+            display: flex; flex-direction: column; height: 100vh;
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;
+            width: calc(100% - 300px);
+        }
         
         .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; }
-        .menu-btn {                         width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        display: flex; align-items: center; justify-content: center; line-height: 1;       }        
+        .menu-btn {
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }        
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }        
         .menu-btn.active-tool { background: rgba(255, 158, 64, 0.35); color: #fff; border-color: #ff9e40; }
         
@@ -29,7 +64,11 @@
         .menu-btn.delete-tool:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
         .menu-btn.delete-tool.active-tool { background: #dc3545; color: #fff; border-color: #dc3545; }
 
-        .bottom-btns {                       display: flex;                       flex-direction: column;                       gap: 10px;        }
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
         /* 도트무늬 배경 적용 카드 */
         .content-card {                         
@@ -41,21 +80,97 @@
             background: radial-gradient(circle, #222 1px, transparent 1px) #101010;
             background-size: 20px 20px;
             position: relative;             
-            transition: all 0.3s ease;       }
+            transition: all 0.3s ease;
+        }
         
-        .card-btn-group {            position: absolute;            top: 15px;            right: 15px;            z-index: 2001;            display: flex;            gap: 8px;        }
-        .action-btn {                         background: #202020;                         color: #ff9e40;                         border: 1px solid #ff9e40;                         padding: 6px 14px;                         border-radius: 8px;                         cursor: pointer;                         font-size: 0.8rem;                         font-weight: bold;                         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         transition: all 0.3s;       }        .action-btn:hover {                         background: #ff9e40;                         color: #101010;       }
+        .card-btn-group {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2001;
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
 
-        body.is-fullscreen .sidebar {            transform: translateX(-120%);            opacity: 0;            pointer-events: none;        }        body.is-fullscreen .main-content {            margin-left: 0 !important;            width: 100vw !important;            padding: 0 !important;            height: 100vh !important;        }        body.is-fullscreen .top-section {            display: none !important;        }        body.is-fullscreen .content-card {            position: fixed !important;            top: 0 !important;            left: 0 !important;            right: 0 !important;            bottom: 0 !important;            width: 100vw !important;            height: 100vh !important;            z-index: 9999 !important;            border-radius: 0 !important;            border: none !important;            padding: 0 !important;            margin: 0 !important;        }
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
 
-        /* 뷰어 영역 스타일 */        .effect-view {            display: block;            width: 100%;            height: 100%;            position: absolute;            top: 0;            left: 0;            background: transparent;            z-index: 15;        }
-        .effect-canvas {            display: block;            width: 100%;            height: 100%;            cursor: crosshair;        }
+        /* 뷰어 영역 스타일 */
+        .effect-view {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 15;
+        }
+        .effect-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
 
         /* Light Mode */
         body.light-mode { background-color: #fff; color: #202020; }                
-        body.light-mode .sidebar {                         background: rgba(255, 255, 255, 0.4);                         border-color: rgba(243, 128, 32, 0.35);                         box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);                 }                         
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {                         background: rgba(0, 0, 0, 0.02);                         color: #F38020;                         border-color: rgba(243, 128, 32, 0.5);         }        
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {                         background: rgba(243, 128, 32, 0.15);                         border-color: rgba(243, 128, 32, 0.4);         }                         
+        body.light-mode .sidebar {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(243, 128, 32, 0.35);
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);
+        }                         
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.02);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.5);
+        }        
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {
+            background: rgba(243, 128, 32, 0.15);
+            border-color: rgba(243, 128, 32, 0.4);
+        }                         
         body.light-mode .menu-btn.active-tool { background: #F38020; color: #fff; }        
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }        
         body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }        
@@ -63,11 +178,25 @@
         body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }        
         body.light-mode .content-card.fullscreen { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff !important; background-size: 20px 20px !important; }
 
-        .menu-toggle-btn {                         display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;                         padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;                         font-weight: bold; cursor: pointer; color: #ffffff;         }                 
+        .menu-toggle-btn {
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;
+            font-weight: bold; cursor: pointer; color: #ffffff;
+        }                 
         @media (max-width: 900px) {                         
             .menu-toggle-btn { display: block; }                         
-            .sidebar {                                 transform: translateX(-320px);                                 background: #101010 !important;                                 backdrop-filter: none !important;                                -webkit-backdrop-filter: none !important;                                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;                 z-index: 3000;             }                         
-            body.light-mode .sidebar {                                background: #ffffff !important;                                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;             }            
+            .sidebar {
+                transform: translateX(-320px);
+                background: #101010 !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;
+                z-index: 3000;
+            }                         
+            body.light-mode .sidebar {
+                background: #ffffff !important;
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;
+            }            
             .sidebar.active { transform: translateX(0); }                         
             .sidebar-backdrop.active { display: block; opacity: 1; }            
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                         
@@ -96,8 +225,11 @@
             <button class="menu-btn" onclick="selectTool('OR', this)">OR</button>
             <button class="menu-btn" onclick="selectTool('NOT', this)">NOT</button>
             
-            <div class="menu-section-title" style="margin-top: 10px;">Editing</div>
+            <div class="menu-section-title" style="margin-top: 10px;">Circuit Management</div>
             <div class="bottom-btns">                           
+                <button class="menu-btn" onclick="exportCircuitJSON()">Export JSON</button>
+                <button class="menu-btn" onclick="document.getElementById('import-file').click()">Import JSON</button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importCircuitJSON(event)">
                 <button class="menu-btn delete-tool" onclick="selectTool('DELETE', this)">Delete</button>
                 <button class="menu-btn" onclick="clearCanvas()">Reset</button>
             </div>                
@@ -116,7 +248,8 @@
 
                 <!-- 회로 캔버스 뷰어 -->                
                 <div class="effect-view">                    
-                    <canvas id="circuitCanvas" class="effect-canvas"></canvas>                </div>
+                    <canvas id="circuitCanvas" class="effect-canvas"></canvas>
+                </div>
             </section>                
         </main>
     </div>
@@ -162,6 +295,81 @@
             if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                                  
                 closeSidebar();            }                 
         });
+
+        /* --- JSON Export / Import 기능 추가 --- */
+        function exportCircuitJSON() {
+            // 컴포넌트 데이터와 와이어 연결 정보(인덱스 기반) 추출
+            const dataToExport = {
+                components: components.map(c => ({
+                    type: c.type,
+                    x: c.x,
+                    y: c.y,
+                    state: c.state
+                })),
+                wires: wires.map(w => ({
+                    fromComp: components.indexOf(w.from.parent),
+                    fromPinType: w.from.parent.outputs.indexOf(w.from) !== -1 ? 'output' : 'input',
+                    fromPinIndex: w.from.parent.outputs.indexOf(w.from) !== -1 ? w.from.parent.outputs.indexOf(w.from) : w.from.parent.inputs.indexOf(w.from),
+                    toComp: components.indexOf(w.to.parent),
+                    toPinIndex: w.to.parent.inputs.indexOf(w.to)
+                }))
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "logic_circuit.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            if (window.innerWidth <= 900) closeSidebar();
+        }
+
+        function importCircuitJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // 컴포넌트 재생성
+                    components = importedData.components.map(data => {
+                        const comp = new Component(data.type, data.x, data.y);
+                        comp.state = data.state !== undefined ? data.state : 0;
+                        if (comp.type === 'SWITCH' && comp.outputs.length > 0) {
+                            comp.outputs[0].val = comp.state;
+                        }
+                        return comp;
+                    });
+
+                    // 와이어 연결 재생성
+                    wires = [];
+                    importedData.wires.forEach(wData => {
+                        const fromComp = components[wData.fromComp];
+                        const toComp = components[wData.toComp];
+                        if (fromComp && toComp) {
+                            const fromPin = fromComp.outputs[wData.fromPinIndex];
+                            const toPin = toComp.inputs[wData.toPinIndex];
+                            if (fromPin && toPin) {
+                                wires.push({ from: fromPin, to: toPin });
+                            }
+                        }
+                    });
+
+                    evaluateCircuit();
+                    drawAll();
+                } catch (err) {
+                    alert("Invalid JSON file format!");
+                    console.error(err);
+                }
+                // 파일 input 초기화 (동일 파일 재선택 가능하도록)
+                event.target.value = '';
+                if (window.innerWidth <= 900) closeSidebar();
+            };
+            reader.readAsText(file);
+        }
 
         /* --- 논리회로 시뮬레이터 로직 --- */
         const canvas = document.getElementById('circuitCanvas');
@@ -271,7 +479,7 @@
             connectingSource = null;
 
             document.querySelectorAll('.sidebar .menu-btn').forEach(btn => {
-                if (!btn.classList.contains('delete-tool') && btn.innerText !== '전체 초기화' && btn.innerText !== 'Home') {
+                if (!btn.classList.contains('delete-tool') && btn.innerText !== 'Reset' && btn.innerText !== 'Home' && btn.innerText !== 'Export JSON' && btn.innerText !== 'Import JSON') {
                     btn.classList.remove('active-tool');
                 }
             });
