@@ -903,7 +903,83 @@
         });
     }
 
-    function selectHanzi(charStr) {
+function selectHanzi(charStr) {
+    if (!charStr) return;
+    charStr = charStr.trim();
+
+    // 1순위: 번체(char)와 정확히 일치하는 항목 찾기
+    let found = db.find(x => x.char && x.char.trim() === charStr);
+
+    // 2순위: 못 찾았다면, 간체(chinese의 첫 글자)와 일치하는 항목 찾기
+    if (!found) {
+        found = db.find(x => {
+            if (!x.chinese) return false;
+            const match = x.chinese.match(/^([\u4e00-\u9fa5])/);
+            return match && match[1] === charStr;
+        });
+    }
+
+    // 3순위: 그래도 못 찾았다면, chinese 필드 전체에 포함되는지 확인
+    if (!found) {
+        found = db.find(x => x.chinese && x.chinese.includes(charStr));
+    }
+
+    const tradTarget = document.getElementById('tradTarget');
+    const simpTarget = document.getElementById('simpTarget');
+    tradTarget.innerHTML = '';
+    simpTarget.innerHTML = '';
+
+    if (!found) {
+        document.getElementById('detailMeaning').innerText = 'Character not found in database.';
+        document.getElementById('detailChinese').innerText = '-';
+        document.getElementById('detailBusu').innerText = '-';
+        document.getElementById('detailStrokes').innerText = '-';
+        return;
+    }
+
+    document.getElementById('detailMeaning').innerText = found.meaning;
+
+    const tradChar = found.char;
+    let simpChar = tradChar;
+    let pinyin = '';
+
+    if (found.chinese) {
+        const match = found.chinese.match(/^([\u4e00-\u9fa5])/);
+        if (match) {
+            simpChar = match[1];
+        }
+        const pinyinMatch = found.chinese.match(/\(.*\)/);
+        if (pinyinMatch) {
+            pinyin = pinyinMatch[0];
+        } else {
+            pinyin = `(${found.chinese})`;
+        }
+    }
+
+    document.getElementById('detailChinese').innerText = `${tradChar} / ${simpChar} ${pinyin}`;
+    document.getElementById('detailBusu').innerText = found.busu;
+    document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
+
+    const writerSize = window.innerWidth <= 900 ? 200 : 320;
+    try {
+        tradWriter = HanziWriter.create('tradTarget', tradChar, {
+            width: writerSize, height: writerSize, padding: 18,
+            showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
+        });
+        tradWriter.animateCharacter();
+
+        simpWriter = HanziWriter.create('simpTarget', simpChar, {
+            width: writerSize, height: writerSize, padding: 15,
+            showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
+        });
+        simpWriter.animateCharacter();
+    } catch (e) {
+        console.error("Hanzi Writer rendering failed:", e);
+    }
+}
+
+
+    /*function selectHanzi(charStr) {
         let found = db.find(x => x.char === charStr);
         if (!found) {
             found = db.find(x => {
@@ -968,7 +1044,7 @@
         } catch (e) {
             console.error("Hanzi Writer rendering failed:", e);
         }
-    }
+    }*/
 
     function animateWriters() {
         if (tradWriter) tradWriter.animateCharacter();
