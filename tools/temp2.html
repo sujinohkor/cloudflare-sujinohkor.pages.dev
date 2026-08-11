@@ -1215,6 +1215,8 @@
             });
 
             renderCandidates(candidateList);
+            
+            // 1순위 인식 글자 자동 상세 조회 실행
             if (candidateList.length > 0) {
                 selectHanzi(candidateList[0].char);
             }
