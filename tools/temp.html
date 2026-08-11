@@ -36,7 +36,6 @@
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
 
-        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
@@ -118,7 +117,7 @@
             flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; 
             padding: 25px; background: transparent; flex-direction: column; 
             align-items: center; justify-content: flex-start;
-            gap: 20px; overflow-y: auto;
+            gap: 15px; overflow-y: auto;
         }
                 
         /* 오른쪽 박스: 결과 목록 & 상세 정보 영역 (1:1 세로 분할) */
@@ -205,7 +204,7 @@
         }
         .secondary-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 필기 인식 캔버스 스타일 (PC 기준 기본 4배 크기: 480x480) */
+        /* 필기 인식 캔버스 스타일 */
         .canvas-wrapper {
             border: 2px dashed #ff9e40;
             border-radius: 12px;
@@ -213,8 +212,8 @@
             background: #202020;
             position: relative;
             cursor: crosshair;
-            width: 480px;
-            height: 480px;
+            width: 320px;
+            height: 320px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -223,8 +222,18 @@
             touch-action: none;
             background: #fff;
             border-radius: 8px;
-            width: 440px;
-            height: 440px;
+            width: 300px;
+            height: 300px;
+        }
+
+        /* 후보군 리스트 패널 */
+        #candidateList {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            min-height: 40px;
+            align-items: center;
+            width: 100%;
         }
 
         /* 결과 목록 스타일 */
@@ -265,7 +274,6 @@
             align-items: center;
             height: 100%;
         }
-        /* 필순 SVG 영역 */
         .character-target {
             width: 140px;
             height: 140px;
@@ -294,7 +302,6 @@
             margin-bottom: 2px;
         }
 
-        /* 그림자 설정 */
         .calc-card, .content-mid, .content-down {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -343,30 +350,28 @@
         body.light-mode .hanzi-result-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
         body.light-mode .character-target { background: #fff; border-color: #ddd; }
         body.light-mode .canvas-wrapper { background: #fafafa; border-color: #e68a35; }
-        /* DAY 모드에서 상세 정보 텍스트를 검정색으로 설정 */
         body.light-mode .detail-info { color: #202020; }
 
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
-        @media (max-width: 900px) {                                            
-            .menu-toggle-btn { display: block; }                                            
+        @media (max-width: 900px) {                            
+            .menu-toggle-btn { display: block; }                            
             .sidebar { 
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                                            
+            }                            
             body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .sidebar.active { transform: translateX(0); }                                            
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                                            
-            .workspace-container { flex-direction: column; overflow: visible; }                                            
-            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                                            
-            .content-down { height: auto; overflow: visible; min-height: 500px; }                                    
-            /* 모바일 환경에서는 캔버스 크기를 기존 설정(220px)으로 유지 */
+            .sidebar.active { transform: translateX(0); }                            
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }                            
+            .workspace-container { flex-direction: column; overflow: visible; }                            
+            .content-mid { height: auto; overflow: visible; flex: none; align-items: center; }                            
+            .content-down { height: auto; overflow: visible; min-height: 500px; }                            
             .canvas-wrapper {
                 width: 220px;
                 height: 220px;
@@ -390,7 +395,7 @@
 
         <div class="search-container">
             <span class="control-label">한자/음/뜻 검색</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                            
+            <input type="text" id="searchInput" class="search-input" placeholder="Search term..." oninput="searchHanziText()">                        
         </div>
 
         <div class="control-group" id="algo-select-group">
@@ -621,15 +626,21 @@
                     <label>✍️ 필기 인식 (마우스로 그리세요)</label>
                 </div>
                 <div class="canvas-wrapper">
-                    <canvas id="drawCanvas" width="440" height="440"></canvas>
+                    <canvas id="drawCanvas" width="300" height="300"></canvas>
                 </div>
-                <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
+                <div class="input-group">
+                    <label>🎯 인식 후보군 (Top 5)</label>
+                    <div id="candidateList">
+                        <span style="font-size: 0.8rem; color: #888;">글씨를 그린 후 '인식하기'를 누르세요.</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px;">
                     <button class="secondary-btn" style="flex: 1;" onclick="clearCanvas()">지우기</button>
                     <button class="secondary-btn" style="flex: 1;" onclick="recognizeCanvas()">인식하기</button>
                 </div>
             </section>
 
-            <!-- 오른쪽 박스: 결과 목록 및 상세 정보 영역 (1:1 세로 분할) -->
+            <!-- 오른쪽 박스: 결과 목록 및 상세 정보 영역 -->
             <section class="content-down">
                 <!-- 결과 목록 카드 -->
                 <div class="calc-card">
@@ -705,11 +716,9 @@
                 return await res.arrayBuffer();
             });
 
-            // 문자 사전 파일 로드 및 빈 줄 완벽 제거 파싱
             const dictPromise = fetch('/models/mandarin-onnx.txt').then(async (res) => {
                 if (!res.ok) throw new Error("사전 파일(mandarin-onnx.txt) 로드 실패");
                 const text = await res.text();
-                // 줄바꿈으로 쪼갠 후, 공백이거나 빈 문자열은 완전히 제외하여 정확한 인덱스 매핑 보장
                 return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
             });
 
@@ -838,7 +847,7 @@
     let isDrawing = false;
 
     function initCanvas() {
-        ctx.lineWidth = 12;
+        ctx.lineWidth = 14;
         ctx.lineCap = 'round';
         ctx.strokeStyle = '#101010';
 
@@ -888,9 +897,44 @@
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         strokeCount = 0;
+        document.getElementById('candidateList').innerHTML = '<span style="font-size: 0.8rem; color: #888;">글씨를 그린 후 \'인식하기\'를 누르세요.</span>';
     }
 
-    // ONNX 모델 추론 및 사전 매핑을 수행하는 인식 함수
+    // 후보군 버튼 UI 렌더링 함수
+    function renderCandidates(candidates) {
+        const container = document.getElementById('candidateList');
+        container.innerHTML = '';
+
+        if (candidates.length === 0) {
+            container.innerHTML = '<span style="font-size: 0.8rem; color: #888;">인식된 후보가 없습니다.</span>';
+            return;
+        }
+
+        candidates.forEach((cand, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'secondary-btn';
+            btn.style.flex = '1';
+            btn.style.padding = '8px 4px';
+            btn.style.fontSize = '0.8rem';
+            btn.innerHTML = `<strong>${idx + 1}.</strong> ${cand.char} <span style="font-size:0.65rem; color:#ff9e40;">(${cand.confidence}%)</span>`;
+            
+            btn.onclick = () => {
+                const found = db.find(x => x.char === cand.char);
+                if (found) {
+                    selectHanzi(found.char);
+                } else {
+                    document.getElementById('detailChar').innerText = cand.char;
+                    document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
+                    document.getElementById('detailChinese').innerText = '-';
+                    document.getElementById('detailBusu').innerText = '-';
+                    document.getElementById('detailStrokes').innerText = '-';
+                }
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    // ONNX 모델 추론 및 Top-5 후보군 추출 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -910,18 +954,14 @@
             tempCtx.fillRect(0, 0, inputSize, inputSize);
             tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
             
-            // 캔버스 이미지 가져오기
             const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
             const floatData = new Float32Array(3 * inputSize * inputSize);
             
             for (let i = 0; i < inputSize * inputSize; i++) {
-                // 원본: 흰 배경(255), 검정 글씨(0)
-                // 변환: 검정 배경(0), 흰 글씨(255)로 반전
                 const r = 255 - imgData[i * 4];
                 const g = 255 - imgData[i * 4 + 1];
                 const b = 255 - imgData[i * 4 + 2];
                 
-                // 정규화 (0~1 사이 값)
                 floatData[i] = r / 255.0;
                 floatData[inputSize * inputSize + i] = g / 255.0;
                 floatData[inputSize * inputSize * 2 + i] = b / 255.0;
@@ -935,50 +975,51 @@
             const dims = outputTensor.dims; // [1, 6, 18385]
             const outputData = outputTensor.data;
 
-            const seqLen = dims[1];    // 6 (시간축/타임스텝)
-            const numClasses = dims[2]; // 18385 (글자 종류)
+            const seqLen = dims[1];    
+            const numClasses = dims[2]; 
 
-            let recognizedChar = "";
-
-            // 6개의 칸(타임스텝)을 하나씩 돌면서 가장 확실하게 인식된 글자 찾기
-            for (let t = 0; t < seqLen; t++) {
-                let maxIdx = 0;
-                let maxVal = outputData[t * numClasses];
-
-                for (let i = 1; i < numClasses; i++) {
-                    const val = outputData[t * numClasses + i];
-                    if (val > maxVal) {
-                        maxVal = val;
-                        maxIdx = i;
-                    }
-                }
-
-                if (maxIdx > 0 && maxIdx < dict.length) {
-                    recognizedChar = dict[maxIdx];
-                    console.log(`타임스텝 ${t}에서 인식된 글자: ${recognizedChar} (인덱스: ${maxIdx})`);
-                    break; 
-                }
+            const t = 0; 
+            const stepOffset = t * numClasses;
+            
+            let scoredClasses = [];
+            for (let i = 0; i < numClasses; i++) {
+                scoredClasses.push({ index: i, score: outputData[stepOffset + i] });
             }
 
-            console.log("최종 인식된 글자:", recognizedChar);
+            scoredClasses.sort((a, b) => b.score - a.score);
+            const top5 = scoredClasses.slice(0, 5);
 
-            if (!recognizedChar) {
-                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
-                return;
-            }
+            const maxScore = top5[0].score;
+            const expScores = top5.map(item => Math.exp(item.score - maxScore));
+            const sumExp = expScores.reduce((a, b) => a + b, 0);
+            const confidences = expScores.map(exp => (exp / sumExp) * 100);
 
-            // 보유 중인 DB에서 검색
-            const found = db.find(x => x.char === recognizedChar);
-            if (found) {
-                alert(`ONNX 인식 결과: '${found.char}' (${found.meaning})`);
-                selectHanzi(found.char);
+            let candidateList = [];
+            top5.forEach((item, idx) => {
+                if (item.index > 0 && item.index < dict.length) {
+                    candidateList.push({
+                        char: dict[item.index],
+                        confidence: confidences[idx].toFixed(1)
+                    });
+                }
+            });
+
+            renderCandidates(candidateList);
+
+            if (candidateList.length > 0) {
+                const bestChar = candidateList[0].char;
+                const found = db.find(x => x.char === bestChar);
+                if (found) {
+                    selectHanzi(found.char);
+                } else {
+                    document.getElementById('detailChar').innerText = bestChar;
+                    document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
+                    document.getElementById('detailChinese').innerText = '-';
+                    document.getElementById('detailBusu').innerText = '-';
+                    document.getElementById('detailStrokes').innerText = '-';
+                }
             } else {
-                alert(`ONNX 인식 결과: '${recognizedChar}' (DB에 상세 정보 없음)`);
-                document.getElementById('detailChar').innerText = recognizedChar;
-                document.getElementById('detailMeaning').innerText = '상세 정보가 등록되지 않은 한자입니다.';
-                document.getElementById('detailChinese').innerText = '-';
-                document.getElementById('detailBusu').innerText = '-';
-                document.getElementById('detailStrokes').innerText = '-';
+                alert("인식된 문자를 사전에서 찾을 수 없습니다.");
             }
 
         } catch (err) {
