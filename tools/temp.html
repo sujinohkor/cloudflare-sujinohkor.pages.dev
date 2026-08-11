@@ -934,7 +934,7 @@
         });
     }
 
-    // ONNX 모델 추론 및 순수 한자 Top-5 후보군 필터링 함수
+    // ONNX 모델 추론 및 동적 비율(Dynamic Width, Height 48, RGB 3채널) 전처리 적용 함수
     async function recognizeCanvas() {
         if (strokeCount === 0) {
             alert("인식할 글자를 캔버스에 그려주세요.");
@@ -944,35 +944,44 @@
         try {
             const { session, dict } = await getHanziSession();
             
-            const inputSize = 48; // 모델 입력 규격 (48x48)
+            const targetHeight = 48; // 모델이 요구하는 고정 높이
+            const srcAspect = canvas.width / canvas.height;
+            const targetWidth = Math.max(48, Math.round(targetHeight * srcAspect)); // 비율 유지 동적 너비
+
             const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = inputSize;
-            tempCanvas.height = inputSize;
+            tempCanvas.width = targetWidth;
+            tempCanvas.height = targetHeight;
             const tempCtx = tempCanvas.getContext('2d');
             
+            // 흰색 배경 채우기
             tempCtx.fillStyle = "#FFFFFF";
-            tempCtx.fillRect(0, 0, inputSize, inputSize);
-            tempCtx.drawImage(canvas, 0, 0, inputSize, inputSize);
+            tempCtx.fillRect(0, 0, targetWidth, targetHeight);
             
-            const imgData = tempCtx.getImageData(0, 0, inputSize, inputSize).data;
-            const floatData = new Float32Array(3 * inputSize * inputSize);
+            // 비율 유지하며 드로잉 캔버스 내용 복사
+            tempCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
             
-            for (let i = 0; i < inputSize * inputSize; i++) {
+            const imgData = tempCtx.getImageData(0, 0, targetWidth, targetHeight).data;
+            const floatData = new Float32Array(3 * targetWidth * targetHeight);
+            
+            for (let i = 0; i < targetWidth * targetHeight; i++) {
+                // 흰 배경(255) / 검은 선(0) 반전 처리
                 const r = 255 - imgData[i * 4];
                 const g = 255 - imgData[i * 4 + 1];
                 const b = 255 - imgData[i * 4 + 2];
                 
+                // RGB 3채널 정규화 (0~1 범위)
                 floatData[i] = r / 255.0;
-                floatData[inputSize * inputSize + i] = g / 255.0;
-                floatData[inputSize * inputSize * 2 + i] = b / 255.0;
+                floatData[targetWidth * targetHeight + i] = g / 255.0;
+                floatData[targetWidth * targetHeight * 2 + i] = b / 255.0;
             }
 
-            const inputTensor = new ort.Tensor('float32', floatData, [1, 3, inputSize, inputSize]);
+            // 동적 텐서 [1, 3, 48, targetWidth] 생성
+            const inputTensor = new ort.Tensor('float32', floatData, [1, 3, targetHeight, targetWidth]);
             const feeds = { [session.inputNames[0]]: inputTensor };
             
             const results = await session.run(feeds);
             const outputTensor = results[session.outputNames[0]];
-            const dims = outputTensor.dims; // [1, 6, 18385]
+            const dims = outputTensor.dims; 
             const outputData = outputTensor.data;
 
             const seqLen = dims[1];    
@@ -986,10 +995,9 @@
                 scoredClasses.push({ index: i, score: outputData[stepOffset + i] });
             }
 
-            // 점수 기준 내림차순 정렬
             scoredClasses.sort((a, b) => b.score - a.score);
 
-            // 💡 순수 한자(CJK Unified Ideographs)만 필터링하여 상위 5개 추출
+            // 순수 한자(CJK Unified Ideographs)만 필터링하여 상위 5개 추출
             let filteredTop5 = [];
             for (let item of scoredClasses) {
                 if (filteredTop5.length >= 5) break;
@@ -997,7 +1005,6 @@
                 let idx = item.index;
                 if (idx > 0 && idx < dict.length) {
                     let char = dict[idx];
-                    // 정규식을 이용해 순수 한자 여부 검사 (\u4e00-\u9fa5 영역)
                     const isHanzi = /^[\u4e00-\u9fa5]+$/.test(char);
                     if (isHanzi) {
                         filteredTop5.push(item);
@@ -1010,7 +1017,6 @@
                 return;
             }
 
-            // 소프트맥스를 통한 상대적 확률 계산
             const maxScore = filteredTop5[0].score;
             const expScores = filteredTop5.map(item => Math.exp(item.score - maxScore));
             const sumExp = expScores.reduce((a, b) => a + b, 0);
@@ -1026,7 +1032,6 @@
 
             renderCandidates(candidateList);
 
-            // 1위 후보 자동 선택
             const bestChar = candidateList[0].char;
             const found = db.find(x => x.char === bestChar);
             if (found) {
