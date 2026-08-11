@@ -1044,6 +1044,11 @@
                 document.getElementById('detailStrokes').innerText = '-';
             }
 
+            const results = await session.run(feeds);
+            const outputTensor = results[session.outputNames[0]];
+            console.log("모델 출력 텐서 형태(Dims):", outputTensor.dims);
+            console.log("출력 데이터 상위 20개:", outputTensor.data.slice(0, 20));
+
         } catch (err) {
             console.error("ONNX 추론 오류:", err);
             alert("모델 추론 중 오류가 발생했습니다. (콘솔창 확인)");
