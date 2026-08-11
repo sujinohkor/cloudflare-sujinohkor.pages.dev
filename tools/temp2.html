@@ -215,8 +215,8 @@
             font-weight: bold;
         }
         .character-target {
-            width: 220px;
-            height: 220px;
+            width: 320px;
+            height: 320px;
             border: 1px solid #333;
             border-radius: 12px;
             background: #202020;
@@ -939,10 +939,10 @@
         document.getElementById('detailBusu').innerText = found.busu;
         document.getElementById('detailStrokes').innerText = found.strokes + ' strokes';
 
-        const writerSize = window.innerWidth <= 900 ? 180 : 220;
+        const writerSize = window.innerWidth <= 900 ? 200 : 320;
         try {
             tradWriter = HanziWriter.create('tradTarget', tradChar, {
-                width: writerSize, height: writerSize, padding: 15,
+                width: writerSize, height: writerSize, padding: 18,
                 showOutline: true, strokeAnimationSpeed: 1, delayBetweenStrokes: 300, strokeColor: '#ff9e40'
             });
             tradWriter.animateCharacter();
