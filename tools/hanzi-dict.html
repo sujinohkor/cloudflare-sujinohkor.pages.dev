@@ -776,6 +776,14 @@
     let canvasInitialized = false;
     let strokeCount = 0;
 
+    // 이체자 상호 매핑 맵 (앞으로 이런 글자가 또 생기면 여기에 추가하면 됩니다)
+    const charNormalizationMap = {
+        "為": "爲"
+    };
+    function normalizeChar(charStr) {
+        return charNormalizationMap[charStr] || charStr;
+    }
+    
     // 모드 전환 함수 ('list' 또는 'drawing')
     function switchMode(mode) {
         const btnList = document.getElementById('btnModeList');
@@ -904,6 +912,7 @@
     }
 
     function selectHanzi(charStr) {
+        charStr = normalizeChar(charStr); // <-- 이 줄을 여기에 추가
         let found = db.find(x => x.char === charStr);
         if (!found) {
             found = db.find(x => {
@@ -978,8 +987,8 @@
     function onSearchInput() {
         document.getElementById('filterBusu').value = '';
         document.getElementById('filterStrokes').value = '';
-
-        const query = document.getElementById('searchInput').value.trim();
+        
+        const query = normalizeChar(document.getElementById('searchInput').value.trim()); // <-- 쿼리도 정규화
         if(!query) {
             renderList(db);
             return;
@@ -1223,7 +1232,7 @@
             let candidateList = [];
             filteredTop5.forEach((item, idx) => {
                 candidateList.push({
-                    char: dict[item.index],
+                    char: normalizeChar(dict[item.index]), // <-- dict[item.index]를 함수로 감싸기
                     confidence: confidences[idx].toFixed(1)
                 });
             });
