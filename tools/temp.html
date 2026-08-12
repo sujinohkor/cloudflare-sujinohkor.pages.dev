@@ -127,10 +127,13 @@
         .word-span {
             position: relative;
             cursor: pointer;
-            padding: 2px 4px;
-            margin: 0 1px;
-            border-radius: 3px;
+            padding: 2px 2px;
+            margin: 0 0.5px;
+            display: inline-block;
         }
+        /* 단어 내부 글자들의 테두리/간격 자연스럽게 연결 */
+        .word-span:first-of-type { border-top-left-radius: 3px; border-bottom-left-radius: 3px; padding-left: 4px; }
+        .word-span:last-of-type { border-top-right-radius: 3px; border-bottom-right-radius: 3px; padding-right: 4px; }
 
         /* 최상위 Body 기반 전역 툴팁 스타일 */
         #global-tooltip {
@@ -330,12 +333,17 @@
             let htmlOutput = '';
             tokens.forEach(token => {
                 if (token.found) {
-                    // 내부 HTML 툴팁 태그를 제거하고 데이터 속성(dataset)으로 데이터 전달
-                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">
-                        ${token.word}
-                    </span>`;
+                    // 단어 내 각 글자를 쪼개서 개별 span으로 생성하여 줄바꿈 오작동 방지
+                    for (let i = 0; i < token.word.length; i++) {
+                        const char = token.word[i];
+                        htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">
+                            ${char}
+                        </span>`;
+                    }
                 } else {
-                    htmlOutput += `<span class="hsk-unknown">${token.word}</span>`;
+                    for (let i = 0; i < token.word.length; i++) {
+                        htmlOutput += `<span class="hsk-unknown">${token.word[i]}</span>`;
+                    }
                 }
             });
             
