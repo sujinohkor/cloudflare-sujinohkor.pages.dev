@@ -32,7 +32,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'hsk_words.json';
+    a.download = 'hsk-words.json';
     document.body.appendChild(a);
     a.click();
     a.remove();
