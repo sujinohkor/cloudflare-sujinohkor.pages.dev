@@ -111,6 +111,7 @@
             resize: none;
             box-sizing: border-box;
             outline: none;
+            white-space: pre-wrap;
         }
         textarea.viewer-textarea:focus { border-color: #ff9e40; }
 
@@ -170,6 +171,7 @@
             overflow-x: hidden;
             word-break: keep-all;
             overflow-wrap: break-word;
+            white-space: pre-wrap; /* 줄바꿈 반영을 위해 추가된 속성 */
         }
 
         .mini-action-btn {
@@ -227,24 +229,24 @@
         /* 5. Mobile Responsive */
         .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
         @media (max-width: 900px) {
-            body { overflow: auto; height: auto; }                        
-            .menu-toggle-btn { display: block; }                        
+            body { overflow: auto; height: auto; }                    
+            .menu-toggle-btn { display: block; }                    
             .sidebar { 
                 transform: translateX(-320px); 
                 background: #101010 !important; 
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                        
+            }                    
             body.light-mode .sidebar { 
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .sidebar.active { transform: translateX(0); }                        
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }                        
-            .workspace-container { flex-direction: column; overflow: visible; }                        
-            .content-left { height: auto; min-height: 200px; overflow-y: auto; flex: none; }                        
-            .content-right { height: auto; overflow: visible; min-height: unset; }                        
+            .sidebar.active { transform: translateX(0); }                    
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }                    
+            .workspace-container { flex-direction: column; overflow: visible; }                    
+            .content-left { height: auto; min-height: 200px; overflow-y: auto; flex: none; }                    
+            .content-right { height: auto; overflow: visible; min-height: unset; }                    
         }
     </style>
 </head>
@@ -336,18 +338,28 @@
             
             let htmlOutput = '';
             tokens.forEach(token => {
-                if (token.found) {
-                    // 단어 단위 래퍼로 감싸고, 내부 글자만 조각내어 줄바꿈 유연성 확보
-                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">`;
-                    for (let i = 0; i < token.word.length; i++) {
-                        htmlOutput += `<span class="word-char">${token.word[i]}</span>`;
+                // 토큰 내부에 포함된 줄바꿈(\n) 처리
+                const parts = token.word.split('\n');
+                
+                parts.forEach((part, index) => {
+                    if (index > 0) {
+                        htmlOutput += '<br>';
                     }
-                    htmlOutput += `</span>`;
-                } else {
-                    for (let i = 0; i < token.word.length; i++) {
-                        htmlOutput += `<span class="hsk-unknown">${token.word[i]}</span>`;
+
+                    if (part) {
+                        if (token.found) {
+                            htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">`;
+                            for (let i = 0; i < part.length; i++) {
+                                htmlOutput += `<span class="word-char">${part[i]}</span>`;
+                            }
+                            htmlOutput += `</span>`;
+                        } else {
+                            for (let i = 0; i < part.length; i++) {
+                                htmlOutput += `<span class="hsk-unknown">${part[i]}</span>`;
+                            }
+                        }
                     }
-                }
+                });
             });
             
             viewer.innerHTML = htmlOutput;
