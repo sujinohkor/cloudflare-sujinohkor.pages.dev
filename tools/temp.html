@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>HSK 단어장</title>
+</head>
+<body>
+    <ul id="word-list"></ul>
+
+    <script>
+        fetch('/codes/hsk/hsk-words-1-cleaned.json')
+            .then(response => response.json())
+            .then(words => {
+                const listElement = document.getElementById('word-list');
+                
+                words.forEach(item => {
+                    const li = document.createElement('li');
+                    // 키값 수정: item.speech -> item['part of speech']
+                    li.textContent = `${item.word} (${item.pinyin}) - ${item.translation} [${item['part of speech']}]`;
+                    listElement.appendChild(li);
+                });
+            })
+            .catch(error => console.error('데이터 로드 실패:', error));
+    </script>
+</body>
+</html>
