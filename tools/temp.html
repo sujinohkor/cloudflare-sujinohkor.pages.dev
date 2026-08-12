@@ -121,7 +121,7 @@
         .hsk-4 { background-color: #522d1f; color: #fbd38d; }
         .hsk-5 { background-color: #5b2121; color: #feb2b2; }
         .hsk-6 { background-color: #3b2c56; color: #d6bcfa; }
-        .hsk-7 { background-color: #1a4944; color: #4ust9d; }
+        .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
         .hsk-unknown { background-color: transparent; color: inherit; }
 
         .word-span {
@@ -341,6 +341,11 @@
             console.error(error);
             viewer.innerHTML = "An error occurred. Please check the console.";
         }
+    }
+
+    function resetAll() {
+        document.getElementById('inputText').value = '';
+        document.getElementById('viewerResult').innerHTML = 'Analysis results will appear here.';
     }
 </script>
 </body>
