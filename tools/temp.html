@@ -164,7 +164,10 @@
             border-radius: 8px;
             height: 100%;
             overflow-y: auto;
-            word-break: break-all;
+            /*word-break: break-all;*/
+            overflow-x: hidden;           /* 가로 스크롤 원천 차단 */
+            word-break: keep-all;         /* 어절 단위 또는 자연스러운 줄바꿈 */
+            overflow-wrap: break-word;    /* 너무 긴 단어가 올 경우에만 안전하게 줄바꿈 */
         }
 
         .mini-action-btn {
