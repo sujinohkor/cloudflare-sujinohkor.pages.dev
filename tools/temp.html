@@ -2,25 +2,157 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>HSK 단어장</title>
+    <title>HSK 어휘 분석기 및 독해 뷰어</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+        h2 {
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+        #viewer {
+            line-height: 2.5;
+            font-size: 18px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-top: 20px;
+            background-color: #fafafa;
+            min-height: 150px;
+            word-break: break-all;
+        }
+
+        /* HSK 레벨별 색상 매핑 스타일 */
+        .hsk-1 { background-color: #d0e8ff; }
+        .hsk-2 { background-color: #d4edda; }
+        .hsk-3 { background-color: #fff3cd; }
+        .hsk-4 { background-color: #ffeeba; }
+        .hsk-5 { background-color: #f8d7da; }
+        .hsk-6 { background-color: #e2d9f3; }
+        .hsk-7 { background-color: #d1ecf1; }
+        .hsk-unknown { background-color: transparent; }
+
+        /* 단어 툴팁 스타일 */
+        .word-span {
+            position: relative;
+            cursor: pointer;
+            padding: 2px 4px;
+            margin: 0 1px;
+            border-radius: 3px;
+        }
+        .word-span .tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 14px;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+        }
+        .word-span:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <ul id="word-list"></ul>
 
-    <script>
-        fetch('/codes/hsk/hsk-words-1-cleaned.json')
-            .then(response => response.json())
-            .then(words => {
-                const listElement = document.getElementById('word-list');
-                
-                words.forEach(item => {
-                    const li = document.createElement('li');
-                    // 키값 수정: item.speech -> item['part of speech']
-                    li.textContent = `${item.word} (${item.pinyin}) - ${item.translation} [${item['part of speech']}]`;
-                    listElement.appendChild(li);
-                });
-            })
-            .catch(error => console.error('데이터 로드 실패:', error));
-    </script>
+    <h2>HSK 어휘 분석기 및 독해 뷰어</h2>
+    
+    <textarea id="inputText" placeholder="분석할 중국어 텍스트를 입력하세요..."></textarea>
+    <br>
+    <button onclick="analyzeText()">분석 실행</button>
+
+    <div id="viewer">분석 결과가 여기에 표시됩니다.</div>
+
+<script>
+// 배포한 Cloudflare Worker의 실제 URL로 변경해주세요. (예: https://hsk-analyzer.your-subdomain.workers.dev)
+const WORKER_URL = "https://mandarin-segmenter.sujinohkor.workers.dev";
+
+async function analyzeText() {
+    const text = document.getElementById('inputText').value.trim();
+    const viewer = document.getElementById('viewer');
+    
+    if (!text) {
+        alert("텍스트를 입력해주세요.");
+        return;
+    }
+
+    viewer.innerHTML = "분석 중...";
+
+    try {
+        const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ text: text })
+        });
+
+        if (!response.ok) {
+            throw new Error("서버 통신에 실패했습니다.");
+        }
+
+        const data = await response.json();
+        const tokens = data.tokens;
+        
+        let htmlOutput = '';
+        tokens.forEach(token => {
+            if (token.found) {
+                htmlOutput += `<span class="word-span hsk-${token.level}">
+                    ${token.word}
+                    <span class="tooltip"><strong>[HSK ${token.level}급]</strong><br>${token.pinyin}<br>${token.translation}</span>
+                </span>`;
+            } else {
+                htmlOutput += `<span class="hsk-unknown">${token.word}</span>`;
+            }
+        });
+        
+        viewer.innerHTML = htmlOutput;
+
+    } catch (error) {
+        console.error(error);
+        viewer.innerHTML = "오류가 발생했습니다. 콘솔을 확인해주세요.";
+    }
+}
+</script>
+
 </body>
 </html>
