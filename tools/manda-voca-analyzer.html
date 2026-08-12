@@ -131,28 +131,24 @@
             margin: 0 1px;
             border-radius: 3px;
         }
-        .word-span .tooltip {
-            visibility: hidden;
+
+        /* 최상위 Body 기반 전역 툴팁 스타일 */
+        #global-tooltip {
+            position: fixed;
+            z-index: 99999;
             width: 200px;
             background-color: #222;
             color: #fff;
             text-align: center;
             border-radius: 6px;
             padding: 8px;
-            position: absolute;
-            z-index: 10;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.2s;
             font-size: 14px;
             border: 1px solid #ff9e40;
             box-shadow: 0px 4px 6px rgba(0,0,0,0.5);
-        }
-        .word-span:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
+            pointer-events: none;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         #viewerResult {
@@ -164,10 +160,9 @@
             border-radius: 8px;
             height: 100%;
             overflow-y: auto;
-            /*word-break: break-all;*/
-            overflow-x: hidden;           /* 가로 스크롤 원천 차단 */
-            word-break: keep-all;         /* 어절 단위 또는 자연스러운 줄바꿈 */
-            overflow-wrap: break-word;    /* 너무 긴 단어가 올 경우에만 안전하게 줄바꿈 */
+            overflow-x: hidden;
+            word-break: keep-all;
+            overflow-wrap: break-word;
         }
 
         .mini-action-btn {
@@ -209,10 +204,11 @@
         }
         body.light-mode textarea.viewer-textarea { background: #fff; color: #202020; border-color: #ccc; }
         body.light-mode #viewerResult { background: #fff; color: #202020; border-color: #ccc; }
+        body.light-mode #global-tooltip { background-color: #fff; color: #202020; border-color: #F38020; box-shadow: 0px 4px 10px rgba(243, 128, 32, 0.2); }
         body.light-mode .mini-action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
 
-        /* 👇 데이모드(라이트모드) 전용 HSK 레벨별 밝은 파스텔톤 배경색 및 선명한 글자색 */
+        /* 데이모드(라이트모드) 전용 HSK 레벨별 밝은 파스텔톤 배경색 및 선명한 글자색 */
         body.light-mode .hsk-1 { background-color: #ebf8ff; color: #2b6cb0; }
         body.light-mode .hsk-2 { background-color: #f0fff4; color: #22543d; }
         body.light-mode .hsk-3 { background-color: #fffaf0; color: #744210; }
@@ -289,6 +285,10 @@
         </div>
     </main>
 </div>
+
+<!-- 최상위 Body 전역 툴팁 요소 생성 -->
+<div id="global-tooltip"></div>
+
 <script>
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
@@ -298,6 +298,7 @@
     });
 
     const WORKER_URL = "https://mandarin-segmenter.sujinohkor.workers.dev";
+    const globalTooltip = document.getElementById('global-tooltip');
 
     async function analyzeText() {
         const text = document.getElementById('inputText').value.trim();
@@ -329,9 +330,9 @@
             let htmlOutput = '';
             tokens.forEach(token => {
                 if (token.found) {
-                    htmlOutput += `<span class="word-span hsk-${token.level}">
+                    // 내부 HTML 툴팁 태그를 제거하고 데이터 속성(dataset)으로 데이터 전달
+                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">
                         ${token.word}
-                        <span class="tooltip"><strong>[HSK Level ${token.level}]</strong><br>${token.pinyin}<br>${token.translation}</span>
                     </span>`;
                 } else {
                     htmlOutput += `<span class="hsk-unknown">${token.word}</span>`;
@@ -339,6 +340,7 @@
             });
             
             viewer.innerHTML = htmlOutput;
+            bindTooltipEvents();
 
         } catch (error) {
             console.error(error);
@@ -346,9 +348,54 @@
         }
     }
 
+    // 마우스 호버 시 최상위 <body>에 좌표를 계산하여 툴팁 위치 설정
+    function bindTooltipEvents() {
+        const wordSpans = document.querySelectorAll('.word-span');
+        
+        wordSpans.forEach(span => {
+            span.addEventListener('mouseenter', (e) => {
+                const level = span.getAttribute('data-level');
+                const pinyin = span.getAttribute('data-pinyin');
+                const translation = span.getAttribute('data-translation');
+                
+                globalTooltip.innerHTML = `<strong>[HSK Level ${level}]</strong><br>${pinyin}<br>${translation}`;
+                globalTooltip.style.display = 'block';
+                
+                const rect = span.getBoundingClientRect();
+                const tooltipRect = globalTooltip.getBoundingClientRect();
+                
+                // 기본 위치: 단어 가운데 위쪽
+                let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                let top = rect.top - tooltipRect.height - 8;
+                
+                // 만약 위쪽 공간이 부족하면 단어 아래쪽에 표시
+                if (top < 10) {
+                    top = rect.bottom + 8;
+                }
+                
+                // 화면 왼쪽/오른쪽 벽에 부딪힐 경우 보정
+                if (left < 10) {
+                    left = 10;
+                } else if (left + tooltipRect.width > window.innerWidth - 10) {
+                    left = window.innerWidth - tooltipRect.width - 10;
+                }
+                
+                globalTooltip.style.left = `${left}px`;
+                globalTooltip.style.top = `${top}px`;
+                globalTooltip.style.opacity = '1';
+            });
+            
+            span.addEventListener('mouseleave', () => {
+                globalTooltip.style.opacity = '0';
+                globalTooltip.style.display = 'none';
+            });
+        });
+    }
+
     function resetAll() {
         document.getElementById('inputText').value = '';
         document.getElementById('viewerResult').innerHTML = 'Analysis results will appear here.';
+        globalTooltip.style.display = 'none';
     }
 </script>
 </body>
