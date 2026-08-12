@@ -223,6 +223,7 @@
             <button class="menu-btn" onclick="selectTool('LED', this)">OUTPUT (LED)</button>
             <button class="menu-btn" onclick="selectTool('AND', this)">AND</button>
             <button class="menu-btn" onclick="selectTool('OR', this)">OR</button>
+            <button class="menu-btn" onclick="selectTool('XOR', this)">XOR</button>
             <button class="menu-btn" onclick="selectTool('NOT', this)">NOT</button>
             
             <div class="menu-section-title" style="margin-top: 10px;">Circuit Management</div>
@@ -589,6 +590,9 @@
                         c.outputs[0].val = (c.inputs[0].val & c.inputs[1].val);
                     } else if (c.type === 'OR') {
                         c.outputs[0].val = (c.inputs[0].val | c.inputs[1].val);
+                    } else if (c.type === 'XOR') {
+                        // XOR 연산: 두 입력이 다를 때 1, 같을 때 0
+                        c.outputs[0].val = (c.inputs[0].val !== c.inputs[1].val) ? 1 : 0;
                     } else if (c.type === 'NOT') {
                         c.outputs[0].val = c.inputs[0].val === 0 ? 1 : 0;
                     } else if (c.type === 'LED') {
