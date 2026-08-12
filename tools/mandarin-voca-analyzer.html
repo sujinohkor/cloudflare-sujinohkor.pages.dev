@@ -124,12 +124,19 @@
         .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
         .hsk-unknown { background-color: transparent; color: inherit; }
 
+        /* 단어 단위 래퍼 (배경색과 패딩은 여기에 적용) */
         .word-span {
             position: relative;
             cursor: pointer;
             padding: 2px 4px;
             margin: 0 1px;
             border-radius: 3px;
+            display: inline;
+        }
+
+        /* 내부 글자 조각 (배경색 없이 줄바꿈만 유연하게 처리) */
+        .word-char {
+            display: inline;
         }
 
         /* 최상위 Body 기반 전역 툴팁 스타일 */
@@ -330,12 +337,16 @@
             let htmlOutput = '';
             tokens.forEach(token => {
                 if (token.found) {
-                    // 내부 HTML 툴팁 태그를 제거하고 데이터 속성(dataset)으로 데이터 전달
-                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">
-                        ${token.word}
-                    </span>`;
+                    // 단어 단위 래퍼로 감싸고, 내부 글자만 조각내어 줄바꿈 유연성 확보
+                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">`;
+                    for (let i = 0; i < token.word.length; i++) {
+                        htmlOutput += `<span class="word-char">${token.word[i]}</span>`;
+                    }
+                    htmlOutput += `</span>`;
                 } else {
-                    htmlOutput += `<span class="hsk-unknown">${token.word}</span>`;
+                    for (let i = 0; i < token.word.length; i++) {
+                        htmlOutput += `<span class="hsk-unknown">${token.word[i]}</span>`;
+                    }
                 }
             });
             
