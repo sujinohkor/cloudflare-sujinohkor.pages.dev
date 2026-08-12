@@ -36,5 +36,5 @@
     document.body.appendChild(a);
     a.click();
     a.remove();
-    console.log("hsk_words.json 파일 다운로드 완료!");
+    console.log("hsk-words.json 파일 다운로드 완료!");
 })();
