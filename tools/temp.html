@@ -122,9 +122,11 @@
         .hsk-5 { background-color: #5b2121; color: #feb2b2; }
         .hsk-6 { background-color: #3b2c56; color: #d6bcfa; }
         .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
-        .hsk-unknown { background-color: transparent; color: inherit; }
+        
+        /* 미인식 단어 및 문장부호 (여백 유발 방지) */
+        .hsk-unknown { background-color: transparent; color: inherit; display: inline; }
 
-        /* 단어 단위 래퍼 (배경색과 패딩은 여기에 적용) */
+        /* 단어 단위 래퍼 */
         .word-span {
             position: relative;
             cursor: pointer;
@@ -134,7 +136,7 @@
             display: inline;
         }
 
-        /* 내부 글자 조각 (배경색 없이 줄바꿈만 유연하게 처리) */
+        /* 내부 글자 조각 */
         .word-char {
             display: inline;
         }
@@ -337,16 +339,13 @@
             let htmlOutput = '';
             tokens.forEach(token => {
                 if (token.found) {
-                    // 단어 단위 래퍼로 감싸고, 내부 글자만 조각내어 줄바꿈 유연성 확보
                     htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">`;
                     for (let i = 0; i < token.word.length; i++) {
                         htmlOutput += `<span class="word-char">${token.word[i]}</span>`;
                     }
                     htmlOutput += `</span>`;
                 } else {
-                    for (let i = 0; i < token.word.length; i++) {
-                        htmlOutput += `<span class="hsk-unknown">${token.word[i]}</span>`;
-                    }
+                    htmlOutput += `<span class="hsk-unknown">${token.word}</span>`;
                 }
             });
             
