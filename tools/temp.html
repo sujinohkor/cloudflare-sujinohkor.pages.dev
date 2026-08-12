@@ -124,16 +124,20 @@
         .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
         .hsk-unknown { background-color: transparent; color: inherit; }
 
+        /* 단어 단위 래퍼 (배경색과 패딩은 여기에 적용) */
         .word-span {
             position: relative;
             cursor: pointer;
-            padding: 2px 2px;
-            margin: 0 0.5px;
-            display: inline-block;
+            padding: 2px 4px;
+            margin: 0 1px;
+            border-radius: 3px;
+            display: inline;
         }
-        /* 단어 내부 글자들의 테두리/간격 자연스럽게 연결 */
-        .word-span:first-of-type { border-top-left-radius: 3px; border-bottom-left-radius: 3px; padding-left: 4px; }
-        .word-span:last-of-type { border-top-right-radius: 3px; border-bottom-right-radius: 3px; padding-right: 4px; }
+
+        /* 내부 글자 조각 (배경색 없이 줄바꿈만 유연하게 처리) */
+        .word-char {
+            display: inline;
+        }
 
         /* 최상위 Body 기반 전역 툴팁 스타일 */
         #global-tooltip {
@@ -333,13 +337,12 @@
             let htmlOutput = '';
             tokens.forEach(token => {
                 if (token.found) {
-                    // 단어 내 각 글자를 쪼개서 개별 span으로 생성하여 줄바꿈 오작동 방지
+                    // 단어 단위 래퍼로 감싸고, 내부 글자만 조각내어 줄바꿈 유연성 확보
+                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">`;
                     for (let i = 0; i < token.word.length; i++) {
-                        const char = token.word[i];
-                        htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">
-                            ${char}
-                        </span>`;
+                        htmlOutput += `<span class="word-char">${token.word[i]}</span>`;
                     }
+                    htmlOutput += `</span>`;
                 } else {
                     for (let i = 0; i < token.word.length; i++) {
                         htmlOutput += `<span class="hsk-unknown">${token.word[i]}</span>`;
