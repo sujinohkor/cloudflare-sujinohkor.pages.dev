@@ -131,6 +131,7 @@
             padding: 2px 4px;
             margin: 0 1px;
             border-radius: 3px;
+            display: inline-block; /* 👈 inline에서 블록 성향이 섞이지 않도록 명시 */
         }
         .word-span .tooltip {
             visibility: hidden;
@@ -168,6 +169,9 @@
             overflow-x: hidden;      /* 👈 가로 스크롤 차단 */
             word-break: break-all;   /* 👈 긴 단어/문장 강제 줄바꿈 */
             white-space: pre-wrap;   /* 👈 줄바꿈 및 공백 유지 */
+            display: flex;       /* 👈 추가 */
+            flex-wrap: wrap;     /* 👈 추가: 단어들이 자연스럽게 줄바꿈되도록 함 */
+            align-content: flex-start; /* 👈 추가 */
         }
 
         .mini-action-btn {
