@@ -467,10 +467,22 @@
                 this.inputs.forEach(pin => {
                     ctx.fillStyle = pin.val === 1 ? '#ff4d4d' : '#cc0000';
                     ctx.beginPath(); ctx.arc(pin.x, pin.y, 4, 0, Math.PI*2); ctx.fill();
+                    // 선택된 핀이면 노란색 테두리 추가
+                    if (connectingSource === pin) {
+                        ctx.strokeStyle = '#ffff00';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
                 });
                 this.outputs.forEach(pin => {
                     ctx.fillStyle = pin.val === 1 ? '#2ecc71' : '#27ae60';
                     ctx.beginPath(); ctx.arc(pin.x, pin.y, 4, 0, Math.PI*2); ctx.fill();
+                    // 선택된 핀이면 노란색 테두리 추가
+                    if (connectingSource === pin) {
+                        ctx.strokeStyle = '#ffff00';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
                 });
             }
         }
@@ -532,6 +544,7 @@
                     if (Math.hypot(pin.x - x, pin.y - y) < 8) {
                         connectingSource = pin;
                         clickedPin = true;
+                        drawAll(); // 핀을 클릭한 순간 화면을 다시 그려 노란색 테두리 표시
                     }
                 });
                 c.inputs.forEach(pin => {
