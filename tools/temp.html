@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSK Vocabulary Analyzer & Reading Viewer</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
+    <style>
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+                
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+            overflow-y: auto;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .mode-btn {
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: #ff9e40; color: #101010; border: 1px solid #ff9e40; 
+            border-radius: 50px; font-weight: bold; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+
+        .workspace-container {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+            position: relative;
+        }
+
+        /* 왼쪽 박스: 텍스트 입력 영역 */
+        .content-left { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            overflow: hidden; padding: 20px; background: transparent; gap: 15px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+                
+        /* 오른쪽 박스: 분석 결과 영역 */
+        .content-right { 
+            flex: 1.6; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            overflow-y: auto; padding: 25px; background: transparent; gap: 15px; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .calc-card {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+        .calc-card h3 {
+            font-size: 0.9rem;
+            color: #ff9e40;
+            flex-shrink: 0;
+        }
+
+        textarea.viewer-textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 200px;
+            padding: 12px;
+            font-size: 16px;
+            background: #202020;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 8px;
+            resize: none;
+            box-sizing: border-box;
+            outline: none;
+        }
+        textarea.viewer-textarea:focus { border-color: #ff9e40; }
+
+        /* HSK 레벨별 색상 스타일 */
+        .hsk-1 { background-color: #1a365d; color: #90cdf4; }
+        .hsk-2 { background-color: #1c4532; color: #9ae6b4; }
+        .hsk-3 { background-color: #593e1a; color: #fbd38d; }
+        .hsk-4 { background-color: #522d1f; color: #fbd38d; }
+        .hsk-5 { background-color: #5b2121; color: #feb2b2; }
+        .hsk-6 { background-color: #3b2c56; color: #d6bcfa; }
+        .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
+        .hsk-unknown { background-color: transparent; color: inherit; }
+
+        .word-span {
+            position: relative;
+            cursor: pointer;
+            padding: 2px 4px;
+            margin: 0 1px;
+            border-radius: 3px;
+        }
+
+        /* 최상위 Body 기반 전역 툴팁 스타일 */
+        #global-tooltip {
+            position: fixed;
+            z-index: 99999;
+            width: 200px;
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ff9e40;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.5);
+            pointer-events: none;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        #viewerResult {
+            line-height: 2.2;
+            font-size: 18px;
+            padding: 15px;
+            background: #202020;
+            border: 1px solid #333;
+            border-radius: 8px;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        .mini-action-btn {
+            background: #202020; 
+            color: #ff9e40; 
+            border: 1px solid #ff9e40; 
+            padding: 5px 14px;
+            border-radius: 50px; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .mini-action-btn:hover { background: #ff9e40; color: #101010; }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .mode-btn { background: #F38020; color: #fff; border-color: #F38020; }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card {
+            background-color: #fafafa;
+            border-color: #F38020;
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+        body.light-mode textarea.viewer-textarea { background: #fff; color: #202020; border-color: #ccc; }
+        body.light-mode #viewerResult { background: #fff; color: #202020; border-color: #ccc; }
+        body.light-mode #global-tooltip { background-color: #fff; color: #202020; border-color: #F38020; box-shadow: 0px 4px 10px rgba(243, 128, 32, 0.2); }
+        body.light-mode .mini-action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+
+        /* 데이모드(라이트모드) 전용 HSK 레벨별 밝은 파스텔톤 배경색 및 선명한 글자색 */
+        body.light-mode .hsk-1 { background-color: #ebf8ff; color: #2b6cb0; }
+        body.light-mode .hsk-2 { background-color: #f0fff4; color: #22543d; }
+        body.light-mode .hsk-3 { background-color: #fffaf0; color: #744210; }
+        body.light-mode .hsk-4 { background-color: #fefcbf; color: #744210; }
+        body.light-mode .hsk-5 { background-color: #fff5f5; color: #742a2a; }
+        body.light-mode .hsk-6 { background-color: #faf5ff; color: #44337a; }
+        body.light-mode .hsk-7 { background-color: #e6fffa; color: #234e52; }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
+        @media (max-width: 900px) {
+            body { overflow: auto; height: auto; }                        
+            .menu-toggle-btn { display: block; }                        
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            }                        
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); }                        
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }                        
+            .workspace-container { flex-direction: column; overflow: visible; }                        
+            .content-left { height: auto; min-height: 200px; overflow-y: auto; flex: none; }                        
+            .content-right { height: auto; overflow: visible; min-height: unset; }                        
+        }
+    </style>
+</head>
+<body>
+<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-title">HSK Analyzer</div>
+        <div class="sidebar-top">
+            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+        </div>
+        <button class="menu-btn" onclick="location.href='../index'">Home</button>
+        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
+            <button class="mode-btn">HSK</button>
+        </div>
+        <button class="menu-btn" id="resetBtn" onclick="resetAll()">Reset</button>
+    </aside>
+    <main class="main-content">
+        <header class="top-section">
+            <h1>HSK Vocabulary Analyzer & Reading Viewer</h1>
+            <p>Paste Chinese text below to analyze and highlight words by HSK level.</p>
+        </header>
+
+        <div class="workspace-container">
+            <!-- Left Panel: Text Input -->
+            <section class="content-left">
+                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; height:100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; margin-bottom: 10px;">
+                        <h3>Text Input</h3>
+                        <button class="mini-action-btn" onclick="analyzeText()">Analyze</button>
+                    </div>
+                    <textarea id="inputText" class="viewer-textarea" placeholder="Enter Chinese text to analyze..."></textarea>
+                </div>
+            </section>
+
+            <!-- Right Panel: Analysis Results -->
+            <section class="content-right">
+                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:12px; height:100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <h3>Viewer Results</h3>
+                    </div>
+                    <div id="viewerResult">Analysis results will appear here.</div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- 최상위 Body 전역 툴팁 요소 생성 -->
+<div id="global-tooltip"></div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    function toggleSidebar() { sidebar.classList.toggle('active'); }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => { 
+        document.body.classList.toggle('light-mode'); 
+    });
+
+    const WORKER_URL = "https://mandarin-segmenter.sujinohkor.workers.dev";
+    const globalTooltip = document.getElementById('global-tooltip');
+
+    async function analyzeText() {
+        const text = document.getElementById('inputText').value.trim();
+        const viewer = document.getElementById('viewerResult');
+        
+        if (!text) {
+            alert("Please enter some text.");
+            return;
+        }
+
+        viewer.innerHTML = "Analyzing...";
+
+        try {
+            const response = await fetch(WORKER_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: text })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to communicate with the server.");
+            }
+
+            const data = await response.json();
+            const tokens = data.tokens;
+            
+            let htmlOutput = '';
+            tokens.forEach(token => {
+                if (token.found) {
+                    // 내부 HTML 툴팁 태그를 제거하고 데이터 속성(dataset)으로 데이터 전달
+                    htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}">
+                        ${token.word}
+                    </span>`;
+                } else {
+                    htmlOutput += `<span class="hsk-unknown">${token.word}</span>`;
+                }
+            });
+            
+            viewer.innerHTML = htmlOutput;
+            bindTooltipEvents();
+
+        } catch (error) {
+            console.error(error);
+            viewer.innerHTML = "An error occurred. Please check the console.";
+        }
+    }
+
+    // 마우스 호버 시 최상위 <body>에 좌표를 계산하여 툴팁 위치 설정
+    function bindTooltipEvents() {
+        const wordSpans = document.querySelectorAll('.word-span');
+        
+        wordSpans.forEach(span => {
+            span.addEventListener('mouseenter', (e) => {
+                const level = span.getAttribute('data-level');
+                const pinyin = span.getAttribute('data-pinyin');
+                const translation = span.getAttribute('data-translation');
+                
+                globalTooltip.innerHTML = `<strong>[HSK Level ${level}]</strong><br>${pinyin}<br>${translation}`;
+                globalTooltip.style.display = 'block';
+                
+                const rect = span.getBoundingClientRect();
+                const tooltipRect = globalTooltip.getBoundingClientRect();
+                
+                // 기본 위치: 단어 가운데 위쪽
+                let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                let top = rect.top - tooltipRect.height - 8;
+                
+                // 만약 위쪽 공간이 부족하면 단어 아래쪽에 표시
+                if (top < 10) {
+                    top = rect.bottom + 8;
+                }
+                
+                // 화면 왼쪽/오른쪽 벽에 부딪힐 경우 보정
+                if (left < 10) {
+                    left = 10;
+                } else if (left + tooltipRect.width > window.innerWidth - 10) {
+                    left = window.innerWidth - tooltipRect.width - 10;
+                }
+                
+                globalTooltip.style.left = `${left}px`;
+                globalTooltip.style.top = `${top}px`;
+                globalTooltip.style.opacity = '1';
+            });
+            
+            span.addEventListener('mouseleave', () => {
+                globalTooltip.style.opacity = '0';
+                globalTooltip.style.display = 'none';
+            });
+        });
+    }
+
+    function resetAll() {
+        document.getElementById('inputText').value = '';
+        document.getElementById('viewerResult').innerHTML = 'Analysis results will appear here.';
+        globalTooltip.style.display = 'none';
+    }
+</script>
+</body>
+</html>
