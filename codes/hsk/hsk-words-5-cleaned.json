@@ -1,0 +1,7802 @@
+[
+  {
+    "word": "哎",
+    "pinyin": "āi",
+    "part of speech": "叹",
+    "translation": "hey"
+  },
+  {
+    "word": "熬夜",
+    "pinyin": "áo yè",
+    "part of speech": "动",
+    "translation": "to stay up late or all night"
+  },
+  {
+    "word": "唉",
+    "pinyin": "ài",
+    "part of speech": "叹",
+    "translation": "oh; ah; well"
+  },
+  {
+    "word": "爱护",
+    "pinyin": "ài hù",
+    "part of speech": "动",
+    "translation": "care; cherish; take good care of"
+  },
+  {
+    "word": "爱惜",
+    "pinyin": "ài xī",
+    "part of speech": "动",
+    "translation": "value; cherish; treasure"
+  },
+  {
+    "word": "爱心",
+    "pinyin": "ài xīn",
+    "part of speech": "名",
+    "translation": "compassion; kindness; consideration"
+  },
+  {
+    "word": "安慰",
+    "pinyin": "ān wèi",
+    "part of speech": "动",
+    "translation": "to comfort; console"
+  },
+  {
+    "word": "安装",
+    "pinyin": "ān zhuāng",
+    "part of speech": "动",
+    "translation": "to install; mount; erect"
+  },
+  {
+    "word": "暗",
+    "pinyin": "àn",
+    "part of speech": "形",
+    "translation": "dark"
+  },
+  {
+    "word": "岸",
+    "pinyin": "àn",
+    "part of speech": "名",
+    "translation": "shore; coast; bank;"
+  },
+  {
+    "word": "把握",
+    "pinyin": "bǎ wò",
+    "part of speech": "动/名",
+    "translation": "to grasp; to hold; seize"
+  },
+  {
+    "word": "摆",
+    "pinyin": "bǎi",
+    "part of speech": "动",
+    "translation": "to arrange; set in order; pendulum; lower hem (of a gown/jacket/skirt)"
+  },
+  {
+    "word": "办理",
+    "pinyin": "bàn lǐ",
+    "part of speech": "动",
+    "translation": "deal with; attend to; handle"
+  },
+  {
+    "word": "傍晚",
+    "pinyin": "bàng wǎn",
+    "part of speech": "名",
+    "translation": "towards evening; at nightfall; at dusk"
+  },
+  {
+    "word": "包裹",
+    "pinyin": "bāo guǒ",
+    "part of speech": "名",
+    "translation": "wrap up; pack up"
+  },
+  {
+    "word": "包含",
+    "pinyin": "bāo hán",
+    "part of speech": "动",
+    "translation": "to contain; embody; include; inclusion"
+  },
+  {
+    "word": "包括",
+    "pinyin": "bāo kuò",
+    "part of speech": "动",
+    "translation": "include"
+  },
+  {
+    "word": "薄",
+    "pinyin": "báo",
+    "part of speech": "形",
+    "translation": "thin; flimsy"
+  },
+  {
+    "word": "宝贝",
+    "pinyin": "bǎo bèi",
+    "part of speech": "名",
+    "translation": "treasure; baby"
+  },
+  {
+    "word": "保持",
+    "pinyin": "bǎo chí",
+    "part of speech": "动",
+    "translation": "to keep; hold; retain; maintain"
+  },
+  {
+    "word": "保存",
+    "pinyin": "bǎo cún",
+    "part of speech": "动",
+    "translation": "preserve; keep; conserve"
+  },
+  {
+    "word": "宝贵",
+    "pinyin": "bǎo guì",
+    "part of speech": "形",
+    "translation": "valuable; precious"
+  },
+  {
+    "word": "保留",
+    "pinyin": "bǎo liú",
+    "part of speech": "动",
+    "translation": "continue to have; persist; to retain; hold back"
+  },
+  {
+    "word": "保险",
+    "pinyin": "bǎo xiǎn",
+    "part of speech": "名",
+    "translation": "guarantee; insurance"
+  },
+  {
+    "word": "报道",
+    "pinyin": "bào dào",
+    "part of speech": "动",
+    "translation": "report"
+  },
+  {
+    "word": "报到",
+    "pinyin": "bào dào",
+    "part of speech": "动",
+    "translation": "report for duty; check in; register"
+  },
+  {
+    "word": "报告",
+    "pinyin": "bào gào",
+    "part of speech": "名",
+    "translation": "report; make known; inform"
+  },
+  {
+    "word": "报社",
+    "pinyin": "bào shè",
+    "part of speech": "名",
+    "translation": "newspaper office"
+  },
+  {
+    "word": "抱怨",
+    "pinyin": "bào yuàn",
+    "part of speech": "动",
+    "translation": "complain; grumble"
+  },
+  {
+    "word": "悲观",
+    "pinyin": "bēi guān",
+    "part of speech": "形",
+    "translation": "pessimistic"
+  },
+  {
+    "word": "背",
+    "pinyin": "bèi",
+    "part of speech": "动",
+    "translation": "back"
+  },
+  {
+    "word": "背景",
+    "pinyin": "bèi jǐng",
+    "part of speech": "名",
+    "translation": "background"
+  },
+  {
+    "word": "被子",
+    "pinyin": "bèi zi",
+    "part of speech": "名",
+    "translation": "quilt"
+  },
+  {
+    "word": "本科",
+    "pinyin": "běn kē",
+    "part of speech": "名",
+    "translation": "undergraduate course; regular college course"
+  },
+  {
+    "word": "本领",
+    "pinyin": "běn lǐng",
+    "part of speech": "名",
+    "translation": "capability; capacity; faculty"
+  },
+  {
+    "word": "本质",
+    "pinyin": "běn zhì",
+    "part of speech": "名",
+    "translation": "nature; innate character; intrinsic quality"
+  },
+  {
+    "word": "彼此",
+    "pinyin": "bǐ cǐ",
+    "part of speech": "代",
+    "translation": "each other; both parties; one another"
+  },
+  {
+    "word": "比例",
+    "pinyin": "bǐ lì",
+    "part of speech": "名",
+    "translation": "scale; proportion; ratio"
+  },
+  {
+    "word": "毕竟",
+    "pinyin": "bì jìng",
+    "part of speech": "副",
+    "translation": "after all; all in all; when all is said and done"
+  },
+  {
+    "word": "避免",
+    "pinyin": "bì miǎn",
+    "part of speech": "动",
+    "translation": "to avoid; refrain from; prevent something from happening"
+  },
+  {
+    "word": "必然",
+    "pinyin": "bì rán",
+    "part of speech": "形",
+    "translation": "inevitable; certain; necessarily"
+  },
+  {
+    "word": "必要",
+    "pinyin": "bì yào",
+    "part of speech": "形",
+    "translation": "requisite; necessary; essential"
+  },
+  {
+    "word": "编辑",
+    "pinyin": "biān jí",
+    "part of speech": "名/动",
+    "translation": "edit; compile"
+  },
+  {
+    "word": "鞭炮",
+    "pinyin": "biān pào",
+    "part of speech": "名",
+    "translation": "firecrackers"
+  },
+  {
+    "word": "便",
+    "pinyin": "biàn",
+    "part of speech": "副",
+    "translation": "convenience; excrement or urine; relieve oneself"
+  },
+  {
+    "word": "辩论",
+    "pinyin": "biàn lùn",
+    "part of speech": "动",
+    "translation": "argue; debate"
+  },
+  {
+    "word": "标点",
+    "pinyin": "biāo diǎn",
+    "part of speech": "名",
+    "translation": "punctuation"
+  },
+  {
+    "word": "标志",
+    "pinyin": "biāo zhì",
+    "part of speech": "动/名",
+    "translation": "sign; symbol; hallmark"
+  },
+  {
+    "word": "表达",
+    "pinyin": "biǎo dá",
+    "part of speech": "动",
+    "translation": "to voice (an opinion)"
+  },
+  {
+    "word": "表面",
+    "pinyin": "biǎo miàn",
+    "part of speech": "名",
+    "translation": "surface"
+  },
+  {
+    "word": "表明",
+    "pinyin": "biǎo míng",
+    "part of speech": "动",
+    "translation": "make known; state clearly; indicate"
+  },
+  {
+    "word": "表情",
+    "pinyin": "biǎo qíng",
+    "part of speech": "名",
+    "translation": "expression; look"
+  },
+  {
+    "word": "表现",
+    "pinyin": "biǎo xiàn",
+    "part of speech": "动",
+    "translation": "expression; representation; display"
+  },
+  {
+    "word": "冰激凌",
+    "pinyin": "bīng jī líng",
+    "part of speech": "名",
+    "translation": "ice cream"
+  },
+  {
+    "word": "病毒",
+    "pinyin": "bìng dú",
+    "part of speech": "名",
+    "translation": "virus"
+  },
+  {
+    "word": "播放",
+    "pinyin": "bō fàng",
+    "part of speech": "动",
+    "translation": "broadcast"
+  },
+  {
+    "word": "玻璃",
+    "pinyin": "bō li",
+    "part of speech": "名",
+    "translation": "glass"
+  },
+  {
+    "word": "博物馆",
+    "pinyin": "bó wù guǎn",
+    "part of speech": "名",
+    "translation": "museum"
+  },
+  {
+    "word": "脖子",
+    "pinyin": "bó zi",
+    "part of speech": "名",
+    "translation": "neck"
+  },
+  {
+    "word": "不断",
+    "pinyin": "bú duàn",
+    "part of speech": "副",
+    "translation": "ceaseless; uninterrupted; continual continuous; unceasing"
+  },
+  {
+    "word": "不见得",
+    "pinyin": "bú jiàn de",
+    "part of speech": "副",
+    "translation": "not likely; not necessarily"
+  },
+  {
+    "word": "不耐烦",
+    "pinyin": "bú nài fán",
+    "part of speech": "",
+    "translation": "impatient"
+  },
+  {
+    "word": "不要紧",
+    "pinyin": "bú yào jǐn",
+    "part of speech": "形",
+    "translation": "not important; not serious It doesn't matter; never mind"
+  },
+  {
+    "word": "补充",
+    "pinyin": "bǔ chōng",
+    "part of speech": "动",
+    "translation": "add; supplement; replenish"
+  },
+  {
+    "word": "布",
+    "pinyin": "bù",
+    "part of speech": "名",
+    "translation": "cloth; textile; proclaim"
+  },
+  {
+    "word": "不安",
+    "pinyin": "bù ān",
+    "part of speech": "形",
+    "translation": "uneasy; unsettled; unstable"
+  },
+  {
+    "word": "不得了",
+    "pinyin": "bù dé liǎo",
+    "part of speech": "形",
+    "translation": "desperately serious disastrous; terrible"
+  },
+  {
+    "word": "部门",
+    "pinyin": "bù mén",
+    "part of speech": "名",
+    "translation": "department; branch; section"
+  },
+  {
+    "word": "不然",
+    "pinyin": "bù rán",
+    "part of speech": "连",
+    "translation": "not the case; otherwise"
+  },
+  {
+    "word": "不如",
+    "pinyin": "bù rú",
+    "part of speech": "动",
+    "translation": "it would be better to …not as good as"
+  },
+  {
+    "word": "步骤",
+    "pinyin": "bù zhòu",
+    "part of speech": "名",
+    "translation": "step; move; procedure"
+  },
+  {
+    "word": "不足",
+    "pinyin": "bù zú",
+    "part of speech": "动/名",
+    "translation": "not enough; insufficient"
+  },
+  {
+    "word": "财产",
+    "pinyin": "cái chǎn",
+    "part of speech": "名",
+    "translation": "property; assets; estate"
+  },
+  {
+    "word": "踩",
+    "pinyin": "cǎi",
+    "part of speech": "动",
+    "translation": "to step on; to stamp on; trample"
+  },
+  {
+    "word": "采访",
+    "pinyin": "cǎi fǎng",
+    "part of speech": "动",
+    "translation": "to interview"
+  },
+  {
+    "word": "彩虹",
+    "pinyin": "cǎi hóng",
+    "part of speech": "名",
+    "translation": "rainbow"
+  },
+  {
+    "word": "采取",
+    "pinyin": "cǎi qǔ",
+    "part of speech": "动",
+    "translation": "to carry out; adopt; take"
+  },
+  {
+    "word": "参考",
+    "pinyin": "cān kǎo",
+    "part of speech": "动",
+    "translation": "to consult; to refer to"
+  },
+  {
+    "word": "参与",
+    "pinyin": "cān yù",
+    "part of speech": "动",
+    "translation": "to take part; to participate in"
+  },
+  {
+    "word": "惭愧",
+    "pinyin": "cán kuì",
+    "part of speech": "行",
+    "translation": "ashamed"
+  },
+  {
+    "word": "操场",
+    "pinyin": "cāo chǎng",
+    "part of speech": "名",
+    "translation": "playground; sports ground; drill ground"
+  },
+  {
+    "word": "操心",
+    "pinyin": "cāo xīn",
+    "part of speech": "动",
+    "translation": "to worry about; to take pains over; be concerned over"
+  },
+  {
+    "word": "册",
+    "pinyin": "cè",
+    "part of speech": "名",
+    "translation": "volume; copy [measure word for books]"
+  },
+  {
+    "word": "测验",
+    "pinyin": "cè yàn",
+    "part of speech": "动",
+    "translation": "test; trial run; examination"
+  },
+  {
+    "word": "曾经",
+    "pinyin": "céng jīng",
+    "part of speech": "副",
+    "translation": "once"
+  },
+  {
+    "word": "插",
+    "pinyin": "chā",
+    "part of speech": "动",
+    "translation": "stick in; to insert; interpose"
+  },
+  {
+    "word": "差别",
+    "pinyin": "chā bié",
+    "part of speech": "名",
+    "translation": "difference"
+  },
+  {
+    "word": "差距",
+    "pinyin": "chā jù",
+    "part of speech": "名",
+    "translation": "gap; disparity"
+  },
+  {
+    "word": "叉子",
+    "pinyin": "chā zi",
+    "part of speech": "名",
+    "translation": "fork; prong"
+  },
+  {
+    "word": "拆",
+    "pinyin": "chāi",
+    "part of speech": "动",
+    "translation": "to tear open; take apart; pull down"
+  },
+  {
+    "word": "产品",
+    "pinyin": "chǎn pǐn",
+    "part of speech": "名",
+    "translation": "product"
+  },
+  {
+    "word": "产生",
+    "pinyin": "chǎn shēng",
+    "part of speech": "动",
+    "translation": "produce"
+  },
+  {
+    "word": "常识",
+    "pinyin": "cháng shí",
+    "part of speech": "名",
+    "translation": "general knowledge"
+  },
+  {
+    "word": "长途",
+    "pinyin": "cháng tú",
+    "part of speech": "形",
+    "translation": "long-distance"
+  },
+  {
+    "word": "抄",
+    "pinyin": "chāo",
+    "part of speech": "动",
+    "translation": "to copy; transcribe; plagiarise"
+  },
+  {
+    "word": "超级",
+    "pinyin": "chāo jí",
+    "part of speech": "形",
+    "translation": "super"
+  },
+  {
+    "word": "朝",
+    "pinyin": "cháo",
+    "part of speech": "介",
+    "translation": "dynasty; court; government"
+  },
+  {
+    "word": "潮湿",
+    "pinyin": "cháo shī",
+    "part of speech": "形",
+    "translation": "damp; moist; humidy"
+  },
+  {
+    "word": "吵",
+    "pinyin": "chǎo",
+    "part of speech": "形",
+    "translation": "noisy"
+  },
+  {
+    "word": "炒",
+    "pinyin": "chǎo",
+    "part of speech": "动",
+    "translation": "stir-fry"
+  },
+  {
+    "word": "吵架",
+    "pinyin": "chǎo jià",
+    "part of speech": "动",
+    "translation": "to quarrel; have a row"
+  },
+  {
+    "word": "车库",
+    "pinyin": "chē kù",
+    "part of speech": "名",
+    "translation": "garage"
+  },
+  {
+    "word": "车厢",
+    "pinyin": "chē xiāng",
+    "part of speech": "名",
+    "translation": "railway carriage; compartment"
+  },
+  {
+    "word": "彻底",
+    "pinyin": "chè dǐ",
+    "part of speech": "形",
+    "translation": "thorough"
+  },
+  {
+    "word": "沉默",
+    "pinyin": "chén mò",
+    "part of speech": "动",
+    "translation": "reticent; taciturn; uncommunicative"
+  },
+  {
+    "word": "趁",
+    "pinyin": "chèn",
+    "part of speech": "介",
+    "translation": "to take advantage of; avail oneself of"
+  },
+  {
+    "word": "称",
+    "pinyin": "chēng",
+    "part of speech": "动",
+    "translation": "fit; match; to name"
+  },
+  {
+    "word": "称呼",
+    "pinyin": "chēng hu",
+    "part of speech": "名",
+    "translation": "call; address"
+  },
+  {
+    "word": "称赞",
+    "pinyin": "chēng zàn",
+    "part of speech": "动",
+    "translation": "to praise; to acclaim; to commend"
+  },
+  {
+    "word": "承担",
+    "pinyin": "chéng dān",
+    "part of speech": "动",
+    "translation": "bear; to undertake; assume"
+  },
+  {
+    "word": "程度",
+    "pinyin": "chéng dù",
+    "part of speech": "名",
+    "translation": "level; degree; extent"
+  },
+  {
+    "word": "成分",
+    "pinyin": "chéng fèn",
+    "part of speech": "名",
+    "translation": "composition; component part; ingredient"
+  },
+  {
+    "word": "成果",
+    "pinyin": "chéng guǒ",
+    "part of speech": "名",
+    "translation": "achievement; gain; positive result"
+  },
+  {
+    "word": "成就",
+    "pinyin": "chéng jiù",
+    "part of speech": "名",
+    "translation": "achievement; accomplishment; attainment"
+  },
+  {
+    "word": "诚恳",
+    "pinyin": "chéng kěn",
+    "part of speech": "形",
+    "translation": "sincere; earnest"
+  },
+  {
+    "word": "成立",
+    "pinyin": "chéng lì",
+    "part of speech": "动",
+    "translation": "found; to establish; set up"
+  },
+  {
+    "word": "成人",
+    "pinyin": "chéng rén",
+    "part of speech": "名",
+    "translation": "adult"
+  },
+  {
+    "word": "承认",
+    "pinyin": "chéng rèn",
+    "part of speech": "动",
+    "translation": "to admit; to acknowledge; to recognise"
+  },
+  {
+    "word": "承受",
+    "pinyin": "chéng shòu",
+    "part of speech": "动",
+    "translation": "to bear; support; to endure; inherit"
+  },
+  {
+    "word": "成熟",
+    "pinyin": "chéng shú",
+    "part of speech": "形",
+    "translation": "mature"
+  },
+  {
+    "word": "程序",
+    "pinyin": "chéng xù",
+    "part of speech": "名",
+    "translation": "order; procedure; sequence"
+  },
+  {
+    "word": "成语",
+    "pinyin": "chéng yǔ",
+    "part of speech": "名",
+    "translation": "set phrase; idiom; proverb"
+  },
+  {
+    "word": "成长",
+    "pinyin": "chéng zhǎng",
+    "part of speech": "动",
+    "translation": "to grow up"
+  },
+  {
+    "word": "吃亏",
+    "pinyin": "chī kuī",
+    "part of speech": "动",
+    "translation": "to suffer losses; come to grief; take a beating"
+  },
+  {
+    "word": "池塘",
+    "pinyin": "chí táng",
+    "part of speech": "名",
+    "translation": "pool; pond"
+  },
+  {
+    "word": "持续",
+    "pinyin": "chí xù",
+    "part of speech": "动",
+    "translation": "last; continue; sustain"
+  },
+  {
+    "word": "迟早",
+    "pinyin": "chí zǎo",
+    "part of speech": "副",
+    "translation": "sooner or later"
+  },
+  {
+    "word": "尺子",
+    "pinyin": "chǐ zi",
+    "part of speech": "名",
+    "translation": "ruler"
+  },
+  {
+    "word": "翅膀",
+    "pinyin": "chì bǎng",
+    "part of speech": "名",
+    "translation": "wing [of a bird]"
+  },
+  {
+    "word": "冲",
+    "pinyin": "chōng",
+    "part of speech": "动",
+    "translation": "to flush; vigorously; on the strength of"
+  },
+  {
+    "word": "充电器",
+    "pinyin": "chōng diàn qì",
+    "part of speech": "名",
+    "translation": "(battery) charger"
+  },
+  {
+    "word": "充分",
+    "pinyin": "chōng fèn",
+    "part of speech": "形",
+    "translation": "full; ample"
+  },
+  {
+    "word": "充满",
+    "pinyin": "chōng mǎn",
+    "part of speech": "动",
+    "translation": "be filled with; be full of"
+  },
+  {
+    "word": "重复",
+    "pinyin": "chóng fù",
+    "part of speech": "动",
+    "translation": "to repeat; to duplicate; iterate"
+  },
+  {
+    "word": "宠物",
+    "pinyin": "chǒng wù",
+    "part of speech": "名",
+    "translation": "pet"
+  },
+  {
+    "word": "抽屉",
+    "pinyin": "chōu ti",
+    "part of speech": "名",
+    "translation": "drawer"
+  },
+  {
+    "word": "抽象",
+    "pinyin": "chōu xiàng",
+    "part of speech": "形",
+    "translation": "abstract"
+  },
+  {
+    "word": "丑",
+    "pinyin": "chǒu",
+    "part of speech": "形",
+    "translation": "ugly; clown in Beijing opera; the second of the Twelve Earthly Branches"
+  },
+  {
+    "word": "臭",
+    "pinyin": "chòu",
+    "part of speech": "形",
+    "translation": "smelly; stinking"
+  },
+  {
+    "word": "出版",
+    "pinyin": "chū bǎn",
+    "part of speech": "动",
+    "translation": "publish; come off the press"
+  },
+  {
+    "word": "初级",
+    "pinyin": "chū jí",
+    "part of speech": "形",
+    "translation": "elementary; primary; initial"
+  },
+  {
+    "word": "出口",
+    "pinyin": "chū kǒu",
+    "part of speech": "名",
+    "translation": "exit [from a building]"
+  },
+  {
+    "word": "出色",
+    "pinyin": "chū sè",
+    "part of speech": "形",
+    "translation": "outstanding; remarkable; splendid"
+  },
+  {
+    "word": "出示",
+    "pinyin": "chū shì",
+    "part of speech": "动",
+    "translation": "to show"
+  },
+  {
+    "word": "出席",
+    "pinyin": "chū xí",
+    "part of speech": "动",
+    "translation": "to attend; to be present"
+  },
+  {
+    "word": "除非",
+    "pinyin": "chú fēi",
+    "part of speech": "连",
+    "translation": "only if; only when; unless"
+  },
+  {
+    "word": "除夕",
+    "pinyin": "chú xī",
+    "part of speech": "名",
+    "translation": "(lunar) New Year’s Eve"
+  },
+  {
+    "word": "处理",
+    "pinyin": "chǔ lǐ",
+    "part of speech": "动",
+    "translation": "to handle; deal with; manage"
+  },
+  {
+    "word": "传播",
+    "pinyin": "chuán bō",
+    "part of speech": "动",
+    "translation": "disseminate; propagate"
+  },
+  {
+    "word": "传染",
+    "pinyin": "chuán rǎn",
+    "part of speech": "动",
+    "translation": "infect; be contagious"
+  },
+  {
+    "word": "传说",
+    "pinyin": "chuán shuō",
+    "part of speech": "名",
+    "translation": "legend; lore"
+  },
+  {
+    "word": "传统",
+    "pinyin": "chuán tǒng",
+    "part of speech": "名/形",
+    "translation": "tradition; custom"
+  },
+  {
+    "word": "窗帘",
+    "pinyin": "chuāng lián",
+    "part of speech": "名",
+    "translation": "curtains; sunblind"
+  },
+  {
+    "word": "闯",
+    "pinyin": "chuǎng",
+    "part of speech": "动",
+    "translation": "to rush; charge"
+  },
+  {
+    "word": "创造",
+    "pinyin": "chuàng zào",
+    "part of speech": "动",
+    "translation": "create"
+  },
+  {
+    "word": "吹",
+    "pinyin": "chuī",
+    "part of speech": "动",
+    "translation": "to blow; puff"
+  },
+  {
+    "word": "词汇",
+    "pinyin": "cí huì",
+    "part of speech": "名",
+    "translation": "vocabulary; words and phrases"
+  },
+  {
+    "word": "辞职",
+    "pinyin": "cí zhí",
+    "part of speech": "动",
+    "translation": "to resign; hand in one's resignation"
+  },
+  {
+    "word": "此外",
+    "pinyin": "cǐ wài",
+    "part of speech": "连",
+    "translation": "besides; in addition; furthermore"
+  },
+  {
+    "word": "刺激",
+    "pinyin": "cì jī",
+    "part of speech": "动",
+    "translation": "to stimulate; provoke; irritate"
+  },
+  {
+    "word": "次要",
+    "pinyin": "cì yào",
+    "part of speech": "形",
+    "translation": "less important; secondary; subordinate"
+  },
+  {
+    "word": "匆忙",
+    "pinyin": "cōng máng",
+    "part of speech": "形",
+    "translation": "hastily; in a hurry"
+  },
+  {
+    "word": "从此",
+    "pinyin": "cóng cǐ",
+    "part of speech": "副",
+    "translation": "from this time on; from now; then on"
+  },
+  {
+    "word": "从而",
+    "pinyin": "cóng ér",
+    "part of speech": "连",
+    "translation": "thus; therebyupon"
+  },
+  {
+    "word": "从前",
+    "pinyin": "cóng qián",
+    "part of speech": "名",
+    "translation": "in the past; formerly"
+  },
+  {
+    "word": "从事",
+    "pinyin": "cóng shì",
+    "part of speech": "动",
+    "translation": "go in for; devote oneself to; be to engaged in [formal]"
+  },
+  {
+    "word": "粗糙",
+    "pinyin": "cū cāo",
+    "part of speech": "形",
+    "translation": "coarse"
+  },
+  {
+    "word": "醋",
+    "pinyin": "cù",
+    "part of speech": "名",
+    "translation": "vinegar"
+  },
+  {
+    "word": "促进",
+    "pinyin": "cù jìn",
+    "part of speech": "动",
+    "translation": "promote; boost; accelerate"
+  },
+  {
+    "word": "促使",
+    "pinyin": "cù shǐ",
+    "part of speech": "动",
+    "translation": "precipitate; impel; to urge"
+  },
+  {
+    "word": "催",
+    "pinyin": "cuī",
+    "part of speech": "动",
+    "translation": "to urge; hurry; to hasten"
+  },
+  {
+    "word": "存在",
+    "pinyin": "cún zài",
+    "part of speech": "动",
+    "translation": "to exist; be"
+  },
+  {
+    "word": "措施",
+    "pinyin": "cuò shī",
+    "part of speech": "名",
+    "translation": "measure; step"
+  },
+  {
+    "word": "答应",
+    "pinyin": "dā ying",
+    "part of speech": "动",
+    "translation": "answer; reply; to agree"
+  },
+  {
+    "word": "达到",
+    "pinyin": "dá dào",
+    "part of speech": "动",
+    "translation": "to achieve; attain; reach"
+  },
+  {
+    "word": "打工",
+    "pinyin": "dǎ gōng",
+    "part of speech": "动",
+    "translation": "do manual work"
+  },
+  {
+    "word": "打交道",
+    "pinyin": "dǎ jiāo dào",
+    "part of speech": "",
+    "translation": "make contact with; have dealings with"
+  },
+  {
+    "word": "打喷嚏",
+    "pinyin": "dǎ pēn tì",
+    "part of speech": "",
+    "translation": "to sneeze"
+  },
+  {
+    "word": "打听",
+    "pinyin": "dǎ ting",
+    "part of speech": "动",
+    "translation": "to ask about; inquire about"
+  },
+  {
+    "word": "大方",
+    "pinyin": "dà fang",
+    "part of speech": "形",
+    "translation": "generous; liberal"
+  },
+  {
+    "word": "大厦",
+    "pinyin": "dà shà",
+    "part of speech": "名",
+    "translation": "large building; edifice"
+  },
+  {
+    "word": "大象",
+    "pinyin": "dà xiàng",
+    "part of speech": "名",
+    "translation": "elephant"
+  },
+  {
+    "word": "大型",
+    "pinyin": "dà xíng",
+    "part of speech": "形",
+    "translation": "large-scale"
+  },
+  {
+    "word": "呆",
+    "pinyin": "dāi",
+    "part of speech": "动",
+    "translation": "slow-witted; stupid; to stay"
+  },
+  {
+    "word": "代表",
+    "pinyin": "dài biǎo",
+    "part of speech": "动",
+    "translation": "to stand for; on behalf of representative"
+  },
+  {
+    "word": "贷款",
+    "pinyin": "dài kuǎn",
+    "part of speech": "动/名",
+    "translation": "to provide a loan; make an advance to; extend credit to"
+  },
+  {
+    "word": "代替",
+    "pinyin": "dài tì",
+    "part of speech": "动",
+    "translation": "instead"
+  },
+  {
+    "word": "待遇",
+    "pinyin": "dài yù",
+    "part of speech": "名",
+    "translation": "treatment"
+  },
+  {
+    "word": "单纯",
+    "pinyin": "dān chún",
+    "part of speech": "形",
+    "translation": "simple; pure; alone"
+  },
+  {
+    "word": "单调",
+    "pinyin": "dān diào",
+    "part of speech": "形",
+    "translation": "monotonous; dull; drab"
+  },
+  {
+    "word": "单独",
+    "pinyin": "dān dú",
+    "part of speech": "副",
+    "translation": "alone; by oneself; on one's own; single-handed"
+  },
+  {
+    "word": "担任",
+    "pinyin": "dān rèn",
+    "part of speech": "动",
+    "translation": "assume the office of; to hold the post of"
+  },
+  {
+    "word": "单位",
+    "pinyin": "dān wèi",
+    "part of speech": "名",
+    "translation": "unit"
+  },
+  {
+    "word": "耽误",
+    "pinyin": "dān wu",
+    "part of speech": "动",
+    "translation": "delay; hold up"
+  },
+  {
+    "word": "单元",
+    "pinyin": "dān yuán",
+    "part of speech": "名",
+    "translation": "unit; cell"
+  },
+  {
+    "word": "胆小鬼",
+    "pinyin": "dǎn xiǎo guǐ",
+    "part of speech": "名",
+    "translation": "coward"
+  },
+  {
+    "word": "淡",
+    "pinyin": "dàn",
+    "part of speech": "形",
+    "translation": "thin; light in colour; tasteless"
+  },
+  {
+    "word": "当地",
+    "pinyin": "dāng dì",
+    "part of speech": "名",
+    "translation": "local area"
+  },
+  {
+    "word": "当心",
+    "pinyin": "dāng xīn",
+    "part of speech": "动",
+    "translation": "be careful"
+  },
+  {
+    "word": "挡",
+    "pinyin": "dǎng",
+    "part of speech": "动",
+    "translation": "to block; hinder; resist"
+  },
+  {
+    "word": "倒霉",
+    "pinyin": "dǎo méi",
+    "part of speech": "形",
+    "translation": "fall on hard times; have bad luck"
+  },
+  {
+    "word": "导演",
+    "pinyin": "dǎo yǎn",
+    "part of speech": "名",
+    "translation": "director"
+  },
+  {
+    "word": "岛屿",
+    "pinyin": "dǎo yǔ",
+    "part of speech": "名",
+    "translation": "islands and islets"
+  },
+  {
+    "word": "导致",
+    "pinyin": "dǎo zhì",
+    "part of speech": "动",
+    "translation": "to cause; lead to; result in"
+  },
+  {
+    "word": "到达",
+    "pinyin": "dào dá",
+    "part of speech": "动",
+    "translation": "to arrive; get to reach"
+  },
+  {
+    "word": "道德",
+    "pinyin": "dào dé",
+    "part of speech": "名",
+    "translation": "morality; ethics"
+  },
+  {
+    "word": "道理",
+    "pinyin": "dào lǐ",
+    "part of speech": "名",
+    "translation": "reason; principle; truth"
+  },
+  {
+    "word": "登记",
+    "pinyin": "dēng jì",
+    "part of speech": "动",
+    "translation": "to register; check in"
+  },
+  {
+    "word": "等待",
+    "pinyin": "děng dài",
+    "part of speech": "动",
+    "translation": "to wait for; to await"
+  },
+  {
+    "word": "等于",
+    "pinyin": "děng yú",
+    "part of speech": "动",
+    "translation": "equal to; equivalent to; be worth"
+  },
+  {
+    "word": "滴",
+    "pinyin": "dī",
+    "part of speech": "量",
+    "translation": "to drip; to drop; droplet"
+  },
+  {
+    "word": "的确",
+    "pinyin": "dí què",
+    "part of speech": "副",
+    "translation": "really; and no mistake; indeed"
+  },
+  {
+    "word": "敌人",
+    "pinyin": "dí rén",
+    "part of speech": "名",
+    "translation": "enemy; foe"
+  },
+  {
+    "word": "递",
+    "pinyin": "dì",
+    "part of speech": "动",
+    "translation": "to hand over; to pass on; progressively"
+  },
+  {
+    "word": "地道",
+    "pinyin": "dì dao",
+    "part of speech": "形",
+    "translation": "tunnel; underpass; typical [of a place]"
+  },
+  {
+    "word": "地理",
+    "pinyin": "dì lǐ",
+    "part of speech": "名",
+    "translation": "geographical features of a place; geography"
+  },
+  {
+    "word": "地区",
+    "pinyin": "dì qū",
+    "part of speech": "名",
+    "translation": "area; district; region"
+  },
+  {
+    "word": "地毯",
+    "pinyin": "dì tǎn",
+    "part of speech": "名",
+    "translation": "carpet; rug"
+  },
+  {
+    "word": "地位",
+    "pinyin": "dì wèi",
+    "part of speech": "名",
+    "translation": "position; standing; status"
+  },
+  {
+    "word": "地震",
+    "pinyin": "dì zhèn",
+    "part of speech": "动",
+    "translation": "earthquake; tremour"
+  },
+  {
+    "word": "点心",
+    "pinyin": "diǎn xin",
+    "part of speech": "名",
+    "translation": "snack; dim sum"
+  },
+  {
+    "word": "电池",
+    "pinyin": "diàn chí",
+    "part of speech": "名",
+    "translation": "battery; cell"
+  },
+  {
+    "word": "电台",
+    "pinyin": "diàn tái",
+    "part of speech": "名",
+    "translation": "transceiver; radio station"
+  },
+  {
+    "word": "钓",
+    "pinyin": "diào",
+    "part of speech": "动",
+    "translation": "fish with a hook and line; angle"
+  },
+  {
+    "word": "顶",
+    "pinyin": "dǐng",
+    "part of speech": "量/名",
+    "translation": "apex; [measure word for something with a top (e.g. hat, tent, etc.)]"
+  },
+  {
+    "word": "洞",
+    "pinyin": "dòng",
+    "part of speech": "名",
+    "translation": "hole; cavity"
+  },
+  {
+    "word": "冻",
+    "pinyin": "dòng",
+    "part of speech": "动",
+    "translation": "frozen; jelly"
+  },
+  {
+    "word": "动画片",
+    "pinyin": "dòng huà piān",
+    "part of speech": "名",
+    "translation": "cartoon"
+  },
+  {
+    "word": "逗",
+    "pinyin": "dòu",
+    "part of speech": "动",
+    "translation": "to tease; play with; amuse"
+  },
+  {
+    "word": "豆腐",
+    "pinyin": "dòu fu",
+    "part of speech": "名",
+    "translation": "bean curd; tofu"
+  },
+  {
+    "word": "独立",
+    "pinyin": "dú lì",
+    "part of speech": "动/形",
+    "translation": "stand alone; independent; on one's own"
+  },
+  {
+    "word": "独特",
+    "pinyin": "dú tè",
+    "part of speech": "形",
+    "translation": "unique; distinctive"
+  },
+  {
+    "word": "度过",
+    "pinyin": "dù guò",
+    "part of speech": "动",
+    "translation": "spend; pass"
+  },
+  {
+    "word": "断",
+    "pinyin": "duàn",
+    "part of speech": "动",
+    "translation": "to break"
+  },
+  {
+    "word": "堆",
+    "pinyin": "duī",
+    "part of speech": "动/量",
+    "translation": "heap; pile; crowd"
+  },
+  {
+    "word": "对比",
+    "pinyin": "duì bǐ",
+    "part of speech": "动",
+    "translation": "contrast; comparison; ratio"
+  },
+  {
+    "word": "对待",
+    "pinyin": "duì dài",
+    "part of speech": "动",
+    "translation": "to treat; handle; be in a position related to another"
+  },
+  {
+    "word": "对方",
+    "pinyin": "duì fāng",
+    "part of speech": "名",
+    "translation": "counterpart; the other party"
+  },
+  {
+    "word": "兑换",
+    "pinyin": "duì huàn",
+    "part of speech": "动",
+    "translation": "exchange; convert"
+  },
+  {
+    "word": "对手",
+    "pinyin": "duì shǒu",
+    "part of speech": "名",
+    "translation": "opponent; adversary; rival"
+  },
+  {
+    "word": "对象",
+    "pinyin": "duì xiàng",
+    "part of speech": "名",
+    "translation": "target; object; partner"
+  },
+  {
+    "word": "吨",
+    "pinyin": "dūn",
+    "part of speech": "量",
+    "translation": "ton"
+  },
+  {
+    "word": "蹲",
+    "pinyin": "dūn",
+    "part of speech": "动",
+    "translation": "squat on the heels; to crouch"
+  },
+  {
+    "word": "顿",
+    "pinyin": "dùn",
+    "part of speech": "量",
+    "translation": "[measure word for occurences, and therefore of meals]"
+  },
+  {
+    "word": "多亏",
+    "pinyin": "duō kuī",
+    "part of speech": "动",
+    "translation": "thanks to; owing to; fortunately"
+  },
+  {
+    "word": "多余",
+    "pinyin": "duō yú",
+    "part of speech": "形",
+    "translation": "unnecessary; surplus; superfluous"
+  },
+  {
+    "word": "朵",
+    "pinyin": "duǒ",
+    "part of speech": "量",
+    "translation": "stem; [measure word for flowers]"
+  },
+  {
+    "word": "躲藏",
+    "pinyin": "duǒ cáng",
+    "part of speech": "动",
+    "translation": "to hide oneself; go into hiding"
+  },
+  {
+    "word": "恶劣",
+    "pinyin": "è liè",
+    "part of speech": "形",
+    "translation": "odious; vile; disgusting"
+  },
+  {
+    "word": "耳环",
+    "pinyin": "ěr huán",
+    "part of speech": "名",
+    "translation": "earrings"
+  },
+  {
+    "word": "发表",
+    "pinyin": "fā biǎo",
+    "part of speech": "动",
+    "translation": "to issue; to publish; report"
+  },
+  {
+    "word": "发愁",
+    "pinyin": "fā chóu",
+    "part of speech": "动",
+    "translation": "to worry; to be anxious; sullen"
+  },
+  {
+    "word": "发达",
+    "pinyin": "fā dá",
+    "part of speech": "形",
+    "translation": "developed; advanced; prosperous"
+  },
+  {
+    "word": "发抖",
+    "pinyin": "fā dǒu",
+    "part of speech": "动",
+    "translation": "to shiver; shake; tremble"
+  },
+  {
+    "word": "发挥",
+    "pinyin": "fā huī",
+    "part of speech": "动",
+    "translation": "bring into play; give free rein to"
+  },
+  {
+    "word": "发明",
+    "pinyin": "fā míng",
+    "part of speech": "名/动",
+    "translation": "invent; expound"
+  },
+  {
+    "word": "发票",
+    "pinyin": "fā piào",
+    "part of speech": "名",
+    "translation": "bill; receipt"
+  },
+  {
+    "word": "发言",
+    "pinyin": "fā yán",
+    "part of speech": "动",
+    "translation": "speak; make a statement; take the floor"
+  },
+  {
+    "word": "罚款",
+    "pinyin": "fá kuǎn",
+    "part of speech": "动/名",
+    "translation": "(impose a) fine"
+  },
+  {
+    "word": "法院",
+    "pinyin": "fǎ yuàn",
+    "part of speech": "名",
+    "translation": "court of law"
+  },
+  {
+    "word": "翻",
+    "pinyin": "fān",
+    "part of speech": "动",
+    "translation": "turn over; turn around; reverse"
+  },
+  {
+    "word": "繁荣",
+    "pinyin": "fán róng",
+    "part of speech": "形",
+    "translation": "flourishing; prosperous; booming"
+  },
+  {
+    "word": "反而",
+    "pinyin": "fǎn ér",
+    "part of speech": "副",
+    "translation": "on the contrary; instead"
+  },
+  {
+    "word": "反复",
+    "pinyin": "fǎn fù",
+    "part of speech": "副/动",
+    "translation": "repeatedly; again and again; over and over"
+  },
+  {
+    "word": "反应",
+    "pinyin": "fǎn yìng",
+    "part of speech": "动/名",
+    "translation": "reaction; response; repercussion"
+  },
+  {
+    "word": "反映",
+    "pinyin": "fǎn yìng",
+    "part of speech": "动",
+    "translation": "to mirror"
+  },
+  {
+    "word": "反正",
+    "pinyin": "fǎn zhèng",
+    "part of speech": "副",
+    "translation": "anyway; anyhow; in any case"
+  },
+  {
+    "word": "范围",
+    "pinyin": "fàn wéi",
+    "part of speech": "名",
+    "translation": "range"
+  },
+  {
+    "word": "方",
+    "pinyin": "fāng",
+    "part of speech": "形",
+    "translation": "square; honest; just now"
+  },
+  {
+    "word": "方案",
+    "pinyin": "fāng àn",
+    "part of speech": "名",
+    "translation": "scheme; plan; programme"
+  },
+  {
+    "word": "妨碍",
+    "pinyin": "fáng ài",
+    "part of speech": "动",
+    "translation": "to hinder; hamper; impede"
+  },
+  {
+    "word": "仿佛",
+    "pinyin": "fǎng fú",
+    "part of speech": "副",
+    "translation": "to seem as if; be more or less the same; be alike"
+  },
+  {
+    "word": "非",
+    "pinyin": "fēi",
+    "part of speech": "副",
+    "translation": "un-; non-; short for Africa"
+  },
+  {
+    "word": "肥皂",
+    "pinyin": "féi zào",
+    "part of speech": "名",
+    "translation": "soap"
+  },
+  {
+    "word": "废话",
+    "pinyin": "fèi huà",
+    "part of speech": "名",
+    "translation": "superfluous words; nonsense; rubbish"
+  },
+  {
+    "word": "分别",
+    "pinyin": "fēn bié",
+    "part of speech": "动/副",
+    "translation": "to part; distinguish; differentiate"
+  },
+  {
+    "word": "分布",
+    "pinyin": "fēn bù",
+    "part of speech": "动",
+    "translation": "to distribute; spread; scatter"
+  },
+  {
+    "word": "纷纷",
+    "pinyin": "fēn fēn",
+    "part of speech": "副",
+    "translation": "one after another; in succession"
+  },
+  {
+    "word": "分配",
+    "pinyin": "fēn pèi",
+    "part of speech": "动",
+    "translation": "distribute; allocate; assign"
+  },
+  {
+    "word": "分手",
+    "pinyin": "fēn shǒu",
+    "part of speech": "动",
+    "translation": "part company; say good-bye; separate"
+  },
+  {
+    "word": "分析",
+    "pinyin": "fēn xī",
+    "part of speech": "动",
+    "translation": "analysis"
+  },
+  {
+    "word": "奋斗",
+    "pinyin": "fèn dòu",
+    "part of speech": "动",
+    "translation": "struggle; to fight for; to strive for"
+  },
+  {
+    "word": "风格",
+    "pinyin": "fēng gé",
+    "part of speech": "名",
+    "translation": "style; form; manner"
+  },
+  {
+    "word": "风景",
+    "pinyin": "fēng jǐng",
+    "part of speech": "名",
+    "translation": "scenery"
+  },
+  {
+    "word": "疯狂",
+    "pinyin": "fēng kuáng",
+    "part of speech": "形",
+    "translation": "insane; frenzied; crazy"
+  },
+  {
+    "word": "风俗",
+    "pinyin": "fēng sú",
+    "part of speech": "名",
+    "translation": "custom"
+  },
+  {
+    "word": "风险",
+    "pinyin": "fēng xiǎn",
+    "part of speech": "名",
+    "translation": "risk; hazard; danger"
+  },
+  {
+    "word": "讽刺",
+    "pinyin": "fěng cì",
+    "part of speech": "动",
+    "translation": "satire; sarcasm; to mock"
+  },
+  {
+    "word": "否定",
+    "pinyin": "fǒu dìng",
+    "part of speech": "动",
+    "translation": "to negate; to deny"
+  },
+  {
+    "word": "否认",
+    "pinyin": "fǒu rèn",
+    "part of speech": "动",
+    "translation": "to deny; repudiate"
+  },
+  {
+    "word": "扶",
+    "pinyin": "fú",
+    "part of speech": "动",
+    "translation": "hold up; support with the hand; to help somebody up"
+  },
+  {
+    "word": "幅",
+    "pinyin": "fú",
+    "part of speech": "量",
+    "translation": "width of cloth; [measure word (for paintings, pictures, textiles etc.)]"
+  },
+  {
+    "word": "服装",
+    "pinyin": "fú zhuāng",
+    "part of speech": "名",
+    "translation": "dress; clothing; costume"
+  },
+  {
+    "word": "辅导",
+    "pinyin": "fǔ dǎo",
+    "part of speech": "动",
+    "translation": "to coach; train; tutor"
+  },
+  {
+    "word": "妇女",
+    "pinyin": "fù nǚ",
+    "part of speech": "名",
+    "translation": "woman"
+  },
+  {
+    "word": "复制",
+    "pinyin": "fù zhì",
+    "part of speech": "动",
+    "translation": "to duplicate; reproduce; copy"
+  },
+  {
+    "word": "改革",
+    "pinyin": "gǎi gé",
+    "part of speech": "动",
+    "translation": "reform"
+  },
+  {
+    "word": "改进",
+    "pinyin": "gǎi jìn",
+    "part of speech": "动",
+    "translation": "to improve; make better; mend"
+  },
+  {
+    "word": "改善",
+    "pinyin": "gǎi shàn",
+    "part of speech": "动",
+    "translation": "to improve"
+  },
+  {
+    "word": "改正",
+    "pinyin": "gǎi zhèng",
+    "part of speech": "动",
+    "translation": "to correct; to amend; put right"
+  },
+  {
+    "word": "盖",
+    "pinyin": "gài",
+    "part of speech": "动",
+    "translation": "cover; lid"
+  },
+  {
+    "word": "概括",
+    "pinyin": "gài kuò",
+    "part of speech": "动",
+    "translation": "to summarise; generalise; epitomise"
+  },
+  {
+    "word": "概念",
+    "pinyin": "gài niàn",
+    "part of speech": "名",
+    "translation": "concept; notion; idea"
+  },
+  {
+    "word": "干脆",
+    "pinyin": "gān cuì",
+    "part of speech": "副",
+    "translation": "clear-cut; straightforward; frank"
+  },
+  {
+    "word": "干燥",
+    "pinyin": "gān zào",
+    "part of speech": "形",
+    "translation": "dull; dry"
+  },
+  {
+    "word": "感激",
+    "pinyin": "gǎn jī",
+    "part of speech": "动",
+    "translation": "to feel grateful; be thankful"
+  },
+  {
+    "word": "赶紧",
+    "pinyin": "gǎn jǐn",
+    "part of speech": "副",
+    "translation": "at once; losing no time; hasten"
+  },
+  {
+    "word": "赶快",
+    "pinyin": "gǎn kuài",
+    "part of speech": "副",
+    "translation": "at once; quickly"
+  },
+  {
+    "word": "感受",
+    "pinyin": "gǎn shòu",
+    "part of speech": "动/名",
+    "translation": "be affected by; feeling; perception"
+  },
+  {
+    "word": "感想",
+    "pinyin": "gǎn xiǎng",
+    "part of speech": "名",
+    "translation": "impression; reflection; thought"
+  },
+  {
+    "word": "干活儿",
+    "pinyin": "gàn huó er",
+    "part of speech": "动",
+    "translation": "to work [often manual] on a job"
+  },
+  {
+    "word": "钢铁",
+    "pinyin": "gāng tiě",
+    "part of speech": "名",
+    "translation": "iron and steel"
+  },
+  {
+    "word": "高档",
+    "pinyin": "gāo dàng",
+    "part of speech": "形",
+    "translation": "top; superior quality"
+  },
+  {
+    "word": "高级",
+    "pinyin": "gāo jí",
+    "part of speech": "形",
+    "translation": "advanced; high level"
+  },
+  {
+    "word": "搞",
+    "pinyin": "gǎo",
+    "part of speech": "动",
+    "translation": "to make/do; carry on; be engaged in"
+  },
+  {
+    "word": "告别",
+    "pinyin": "gào bié",
+    "part of speech": "动",
+    "translation": "bid farewell to; to say good-bye to"
+  },
+  {
+    "word": "隔壁",
+    "pinyin": "gé bì",
+    "part of speech": "名",
+    "translation": "next door"
+  },
+  {
+    "word": "格外",
+    "pinyin": "gé wài",
+    "part of speech": "副",
+    "translation": "especially; exceptionally"
+  },
+  {
+    "word": "个别",
+    "pinyin": "gè bié",
+    "part of speech": "副",
+    "translation": "individually; separately"
+  },
+  {
+    "word": "个人",
+    "pinyin": "gè rén",
+    "part of speech": "名",
+    "translation": "oneself; personal; individual"
+  },
+  {
+    "word": "个性",
+    "pinyin": "gè xìng",
+    "part of speech": "名",
+    "translation": "individual character; personality"
+  },
+  {
+    "word": "各自",
+    "pinyin": "gè zì",
+    "part of speech": "代",
+    "translation": "each; by oneself; respective"
+  },
+  {
+    "word": "根",
+    "pinyin": "gēn",
+    "part of speech": "量",
+    "translation": "root; descendants; completely; [measure word for long, slender objects]"
+  },
+  {
+    "word": "根本",
+    "pinyin": "gēn běn",
+    "part of speech": "副",
+    "translation": "root; basic; fundamental"
+  },
+  {
+    "word": "公布",
+    "pinyin": "gōng bù",
+    "part of speech": "动",
+    "translation": "to announce; make public"
+  },
+  {
+    "word": "工厂",
+    "pinyin": "gōng chǎng",
+    "part of speech": "名",
+    "translation": "factory; plant; works"
+  },
+  {
+    "word": "工程师",
+    "pinyin": "gōng chéng shī",
+    "part of speech": "名",
+    "translation": "engineer"
+  },
+  {
+    "word": "工具",
+    "pinyin": "gōng jù",
+    "part of speech": "名",
+    "translation": "tool"
+  },
+  {
+    "word": "公开",
+    "pinyin": "gōng kāi",
+    "part of speech": "动/形",
+    "translation": "open; overt; to make public"
+  },
+  {
+    "word": "功能",
+    "pinyin": "gōng néng",
+    "part of speech": "名",
+    "translation": "function"
+  },
+  {
+    "word": "公平",
+    "pinyin": "gōng píng",
+    "part of speech": "形",
+    "translation": "fair; just"
+  },
+  {
+    "word": "工人",
+    "pinyin": "gōng rén",
+    "part of speech": "名",
+    "translation": "(manual) worker; labourer"
+  },
+  {
+    "word": "恭喜",
+    "pinyin": "gōng xǐ",
+    "part of speech": "动",
+    "translation": "congratulate"
+  },
+  {
+    "word": "工业",
+    "pinyin": "gōng yè",
+    "part of speech": "名",
+    "translation": "industry"
+  },
+  {
+    "word": "公寓",
+    "pinyin": "gōng yù",
+    "part of speech": "名",
+    "translation": "flats; apartment"
+  },
+  {
+    "word": "公元",
+    "pinyin": "gōng yuán",
+    "part of speech": "名",
+    "translation": "the Christian/Common era"
+  },
+  {
+    "word": "公主",
+    "pinyin": "gōng zhǔ",
+    "part of speech": "名",
+    "translation": "princess"
+  },
+  {
+    "word": "贡献",
+    "pinyin": "gòng xiàn",
+    "part of speech": "名",
+    "translation": "to dedicate; devote; contribution"
+  },
+  {
+    "word": "沟通",
+    "pinyin": "gōu tōng",
+    "part of speech": "动",
+    "translation": "to communicate; link up; connect"
+  },
+  {
+    "word": "构成",
+    "pinyin": "gòu chéng",
+    "part of speech": "名",
+    "translation": "to constitute; form; consist of"
+  },
+  {
+    "word": "姑姑",
+    "pinyin": "gū gu",
+    "part of speech": "名",
+    "translation": "aunt [father's sister]"
+  },
+  {
+    "word": "姑娘",
+    "pinyin": "gū niang",
+    "part of speech": "名",
+    "translation": "girl"
+  },
+  {
+    "word": "古代",
+    "pinyin": "gǔ dài",
+    "part of speech": "名",
+    "translation": "ancient; archaic; antiquity"
+  },
+  {
+    "word": "古典",
+    "pinyin": "gǔ diǎn",
+    "part of speech": "形",
+    "translation": "classical"
+  },
+  {
+    "word": "股票",
+    "pinyin": "gǔ piào",
+    "part of speech": "名",
+    "translation": "shares; stock; equity"
+  },
+  {
+    "word": "骨头",
+    "pinyin": "gǔ tou",
+    "part of speech": "名",
+    "translation": "bone"
+  },
+  {
+    "word": "鼓舞",
+    "pinyin": "gǔ wǔ",
+    "part of speech": "动",
+    "translation": "to inspire; hearten; embolden"
+  },
+  {
+    "word": "鼓掌",
+    "pinyin": "gǔ zhǎng",
+    "part of speech": "动",
+    "translation": "applaud"
+  },
+  {
+    "word": "固定",
+    "pinyin": "gù dìng",
+    "part of speech": "动",
+    "translation": "fixed; fasten"
+  },
+  {
+    "word": "挂号",
+    "pinyin": "guà hào",
+    "part of speech": "动",
+    "translation": "register; send by registered mail"
+  },
+  {
+    "word": "乖",
+    "pinyin": "guāi",
+    "part of speech": "形",
+    "translation": "obeident; well-behaved [child]"
+  },
+  {
+    "word": "拐弯",
+    "pinyin": "guǎi wān",
+    "part of speech": "动",
+    "translation": "to turn a corner; turn round; pursue a new course"
+  },
+  {
+    "word": "怪不得",
+    "pinyin": "guài bu de",
+    "part of speech": "副",
+    "translation": "no wonder; so that's why"
+  },
+  {
+    "word": "官",
+    "pinyin": "guān",
+    "part of speech": "名",
+    "translation": "government official"
+  },
+  {
+    "word": "关闭",
+    "pinyin": "guān bì",
+    "part of speech": "动",
+    "translation": "to close; to shut"
+  },
+  {
+    "word": "观察",
+    "pinyin": "guān chá",
+    "part of speech": "动",
+    "translation": "observe; watch; survey"
+  },
+  {
+    "word": "观点",
+    "pinyin": "guān diǎn",
+    "part of speech": "名",
+    "translation": "point of view; standpoint"
+  },
+  {
+    "word": "观念",
+    "pinyin": "guān niàn",
+    "part of speech": "名",
+    "translation": "sense; concept; perception"
+  },
+  {
+    "word": "管子",
+    "pinyin": "guǎn zi",
+    "part of speech": "动",
+    "translation": "tube; pipe; valve"
+  },
+  {
+    "word": "冠军",
+    "pinyin": "guàn jūn",
+    "part of speech": "名",
+    "translation": "champion"
+  },
+  {
+    "word": "光滑",
+    "pinyin": "guāng huá",
+    "part of speech": "形",
+    "translation": "smooth; glossy; slick"
+  },
+  {
+    "word": "光临",
+    "pinyin": "guāng lín",
+    "part of speech": "动",
+    "translation": "to honour with your presence"
+  },
+  {
+    "word": "光明",
+    "pinyin": "guāng míng",
+    "part of speech": "形",
+    "translation": "light; bright; openhearted"
+  },
+  {
+    "word": "光盘",
+    "pinyin": "guāng pán",
+    "part of speech": "名",
+    "translation": "laser disc (eg CD or DVD)"
+  },
+  {
+    "word": "广场",
+    "pinyin": "guǎng chǎng",
+    "part of speech": "名",
+    "translation": "(public) square"
+  },
+  {
+    "word": "广大",
+    "pinyin": "guǎng dà",
+    "part of speech": "形",
+    "translation": "vast; wide; extensive"
+  },
+  {
+    "word": "广泛",
+    "pinyin": "guǎng fàn",
+    "part of speech": "形",
+    "translation": "extensive; wide-ranging"
+  },
+  {
+    "word": "规矩",
+    "pinyin": "guī ju",
+    "part of speech": "名",
+    "translation": "rule; established practice; custom"
+  },
+  {
+    "word": "规律",
+    "pinyin": "guī lǜ",
+    "part of speech": "名",
+    "translation": "law; regular pattern"
+  },
+  {
+    "word": "规模",
+    "pinyin": "guī mó",
+    "part of speech": "名",
+    "translation": "scale; scope; dimensions"
+  },
+  {
+    "word": "归纳",
+    "pinyin": "guī nà",
+    "part of speech": "动",
+    "translation": "induce; conclude; sum up"
+  },
+  {
+    "word": "规则",
+    "pinyin": "guī zé",
+    "part of speech": "名",
+    "translation": "rule; regulation"
+  },
+  {
+    "word": "柜台",
+    "pinyin": "guì tái",
+    "part of speech": "名",
+    "translation": "counter; bar"
+  },
+  {
+    "word": "滚",
+    "pinyin": "gǔn",
+    "part of speech": "动",
+    "translation": "to roll; trundle"
+  },
+  {
+    "word": "锅",
+    "pinyin": "guō",
+    "part of speech": "名",
+    "translation": "pan; pot; wok"
+  },
+  {
+    "word": "国庆节",
+    "pinyin": "guó qìng jié",
+    "part of speech": "名",
+    "translation": "National Day"
+  },
+  {
+    "word": "国王",
+    "pinyin": "guó wáng",
+    "part of speech": "名",
+    "translation": "king"
+  },
+  {
+    "word": "果然",
+    "pinyin": "guǒ rán",
+    "part of speech": "副",
+    "translation": "really"
+  },
+  {
+    "word": "果实",
+    "pinyin": "guǒ shí",
+    "part of speech": "名",
+    "translation": "fruit; gains"
+  },
+  {
+    "word": "过分",
+    "pinyin": "guò fèn",
+    "part of speech": "形",
+    "translation": "excessive; go too far"
+  },
+  {
+    "word": "过敏",
+    "pinyin": "guò mǐn",
+    "part of speech": "动",
+    "translation": "allergy; irritability"
+  },
+  {
+    "word": "过期",
+    "pinyin": "guò qī",
+    "part of speech": "动",
+    "translation": "exceed the time limit; be overdue; expire"
+  },
+  {
+    "word": "哈",
+    "pinyin": "hā",
+    "part of speech": "叹",
+    "translation": "ha"
+  },
+  {
+    "word": "海关",
+    "pinyin": "hǎi guān",
+    "part of speech": "名",
+    "translation": "customs [import/export]"
+  },
+  {
+    "word": "海鲜",
+    "pinyin": "hǎi xiān",
+    "part of speech": "名",
+    "translation": "seafood"
+  },
+  {
+    "word": "喊",
+    "pinyin": "hǎn",
+    "part of speech": "动",
+    "translation": "shout; cry out; yell"
+  },
+  {
+    "word": "行业",
+    "pinyin": "háng yè",
+    "part of speech": "名",
+    "translation": "trade; profession; industry"
+  },
+  {
+    "word": "豪华",
+    "pinyin": "háo huá",
+    "part of speech": "形",
+    "translation": "luxurious; sumptuous"
+  },
+  {
+    "word": "好客",
+    "pinyin": "hào kè",
+    "part of speech": "形",
+    "translation": "be hospitable"
+  },
+  {
+    "word": "好奇",
+    "pinyin": "hào qí",
+    "part of speech": "形",
+    "translation": "curious"
+  },
+  {
+    "word": "何必",
+    "pinyin": "hé bì",
+    "part of speech": "副",
+    "translation": "there is no need"
+  },
+  {
+    "word": "合法",
+    "pinyin": "hé fǎ",
+    "part of speech": "形",
+    "translation": "legal; legitimate; rightful"
+  },
+  {
+    "word": "何况",
+    "pinyin": "hé kuàng",
+    "part of speech": "连",
+    "translation": "much less; let alone"
+  },
+  {
+    "word": "合理",
+    "pinyin": "hé lǐ",
+    "part of speech": "形",
+    "translation": "rational; reasonable; equitable"
+  },
+  {
+    "word": "和平",
+    "pinyin": "hé píng",
+    "part of speech": "名",
+    "translation": "peace; mild"
+  },
+  {
+    "word": "合同",
+    "pinyin": "hé tong",
+    "part of speech": "名",
+    "translation": "agreement; contract"
+  },
+  {
+    "word": "核心",
+    "pinyin": "hé xīn",
+    "part of speech": "名",
+    "translation": "core; kernel; heart"
+  },
+  {
+    "word": "合影",
+    "pinyin": "hé yǐng",
+    "part of speech": "动",
+    "translation": "group photo"
+  },
+  {
+    "word": "合作",
+    "pinyin": "hé zuò",
+    "part of speech": "动",
+    "translation": "cooperate; collaborate; work together"
+  },
+  {
+    "word": "恨",
+    "pinyin": "hèn",
+    "part of speech": "动",
+    "translation": "hate; regret"
+  },
+  {
+    "word": "猴子",
+    "pinyin": "hóu zi",
+    "part of speech": "名",
+    "translation": "monkey"
+  },
+  {
+    "word": "后背",
+    "pinyin": "hòu bèi",
+    "part of speech": "名",
+    "translation": "back"
+  },
+  {
+    "word": "后果",
+    "pinyin": "hòu guǒ",
+    "part of speech": "名",
+    "translation": "consequence; aftermath"
+  },
+  {
+    "word": "忽然",
+    "pinyin": "hū rán",
+    "part of speech": "副",
+    "translation": "suddenly"
+  },
+  {
+    "word": "忽视",
+    "pinyin": "hū shì",
+    "part of speech": "动",
+    "translation": "ignore; look down upon; overlook"
+  },
+  {
+    "word": "呼吸",
+    "pinyin": "hū xī",
+    "part of speech": "动",
+    "translation": "to breathe; respire"
+  },
+  {
+    "word": "壶",
+    "pinyin": "hú",
+    "part of speech": "名",
+    "translation": "kettle; pot; flask"
+  },
+  {
+    "word": "蝴蝶",
+    "pinyin": "hú dié",
+    "part of speech": "名",
+    "translation": "butterfly"
+  },
+  {
+    "word": "胡说",
+    "pinyin": "hú shuō",
+    "part of speech": "动",
+    "translation": "nonsense; rubbish; drivel"
+  },
+  {
+    "word": "胡同",
+    "pinyin": "hú tòng",
+    "part of speech": "名",
+    "translation": "alleyway; lane"
+  },
+  {
+    "word": "糊涂",
+    "pinyin": "hú tu",
+    "part of speech": "形",
+    "translation": "muddled; confused; bewildered"
+  },
+  {
+    "word": "花生",
+    "pinyin": "huā shēng",
+    "part of speech": "名",
+    "translation": "peanut"
+  },
+  {
+    "word": "滑",
+    "pinyin": "huá",
+    "part of speech": "形",
+    "translation": "slippery"
+  },
+  {
+    "word": "华裔",
+    "pinyin": "huá yì",
+    "part of speech": "名",
+    "translation": "foreign citizen of Chinese origin"
+  },
+  {
+    "word": "划",
+    "pinyin": "huà",
+    "part of speech": "动",
+    "translation": "to assign"
+  },
+  {
+    "word": "话题",
+    "pinyin": "huà tí",
+    "part of speech": "名",
+    "translation": "subject of a talk; topic of conversation"
+  },
+  {
+    "word": "化学",
+    "pinyin": "huà xué",
+    "part of speech": "名",
+    "translation": "chemistry"
+  },
+  {
+    "word": "怀念",
+    "pinyin": "huái niàn",
+    "part of speech": "动",
+    "translation": "cherish the memory of; remember fondly"
+  },
+  {
+    "word": "怀孕",
+    "pinyin": "huái yùn",
+    "part of speech": "动",
+    "translation": "be pregnant; conceive"
+  },
+  {
+    "word": "缓解",
+    "pinyin": "huǎn jiě",
+    "part of speech": "动",
+    "translation": "relieve; ease"
+  },
+  {
+    "word": "幻想",
+    "pinyin": "huàn xiǎng",
+    "part of speech": "动",
+    "translation": "illusion; fantasy; figment of one's imagination"
+  },
+  {
+    "word": "慌张",
+    "pinyin": "huāng zhāng",
+    "part of speech": "形",
+    "translation": "flustered; confused; trepidation"
+  },
+  {
+    "word": "黄金",
+    "pinyin": "huáng jīn",
+    "part of speech": "名",
+    "translation": "gold"
+  },
+  {
+    "word": "挥",
+    "pinyin": "huī",
+    "part of speech": "动",
+    "translation": "wave; wield; wipe off"
+  },
+  {
+    "word": "灰",
+    "pinyin": "huī",
+    "part of speech": "形",
+    "translation": "grey; ash; dust"
+  },
+  {
+    "word": "灰尘",
+    "pinyin": "huī chén",
+    "part of speech": "名",
+    "translation": "dust; dirt; ash"
+  },
+  {
+    "word": "恢复",
+    "pinyin": "huī fù",
+    "part of speech": "动",
+    "translation": "resume; renew; to recover"
+  },
+  {
+    "word": "灰心",
+    "pinyin": "huī xīn",
+    "part of speech": "形",
+    "translation": "to lose heart; to be discouraged; be disappointed"
+  },
+  {
+    "word": "汇率",
+    "pinyin": "huì lǜ",
+    "part of speech": "名",
+    "translation": "exchange rate"
+  },
+  {
+    "word": "婚礼",
+    "pinyin": "hūn lǐ",
+    "part of speech": "名",
+    "translation": "wedding"
+  },
+  {
+    "word": "婚姻",
+    "pinyin": "hūn yīn",
+    "part of speech": "名",
+    "translation": "marriage; matrimony"
+  },
+  {
+    "word": "活跃",
+    "pinyin": "huó yuè",
+    "part of speech": "形",
+    "translation": "brisk; dynamic; lively"
+  },
+  {
+    "word": "伙伴",
+    "pinyin": "huǒ bàn",
+    "part of speech": "名",
+    "translation": "partner; companion; colleague"
+  },
+  {
+    "word": "火柴",
+    "pinyin": "huǒ chái",
+    "part of speech": "名",
+    "translation": "match"
+  },
+  {
+    "word": "或许",
+    "pinyin": "huò xǔ",
+    "part of speech": "副",
+    "translation": "perhaps; maybe"
+  },
+  {
+    "word": "基本",
+    "pinyin": "jī běn",
+    "part of speech": "形",
+    "translation": "basic; fundamental"
+  },
+  {
+    "word": "激烈",
+    "pinyin": "jī liè",
+    "part of speech": "形",
+    "translation": "intense; sharp; fierce"
+  },
+  {
+    "word": "机器",
+    "pinyin": "jī qì",
+    "part of speech": "名",
+    "translation": "machine; engine; apparatus"
+  },
+  {
+    "word": "肌肉",
+    "pinyin": "jī ròu",
+    "part of speech": "名",
+    "translation": "muscle"
+  },
+  {
+    "word": "及格",
+    "pinyin": "jí gé",
+    "part of speech": "动",
+    "translation": "pass (a test, examination etc)"
+  },
+  {
+    "word": "集合",
+    "pinyin": "jí hé",
+    "part of speech": "动",
+    "translation": "to gather"
+  },
+  {
+    "word": "急忙",
+    "pinyin": "jí máng",
+    "part of speech": "副",
+    "translation": "in a hurry; in haste"
+  },
+  {
+    "word": "极其",
+    "pinyin": "jí qí",
+    "part of speech": "副",
+    "translation": "extremely"
+  },
+  {
+    "word": "集体",
+    "pinyin": "jí tǐ",
+    "part of speech": "名",
+    "translation": "collective; community; group"
+  },
+  {
+    "word": "急诊",
+    "pinyin": "jí zhěn",
+    "part of speech": "动",
+    "translation": "emergency call"
+  },
+  {
+    "word": "集中",
+    "pinyin": "jí zhōng",
+    "part of speech": "动",
+    "translation": "to concentrate; focus; pay attention"
+  },
+  {
+    "word": "系领带",
+    "pinyin": "jì lǐng dài",
+    "part of speech": "",
+    "translation": "tie a (neck)tie"
+  },
+  {
+    "word": "纪录",
+    "pinyin": "jì lù",
+    "part of speech": "动",
+    "translation": "to record"
+  },
+  {
+    "word": "记录",
+    "pinyin": "jì lù",
+    "part of speech": "动",
+    "translation": "take notes; keep the minutes"
+  },
+  {
+    "word": "纪律",
+    "pinyin": "jì lǜ",
+    "part of speech": "名",
+    "translation": "discipline"
+  },
+  {
+    "word": "寂寞",
+    "pinyin": "jì mò",
+    "part of speech": "形",
+    "translation": "lonely; lonesome"
+  },
+  {
+    "word": "纪念",
+    "pinyin": "jì niàn",
+    "part of speech": "动",
+    "translation": "commemorate"
+  },
+  {
+    "word": "计算",
+    "pinyin": "jì suàn",
+    "part of speech": "动",
+    "translation": "count; compute; calculate"
+  },
+  {
+    "word": "记忆",
+    "pinyin": "jì yì",
+    "part of speech": "名",
+    "translation": "recall; memory; storage"
+  },
+  {
+    "word": "嘉宾",
+    "pinyin": "jiā bīn",
+    "part of speech": "名",
+    "translation": "honoured guest"
+  },
+  {
+    "word": "家庭",
+    "pinyin": "jiā tíng",
+    "part of speech": "名",
+    "translation": "family; household"
+  },
+  {
+    "word": "家务",
+    "pinyin": "jiā wù",
+    "part of speech": "名",
+    "translation": "house work"
+  },
+  {
+    "word": "家乡",
+    "pinyin": "jiā xiāng",
+    "part of speech": "名",
+    "translation": "home town;native place"
+  },
+  {
+    "word": "夹子",
+    "pinyin": "jiā zi",
+    "part of speech": "名",
+    "translation": "folder; tongs; clamp; clip"
+  },
+  {
+    "word": "甲",
+    "pinyin": "jiǎ",
+    "part of speech": "名",
+    "translation": "shell; nail; first; the first of the ten Heavenly Stems"
+  },
+  {
+    "word": "假如",
+    "pinyin": "jiǎ rú",
+    "part of speech": "连",
+    "translation": "if; supposing; in case"
+  },
+  {
+    "word": "假设",
+    "pinyin": "jiǎ shè",
+    "part of speech": "动",
+    "translation": "suppose; assume; presume"
+  },
+  {
+    "word": "假装",
+    "pinyin": "jiǎ zhuāng",
+    "part of speech": "动",
+    "translation": "to pretend; feign"
+  },
+  {
+    "word": "嫁",
+    "pinyin": "jià",
+    "part of speech": "动",
+    "translation": "marry; shift; transfer"
+  },
+  {
+    "word": "驾驶",
+    "pinyin": "jià shǐ",
+    "part of speech": "动",
+    "translation": "drive; pilot; steer"
+  },
+  {
+    "word": "价值",
+    "pinyin": "jià zhí",
+    "part of speech": "名",
+    "translation": "value; cost; worth"
+  },
+  {
+    "word": "肩膀",
+    "pinyin": "jiān bǎng",
+    "part of speech": "名",
+    "translation": "shoulder"
+  },
+  {
+    "word": "艰巨",
+    "pinyin": "jiān jù",
+    "part of speech": "形",
+    "translation": "arduous; formidable; onerous"
+  },
+  {
+    "word": "坚决",
+    "pinyin": "jiān jué",
+    "part of speech": "形",
+    "translation": "firm; resolute; determined"
+  },
+  {
+    "word": "艰苦",
+    "pinyin": "jiān kǔ",
+    "part of speech": "形",
+    "translation": "arduous; difficult; tough"
+  },
+  {
+    "word": "坚强",
+    "pinyin": "jiān qiáng",
+    "part of speech": "形",
+    "translation": "strong; firm; staunch"
+  },
+  {
+    "word": "兼职",
+    "pinyin": "jiān zhí",
+    "part of speech": "名",
+    "translation": "hold two or more posts concurrently; part-time job"
+  },
+  {
+    "word": "捡",
+    "pinyin": "jiǎn",
+    "part of speech": "动",
+    "translation": "to pick up; collect; to gather"
+  },
+  {
+    "word": "剪刀",
+    "pinyin": "jiǎn dāo",
+    "part of speech": "名",
+    "translation": "scissors; shears"
+  },
+  {
+    "word": "简历",
+    "pinyin": "jiǎn lì",
+    "part of speech": "名",
+    "translation": "Curriculum Vitae (CV); résumé"
+  },
+  {
+    "word": "简直",
+    "pinyin": "jiǎn zhí",
+    "part of speech": "副",
+    "translation": "simply"
+  },
+  {
+    "word": "建立",
+    "pinyin": "jiàn lì",
+    "part of speech": "动",
+    "translation": "build; set up; establish"
+  },
+  {
+    "word": "键盘",
+    "pinyin": "jiàn pán",
+    "part of speech": "名",
+    "translation": "keyboard"
+  },
+  {
+    "word": "建设",
+    "pinyin": "jiàn shè",
+    "part of speech": "动",
+    "translation": "to build; to construct; develop"
+  },
+  {
+    "word": "健身",
+    "pinyin": "jiàn shēn",
+    "part of speech": "动",
+    "translation": "keep fit"
+  },
+  {
+    "word": "建筑",
+    "pinyin": "jiàn zhù",
+    "part of speech": "名",
+    "translation": "build; construct; erect"
+  },
+  {
+    "word": "讲究",
+    "pinyin": "jiǎng jiu",
+    "part of speech": "动",
+    "translation": "be particular about; to pay attention to"
+  },
+  {
+    "word": "讲座",
+    "pinyin": "jiǎng zuò",
+    "part of speech": "名",
+    "translation": "series of lectures"
+  },
+  {
+    "word": "酱油",
+    "pinyin": "jiàng yóu",
+    "part of speech": "名",
+    "translation": "soy sauce"
+  },
+  {
+    "word": "浇",
+    "pinyin": "jiāo",
+    "part of speech": "动",
+    "translation": "sprinkle water on; irrigate; to water"
+  },
+  {
+    "word": "交换",
+    "pinyin": "jiāo huàn",
+    "part of speech": "动",
+    "translation": "swap; to exchange"
+  },
+  {
+    "word": "交际",
+    "pinyin": "jiāo jì",
+    "part of speech": "动",
+    "translation": "communication; social intercourse"
+  },
+  {
+    "word": "胶水",
+    "pinyin": "jiāo shuǐ",
+    "part of speech": "名",
+    "translation": "glue"
+  },
+  {
+    "word": "交往",
+    "pinyin": "jiāo wǎng",
+    "part of speech": "动",
+    "translation": "be in contact with; associate with"
+  },
+  {
+    "word": "角度",
+    "pinyin": "jiǎo dù",
+    "part of speech": "名",
+    "translation": "angle; point of view"
+  },
+  {
+    "word": "狡猾",
+    "pinyin": "jiǎo huá",
+    "part of speech": "形",
+    "translation": "sly; crafty; cunning"
+  },
+  {
+    "word": "教材",
+    "pinyin": "jiào cái",
+    "part of speech": "名",
+    "translation": "teaching material"
+  },
+  {
+    "word": "教练",
+    "pinyin": "jiào liàn",
+    "part of speech": "名",
+    "translation": "train; drill; (sports) coach"
+  },
+  {
+    "word": "教训",
+    "pinyin": "jiào xun",
+    "part of speech": "动/名",
+    "translation": "lesson; moral"
+  },
+  {
+    "word": "接触",
+    "pinyin": "jiē chù",
+    "part of speech": "动",
+    "translation": "come into contact with; to get in touch with; engage"
+  },
+  {
+    "word": "接待",
+    "pinyin": "jiē dài",
+    "part of speech": "动",
+    "translation": "to receive (visitor); admit"
+  },
+  {
+    "word": "阶段",
+    "pinyin": "jiē duàn",
+    "part of speech": "名",
+    "translation": "section; stage; phase"
+  },
+  {
+    "word": "接近",
+    "pinyin": "jiē jìn",
+    "part of speech": "动",
+    "translation": "be close to; to approach"
+  },
+  {
+    "word": "结实",
+    "pinyin": "jiē shi",
+    "part of speech": "形",
+    "translation": "solid; sturdy; durable"
+  },
+  {
+    "word": "结构",
+    "pinyin": "jié gòu",
+    "part of speech": "名",
+    "translation": "structure; composition; construction"
+  },
+  {
+    "word": "结合",
+    "pinyin": "jié hé",
+    "part of speech": "动",
+    "translation": "to combine; unite; integrate"
+  },
+  {
+    "word": "结论",
+    "pinyin": "jié lùn",
+    "part of speech": "名",
+    "translation": "conclusion; verdict; epilogue"
+  },
+  {
+    "word": "节省",
+    "pinyin": "jié shěng",
+    "part of speech": "动",
+    "translation": "to economise; save; use sparingly"
+  },
+  {
+    "word": "结账",
+    "pinyin": "jié zhàng",
+    "part of speech": "动",
+    "translation": "to pay the bill"
+  },
+  {
+    "word": "戒",
+    "pinyin": "jiè",
+    "part of speech": "动",
+    "translation": "to give up or stop doing something"
+  },
+  {
+    "word": "届",
+    "pinyin": "jiè",
+    "part of speech": "量",
+    "translation": "fall due; [measure word for meetings, events, etc.]"
+  },
+  {
+    "word": "借口",
+    "pinyin": "jiè kǒu",
+    "part of speech": "名",
+    "translation": "use as an excuse; on the pretext of"
+  },
+  {
+    "word": "戒指",
+    "pinyin": "jiè zhi",
+    "part of speech": "名",
+    "translation": "ring [jewellry]"
+  },
+  {
+    "word": "金属",
+    "pinyin": "jīn shǔ",
+    "part of speech": "名",
+    "translation": "metal"
+  },
+  {
+    "word": "紧急",
+    "pinyin": "jǐn jí",
+    "part of speech": "形",
+    "translation": "urgent; pressing"
+  },
+  {
+    "word": "尽快",
+    "pinyin": "jǐn kuài",
+    "part of speech": "副",
+    "translation": "as quickly as possible"
+  },
+  {
+    "word": "谨慎",
+    "pinyin": "jǐn shèn",
+    "part of speech": "形",
+    "translation": "prudent; careful; cautious"
+  },
+  {
+    "word": "进步",
+    "pinyin": "jìn bù",
+    "part of speech": "动",
+    "translation": "progress"
+  },
+  {
+    "word": "近代",
+    "pinyin": "jìn dài",
+    "part of speech": "名",
+    "translation": "modern times"
+  },
+  {
+    "word": "进口",
+    "pinyin": "jìn kǒu",
+    "part of speech": "动",
+    "translation": "import; entrance; sail into a port"
+  },
+  {
+    "word": "尽力",
+    "pinyin": "jìn lì",
+    "part of speech": "动",
+    "translation": "to do all one can; try one's best"
+  },
+  {
+    "word": "尽量",
+    "pinyin": "jìn liàng",
+    "part of speech": "副",
+    "translation": "to the best of one's ability; as far as possible"
+  },
+  {
+    "word": "经典",
+    "pinyin": "jīng diǎn",
+    "part of speech": "形",
+    "translation": "classics"
+  },
+  {
+    "word": "精力",
+    "pinyin": "jīng lì",
+    "part of speech": "名",
+    "translation": "energy; vigour; vim"
+  },
+  {
+    "word": "经商",
+    "pinyin": "jīng shāng",
+    "part of speech": "动",
+    "translation": "engage in trade; be in business"
+  },
+  {
+    "word": "精神",
+    "pinyin": "jīng shén",
+    "part of speech": "名",
+    "translation": "essence; spirit"
+  },
+  {
+    "word": "经营",
+    "pinyin": "jīng yíng",
+    "part of speech": "动",
+    "translation": "manage; to operate; to run"
+  },
+  {
+    "word": "酒吧",
+    "pinyin": "jiǔ bā",
+    "part of speech": "名",
+    "translation": "bar"
+  },
+  {
+    "word": "救",
+    "pinyin": "jiù",
+    "part of speech": "动",
+    "translation": "to rescue; save"
+  },
+  {
+    "word": "救护车",
+    "pinyin": "jiù hù chē",
+    "part of speech": "名",
+    "translation": "ambulance"
+  },
+  {
+    "word": "舅舅",
+    "pinyin": "jiù jiu",
+    "part of speech": "名",
+    "translation": "uncle [mother's brother]"
+  },
+  {
+    "word": "居然",
+    "pinyin": "jū rán",
+    "part of speech": "副",
+    "translation": "unexpectedly; to one's surprise"
+  },
+  {
+    "word": "桔子",
+    "pinyin": "jú zi",
+    "part of speech": "名",
+    "translation": "tangerine"
+  },
+  {
+    "word": "具备",
+    "pinyin": "jù bèi",
+    "part of speech": "动",
+    "translation": "possess; have; be provided with"
+  },
+  {
+    "word": "巨大",
+    "pinyin": "jù dà",
+    "part of speech": "形",
+    "translation": "huge; enormous; gigantic"
+  },
+  {
+    "word": "俱乐部",
+    "pinyin": "jù lè bù",
+    "part of speech": "名",
+    "translation": "club"
+  },
+  {
+    "word": "据说",
+    "pinyin": "jù shuō",
+    "part of speech": "动",
+    "translation": "it is said; they say; allegedly"
+  },
+  {
+    "word": "具体",
+    "pinyin": "jù tǐ",
+    "part of speech": "形",
+    "translation": "concrete; specific; particular"
+  },
+  {
+    "word": "捐",
+    "pinyin": "juān",
+    "part of speech": "动",
+    "translation": "relinquish; contribute; donate"
+  },
+  {
+    "word": "绝对",
+    "pinyin": "jué duì",
+    "part of speech": "副",
+    "translation": "absolutely; perfectly"
+  },
+  {
+    "word": "决赛",
+    "pinyin": "jué sài",
+    "part of speech": "名",
+    "translation": "finals [of a competition]"
+  },
+  {
+    "word": "角色",
+    "pinyin": "jué sè",
+    "part of speech": "名",
+    "translation": "role; part"
+  },
+  {
+    "word": "决心",
+    "pinyin": "jué xīn",
+    "part of speech": "名",
+    "translation": "determination; resolution"
+  },
+  {
+    "word": "军事",
+    "pinyin": "jūn shì",
+    "part of speech": "名",
+    "translation": "military affairs"
+  },
+  {
+    "word": "均匀",
+    "pinyin": "jūn yún",
+    "part of speech": "形",
+    "translation": "even; well-distributed; equality"
+  },
+  {
+    "word": "卡车",
+    "pinyin": "kǎ chē",
+    "part of speech": "名",
+    "translation": "lorry; truck"
+  },
+  {
+    "word": "开发",
+    "pinyin": "kāi fā",
+    "part of speech": "动",
+    "translation": "develop; open up; exploit"
+  },
+  {
+    "word": "开放",
+    "pinyin": "kāi fàng",
+    "part of speech": "动/形",
+    "translation": "lift a restriction; open up (to the outside world/ public etc.)"
+  },
+  {
+    "word": "开幕式",
+    "pinyin": "kāi mù shì",
+    "part of speech": "名",
+    "translation": "inauguration; opening ceremony"
+  },
+  {
+    "word": "开水",
+    "pinyin": "kāi shuǐ",
+    "part of speech": "名",
+    "translation": "boiling water"
+  },
+  {
+    "word": "砍",
+    "pinyin": "kǎn",
+    "part of speech": "动",
+    "translation": "cut; chop; hack"
+  },
+  {
+    "word": "看不起",
+    "pinyin": "kàn bu qǐ",
+    "part of speech": "动",
+    "translation": "look down upon; scorn; disdain"
+  },
+  {
+    "word": "看望",
+    "pinyin": "kàn wàng",
+    "part of speech": "动",
+    "translation": "call on; visit"
+  },
+  {
+    "word": "靠",
+    "pinyin": "kào",
+    "part of speech": "动",
+    "translation": "lean on"
+  },
+  {
+    "word": "颗",
+    "pinyin": "kē",
+    "part of speech": "量",
+    "translation": "grain; [measure word for anything small and roundish]"
+  },
+  {
+    "word": "可见",
+    "pinyin": "kě jiàn",
+    "part of speech": "连",
+    "translation": "it is thus clear that; visible; visual"
+  },
+  {
+    "word": "可靠",
+    "pinyin": "kě kào",
+    "part of speech": "形",
+    "translation": "reliable; dependable; trustworthy"
+  },
+  {
+    "word": "可怕",
+    "pinyin": "kě pà",
+    "part of speech": "形",
+    "translation": "frightening; dreadful"
+  },
+  {
+    "word": "克",
+    "pinyin": "kè",
+    "part of speech": "量",
+    "translation": "gram"
+  },
+  {
+    "word": "课程",
+    "pinyin": "kè chéng",
+    "part of speech": "名",
+    "translation": "curriculum; course"
+  },
+  {
+    "word": "克服",
+    "pinyin": "kè fú",
+    "part of speech": "动",
+    "translation": "overcome; conquer; endure"
+  },
+  {
+    "word": "客观",
+    "pinyin": "kè guān",
+    "part of speech": "形",
+    "translation": "objective"
+  },
+  {
+    "word": "刻苦",
+    "pinyin": "kè kǔ",
+    "part of speech": "形",
+    "translation": "assiduous; hardworking; painstaking"
+  },
+  {
+    "word": "空间",
+    "pinyin": "kōng jiān",
+    "part of speech": "名",
+    "translation": "space; enclosure"
+  },
+  {
+    "word": "空闲",
+    "pinyin": "kòng xián",
+    "part of speech": "形",
+    "translation": "free time; spare time"
+  },
+  {
+    "word": "控制",
+    "pinyin": "kòng zhì",
+    "part of speech": "动",
+    "translation": "control; regulate"
+  },
+  {
+    "word": "口味",
+    "pinyin": "kǒu wèi",
+    "part of speech": "名",
+    "translation": "flavour/taste"
+  },
+  {
+    "word": "夸",
+    "pinyin": "kuā",
+    "part of speech": "动",
+    "translation": "exaggerate; boast"
+  },
+  {
+    "word": "夸张",
+    "pinyin": "kuā zhāng",
+    "part of speech": "形",
+    "translation": "to exaggerate"
+  },
+  {
+    "word": "会计",
+    "pinyin": "kuài jì",
+    "part of speech": "名",
+    "translation": "accountancy"
+  },
+  {
+    "word": "宽",
+    "pinyin": "kuān",
+    "part of speech": "形",
+    "translation": "wide"
+  },
+  {
+    "word": "昆虫",
+    "pinyin": "kūn chóng",
+    "part of speech": "名",
+    "translation": "insect"
+  },
+  {
+    "word": "扩大",
+    "pinyin": "kuò dà",
+    "part of speech": "动",
+    "translation": "to expand"
+  },
+  {
+    "word": "辣椒",
+    "pinyin": "là jiāo",
+    "part of speech": "名",
+    "translation": "chilli"
+  },
+  {
+    "word": "拦",
+    "pinyin": "lán",
+    "part of speech": "动",
+    "translation": "bar; block; hinder"
+  },
+  {
+    "word": "烂",
+    "pinyin": "làn",
+    "part of speech": "形",
+    "translation": "mashed; mushy; sodden"
+  },
+  {
+    "word": "朗读",
+    "pinyin": "lǎng dú",
+    "part of speech": "动",
+    "translation": "read aloud; read loudly and clearly"
+  },
+  {
+    "word": "劳动",
+    "pinyin": "láo dòng",
+    "part of speech": "动",
+    "translation": "labour; bother"
+  },
+  {
+    "word": "劳驾",
+    "pinyin": "láo jià",
+    "part of speech": "动",
+    "translation": "excuse me"
+  },
+  {
+    "word": "老百姓",
+    "pinyin": "lǎo bǎi xìng",
+    "part of speech": "名",
+    "translation": "common people; civilians"
+  },
+  {
+    "word": "老板",
+    "pinyin": "lǎo bǎn",
+    "part of speech": "名",
+    "translation": "boss; proprietor; shopkeeper"
+  },
+  {
+    "word": "姥姥",
+    "pinyin": "lǎo lao",
+    "part of speech": "名",
+    "translation": "grandmother [mother's mother]"
+  },
+  {
+    "word": "老婆",
+    "pinyin": "lǎo po",
+    "part of speech": "名",
+    "translation": "wife [colloquial]"
+  },
+  {
+    "word": "老实",
+    "pinyin": "lǎo shi",
+    "part of speech": "形",
+    "translation": "honest; frank"
+  },
+  {
+    "word": "老鼠",
+    "pinyin": "lǎo shǔ",
+    "part of speech": "名",
+    "translation": "mouse; rat"
+  },
+  {
+    "word": "乐观",
+    "pinyin": "lè guān",
+    "part of speech": "形",
+    "translation": "optimistic"
+  },
+  {
+    "word": "雷",
+    "pinyin": "léi",
+    "part of speech": "名",
+    "translation": "thunder"
+  },
+  {
+    "word": "类型",
+    "pinyin": "lèi xíng",
+    "part of speech": "名",
+    "translation": "type"
+  },
+  {
+    "word": "冷淡",
+    "pinyin": "lěng dàn",
+    "part of speech": "形",
+    "translation": "treat coldly; give the cold shoulder to"
+  },
+  {
+    "word": "梨",
+    "pinyin": "lí",
+    "part of speech": "名",
+    "translation": "pear"
+  },
+  {
+    "word": "离婚",
+    "pinyin": "lí hūn",
+    "part of speech": "动",
+    "translation": "divorce"
+  },
+  {
+    "word": "厘米",
+    "pinyin": "lí mǐ",
+    "part of speech": "量",
+    "translation": "centimetre"
+  },
+  {
+    "word": "理论",
+    "pinyin": "lǐ lùn",
+    "part of speech": "名",
+    "translation": "theory"
+  },
+  {
+    "word": "理由",
+    "pinyin": "lǐ yóu",
+    "part of speech": "名",
+    "translation": "reason; justification"
+  },
+  {
+    "word": "立即",
+    "pinyin": "lì jí",
+    "part of speech": "副",
+    "translation": "immediately; at once; promptly"
+  },
+  {
+    "word": "立刻",
+    "pinyin": "lì kè",
+    "part of speech": "副",
+    "translation": "immediately; at once; right away"
+  },
+  {
+    "word": "力量",
+    "pinyin": "lì liang",
+    "part of speech": "名",
+    "translation": "physical strength; power"
+  },
+  {
+    "word": "利润",
+    "pinyin": "lì rùn",
+    "part of speech": "名",
+    "translation": "profit"
+  },
+  {
+    "word": "利息",
+    "pinyin": "lì xī",
+    "part of speech": "名",
+    "translation": "interest rate"
+  },
+  {
+    "word": "利益",
+    "pinyin": "lì yì",
+    "part of speech": "名",
+    "translation": "gain; benefit; profit"
+  },
+  {
+    "word": "利用",
+    "pinyin": "lì yòng",
+    "part of speech": "动",
+    "translation": "make use of; take advantage of"
+  },
+  {
+    "word": "联合",
+    "pinyin": "lián hé",
+    "part of speech": "动",
+    "translation": "alliance; union"
+  },
+  {
+    "word": "连忙",
+    "pinyin": "lián máng",
+    "part of speech": "副",
+    "translation": "promptly; immediately; instantly"
+  },
+  {
+    "word": "连续",
+    "pinyin": "lián xù",
+    "part of speech": "形",
+    "translation": "continuous"
+  },
+  {
+    "word": "恋爱",
+    "pinyin": "liàn ài",
+    "part of speech": "动",
+    "translation": "love"
+  },
+  {
+    "word": "良好",
+    "pinyin": "liáng hǎo",
+    "part of speech": "形",
+    "translation": "good; fine"
+  },
+  {
+    "word": "粮食",
+    "pinyin": "liáng shi",
+    "part of speech": "名",
+    "translation": "grain; cereals"
+  },
+  {
+    "word": "亮",
+    "pinyin": "liàng",
+    "part of speech": "形",
+    "translation": "bright; to shine"
+  },
+  {
+    "word": "了不起",
+    "pinyin": "liǎo bu qǐ",
+    "part of speech": "形",
+    "translation": "amazing; terrific; extraordinary"
+  },
+  {
+    "word": "列车",
+    "pinyin": "liè chē",
+    "part of speech": "名",
+    "translation": "train"
+  },
+  {
+    "word": "临时",
+    "pinyin": "lín shí",
+    "part of speech": "副/形",
+    "translation": "temporary; provisional"
+  },
+  {
+    "word": "铃",
+    "pinyin": "líng",
+    "part of speech": "名",
+    "translation": "bell; [bell-shaped things]"
+  },
+  {
+    "word": "灵活",
+    "pinyin": "líng huó",
+    "part of speech": "形",
+    "translation": "nimble; agile; flexible"
+  },
+  {
+    "word": "零件",
+    "pinyin": "líng jiàn",
+    "part of speech": "名",
+    "translation": "part; element; component"
+  },
+  {
+    "word": "零食",
+    "pinyin": "líng shí",
+    "part of speech": "名",
+    "translation": "snacks; nibbles between meals"
+  },
+  {
+    "word": "领导",
+    "pinyin": "lǐng dǎo",
+    "part of speech": "动/名",
+    "translation": "lead; leader"
+  },
+  {
+    "word": "领域",
+    "pinyin": "lǐng yù",
+    "part of speech": "名",
+    "translation": "territory; domain; field"
+  },
+  {
+    "word": "流传",
+    "pinyin": "liú chuán",
+    "part of speech": "动",
+    "translation": "spread; circulate; hand down"
+  },
+  {
+    "word": "浏览",
+    "pinyin": "liú lǎn",
+    "part of speech": "动",
+    "translation": "glance over; skim through; browse"
+  },
+  {
+    "word": "流泪",
+    "pinyin": "liú lèi",
+    "part of speech": "动",
+    "translation": "to shed tears"
+  },
+  {
+    "word": "龙",
+    "pinyin": "lóng",
+    "part of speech": "名",
+    "translation": "dragon"
+  },
+  {
+    "word": "漏",
+    "pinyin": "lòu",
+    "part of speech": "动",
+    "translation": "to leak; divulge; disclose"
+  },
+  {
+    "word": "陆地",
+    "pinyin": "lù dì",
+    "part of speech": "名",
+    "translation": "dry land; terrace"
+  },
+  {
+    "word": "录取",
+    "pinyin": "lù qǔ",
+    "part of speech": "动",
+    "translation": "enroll; recruit; admit to"
+  },
+  {
+    "word": "陆续",
+    "pinyin": "lù xù",
+    "part of speech": "副",
+    "translation": "one after another; in succession"
+  },
+  {
+    "word": "录音",
+    "pinyin": "lù yīn",
+    "part of speech": "动",
+    "translation": "sound recording; film recording"
+  },
+  {
+    "word": "轮流",
+    "pinyin": "lún liú",
+    "part of speech": "动",
+    "translation": "take turns; rotation"
+  },
+  {
+    "word": "论文",
+    "pinyin": "lùn wén",
+    "part of speech": "名",
+    "translation": "thesis; dissertation; treatise"
+  },
+  {
+    "word": "逻辑",
+    "pinyin": "luó ji",
+    "part of speech": "名",
+    "translation": "logic"
+  },
+  {
+    "word": "落后",
+    "pinyin": "luò hòu",
+    "part of speech": "形",
+    "translation": "fall behind; lag behind; backward"
+  },
+  {
+    "word": "骂",
+    "pinyin": "mà",
+    "part of speech": "动",
+    "translation": "scold; abuse; call names"
+  },
+  {
+    "word": "麦克风",
+    "pinyin": "mài kè fēng",
+    "part of speech": "名",
+    "translation": "microphone"
+  },
+  {
+    "word": "馒头",
+    "pinyin": "mán tou",
+    "part of speech": "名",
+    "translation": "[steamed bread]"
+  },
+  {
+    "word": "满足",
+    "pinyin": "mǎn zú",
+    "part of speech": "动",
+    "translation": "satisfied; content"
+  },
+  {
+    "word": "毛病",
+    "pinyin": "máo bìng",
+    "part of speech": "名",
+    "translation": "illness; disease; fault"
+  },
+  {
+    "word": "矛盾",
+    "pinyin": "máo dùn",
+    "part of speech": "名/形",
+    "translation": "contradictory"
+  },
+  {
+    "word": "冒险",
+    "pinyin": "mào xiǎn",
+    "part of speech": "动",
+    "translation": "take a risk; adventure"
+  },
+  {
+    "word": "贸易",
+    "pinyin": "mào yì",
+    "part of speech": "名",
+    "translation": "trade"
+  },
+  {
+    "word": "眉毛",
+    "pinyin": "méi mao",
+    "part of speech": "名",
+    "translation": "eyebrow"
+  },
+  {
+    "word": "煤炭",
+    "pinyin": "méi tàn",
+    "part of speech": "名",
+    "translation": "coal"
+  },
+  {
+    "word": "媒体",
+    "pinyin": "méi tǐ",
+    "part of speech": "名",
+    "translation": "media"
+  },
+  {
+    "word": "美术",
+    "pinyin": "měi shù",
+    "part of speech": "名",
+    "translation": "art"
+  },
+  {
+    "word": "魅力",
+    "pinyin": "mèi lì",
+    "part of speech": "名",
+    "translation": "enchantment"
+  },
+  {
+    "word": "梦想",
+    "pinyin": "mèng xiǎng",
+    "part of speech": "名",
+    "translation": "hope vainly; pipe dream"
+  },
+  {
+    "word": "蜜蜂",
+    "pinyin": "mì fēng",
+    "part of speech": "名",
+    "translation": "(honey) bee"
+  },
+  {
+    "word": "秘密",
+    "pinyin": "mì mì",
+    "part of speech": "名",
+    "translation": "secret; clandestine; confidential"
+  },
+  {
+    "word": "密切",
+    "pinyin": "mì qiè",
+    "part of speech": "形",
+    "translation": "close; intimate; carefully"
+  },
+  {
+    "word": "秘书",
+    "pinyin": "mì shū",
+    "part of speech": "名",
+    "translation": "secretary"
+  },
+  {
+    "word": "面对",
+    "pinyin": "miàn duì",
+    "part of speech": "动",
+    "translation": "face; confront"
+  },
+  {
+    "word": "面积",
+    "pinyin": "miàn jī",
+    "part of speech": "名",
+    "translation": "area"
+  },
+  {
+    "word": "面临",
+    "pinyin": "miàn lín",
+    "part of speech": "动",
+    "translation": "be faced with; be up against"
+  },
+  {
+    "word": "苗条",
+    "pinyin": "miáo tiáo",
+    "part of speech": "形",
+    "translation": "slender; slim"
+  },
+  {
+    "word": "描写",
+    "pinyin": "miáo xiě",
+    "part of speech": "动",
+    "translation": "describe; depict; portray"
+  },
+  {
+    "word": "敏感",
+    "pinyin": "mǐn gǎn",
+    "part of speech": "形",
+    "translation": "sensitive; susceptible; tactful"
+  },
+  {
+    "word": "名牌",
+    "pinyin": "míng pái",
+    "part of speech": "名",
+    "translation": "famous brand"
+  },
+  {
+    "word": "名片",
+    "pinyin": "míng piàn",
+    "part of speech": "名",
+    "translation": "business card; visiting card"
+  },
+  {
+    "word": "明确",
+    "pinyin": "míng què",
+    "part of speech": "动/形",
+    "translation": "clear and definite; clear-cut; unequivocal"
+  },
+  {
+    "word": "名胜古迹",
+    "pinyin": "míng shèng gǔ jì",
+    "part of speech": "",
+    "translation": "places of historic interest and scenic beauty"
+  },
+  {
+    "word": "明显",
+    "pinyin": "míng xiǎn",
+    "part of speech": "形",
+    "translation": "clear; obvious; evident"
+  },
+  {
+    "word": "明星",
+    "pinyin": "míng xīng",
+    "part of speech": "名",
+    "translation": "celebrity; star"
+  },
+  {
+    "word": "命令",
+    "pinyin": "mìng lìng",
+    "part of speech": "名/动",
+    "translation": "order; command; directive"
+  },
+  {
+    "word": "命运",
+    "pinyin": "mìng yùn",
+    "part of speech": "名",
+    "translation": "destiny; lot; fortune"
+  },
+  {
+    "word": "摸",
+    "pinyin": "mō",
+    "part of speech": "动",
+    "translation": "feel [with the hand]"
+  },
+  {
+    "word": "模仿",
+    "pinyin": "mó fǎng",
+    "part of speech": "动",
+    "translation": "to imitate; to copy; model oneself on"
+  },
+  {
+    "word": "模糊",
+    "pinyin": "mó hu",
+    "part of speech": "形",
+    "translation": "vague; indistinct; obscure"
+  },
+  {
+    "word": "模特",
+    "pinyin": "mó tè",
+    "part of speech": "名",
+    "translation": "model"
+  },
+  {
+    "word": "摩托车",
+    "pinyin": "mó tuō chē",
+    "part of speech": "名",
+    "translation": "motorcycle"
+  },
+  {
+    "word": "陌生",
+    "pinyin": "mò shēng",
+    "part of speech": "形",
+    "translation": "strange; unfamiliar; inexperienced"
+  },
+  {
+    "word": "某",
+    "pinyin": "mǒu",
+    "part of speech": "代",
+    "translation": "certain; some"
+  },
+  {
+    "word": "目标",
+    "pinyin": "mù biāo",
+    "part of speech": "名",
+    "translation": "aim; objective; goal"
+  },
+  {
+    "word": "目录",
+    "pinyin": "mù lù",
+    "part of speech": "名",
+    "translation": "catalogue; table of contents"
+  },
+  {
+    "word": "目前",
+    "pinyin": "mù qián",
+    "part of speech": "名",
+    "translation": "at present"
+  },
+  {
+    "word": "木头",
+    "pinyin": "mù tou",
+    "part of speech": "名",
+    "translation": "wood; log; timber"
+  },
+  {
+    "word": "哪怕",
+    "pinyin": "nǎ pà",
+    "part of speech": "连",
+    "translation": "even if; even though"
+  },
+  {
+    "word": "难怪",
+    "pinyin": "nán guài",
+    "part of speech": "副",
+    "translation": "no wonder"
+  },
+  {
+    "word": "难免",
+    "pinyin": "nán miǎn",
+    "part of speech": "形",
+    "translation": "hard to avoid"
+  },
+  {
+    "word": "脑袋",
+    "pinyin": "nǎo dài",
+    "part of speech": "名",
+    "translation": "head; brains"
+  },
+  {
+    "word": "内部",
+    "pinyin": "nèi bù",
+    "part of speech": "名",
+    "translation": "interior"
+  },
+  {
+    "word": "内科",
+    "pinyin": "nèi kē",
+    "part of speech": "名",
+    "translation": "internal medicine"
+  },
+  {
+    "word": "嫩",
+    "pinyin": "nèn",
+    "part of speech": "形",
+    "translation": "tender; delicate; underdone"
+  },
+  {
+    "word": "能干",
+    "pinyin": "néng gàn",
+    "part of speech": "形",
+    "translation": "able; capable; competent"
+  },
+  {
+    "word": "能源",
+    "pinyin": "néng yuán",
+    "part of speech": "名",
+    "translation": "energy"
+  },
+  {
+    "word": "嗯",
+    "pinyin": "ng",
+    "part of speech": "叹",
+    "translation": "huh; yeah"
+  },
+  {
+    "word": "年代",
+    "pinyin": "nián dài",
+    "part of speech": "名",
+    "translation": "years; a decade of a century"
+  },
+  {
+    "word": "年纪",
+    "pinyin": "nián jì",
+    "part of speech": "名",
+    "translation": "age"
+  },
+  {
+    "word": "念",
+    "pinyin": "niàn",
+    "part of speech": "动",
+    "translation": "to read aloud; attend school; think of"
+  },
+  {
+    "word": "宁可",
+    "pinyin": "nìng kě",
+    "part of speech": "副",
+    "translation": "would rather; better"
+  },
+  {
+    "word": "牛仔裤",
+    "pinyin": "niú zǎi kù",
+    "part of speech": "名",
+    "translation": "jeans"
+  },
+  {
+    "word": "浓",
+    "pinyin": "nóng",
+    "part of speech": "形",
+    "translation": "dense; thick; concentrated"
+  },
+  {
+    "word": "农村",
+    "pinyin": "nóng cūn",
+    "part of speech": "名",
+    "translation": "countryside rural area"
+  },
+  {
+    "word": "农民",
+    "pinyin": "nóng mín",
+    "part of speech": "名",
+    "translation": "farmer; peasant"
+  },
+  {
+    "word": "农业",
+    "pinyin": "nóng yè",
+    "part of speech": "名",
+    "translation": "agriculture; farming"
+  },
+  {
+    "word": "女士",
+    "pinyin": "nǚ shì",
+    "part of speech": "名",
+    "translation": "lady; Madam; Miss"
+  },
+  {
+    "word": "欧洲",
+    "pinyin": "oū zhōu",
+    "part of speech": "名",
+    "translation": "Europe"
+  },
+  {
+    "word": "偶然",
+    "pinyin": "ǒu rán",
+    "part of speech": "形",
+    "translation": "accidentally; fortuitous; incidental"
+  },
+  {
+    "word": "拍",
+    "pinyin": "pāi",
+    "part of speech": "动",
+    "translation": "to clap; slap; bat; racket; to take (a photo)"
+  },
+  {
+    "word": "派",
+    "pinyin": "pài",
+    "part of speech": "动",
+    "translation": "faction; clique; to dispatch"
+  },
+  {
+    "word": "盼望",
+    "pinyin": "pàn wàng",
+    "part of speech": "动",
+    "translation": "hope for; long for; yearn for"
+  },
+  {
+    "word": "赔偿",
+    "pinyin": "péi cháng",
+    "part of speech": "动",
+    "translation": "compensate for; pay for"
+  },
+  {
+    "word": "培训",
+    "pinyin": "péi xùn",
+    "part of speech": "动",
+    "translation": "training; cultivate"
+  },
+  {
+    "word": "培养",
+    "pinyin": "péi yǎng",
+    "part of speech": "动",
+    "translation": "train; foster"
+  },
+  {
+    "word": "佩服",
+    "pinyin": "pèi fú",
+    "part of speech": "动",
+    "translation": "to admire; have a high opinion of"
+  },
+  {
+    "word": "配合",
+    "pinyin": "pèi hé",
+    "part of speech": "动",
+    "translation": "suitable; fit; matching"
+  },
+  {
+    "word": "盆",
+    "pinyin": "pén",
+    "part of speech": "名",
+    "translation": "basin; tub; pot"
+  },
+  {
+    "word": "碰",
+    "pinyin": "pèng",
+    "part of speech": "动",
+    "translation": "to meet with"
+  },
+  {
+    "word": "批",
+    "pinyin": "pī",
+    "part of speech": "量",
+    "translation": "to criticize; refute; batch"
+  },
+  {
+    "word": "披",
+    "pinyin": "pī",
+    "part of speech": "动",
+    "translation": "to drape over one's shoulders; to wrap around; unroll"
+  },
+  {
+    "word": "批准",
+    "pinyin": "pī zhǔn",
+    "part of speech": "动",
+    "translation": "ratify; approve; authorise"
+  },
+  {
+    "word": "疲劳",
+    "pinyin": "pí láo",
+    "part of speech": "形",
+    "translation": "tired; fatigued; weary"
+  },
+  {
+    "word": "匹",
+    "pinyin": "pǐ",
+    "part of speech": "量",
+    "translation": "[measure word for horses and cloth]"
+  },
+  {
+    "word": "片",
+    "pinyin": "piàn",
+    "part of speech": "量",
+    "translation": "[flat, thin piece of]; slice; flake"
+  },
+  {
+    "word": "片面",
+    "pinyin": "piàn miàn",
+    "part of speech": "形",
+    "translation": "unilateral; one-sided"
+  },
+  {
+    "word": "飘",
+    "pinyin": "piāo",
+    "part of speech": "动",
+    "translation": "wave to and fro; float; flutter"
+  },
+  {
+    "word": "拼音",
+    "pinyin": "pīn yīn",
+    "part of speech": "名",
+    "translation": "Pinyin [Chinese romanization system]"
+  },
+  {
+    "word": "频道",
+    "pinyin": "pín dào",
+    "part of speech": "名",
+    "translation": "(frequency) channel"
+  },
+  {
+    "word": "平",
+    "pinyin": "píng",
+    "part of speech": "形",
+    "translation": "flat; level; even; equal"
+  },
+  {
+    "word": "凭",
+    "pinyin": "píng",
+    "part of speech": "介",
+    "translation": "lean on; depend on; evidence"
+  },
+  {
+    "word": "平安",
+    "pinyin": "píng ān",
+    "part of speech": "形",
+    "translation": "peace, safe and sound"
+  },
+  {
+    "word": "平常",
+    "pinyin": "píng cháng",
+    "part of speech": "名/形",
+    "translation": "ordinarily; generally; usually"
+  },
+  {
+    "word": "平等",
+    "pinyin": "píng děng",
+    "part of speech": "形",
+    "translation": "equal; equality"
+  },
+  {
+    "word": "平方",
+    "pinyin": "píng fāng",
+    "part of speech": "量",
+    "translation": "square"
+  },
+  {
+    "word": "平衡",
+    "pinyin": "píng héng",
+    "part of speech": "动/形",
+    "translation": "balance; equilibrium"
+  },
+  {
+    "word": "评价",
+    "pinyin": "píng jià",
+    "part of speech": "名/动",
+    "translation": "appraise; evaluate; assess"
+  },
+  {
+    "word": "平静",
+    "pinyin": "píng jìng",
+    "part of speech": "形",
+    "translation": "calm; quiet; tranquil"
+  },
+  {
+    "word": "平均",
+    "pinyin": "píng jūn",
+    "part of speech": "形",
+    "translation": "average; mean; equally"
+  },
+  {
+    "word": "破产",
+    "pinyin": "pò chǎn",
+    "part of speech": "动",
+    "translation": "to go bankrupt; go broke; become insolvent"
+  },
+  {
+    "word": "破坏",
+    "pinyin": "pò huài",
+    "part of speech": "动",
+    "translation": "destroy; wreck; ruin"
+  },
+  {
+    "word": "迫切",
+    "pinyin": "pò qiè",
+    "part of speech": "形",
+    "translation": "urgent; pressing"
+  },
+  {
+    "word": "期待",
+    "pinyin": "qī dài",
+    "part of speech": "动",
+    "translation": "anticipate; await; expect"
+  },
+  {
+    "word": "期间",
+    "pinyin": "qī jiān",
+    "part of speech": "名",
+    "translation": "time; period; duration"
+  },
+  {
+    "word": "奇迹",
+    "pinyin": "qí jì",
+    "part of speech": "名",
+    "translation": "miracle; wonder; marvel"
+  },
+  {
+    "word": "其余",
+    "pinyin": "qí yú",
+    "part of speech": "代",
+    "translation": "the others; rest; remainder"
+  },
+  {
+    "word": "启发",
+    "pinyin": "qǐ fā",
+    "part of speech": "动",
+    "translation": "inspire; illuminate; enlighten"
+  },
+  {
+    "word": "企业",
+    "pinyin": "qǐ yè",
+    "part of speech": "名",
+    "translation": "enterprise; establishment; business"
+  },
+  {
+    "word": "气氛",
+    "pinyin": "qì fēn",
+    "part of speech": "名",
+    "translation": "atmosphere; air"
+  },
+  {
+    "word": "汽油",
+    "pinyin": "qì yóu",
+    "part of speech": "名",
+    "translation": "gasoline; petrol"
+  },
+  {
+    "word": "签",
+    "pinyin": "qiān",
+    "part of speech": "动",
+    "translation": "to sign"
+  },
+  {
+    "word": "谦虚",
+    "pinyin": "qiān xū",
+    "part of speech": "形",
+    "translation": "modest; self-effacing"
+  },
+  {
+    "word": "前途",
+    "pinyin": "qián tú",
+    "part of speech": "名",
+    "translation": "future; prospect; promise"
+  },
+  {
+    "word": "浅",
+    "pinyin": "qiǎn",
+    "part of speech": "形",
+    "translation": "light [colour]; shallow"
+  },
+  {
+    "word": "欠",
+    "pinyin": "qiàn",
+    "part of speech": "动",
+    "translation": "yawn; owe; be behind with"
+  },
+  {
+    "word": "枪",
+    "pinyin": "qiāng",
+    "part of speech": "名",
+    "translation": "spear; rifle; gun"
+  },
+  {
+    "word": "墙",
+    "pinyin": "qiáng",
+    "part of speech": "名",
+    "translation": "wall"
+  },
+  {
+    "word": "强调",
+    "pinyin": "qiáng diào",
+    "part of speech": "动",
+    "translation": "stress; emphasize; underline"
+  },
+  {
+    "word": "强烈",
+    "pinyin": "qiáng liè",
+    "part of speech": "形",
+    "translation": "strong; intense; violent"
+  },
+  {
+    "word": "抢",
+    "pinyin": "qiǎng",
+    "part of speech": "动",
+    "translation": "knock; grab; rob"
+  },
+  {
+    "word": "悄悄",
+    "pinyin": "qiāo qiāo",
+    "part of speech": "副",
+    "translation": "quietly; whisper; on the quiet"
+  },
+  {
+    "word": "瞧",
+    "pinyin": "qiáo",
+    "part of speech": "动",
+    "translation": "look; see"
+  },
+  {
+    "word": "巧妙",
+    "pinyin": "qiǎo miào",
+    "part of speech": "形",
+    "translation": "ingenious; clever"
+  },
+  {
+    "word": "切",
+    "pinyin": "qiē",
+    "part of speech": "动",
+    "translation": "cut; slice"
+  },
+  {
+    "word": "亲爱",
+    "pinyin": "qīn ài",
+    "part of speech": "形",
+    "translation": "dear; beloved"
+  },
+  {
+    "word": "亲切",
+    "pinyin": "qīn qiè",
+    "part of speech": "形",
+    "translation": "kind; amiable; cordial"
+  },
+  {
+    "word": "亲自",
+    "pinyin": "qīn zì",
+    "part of speech": "副",
+    "translation": "in person; oneself"
+  },
+  {
+    "word": "勤奋",
+    "pinyin": "qín fèn",
+    "part of speech": "形",
+    "translation": "diligent; assiduous; industrious"
+  },
+  {
+    "word": "青",
+    "pinyin": "qīng",
+    "part of speech": "形",
+    "translation": "blue or green [colour of water or grass]"
+  },
+  {
+    "word": "青春",
+    "pinyin": "qīng chūn",
+    "part of speech": "名",
+    "translation": "youth"
+  },
+  {
+    "word": "清淡",
+    "pinyin": "qīng dàn",
+    "part of speech": "形",
+    "translation": "light; mild; delicate"
+  },
+  {
+    "word": "青少年",
+    "pinyin": "qīng shào nián",
+    "part of speech": "名",
+    "translation": "youngsters"
+  },
+  {
+    "word": "轻视",
+    "pinyin": "qīng shì",
+    "part of speech": "动",
+    "translation": "despise; look down on"
+  },
+  {
+    "word": "轻易",
+    "pinyin": "qīng yì",
+    "part of speech": "副",
+    "translation": "easily"
+  },
+  {
+    "word": "情景",
+    "pinyin": "qíng jǐng",
+    "part of speech": "名",
+    "translation": "scene; sight; circumstances"
+  },
+  {
+    "word": "情绪",
+    "pinyin": "qíng xù",
+    "part of speech": "名",
+    "translation": "mood; sentiments; feeling"
+  },
+  {
+    "word": "请求",
+    "pinyin": "qǐng qiú",
+    "part of speech": "动/名",
+    "translation": "request; demand; beg"
+  },
+  {
+    "word": "庆祝",
+    "pinyin": "qìng zhù",
+    "part of speech": "动",
+    "translation": "celebration(s); to celebrate"
+  },
+  {
+    "word": "球迷",
+    "pinyin": "qiú mí",
+    "part of speech": "名",
+    "translation": "fan (of a ball sport)"
+  },
+  {
+    "word": "趋势",
+    "pinyin": "qū shì",
+    "part of speech": "名",
+    "translation": "trend; tendency"
+  },
+  {
+    "word": "娶",
+    "pinyin": "qǔ",
+    "part of speech": "动",
+    "translation": "marry [a woman]"
+  },
+  {
+    "word": "取消",
+    "pinyin": "qǔ xiāo",
+    "part of speech": "动",
+    "translation": "cancel; call off; abolish"
+  },
+  {
+    "word": "去世",
+    "pinyin": "qù shì",
+    "part of speech": "动",
+    "translation": "die; pass away"
+  },
+  {
+    "word": "圈",
+    "pinyin": "quān",
+    "part of speech": "名",
+    "translation": "circle; ring"
+  },
+  {
+    "word": "权力",
+    "pinyin": "quán lì",
+    "part of speech": "名",
+    "translation": "power; authority"
+  },
+  {
+    "word": "权利",
+    "pinyin": "quán lì",
+    "part of speech": "名",
+    "translation": "(legal) right; interest"
+  },
+  {
+    "word": "全面",
+    "pinyin": "quán miàn",
+    "part of speech": "形",
+    "translation": "all-round; entire; comprehensive;"
+  },
+  {
+    "word": "劝",
+    "pinyin": "quàn",
+    "part of speech": "动",
+    "translation": "advise; urge; try to persuade"
+  },
+  {
+    "word": "缺乏",
+    "pinyin": "quē fá",
+    "part of speech": "动",
+    "translation": "be short of; lack; deficiency"
+  },
+  {
+    "word": "确定",
+    "pinyin": "què dìng",
+    "part of speech": "动",
+    "translation": "define; fix; determine"
+  },
+  {
+    "word": "确认",
+    "pinyin": "què rèn",
+    "part of speech": "动",
+    "translation": "affirm; confirm; acknowledge"
+  },
+  {
+    "word": "群",
+    "pinyin": "qún",
+    "part of speech": "名",
+    "translation": "group"
+  },
+  {
+    "word": "燃烧",
+    "pinyin": "rán shāo",
+    "part of speech": "动",
+    "translation": "burn; kindle; set on fire"
+  },
+  {
+    "word": "绕",
+    "pinyin": "rào",
+    "part of speech": "动",
+    "translation": "wind; coil; move round"
+  },
+  {
+    "word": "热爱",
+    "pinyin": "rè ài",
+    "part of speech": "动",
+    "translation": "have deep love for; love heartily"
+  },
+  {
+    "word": "热烈",
+    "pinyin": "rè liè",
+    "part of speech": "形",
+    "translation": "warm; heartily; fervent"
+  },
+  {
+    "word": "热心",
+    "pinyin": "rè xīn",
+    "part of speech": "形",
+    "translation": "enthusiastic; ardent; earnest"
+  },
+  {
+    "word": "人才",
+    "pinyin": "rén cái",
+    "part of speech": "名",
+    "translation": "a talented person; talent"
+  },
+  {
+    "word": "人口",
+    "pinyin": "rén kǒu",
+    "part of speech": "名",
+    "translation": "population"
+  },
+  {
+    "word": "人类",
+    "pinyin": "rén lèi",
+    "part of speech": "名",
+    "translation": "humanity"
+  },
+  {
+    "word": "人民币",
+    "pinyin": "rén mín bì",
+    "part of speech": "名",
+    "translation": "Renminbi [Chinese currency]"
+  },
+  {
+    "word": "人生",
+    "pinyin": "rén shēng",
+    "part of speech": "名",
+    "translation": "[human] life"
+  },
+  {
+    "word": "人事",
+    "pinyin": "rén shì",
+    "part of speech": "名",
+    "translation": "human affairs matters; ways of the world"
+  },
+  {
+    "word": "人物",
+    "pinyin": "rén wù",
+    "part of speech": "名",
+    "translation": "character; figure; personage"
+  },
+  {
+    "word": "人员",
+    "pinyin": "rén yuán",
+    "part of speech": "名",
+    "translation": "personnel; staff"
+  },
+  {
+    "word": "忍不住",
+    "pinyin": "rěn bu zhù",
+    "part of speech": "",
+    "translation": "unbearable; unable to restrain"
+  },
+  {
+    "word": "日常",
+    "pinyin": "rì cháng",
+    "part of speech": "形",
+    "translation": "day-to-day; everyday; usual"
+  },
+  {
+    "word": "日程",
+    "pinyin": "rì chéng",
+    "part of speech": "名",
+    "translation": "programme; schedule; agenda for the day"
+  },
+  {
+    "word": "日历",
+    "pinyin": "rì lì",
+    "part of speech": "名",
+    "translation": "calendar"
+  },
+  {
+    "word": "日期",
+    "pinyin": "rì qī",
+    "part of speech": "名",
+    "translation": "date"
+  },
+  {
+    "word": "日用品",
+    "pinyin": "rì yòng pǐn",
+    "part of speech": "名",
+    "translation": "articles for everyday use"
+  },
+  {
+    "word": "日子",
+    "pinyin": "rì zi",
+    "part of speech": "名",
+    "translation": "life"
+  },
+  {
+    "word": "如何",
+    "pinyin": "rú hé",
+    "part of speech": "代",
+    "translation": "how"
+  },
+  {
+    "word": "如今",
+    "pinyin": "rú jīn",
+    "part of speech": "名",
+    "translation": "nowadays; these days"
+  },
+  {
+    "word": "软",
+    "pinyin": "ruǎn",
+    "part of speech": "形",
+    "translation": "soft"
+  },
+  {
+    "word": "软件",
+    "pinyin": "ruǎn jiàn",
+    "part of speech": "名",
+    "translation": "software"
+  },
+  {
+    "word": "弱",
+    "pinyin": "ruò",
+    "part of speech": "形",
+    "translation": "weak; feeble"
+  },
+  {
+    "word": "洒",
+    "pinyin": "sǎ",
+    "part of speech": "动",
+    "translation": "sprinkle; spray; spill"
+  },
+  {
+    "word": "嗓子",
+    "pinyin": "sǎng zi",
+    "part of speech": "名",
+    "translation": "throat; larynx"
+  },
+  {
+    "word": "色彩",
+    "pinyin": "sè cǎi",
+    "part of speech": "名",
+    "translation": "colour; hue; tint"
+  },
+  {
+    "word": "杀",
+    "pinyin": "shā",
+    "part of speech": "动",
+    "translation": "kill; slaughter; in the extreme"
+  },
+  {
+    "word": "沙漠",
+    "pinyin": "shā mò",
+    "part of speech": "名",
+    "translation": "desert"
+  },
+  {
+    "word": "沙滩",
+    "pinyin": "shā tān",
+    "part of speech": "名",
+    "translation": "beach"
+  },
+  {
+    "word": "傻",
+    "pinyin": "shǎ",
+    "part of speech": "形",
+    "translation": "stupid; muddleheaded; silly"
+  },
+  {
+    "word": "晒",
+    "pinyin": "shài",
+    "part of speech": "动",
+    "translation": "shine upon; dry in the sun; bask"
+  },
+  {
+    "word": "删除",
+    "pinyin": "shān chú",
+    "part of speech": "动",
+    "translation": "to delete; strike out; cut out"
+  },
+  {
+    "word": "闪电",
+    "pinyin": "shǎn diàn",
+    "part of speech": "名",
+    "translation": "lightning"
+  },
+  {
+    "word": "善良",
+    "pinyin": "shàn liáng",
+    "part of speech": "形",
+    "translation": "good and honest; kindhearted"
+  },
+  {
+    "word": "善于",
+    "pinyin": "shàn yú",
+    "part of speech": "动",
+    "translation": "be good at; be adept in"
+  },
+  {
+    "word": "扇子",
+    "pinyin": "shàn zi",
+    "part of speech": "名",
+    "translation": "fan"
+  },
+  {
+    "word": "伤害",
+    "pinyin": "shāng hài",
+    "part of speech": "动",
+    "translation": "to injure"
+  },
+  {
+    "word": "商品",
+    "pinyin": "shāng pǐn",
+    "part of speech": "名",
+    "translation": "goods; merchandise; wares"
+  },
+  {
+    "word": "商务",
+    "pinyin": "shāng wù",
+    "part of speech": "名",
+    "translation": "commercial affairs"
+  },
+  {
+    "word": "商业",
+    "pinyin": "shāng yè",
+    "part of speech": "名",
+    "translation": "commerce; trade; business"
+  },
+  {
+    "word": "上当",
+    "pinyin": "shàng dàng",
+    "part of speech": "动",
+    "translation": "be taken in; be fooled; be duped"
+  },
+  {
+    "word": "蛇",
+    "pinyin": "shé",
+    "part of speech": "名",
+    "translation": "snake; serpent"
+  },
+  {
+    "word": "舍不得",
+    "pinyin": "shě bu de",
+    "part of speech": "动",
+    "translation": "hate to part with; be loath to leave"
+  },
+  {
+    "word": "设备",
+    "pinyin": "shè bèi",
+    "part of speech": "名",
+    "translation": "equipment; device"
+  },
+  {
+    "word": "射击",
+    "pinyin": "shè jī",
+    "part of speech": "动",
+    "translation": "shoot; fire"
+  },
+  {
+    "word": "设计",
+    "pinyin": "shè jì",
+    "part of speech": "动",
+    "translation": "design"
+  },
+  {
+    "word": "设施",
+    "pinyin": "shè shī",
+    "part of speech": "名",
+    "translation": "facilities"
+  },
+  {
+    "word": "摄影",
+    "pinyin": "shè yǐng",
+    "part of speech": "动",
+    "translation": "take a photograph; shoot a film"
+  },
+  {
+    "word": "伸",
+    "pinyin": "shēn",
+    "part of speech": "动",
+    "translation": "stretch; extend"
+  },
+  {
+    "word": "身材",
+    "pinyin": "shēn cái",
+    "part of speech": "名",
+    "translation": "stature; figure"
+  },
+  {
+    "word": "身份",
+    "pinyin": "shēn fèn",
+    "part of speech": "名",
+    "translation": "identity"
+  },
+  {
+    "word": "深刻",
+    "pinyin": "shēn kè",
+    "part of speech": "形",
+    "translation": "deep; profound"
+  },
+  {
+    "word": "神话",
+    "pinyin": "shén huà",
+    "part of speech": "名",
+    "translation": "myth; fairy tale"
+  },
+  {
+    "word": "神秘",
+    "pinyin": "shén mì",
+    "part of speech": "动",
+    "translation": "mysterious; mystical"
+  },
+  {
+    "word": "升",
+    "pinyin": "shēng",
+    "part of speech": "动",
+    "translation": "litre; to promote; to rise"
+  },
+  {
+    "word": "生产",
+    "pinyin": "shēng chǎn",
+    "part of speech": "动",
+    "translation": "produce; manufacture; give birth to"
+  },
+  {
+    "word": "声调",
+    "pinyin": "shēng diào",
+    "part of speech": "名",
+    "translation": "tone; pitch of voice"
+  },
+  {
+    "word": "生动",
+    "pinyin": "shēng dòng",
+    "part of speech": "形",
+    "translation": "lively; vivid"
+  },
+  {
+    "word": "生长",
+    "pinyin": "shēng zhǎng",
+    "part of speech": "动",
+    "translation": "to grow"
+  },
+  {
+    "word": "绳子",
+    "pinyin": "shéng zi",
+    "part of speech": "名",
+    "translation": "cord; rope; string"
+  },
+  {
+    "word": "省略",
+    "pinyin": "shěng lüè",
+    "part of speech": "动",
+    "translation": "leave out; omit; abbreviation"
+  },
+  {
+    "word": "胜利",
+    "pinyin": "shèng lì",
+    "part of speech": "动",
+    "translation": "win; victory; triumph"
+  },
+  {
+    "word": "诗",
+    "pinyin": "shī",
+    "part of speech": "名",
+    "translation": "poetry; verse"
+  },
+  {
+    "word": "失眠",
+    "pinyin": "shī mián",
+    "part of speech": "动",
+    "translation": "lose sleep; wakefulness; insomnia"
+  },
+  {
+    "word": "失去",
+    "pinyin": "shī qù",
+    "part of speech": "动",
+    "translation": "lose"
+  },
+  {
+    "word": "湿润",
+    "pinyin": "shī rùn",
+    "part of speech": "形",
+    "translation": "moist"
+  },
+  {
+    "word": "失业",
+    "pinyin": "shī yè",
+    "part of speech": "名",
+    "translation": "lose one's job; be out of work; be unemployed"
+  },
+  {
+    "word": "狮子",
+    "pinyin": "shī zi",
+    "part of speech": "名",
+    "translation": "lion"
+  },
+  {
+    "word": "时差",
+    "pinyin": "shí chā",
+    "part of speech": "名",
+    "translation": "time difference"
+  },
+  {
+    "word": "时代",
+    "pinyin": "shí dài",
+    "part of speech": "名",
+    "translation": "times; age; era"
+  },
+  {
+    "word": "实话",
+    "pinyin": "shí huà",
+    "part of speech": "名",
+    "translation": "truth"
+  },
+  {
+    "word": "实践",
+    "pinyin": "shí jiàn",
+    "part of speech": "动",
+    "translation": "put into practice; carry out"
+  },
+  {
+    "word": "时刻",
+    "pinyin": "shí kè",
+    "part of speech": "名",
+    "translation": "time; hour; moment"
+  },
+  {
+    "word": "时髦",
+    "pinyin": "shí máo",
+    "part of speech": "形",
+    "translation": "fashionable; stylish; in vogue"
+  },
+  {
+    "word": "时期",
+    "pinyin": "shí qī",
+    "part of speech": "名",
+    "translation": "period"
+  },
+  {
+    "word": "时尚",
+    "pinyin": "shí shàng",
+    "part of speech": "形",
+    "translation": "vogue; trend; fashion"
+  },
+  {
+    "word": "石头",
+    "pinyin": "shí tou",
+    "part of speech": "名",
+    "translation": "rock; stone"
+  },
+  {
+    "word": "食物",
+    "pinyin": "shí wù",
+    "part of speech": "名",
+    "translation": "food"
+  },
+  {
+    "word": "实习",
+    "pinyin": "shí xí",
+    "part of speech": "动",
+    "translation": "practice; fieldwork; internship"
+  },
+  {
+    "word": "实现",
+    "pinyin": "shí xiàn",
+    "part of speech": "动",
+    "translation": "realise; achieve; bring about"
+  },
+  {
+    "word": "实验",
+    "pinyin": "shí yàn",
+    "part of speech": "名",
+    "translation": "experiment; test; trial run"
+  },
+  {
+    "word": "实用",
+    "pinyin": "shí yòng",
+    "part of speech": "形",
+    "translation": "practical; pragmatic; functional"
+  },
+  {
+    "word": "使劲儿",
+    "pinyin": "shǐ jìn er",
+    "part of speech": "动",
+    "translation": "exert all one's strength"
+  },
+  {
+    "word": "始终",
+    "pinyin": "shǐ zhōng",
+    "part of speech": "副",
+    "translation": "from beginning to end; from start to finish; throughout"
+  },
+  {
+    "word": "士兵",
+    "pinyin": "shì bīng",
+    "part of speech": "名",
+    "translation": "private; rank-and-file soldier"
+  },
+  {
+    "word": "市场",
+    "pinyin": "shì chǎng",
+    "part of speech": "名",
+    "translation": "market"
+  },
+  {
+    "word": "似的",
+    "pinyin": "shì de",
+    "part of speech": "助",
+    "translation": "as; -like"
+  },
+  {
+    "word": "试卷",
+    "pinyin": "shì juàn",
+    "part of speech": "名",
+    "translation": "examination paper; test paper"
+  },
+  {
+    "word": "事实",
+    "pinyin": "shì shí",
+    "part of speech": "名",
+    "translation": "fact"
+  },
+  {
+    "word": "事物",
+    "pinyin": "shì wù",
+    "part of speech": "名",
+    "translation": "thing; object"
+  },
+  {
+    "word": "事先",
+    "pinyin": "shì xiān",
+    "part of speech": "名",
+    "translation": "in advance; beforehand"
+  },
+  {
+    "word": "收获",
+    "pinyin": "shōu huò",
+    "part of speech": "动",
+    "translation": "gather in the crops; harvest; reap"
+  },
+  {
+    "word": "收据",
+    "pinyin": "shōu jù",
+    "part of speech": "名",
+    "translation": "receipt; acquittance"
+  },
+  {
+    "word": "首",
+    "pinyin": "shǒu",
+    "part of speech": "量",
+    "translation": "first (occasion, thing etc.)"
+  },
+  {
+    "word": "手工",
+    "pinyin": "shǒu gōng",
+    "part of speech": "名",
+    "translation": "by hand; manual; handmade"
+  },
+  {
+    "word": "手术",
+    "pinyin": "shǒu shù",
+    "part of speech": "名",
+    "translation": "surgical operation; operation"
+  },
+  {
+    "word": "手套",
+    "pinyin": "shǒu tào",
+    "part of speech": "名",
+    "translation": "gloves"
+  },
+  {
+    "word": "手续",
+    "pinyin": "shǒu xù",
+    "part of speech": "名",
+    "translation": "procedures; routine; process"
+  },
+  {
+    "word": "手指",
+    "pinyin": "shǒu zhǐ",
+    "part of speech": "名",
+    "translation": "finger"
+  },
+  {
+    "word": "寿命",
+    "pinyin": "shòu mìng",
+    "part of speech": "名",
+    "translation": "life span; lifetime"
+  },
+  {
+    "word": "受伤",
+    "pinyin": "shòu shāng",
+    "part of speech": "动",
+    "translation": "be injured; be wounded"
+  },
+  {
+    "word": "蔬菜",
+    "pinyin": "shū cài",
+    "part of speech": "名",
+    "translation": "vegetables"
+  },
+  {
+    "word": "书架",
+    "pinyin": "shū jià",
+    "part of speech": "名",
+    "translation": "bookcase"
+  },
+  {
+    "word": "输入",
+    "pinyin": "shū rù",
+    "part of speech": "动",
+    "translation": "to import; input; entry"
+  },
+  {
+    "word": "舒适",
+    "pinyin": "shū shì",
+    "part of speech": "形",
+    "translation": "comfortable; cosy; snug"
+  },
+  {
+    "word": "梳子",
+    "pinyin": "shū zi",
+    "part of speech": "名",
+    "translation": "comb"
+  },
+  {
+    "word": "熟练",
+    "pinyin": "shú liàn",
+    "part of speech": "形",
+    "translation": "skilled; practised; proficient"
+  },
+  {
+    "word": "数",
+    "pinyin": "shǔ",
+    "part of speech": "动",
+    "translation": "frequently; repeatedly"
+  },
+  {
+    "word": "鼠标",
+    "pinyin": "shǔ biāo",
+    "part of speech": "名",
+    "translation": "mouse [in computing]"
+  },
+  {
+    "word": "属于",
+    "pinyin": "shǔ yú",
+    "part of speech": "动",
+    "translation": "belong to; be part of; pertain to"
+  },
+  {
+    "word": "数据",
+    "pinyin": "shù jù",
+    "part of speech": "名",
+    "translation": "data"
+  },
+  {
+    "word": "数码",
+    "pinyin": "shù mǎ",
+    "part of speech": "形",
+    "translation": "numerical code; digit; figure"
+  },
+  {
+    "word": "摔倒",
+    "pinyin": "shuāi dǎo",
+    "part of speech": "动",
+    "translation": "to fall down"
+  },
+  {
+    "word": "甩",
+    "pinyin": "shuǎi",
+    "part of speech": "动",
+    "translation": "to move backward and forward; to swing"
+  },
+  {
+    "word": "双方",
+    "pinyin": "shuāng fāng",
+    "part of speech": "名",
+    "translation": "both sides; mutual"
+  },
+  {
+    "word": "税",
+    "pinyin": "shuì",
+    "part of speech": "名",
+    "translation": "tax; duty"
+  },
+  {
+    "word": "说不定",
+    "pinyin": "shuō bu dìng",
+    "part of speech": "",
+    "translation": "perhaps; maybe"
+  },
+  {
+    "word": "说服",
+    "pinyin": "shuō fú",
+    "part of speech": "动",
+    "translation": "to convince; persuade"
+  },
+  {
+    "word": "撕",
+    "pinyin": "sī",
+    "part of speech": "动",
+    "translation": "tear; rip"
+  },
+  {
+    "word": "丝绸",
+    "pinyin": "sī chóu",
+    "part of speech": "名",
+    "translation": "silk"
+  },
+  {
+    "word": "丝毫",
+    "pinyin": "sī háo",
+    "part of speech": "形",
+    "translation": "the slightest amount"
+  },
+  {
+    "word": "思考",
+    "pinyin": "sī kǎo",
+    "part of speech": "动",
+    "translation": "ponder; reflect on; deliberate"
+  },
+  {
+    "word": "私人",
+    "pinyin": "sī rén",
+    "part of speech": "名",
+    "translation": "private; personal"
+  },
+  {
+    "word": "思想",
+    "pinyin": "sī xiǎng",
+    "part of speech": "名",
+    "translation": "thought; idea"
+  },
+  {
+    "word": "似乎",
+    "pinyin": "sì hū",
+    "part of speech": "副",
+    "translation": "it seems; as if; it looks like"
+  },
+  {
+    "word": "搜索",
+    "pinyin": "sōu suǒ",
+    "part of speech": "动",
+    "translation": "search for; hunt for; scout around"
+  },
+  {
+    "word": "宿舍",
+    "pinyin": "sù shè",
+    "part of speech": "名",
+    "translation": "dormitory; digs"
+  },
+  {
+    "word": "随身",
+    "pinyin": "suí shēn",
+    "part of speech": "形",
+    "translation": "carry ... with one; with one"
+  },
+  {
+    "word": "随时",
+    "pinyin": "suí shí",
+    "part of speech": "副",
+    "translation": "at any time"
+  },
+  {
+    "word": "随手",
+    "pinyin": "suí shǒu",
+    "part of speech": "副",
+    "translation": "conveniently; without extra trouble"
+  },
+  {
+    "word": "碎",
+    "pinyin": "suì",
+    "part of speech": "形",
+    "translation": "to break to pieces; smash; fragmentary"
+  },
+  {
+    "word": "损失",
+    "pinyin": "sǔn shī",
+    "part of speech": "动",
+    "translation": "lose; loss; wastage"
+  },
+  {
+    "word": "缩短",
+    "pinyin": "suō duǎn",
+    "part of speech": "动",
+    "translation": "shorten; curtail; cut down"
+  },
+  {
+    "word": "锁",
+    "pinyin": "suǒ",
+    "part of speech": "名",
+    "translation": "lock"
+  },
+  {
+    "word": "所",
+    "pinyin": "suǒ",
+    "part of speech": "量",
+    "translation": "[2nd syllable of many places]; [measure word for houses, buildings, institutions]"
+  },
+  {
+    "word": "台阶",
+    "pinyin": "tái jiē",
+    "part of speech": "名",
+    "translation": "step; altar; bench"
+  },
+  {
+    "word": "太极拳",
+    "pinyin": "tài jí quán",
+    "part of speech": "名",
+    "translation": "taijiquan.[a kind of traditional Chinese shadow boxing]"
+  },
+  {
+    "word": "太太",
+    "pinyin": "tài tai",
+    "part of speech": "名",
+    "translation": "Mrs; Madam"
+  },
+  {
+    "word": "谈判",
+    "pinyin": "tán pàn",
+    "part of speech": "动",
+    "translation": "negotiations; talks"
+  },
+  {
+    "word": "坦率",
+    "pinyin": "tǎn shuài",
+    "part of speech": "形",
+    "translation": "candid; frank; outspoken"
+  },
+  {
+    "word": "烫",
+    "pinyin": "tàng",
+    "part of speech": "形",
+    "translation": "burn; scald; heat up in hot water"
+  },
+  {
+    "word": "逃",
+    "pinyin": "táo",
+    "part of speech": "动",
+    "translation": "run away; flee; escape"
+  },
+  {
+    "word": "桃",
+    "pinyin": "táo",
+    "part of speech": "名",
+    "translation": "peach"
+  },
+  {
+    "word": "逃避",
+    "pinyin": "táo bì",
+    "part of speech": "动",
+    "translation": "escape; evade; shirk"
+  },
+  {
+    "word": "淘气",
+    "pinyin": "táo qì",
+    "part of speech": "形",
+    "translation": "naughty; mischievous"
+  },
+  {
+    "word": "讨价还价",
+    "pinyin": "tǎo jià huán jià",
+    "part of speech": "",
+    "translation": "bargain/barter with somebody for something"
+  },
+  {
+    "word": "套",
+    "pinyin": "tào",
+    "part of speech": "量",
+    "translation": "cover; case; set"
+  },
+  {
+    "word": "特色",
+    "pinyin": "tè sè",
+    "part of speech": "名",
+    "translation": "characteristic; distinguishing feature"
+  },
+  {
+    "word": "特殊",
+    "pinyin": "tè shū",
+    "part of speech": "形",
+    "translation": "special; particular; exceptional"
+  },
+  {
+    "word": "特征",
+    "pinyin": "tè zhēng",
+    "part of speech": "名",
+    "translation": "characteristic; feature; property"
+  },
+  {
+    "word": "疼爱",
+    "pinyin": "téng ài",
+    "part of speech": "动",
+    "translation": "be very fond of; love dearly"
+  },
+  {
+    "word": "提倡",
+    "pinyin": "tí chàng",
+    "part of speech": "动",
+    "translation": "advocate; promote; recommend"
+  },
+  {
+    "word": "提纲",
+    "pinyin": "tí gāng",
+    "part of speech": "名",
+    "translation": "outline; syllabus; synopsis"
+  },
+  {
+    "word": "题目",
+    "pinyin": "tí mù",
+    "part of speech": "名",
+    "translation": "topic; subject; title"
+  },
+  {
+    "word": "提问",
+    "pinyin": "tí wèn",
+    "part of speech": "动",
+    "translation": "ask a question; put questions to; quiz"
+  },
+  {
+    "word": "体会",
+    "pinyin": "tǐ huì",
+    "part of speech": "动/名",
+    "translation": "know from experience"
+  },
+  {
+    "word": "体贴",
+    "pinyin": "tǐ tiē",
+    "part of speech": "动",
+    "translation": "show consideration for"
+  },
+  {
+    "word": "体现",
+    "pinyin": "tǐ xiàn",
+    "part of speech": "动",
+    "translation": "embody; reflect; give expression to"
+  },
+  {
+    "word": "体验",
+    "pinyin": "tǐ yàn",
+    "part of speech": "动",
+    "translation": "experience; learn through practice"
+  },
+  {
+    "word": "天空",
+    "pinyin": "tiān kōng",
+    "part of speech": "名",
+    "translation": "sky; the heavens"
+  },
+  {
+    "word": "天真",
+    "pinyin": "tiān zhēn",
+    "part of speech": "形",
+    "translation": "innocent; naive"
+  },
+  {
+    "word": "调皮",
+    "pinyin": "tiáo pí",
+    "part of speech": "形",
+    "translation": "naughty; mischievous"
+  },
+  {
+    "word": "调整",
+    "pinyin": "tiáo zhěng",
+    "part of speech": "动",
+    "translation": "to adjust; tune-up; trim"
+  },
+  {
+    "word": "挑战",
+    "pinyin": "tiǎo zhàn",
+    "part of speech": "动",
+    "translation": "throw down the gauntlet; challenge"
+  },
+  {
+    "word": "通常",
+    "pinyin": "tōng cháng",
+    "part of speech": "副/形",
+    "translation": "general; usual; normal"
+  },
+  {
+    "word": "统一",
+    "pinyin": "tǒng yī",
+    "part of speech": "形",
+    "translation": "unify; unite; integrate"
+  },
+  {
+    "word": "痛苦",
+    "pinyin": "tòng kǔ",
+    "part of speech": "形",
+    "translation": "pain; agony; sore"
+  },
+  {
+    "word": "痛快",
+    "pinyin": "tòng kuài",
+    "part of speech": "形",
+    "translation": "very happy; delighted; joyful"
+  },
+  {
+    "word": "偷",
+    "pinyin": "tōu",
+    "part of speech": "动",
+    "translation": "steal"
+  },
+  {
+    "word": "投入",
+    "pinyin": "tóu rù",
+    "part of speech": "动",
+    "translation": "invest, put into"
+  },
+  {
+    "word": "投资",
+    "pinyin": "tóu zī",
+    "part of speech": "动/名",
+    "translation": "invest"
+  },
+  {
+    "word": "透明",
+    "pinyin": "tòu míng",
+    "part of speech": "形",
+    "translation": "transparent"
+  },
+  {
+    "word": "突出",
+    "pinyin": "tū chū",
+    "part of speech": "形",
+    "translation": "protruding; sticking out; outstanding"
+  },
+  {
+    "word": "土地",
+    "pinyin": "tǔ dì",
+    "part of speech": "名",
+    "translation": "territory; local god of the land"
+  },
+  {
+    "word": "土豆",
+    "pinyin": "tǔ dòu",
+    "part of speech": "名",
+    "translation": "potato"
+  },
+  {
+    "word": "吐",
+    "pinyin": "tù",
+    "part of speech": "动",
+    "translation": "vomit; throw up; cough up"
+  },
+  {
+    "word": "兔子",
+    "pinyin": "tù zi",
+    "part of speech": "动",
+    "translation": "rabbit; hare"
+  },
+  {
+    "word": "团",
+    "pinyin": "tuán",
+    "part of speech": "名",
+    "translation": "dumpling; [something shaped like a ball]; [measure word for ball-like things]"
+  },
+  {
+    "word": "推辞",
+    "pinyin": "tuī cí",
+    "part of speech": "动",
+    "translation": "decline"
+  },
+  {
+    "word": "推广",
+    "pinyin": "tuī guǎng",
+    "part of speech": "动",
+    "translation": "popularise; spread; generalisation"
+  },
+  {
+    "word": "推荐",
+    "pinyin": "tuī jiàn",
+    "part of speech": "动",
+    "translation": "recommend"
+  },
+  {
+    "word": "退",
+    "pinyin": "tuì",
+    "part of speech": "动",
+    "translation": "to retreat; draw back"
+  },
+  {
+    "word": "退步",
+    "pinyin": "tuì bù",
+    "part of speech": "动",
+    "translation": "fall behind; to do less well than before"
+  },
+  {
+    "word": "退休",
+    "pinyin": "tuì xiū",
+    "part of speech": "动",
+    "translation": "retire"
+  },
+  {
+    "word": "歪",
+    "pinyin": "wāi",
+    "part of speech": "形",
+    "translation": "askew; oblique; slanting"
+  },
+  {
+    "word": "外公",
+    "pinyin": "wài gōng",
+    "part of speech": "名",
+    "translation": "grandfather"
+  },
+  {
+    "word": "外交",
+    "pinyin": "wài jiāo",
+    "part of speech": "名",
+    "translation": "diplomacy; foreign affairs"
+  },
+  {
+    "word": "玩具",
+    "pinyin": "wán jù",
+    "part of speech": "名",
+    "translation": "toy"
+  },
+  {
+    "word": "完美",
+    "pinyin": "wán měi",
+    "part of speech": "形",
+    "translation": "perfect; flawless"
+  },
+  {
+    "word": "完善",
+    "pinyin": "wán shàn",
+    "part of speech": "形/动",
+    "translation": "perfect; to improve and perfect"
+  },
+  {
+    "word": "完整",
+    "pinyin": "wán zhěng",
+    "part of speech": "形",
+    "translation": "complete; integrated; whole"
+  },
+  {
+    "word": "万一",
+    "pinyin": "wàn yī",
+    "part of speech": "连",
+    "translation": "just in case; if by any chance"
+  },
+  {
+    "word": "王子",
+    "pinyin": "wáng zǐ",
+    "part of speech": "名",
+    "translation": "prince; king's son"
+  },
+  {
+    "word": "往返",
+    "pinyin": "wǎng fǎn",
+    "part of speech": "动",
+    "translation": "go there and back; come and go"
+  },
+  {
+    "word": "网络",
+    "pinyin": "wǎng luò",
+    "part of speech": "名",
+    "translation": "network"
+  },
+  {
+    "word": "危害",
+    "pinyin": "wēi hài",
+    "part of speech": "形",
+    "translation": "harm; detriment; damage"
+  },
+  {
+    "word": "微笑",
+    "pinyin": "wēi xiào",
+    "part of speech": "名",
+    "translation": "smile"
+  },
+  {
+    "word": "威胁",
+    "pinyin": "wēi xié",
+    "part of speech": "动",
+    "translation": "threaten; menace"
+  },
+  {
+    "word": "违反",
+    "pinyin": "wéi fǎn",
+    "part of speech": "动",
+    "translation": "to violate; transgress; infringe"
+  },
+  {
+    "word": "围巾",
+    "pinyin": "wéi jīn",
+    "part of speech": "名",
+    "translation": "scarf; muffler; neckerchief"
+  },
+  {
+    "word": "围绕",
+    "pinyin": "wéi rào",
+    "part of speech": "动",
+    "translation": "center on; revolve round"
+  },
+  {
+    "word": "维修",
+    "pinyin": "wéi xiū",
+    "part of speech": "动",
+    "translation": "keep in good repair; service; maintain"
+  },
+  {
+    "word": "唯一",
+    "pinyin": "wéi yī",
+    "part of speech": "形",
+    "translation": "only; sole; unique"
+  },
+  {
+    "word": "尾巴",
+    "pinyin": "wěi ba",
+    "part of speech": "名",
+    "translation": "tail; appendage"
+  },
+  {
+    "word": "伟大",
+    "pinyin": "wěi dà",
+    "part of speech": "形",
+    "translation": "great; mighty"
+  },
+  {
+    "word": "委屈",
+    "pinyin": "wěi qū",
+    "part of speech": "形/动",
+    "translation": "feel wronged; nurse a grievance"
+  },
+  {
+    "word": "胃",
+    "pinyin": "wèi",
+    "part of speech": "名",
+    "translation": "stomach"
+  },
+  {
+    "word": "未必",
+    "pinyin": "wèi bì",
+    "part of speech": "副",
+    "translation": "may not; not necessarily"
+  },
+  {
+    "word": "胃口",
+    "pinyin": "wèi kǒu",
+    "part of speech": "名",
+    "translation": "appetite; belly"
+  },
+  {
+    "word": "未来",
+    "pinyin": "wèi lái",
+    "part of speech": "名",
+    "translation": "coming; approaching; future"
+  },
+  {
+    "word": "位于",
+    "pinyin": "wèi yú",
+    "part of speech": "动",
+    "translation": "be located; be situated"
+  },
+  {
+    "word": "位置",
+    "pinyin": "wèi zhi",
+    "part of speech": "名",
+    "translation": "position"
+  },
+  {
+    "word": "温暖",
+    "pinyin": "wēn nuǎn",
+    "part of speech": "形",
+    "translation": "warm"
+  },
+  {
+    "word": "温柔",
+    "pinyin": "wēn róu",
+    "part of speech": "形",
+    "translation": "meek; pleasingly affectionate; gentle and soft"
+  },
+  {
+    "word": "闻",
+    "pinyin": "wén",
+    "part of speech": "动",
+    "translation": "hear; smell"
+  },
+  {
+    "word": "文件",
+    "pinyin": "wén jiàn",
+    "part of speech": "名",
+    "translation": "file; document"
+  },
+  {
+    "word": "文具",
+    "pinyin": "wén jù",
+    "part of speech": "名",
+    "translation": "stationery; writing materials"
+  },
+  {
+    "word": "文明",
+    "pinyin": "wén míng",
+    "part of speech": "名",
+    "translation": "civilisation; culture; civilised"
+  },
+  {
+    "word": "文学",
+    "pinyin": "wén xué",
+    "part of speech": "名",
+    "translation": "literature"
+  },
+  {
+    "word": "文字",
+    "pinyin": "wén zì",
+    "part of speech": "名",
+    "translation": "writing"
+  },
+  {
+    "word": "吻",
+    "pinyin": "wěn",
+    "part of speech": "动",
+    "translation": "kiss"
+  },
+  {
+    "word": "稳定",
+    "pinyin": "wěn dìng",
+    "part of speech": "动/形",
+    "translation": "stabilise; steady"
+  },
+  {
+    "word": "问候",
+    "pinyin": "wèn hòu",
+    "part of speech": "动",
+    "translation": "send one's greetings to"
+  },
+  {
+    "word": "卧室",
+    "pinyin": "wò shì",
+    "part of speech": "名",
+    "translation": "bedroom"
+  },
+  {
+    "word": "握手",
+    "pinyin": "wò shǒu",
+    "part of speech": "动",
+    "translation": "to shake hands"
+  },
+  {
+    "word": "屋子",
+    "pinyin": "wū zi",
+    "part of speech": "名",
+    "translation": "room"
+  },
+  {
+    "word": "无奈",
+    "pinyin": "wú nài",
+    "part of speech": "动",
+    "translation": "cannot help but; have no alternative; have no choice"
+  },
+  {
+    "word": "无数",
+    "pinyin": "wú shù",
+    "part of speech": "形",
+    "translation": "innumerable; countless; myriad"
+  },
+  {
+    "word": "无所谓",
+    "pinyin": "wú suǒ wèi",
+    "part of speech": "形",
+    "translation": "to be indifferent"
+  },
+  {
+    "word": "武术",
+    "pinyin": "wǔ shù",
+    "part of speech": "名",
+    "translation": "martial arts"
+  },
+  {
+    "word": "勿",
+    "pinyin": "wù",
+    "part of speech": "副",
+    "translation": "do not"
+  },
+  {
+    "word": "雾",
+    "pinyin": "wù",
+    "part of speech": "名",
+    "translation": "fog"
+  },
+  {
+    "word": "物理",
+    "pinyin": "wù lǐ",
+    "part of speech": "名",
+    "translation": "physics"
+  },
+  {
+    "word": "物质",
+    "pinyin": "wù zhì",
+    "part of speech": "名",
+    "translation": "matter; substance; material"
+  },
+  {
+    "word": "吸取",
+    "pinyin": "xī qǔ",
+    "part of speech": "动",
+    "translation": "absorb; suck up; assimilate"
+  },
+  {
+    "word": "吸收",
+    "pinyin": "xī shōu",
+    "part of speech": "动",
+    "translation": "absorb; soak up; assimilate"
+  },
+  {
+    "word": "系",
+    "pinyin": "xì",
+    "part of speech": "名",
+    "translation": "tie; fasten; system; department"
+  },
+  {
+    "word": "细节",
+    "pinyin": "xì jié",
+    "part of speech": "名",
+    "translation": "details; particulars; minutiae"
+  },
+  {
+    "word": "戏剧",
+    "pinyin": "xì jù",
+    "part of speech": "名",
+    "translation": "play; theatre; script"
+  },
+  {
+    "word": "系统",
+    "pinyin": "xì tǒng",
+    "part of speech": "名/形",
+    "translation": "system"
+  },
+  {
+    "word": "瞎",
+    "pinyin": "xiā",
+    "part of speech": "形",
+    "translation": "blind; aimlessly; groundlessly"
+  },
+  {
+    "word": "吓",
+    "pinyin": "xià",
+    "part of speech": "动",
+    "translation": "threaten; intimidate; to scare"
+  },
+  {
+    "word": "夏令营",
+    "pinyin": "xià lìng yíng",
+    "part of speech": "名",
+    "translation": "summer camp"
+  },
+  {
+    "word": "下载",
+    "pinyin": "xià zǎi",
+    "part of speech": "动",
+    "translation": "download"
+  },
+  {
+    "word": "鲜艳",
+    "pinyin": "xiān yàn",
+    "part of speech": "形",
+    "translation": "brightly coloured"
+  },
+  {
+    "word": "显得",
+    "pinyin": "xiǎn de",
+    "part of speech": "动",
+    "translation": "look; seem; appear"
+  },
+  {
+    "word": "显然",
+    "pinyin": "xiǎn rán",
+    "part of speech": "形",
+    "translation": "obvious; evident; clear"
+  },
+  {
+    "word": "显示",
+    "pinyin": "xiǎn shì",
+    "part of speech": "动",
+    "translation": "display; demonstrate; exhibit"
+  },
+  {
+    "word": "县",
+    "pinyin": "xiàn",
+    "part of speech": "名",
+    "translation": "county"
+  },
+  {
+    "word": "现代",
+    "pinyin": "xiàn dài",
+    "part of speech": "名",
+    "translation": "modern"
+  },
+  {
+    "word": "现实",
+    "pinyin": "xiàn shí",
+    "part of speech": "名/形",
+    "translation": "reality; actual"
+  },
+  {
+    "word": "现象",
+    "pinyin": "xiàn xiàng",
+    "part of speech": "名",
+    "translation": "appearance; phenomenon"
+  },
+  {
+    "word": "限制",
+    "pinyin": "xiàn zhì",
+    "part of speech": "动",
+    "translation": "to restrict"
+  },
+  {
+    "word": "香肠",
+    "pinyin": "xiāng cháng",
+    "part of speech": "名",
+    "translation": "sausage"
+  },
+  {
+    "word": "相处",
+    "pinyin": "xiāng chǔ",
+    "part of speech": "动",
+    "translation": "get along with; get on"
+  },
+  {
+    "word": "相当",
+    "pinyin": "xiāng dāng",
+    "part of speech": "副",
+    "translation": "match; correspond to; be equivalent to"
+  },
+  {
+    "word": "相对",
+    "pinyin": "xiāng duì",
+    "part of speech": "形",
+    "translation": "opposite; face to face; relatively"
+  },
+  {
+    "word": "相关",
+    "pinyin": "xiāng guān",
+    "part of speech": "动",
+    "translation": "be related to; be bound up with; correlation"
+  },
+  {
+    "word": "相似",
+    "pinyin": "xiāng sì",
+    "part of speech": "形",
+    "translation": "resemble; be similar; be alike"
+  },
+  {
+    "word": "想念",
+    "pinyin": "xiǎng niàn",
+    "part of speech": "动",
+    "translation": "long to see again; miss"
+  },
+  {
+    "word": "享受",
+    "pinyin": "xiǎng shòu",
+    "part of speech": "动",
+    "translation": "enjoy"
+  },
+  {
+    "word": "想象",
+    "pinyin": "xiǎng xiàng",
+    "part of speech": "动",
+    "translation": "imagine; think; visualize"
+  },
+  {
+    "word": "项",
+    "pinyin": "xiàng",
+    "part of speech": "量",
+    "translation": "nape (of the neck); sum (of money); term [mathematics]"
+  },
+  {
+    "word": "项链",
+    "pinyin": "xiàng liàn",
+    "part of speech": "名",
+    "translation": "necklace"
+  },
+  {
+    "word": "项目",
+    "pinyin": "xiàng mù",
+    "part of speech": "名",
+    "translation": "project; item; clause"
+  },
+  {
+    "word": "象棋",
+    "pinyin": "xiàng qí",
+    "part of speech": "名",
+    "translation": "Chinese chess"
+  },
+  {
+    "word": "象征",
+    "pinyin": "xiàng zhēng",
+    "part of speech": "动",
+    "translation": "emblem; symbol; signify"
+  },
+  {
+    "word": "消费",
+    "pinyin": "xiāo fèi",
+    "part of speech": "动",
+    "translation": "consume"
+  },
+  {
+    "word": "消化",
+    "pinyin": "xiāo huà",
+    "part of speech": "动",
+    "translation": "digest"
+  },
+  {
+    "word": "消极",
+    "pinyin": "xiāo jí",
+    "part of speech": "形",
+    "translation": "negative; passive; inactive"
+  },
+  {
+    "word": "消失",
+    "pinyin": "xiāo shī",
+    "part of speech": "动",
+    "translation": "disappear; vanish; dissolve"
+  },
+  {
+    "word": "销售",
+    "pinyin": "xiāo shòu",
+    "part of speech": "动",
+    "translation": "sell; sales"
+  },
+  {
+    "word": "小麦",
+    "pinyin": "xiǎo mài",
+    "part of speech": "名",
+    "translation": "wheat"
+  },
+  {
+    "word": "小气",
+    "pinyin": "xiǎo qi",
+    "part of speech": "形",
+    "translation": "stingy; mean"
+  },
+  {
+    "word": "效率",
+    "pinyin": "xiào lǜ",
+    "part of speech": "名",
+    "translation": "efficiency; productivity"
+  },
+  {
+    "word": "孝顺",
+    "pinyin": "xiào shun",
+    "part of speech": "动",
+    "translation": "filial piety"
+  },
+  {
+    "word": "歇",
+    "pinyin": "xiē",
+    "part of speech": "动",
+    "translation": "have a rest"
+  },
+  {
+    "word": "斜",
+    "pinyin": "xié",
+    "part of speech": "形/动",
+    "translation": "oblique; slanting; bevel"
+  },
+  {
+    "word": "写作",
+    "pinyin": "xiě zuò",
+    "part of speech": "动",
+    "translation": "writing; pen and ink; penmanship"
+  },
+  {
+    "word": "心理",
+    "pinyin": "xīn lǐ",
+    "part of speech": "名",
+    "translation": "psychology; mentality; mind"
+  },
+  {
+    "word": "欣赏",
+    "pinyin": "xīn shǎng",
+    "part of speech": "动",
+    "translation": "appreciate; enjoy; admire"
+  },
+  {
+    "word": "心脏",
+    "pinyin": "xīn zàng",
+    "part of speech": "名",
+    "translation": "heart"
+  },
+  {
+    "word": "信号",
+    "pinyin": "xìn hào",
+    "part of speech": "名",
+    "translation": "signal"
+  },
+  {
+    "word": "信任",
+    "pinyin": "xìn rèn",
+    "part of speech": "动",
+    "translation": "to trust"
+  },
+  {
+    "word": "形成",
+    "pinyin": "xíng chéng",
+    "part of speech": "动",
+    "translation": "form; shape"
+  },
+  {
+    "word": "行动",
+    "pinyin": "xíng dòng",
+    "part of speech": "动/名",
+    "translation": "operation; move about; mobile"
+  },
+  {
+    "word": "行人",
+    "pinyin": "xíng rén",
+    "part of speech": "名",
+    "translation": "pedestrian"
+  },
+  {
+    "word": "形容",
+    "pinyin": "xíng róng",
+    "part of speech": "动",
+    "translation": "appearance; countenance"
+  },
+  {
+    "word": "形势",
+    "pinyin": "xíng shì",
+    "part of speech": "名",
+    "translation": "terrain; topographical features; circumstances"
+  },
+  {
+    "word": "形式",
+    "pinyin": "xíng shì",
+    "part of speech": "名",
+    "translation": "form; shape; layout"
+  },
+  {
+    "word": "行为",
+    "pinyin": "xíng wéi",
+    "part of speech": "名",
+    "translation": "action; behaviour; conduct"
+  },
+  {
+    "word": "形象",
+    "pinyin": "xíng xiàng",
+    "part of speech": "名/形",
+    "translation": "image; figure; vivid"
+  },
+  {
+    "word": "形状",
+    "pinyin": "xíng zhuàng",
+    "part of speech": "名",
+    "translation": "form; appearance; fashion"
+  },
+  {
+    "word": "幸亏",
+    "pinyin": "xìng kuī",
+    "part of speech": "副",
+    "translation": "fortunately; luckily"
+  },
+  {
+    "word": "幸运",
+    "pinyin": "xìng yùn",
+    "part of speech": "形",
+    "translation": "good fortune; good luck"
+  },
+  {
+    "word": "性质",
+    "pinyin": "xìng zhì",
+    "part of speech": "名",
+    "translation": "properties; quality; nature"
+  },
+  {
+    "word": "胸",
+    "pinyin": "xiōng",
+    "part of speech": "名",
+    "translation": "chest; bosom; thorax"
+  },
+  {
+    "word": "兄弟",
+    "pinyin": "xiōng dì",
+    "part of speech": "名",
+    "translation": "brothers"
+  },
+  {
+    "word": "修改",
+    "pinyin": "xiū gǎi",
+    "part of speech": "动",
+    "translation": "revise; amend; modify"
+  },
+  {
+    "word": "休闲",
+    "pinyin": "xiū xián",
+    "part of speech": "动",
+    "translation": "enjoy free time; lie fallow"
+  },
+  {
+    "word": "虚心",
+    "pinyin": "xū xīn",
+    "part of speech": "形",
+    "translation": "modest; with an open mind"
+  },
+  {
+    "word": "叙述",
+    "pinyin": "xù shù",
+    "part of speech": "动",
+    "translation": "narrate; recount; relate"
+  },
+  {
+    "word": "宣布",
+    "pinyin": "xuān bù",
+    "part of speech": "动",
+    "translation": "declare; proclaim; announce"
+  },
+  {
+    "word": "宣传",
+    "pinyin": "xuān chuán",
+    "part of speech": "动",
+    "translation": "propagate; disseminate; give publicity to"
+  },
+  {
+    "word": "学历",
+    "pinyin": "xué lì",
+    "part of speech": "名",
+    "translation": "record of formal schooling; educational background"
+  },
+  {
+    "word": "学术",
+    "pinyin": "xué shù",
+    "part of speech": "名",
+    "translation": "learning; science"
+  },
+  {
+    "word": "学问",
+    "pinyin": "xué wèn",
+    "part of speech": "名",
+    "translation": "learning; knowledge; scholarship"
+  },
+  {
+    "word": "血",
+    "pinyin": "xuè",
+    "part of speech": "名",
+    "translation": "blood"
+  },
+  {
+    "word": "询问",
+    "pinyin": "xún wèn",
+    "part of speech": "动",
+    "translation": "ask about; enquire"
+  },
+  {
+    "word": "寻找",
+    "pinyin": "xún zhǎo",
+    "part of speech": "动",
+    "translation": "seek; look for; search"
+  },
+  {
+    "word": "训练",
+    "pinyin": "xùn liàn",
+    "part of speech": "动",
+    "translation": "train; drill"
+  },
+  {
+    "word": "迅速",
+    "pinyin": "xùn sù",
+    "part of speech": "形",
+    "translation": "rapid; swift; prompt"
+  },
+  {
+    "word": "乐器",
+    "pinyin": "yuè qì",
+    "part of speech": "名",
+    "translation": "musical instrument"
+  },
+  {
+    "word": "押金",
+    "pinyin": "yā jīn",
+    "part of speech": "名",
+    "translation": "cash pledge; deposit; security"
+  },
+  {
+    "word": "牙齿",
+    "pinyin": "yá chǐ",
+    "part of speech": "名",
+    "translation": "tooth"
+  },
+  {
+    "word": "延长",
+    "pinyin": "yán cháng",
+    "part of speech": "动",
+    "translation": "lengthen; extend; prolong"
+  },
+  {
+    "word": "严肃",
+    "pinyin": "yán sù",
+    "part of speech": "形",
+    "translation": "serious; solemn; earnest"
+  },
+  {
+    "word": "演讲",
+    "pinyin": "yǎn jiǎng",
+    "part of speech": "动",
+    "translation": "give a lecture; make a speech"
+  },
+  {
+    "word": "宴会",
+    "pinyin": "yàn huì",
+    "part of speech": "名",
+    "translation": "banquet; feast; dinner party"
+  },
+  {
+    "word": "阳台",
+    "pinyin": "yáng tái",
+    "part of speech": "名",
+    "translation": "balcony; terrace; gallery"
+  },
+  {
+    "word": "痒",
+    "pinyin": "yǎng",
+    "part of speech": "形",
+    "translation": "itch; tickle"
+  },
+  {
+    "word": "样式",
+    "pinyin": "yàng shì",
+    "part of speech": "名",
+    "translation": "pattern; type; form"
+  },
+  {
+    "word": "腰",
+    "pinyin": "yāo",
+    "part of speech": "名",
+    "translation": "waist; small of the back"
+  },
+  {
+    "word": "摇",
+    "pinyin": "yáo",
+    "part of speech": "动",
+    "translation": "shake; wave; rock; turn"
+  },
+  {
+    "word": "咬",
+    "pinyin": "yǎo",
+    "part of speech": "动",
+    "translation": "bite; snap at"
+  },
+  {
+    "word": "要不",
+    "pinyin": "yào bù",
+    "part of speech": "连",
+    "translation": "otherwise; or else; or"
+  },
+  {
+    "word": "夜",
+    "pinyin": "yè",
+    "part of speech": "名",
+    "translation": "night; night-time; evening"
+  },
+  {
+    "word": "业务",
+    "pinyin": "yè wù",
+    "part of speech": "名",
+    "translation": "business; professional work"
+  },
+  {
+    "word": "业余",
+    "pinyin": "yè yú",
+    "part of speech": "形",
+    "translation": "spare time; amateur"
+  },
+  {
+    "word": "依然",
+    "pinyin": "yī rán",
+    "part of speech": "副",
+    "translation": "still; as before"
+  },
+  {
+    "word": "一辈子",
+    "pinyin": "yí bèi zi",
+    "part of speech": "名",
+    "translation": "all one's life"
+  },
+  {
+    "word": "一旦",
+    "pinyin": "yí dàn",
+    "part of speech": "副",
+    "translation": "in a single day; in a very short time; in case [something happens]"
+  },
+  {
+    "word": "移动",
+    "pinyin": "yí dòng",
+    "part of speech": "动",
+    "translation": "shift; move; removal"
+  },
+  {
+    "word": "遗憾",
+    "pinyin": "yí hàn",
+    "part of speech": "名/形",
+    "translation": "regret; pity"
+  },
+  {
+    "word": "一律",
+    "pinyin": "yí lǜ",
+    "part of speech": "副",
+    "translation": "same; alike; uniform"
+  },
+  {
+    "word": "移民",
+    "pinyin": "yí mín",
+    "part of speech": "动/名",
+    "translation": "migrate; migrant"
+  },
+  {
+    "word": "疑问",
+    "pinyin": "yí wèn",
+    "part of speech": "名",
+    "translation": "query; problem; doubt"
+  },
+  {
+    "word": "一再",
+    "pinyin": "yí zài",
+    "part of speech": "副",
+    "translation": "time and again; again and again; repeatedly"
+  },
+  {
+    "word": "一致",
+    "pinyin": "yí zhì",
+    "part of speech": "形/副",
+    "translation": "identical; unanimous"
+  },
+  {
+    "word": "乙",
+    "pinyin": "yǐ",
+    "part of speech": "名",
+    "translation": "second(ly); the second of the ten Heavenly Stems"
+  },
+  {
+    "word": "以及",
+    "pinyin": "yǐ jí",
+    "part of speech": "连",
+    "translation": "as well as; along with; and"
+  },
+  {
+    "word": "以来",
+    "pinyin": "yǐ lái",
+    "part of speech": "名",
+    "translation": "since"
+  },
+  {
+    "word": "亿",
+    "pinyin": "yì",
+    "part of speech": "数",
+    "translation": "100 million"
+  },
+  {
+    "word": "议论",
+    "pinyin": "yì lùn",
+    "part of speech": "动",
+    "translation": "comment; discuss"
+  },
+  {
+    "word": "意外",
+    "pinyin": "yì wài",
+    "part of speech": "形/名",
+    "translation": "unexpected; unforeseen"
+  },
+  {
+    "word": "义务",
+    "pinyin": "yì wù",
+    "part of speech": "名",
+    "translation": "duty; obligation"
+  },
+  {
+    "word": "意义",
+    "pinyin": "yì yì",
+    "part of speech": "名",
+    "translation": "meaning; sense; significance"
+  },
+  {
+    "word": "因而",
+    "pinyin": "yīn ér",
+    "part of speech": "连",
+    "translation": "thus; as a result; with the result that"
+  },
+  {
+    "word": "因素",
+    "pinyin": "yīn sù",
+    "part of speech": "名",
+    "translation": "factor; element"
+  },
+  {
+    "word": "银",
+    "pinyin": "yín",
+    "part of speech": "名",
+    "translation": "silver"
+  },
+  {
+    "word": "印刷",
+    "pinyin": "yìn shuā",
+    "part of speech": "动",
+    "translation": "print; printing"
+  },
+  {
+    "word": "英俊",
+    "pinyin": "yīng jùn",
+    "part of speech": "形",
+    "translation": "handsome; talented; brilliant"
+  },
+  {
+    "word": "英雄",
+    "pinyin": "yīng xióng",
+    "part of speech": "名",
+    "translation": "hero"
+  },
+  {
+    "word": "迎接",
+    "pinyin": "yíng jiē",
+    "part of speech": "动",
+    "translation": "welcome; greet; reception"
+  },
+  {
+    "word": "营养",
+    "pinyin": "yíng yǎng",
+    "part of speech": "名",
+    "translation": "nutrition; nourishment"
+  },
+  {
+    "word": "营业",
+    "pinyin": "yíng yè",
+    "part of speech": "动",
+    "translation": "do business"
+  },
+  {
+    "word": "影子",
+    "pinyin": "yǐng zi",
+    "part of speech": "名",
+    "translation": "shadow; reflection; trace"
+  },
+  {
+    "word": "硬",
+    "pinyin": "yìng",
+    "part of speech": "形",
+    "translation": "hard"
+  },
+  {
+    "word": "应付",
+    "pinyin": "yìng fu",
+    "part of speech": "动",
+    "translation": "deal with; cope with; handle"
+  },
+  {
+    "word": "硬件",
+    "pinyin": "yìng jiàn",
+    "part of speech": "名",
+    "translation": "hardware"
+  },
+  {
+    "word": "应用",
+    "pinyin": "yìng yòng",
+    "part of speech": "动",
+    "translation": "use; app; application"
+  },
+  {
+    "word": "拥抱",
+    "pinyin": "yōng bào",
+    "part of speech": "动",
+    "translation": "embrace; hug"
+  },
+  {
+    "word": "拥挤",
+    "pinyin": "yōng jǐ",
+    "part of speech": "动/形",
+    "translation": "crowd; push and squeeze"
+  },
+  {
+    "word": "勇气",
+    "pinyin": "yǒng qì",
+    "part of speech": "名",
+    "translation": "courage; nerve"
+  },
+  {
+    "word": "用功",
+    "pinyin": "yòng gōng",
+    "part of speech": "形",
+    "translation": "hardworking; diligent; studious"
+  },
+  {
+    "word": "用途",
+    "pinyin": "yòng tú",
+    "part of speech": "名",
+    "translation": "use"
+  },
+  {
+    "word": "优惠",
+    "pinyin": "yōu huì",
+    "part of speech": "形",
+    "translation": "discount"
+  },
+  {
+    "word": "悠久",
+    "pinyin": "yōu jiǔ",
+    "part of speech": "形",
+    "translation": "long-standing; age-old"
+  },
+  {
+    "word": "优美",
+    "pinyin": "yōu měi",
+    "part of speech": "形",
+    "translation": "graceful; fine; exquisite"
+  },
+  {
+    "word": "优势",
+    "pinyin": "yōu shì",
+    "part of speech": "名",
+    "translation": "superiority"
+  },
+  {
+    "word": "游览",
+    "pinyin": "yóu lǎn",
+    "part of speech": "动",
+    "translation": "go sightseeing; tour; visit"
+  },
+  {
+    "word": "犹豫",
+    "pinyin": "yóu yù",
+    "part of speech": "形",
+    "translation": "hesitate; be irresolute"
+  },
+  {
+    "word": "油炸",
+    "pinyin": "yóu zhá",
+    "part of speech": "动",
+    "translation": "deep-fry"
+  },
+  {
+    "word": "有利",
+    "pinyin": "yǒu lì",
+    "part of speech": "形",
+    "translation": "advantageous; beneficial; favourable"
+  },
+  {
+    "word": "幼儿园",
+    "pinyin": "yòu ér yuán",
+    "part of speech": "名",
+    "translation": "kindergarten; nursery school"
+  },
+  {
+    "word": "娱乐",
+    "pinyin": "yú lè",
+    "part of speech": "动",
+    "translation": "amusement; entertainment; recreation"
+  },
+  {
+    "word": "与其",
+    "pinyin": "yǔ qí",
+    "part of speech": "连",
+    "translation": "rather than; better than"
+  },
+  {
+    "word": "语气",
+    "pinyin": "yǔ qì",
+    "part of speech": "名",
+    "translation": "tone; manner of speaking; mood"
+  },
+  {
+    "word": "预报",
+    "pinyin": "yù bào",
+    "part of speech": "动/名",
+    "translation": "forecast; prediction"
+  },
+  {
+    "word": "预订",
+    "pinyin": "yù dìng",
+    "part of speech": "动",
+    "translation": "subscribe; book; place an order"
+  },
+  {
+    "word": "预防",
+    "pinyin": "yù fáng",
+    "part of speech": "动",
+    "translation": "prevent; take precautions against; guard against"
+  },
+  {
+    "word": "玉米",
+    "pinyin": "yù mǐ",
+    "part of speech": "名",
+    "translation": "maize; corn"
+  },
+  {
+    "word": "圆",
+    "pinyin": "yuán",
+    "part of speech": "形",
+    "translation": "round"
+  },
+  {
+    "word": "元旦",
+    "pinyin": "yuán dàn",
+    "part of speech": "名",
+    "translation": "New Year's Day"
+  },
+  {
+    "word": "员工",
+    "pinyin": "yuán gōng",
+    "part of speech": "名",
+    "translation": "staff"
+  },
+  {
+    "word": "原料",
+    "pinyin": "yuán liào",
+    "part of speech": "名",
+    "translation": "raw material; crude material"
+  },
+  {
+    "word": "原则",
+    "pinyin": "yuán zé",
+    "part of speech": "名",
+    "translation": "principle"
+  },
+  {
+    "word": "愿望",
+    "pinyin": "yuàn wàng",
+    "part of speech": "名",
+    "translation": "desire; wish; aspiration"
+  },
+  {
+    "word": "晕",
+    "pinyin": "yūn",
+    "part of speech": "动",
+    "translation": "dizzy; giddy; faint"
+  },
+  {
+    "word": "运气",
+    "pinyin": "yùn qi",
+    "part of speech": "名",
+    "translation": "fortune; luck"
+  },
+  {
+    "word": "运输",
+    "pinyin": "yùn shū",
+    "part of speech": "动",
+    "translation": "transport; carriage; conveyance"
+  },
+  {
+    "word": "运用",
+    "pinyin": "yùn yòng",
+    "part of speech": "动",
+    "translation": "utilise; apply; put to use"
+  },
+  {
+    "word": "灾害",
+    "pinyin": "zāi hài",
+    "part of speech": "名",
+    "translation": "damage; disaster; calamity"
+  },
+  {
+    "word": "在乎",
+    "pinyin": "zài hu",
+    "part of speech": "动",
+    "translation": "care about; mind; take to heart"
+  },
+  {
+    "word": "再三",
+    "pinyin": "zài sān",
+    "part of speech": "副",
+    "translation": "again and again; repeatedly"
+  },
+  {
+    "word": "在于",
+    "pinyin": "zài yú",
+    "part of speech": "动",
+    "translation": "to be in/at"
+  },
+  {
+    "word": "赞成",
+    "pinyin": "zàn chéng",
+    "part of speech": "动",
+    "translation": "approve of; agree with; endorse"
+  },
+  {
+    "word": "赞美",
+    "pinyin": "zàn měi",
+    "part of speech": "动",
+    "translation": "praise; eulogize"
+  },
+  {
+    "word": "糟糕",
+    "pinyin": "zāo gāo",
+    "part of speech": "形",
+    "translation": "how terrible; what bad luck; too bad"
+  },
+  {
+    "word": "造成",
+    "pinyin": "zào chéng",
+    "part of speech": "动",
+    "translation": "give rise to; bring about; cause"
+  },
+  {
+    "word": "则",
+    "pinyin": "zé",
+    "part of speech": "连",
+    "translation": "standard; norm; criterion"
+  },
+  {
+    "word": "责备",
+    "pinyin": "zé bèi",
+    "part of speech": "动",
+    "translation": "reproach; blame; reprove"
+  },
+  {
+    "word": "摘",
+    "pinyin": "zhāi",
+    "part of speech": "动",
+    "translation": "pick; pluck; strip"
+  },
+  {
+    "word": "窄",
+    "pinyin": "zhǎi",
+    "part of speech": "形",
+    "translation": "narrow"
+  },
+  {
+    "word": "粘贴",
+    "pinyin": "zhān tiē",
+    "part of speech": "动",
+    "translation": "paste; stick"
+  },
+  {
+    "word": "展开",
+    "pinyin": "zhǎn kāi",
+    "part of speech": "动",
+    "translation": "develop; spread; unfold"
+  },
+  {
+    "word": "展览",
+    "pinyin": "zhǎn lǎn",
+    "part of speech": "动",
+    "translation": "put on display; exhibit; show"
+  },
+  {
+    "word": "占",
+    "pinyin": "zhàn",
+    "part of speech": "动",
+    "translation": "to occupy"
+  },
+  {
+    "word": "战争",
+    "pinyin": "zhàn zhēng",
+    "part of speech": "名",
+    "translation": "war; warfare"
+  },
+  {
+    "word": "涨",
+    "pinyin": "zhǎng",
+    "part of speech": "动",
+    "translation": "swell up; rise; be more than expected"
+  },
+  {
+    "word": "长辈",
+    "pinyin": "zhǎng bèi",
+    "part of speech": "名",
+    "translation": "elder member of a family"
+  },
+  {
+    "word": "掌握",
+    "pinyin": "zhǎng wò",
+    "part of speech": "动",
+    "translation": "grasp; master; know well"
+  },
+  {
+    "word": "账户",
+    "pinyin": "zhàng hù",
+    "part of speech": "名",
+    "translation": "(bank) account"
+  },
+  {
+    "word": "招待",
+    "pinyin": "zhāo dài",
+    "part of speech": "动",
+    "translation": "receive; entertain; serve"
+  },
+  {
+    "word": "着火",
+    "pinyin": "zháo huǒ",
+    "part of speech": "动",
+    "translation": "to burn"
+  },
+  {
+    "word": "着凉",
+    "pinyin": "zháo liáng",
+    "part of speech": "动",
+    "translation": "catch cold; catch a chill"
+  },
+  {
+    "word": "照常",
+    "pinyin": "zhào cháng",
+    "part of speech": "副",
+    "translation": "as usual"
+  },
+  {
+    "word": "召开",
+    "pinyin": "zhào kāi",
+    "part of speech": "动",
+    "translation": "convene"
+  },
+  {
+    "word": "哲学",
+    "pinyin": "zhé xué",
+    "part of speech": "名",
+    "translation": "philosophy"
+  },
+  {
+    "word": "针对",
+    "pinyin": "zhēn duì",
+    "part of speech": "动",
+    "translation": "be directed against; be aimed at"
+  },
+  {
+    "word": "真实",
+    "pinyin": "zhēn shí",
+    "part of speech": "形",
+    "translation": "true; real; authentic"
+  },
+  {
+    "word": "珍惜",
+    "pinyin": "zhēn xī",
+    "part of speech": "动",
+    "translation": "treasure; value; cherish"
+  },
+  {
+    "word": "诊断",
+    "pinyin": "zhěn duàn",
+    "part of speech": "动",
+    "translation": "diagnosis"
+  },
+  {
+    "word": "阵",
+    "pinyin": "zhèn",
+    "part of speech": "量",
+    "translation": "battle array; position; front"
+  },
+  {
+    "word": "振动",
+    "pinyin": "zhèn dòng",
+    "part of speech": "动",
+    "translation": "vibrate; vibrant"
+  },
+  {
+    "word": "睁",
+    "pinyin": "zhēng",
+    "part of speech": "动",
+    "translation": "open (eyes)"
+  },
+  {
+    "word": "争论",
+    "pinyin": "zhēng lùn",
+    "part of speech": "动",
+    "translation": "argue; debate"
+  },
+  {
+    "word": "征求",
+    "pinyin": "zhēng qiú",
+    "part of speech": "动",
+    "translation": "solicit; seek; ask for"
+  },
+  {
+    "word": "争取",
+    "pinyin": "zhēng qǔ",
+    "part of speech": "动",
+    "translation": "strive for; fight for"
+  },
+  {
+    "word": "整个",
+    "pinyin": "zhěng gè",
+    "part of speech": "形",
+    "translation": "whole; total; entire"
+  },
+  {
+    "word": "整齐",
+    "pinyin": "zhěng qí",
+    "part of speech": "形",
+    "translation": "tidy"
+  },
+  {
+    "word": "整体",
+    "pinyin": "zhěng tǐ",
+    "part of speech": "名",
+    "translation": "ensemble; whole; entirety"
+  },
+  {
+    "word": "正",
+    "pinyin": "zhèng",
+    "part of speech": "形",
+    "translation": "straight; upright; correct"
+  },
+  {
+    "word": "挣",
+    "pinyin": "zhèng",
+    "part of speech": "动",
+    "translation": "to make (money)"
+  },
+  {
+    "word": "政府",
+    "pinyin": "zhèng fǔ",
+    "part of speech": "名",
+    "translation": "government"
+  },
+  {
+    "word": "证件",
+    "pinyin": "zhèng jiàn",
+    "part of speech": "名",
+    "translation": "credentials; papers"
+  },
+  {
+    "word": "证据",
+    "pinyin": "zhèng jù",
+    "part of speech": "名",
+    "translation": "evidence; proof; testimony"
+  },
+  {
+    "word": "政治",
+    "pinyin": "zhèng zhì",
+    "part of speech": "名",
+    "translation": "politics; political affairs"
+  },
+  {
+    "word": "支",
+    "pinyin": "zhī",
+    "part of speech": "量",
+    "translation": "branch; the twelve Earthly Branches"
+  },
+  {
+    "word": "支票",
+    "pinyin": "zhī piào",
+    "part of speech": "名",
+    "translation": "check/cheque"
+  },
+  {
+    "word": "直",
+    "pinyin": "zhí",
+    "part of speech": "形",
+    "translation": "straight; direct"
+  },
+  {
+    "word": "执照",
+    "pinyin": "zhí zhào",
+    "part of speech": "名",
+    "translation": "license; permit"
+  },
+  {
+    "word": "指导",
+    "pinyin": "zhǐ dǎo",
+    "part of speech": "动",
+    "translation": "guide; direct; conduct"
+  },
+  {
+    "word": "指挥",
+    "pinyin": "zhǐ huī",
+    "part of speech": "动/名",
+    "translation": "command; direct; conduct"
+  },
+  {
+    "word": "制定",
+    "pinyin": "zhì dìng",
+    "part of speech": "动",
+    "translation": "draw up; draft; formulate"
+  },
+  {
+    "word": "制度",
+    "pinyin": "zhì dù",
+    "part of speech": "名",
+    "translation": "system; institution"
+  },
+  {
+    "word": "智慧",
+    "pinyin": "zhì huì",
+    "part of speech": "名",
+    "translation": "wisdom; intelligence; wit"
+  },
+  {
+    "word": "至今",
+    "pinyin": "zhì jīn",
+    "part of speech": "副",
+    "translation": "up to now; hitherto; so far"
+  },
+  {
+    "word": "治疗",
+    "pinyin": "zhì liáo",
+    "part of speech": "动",
+    "translation": "treat; cure; remedy"
+  },
+  {
+    "word": "秩序",
+    "pinyin": "zhì xù",
+    "part of speech": "名",
+    "translation": "order; sequence"
+  },
+  {
+    "word": "至于",
+    "pinyin": "zhì yú",
+    "part of speech": "介",
+    "translation": "go so far as to"
+  },
+  {
+    "word": "志愿者",
+    "pinyin": "zhì yuàn zhě",
+    "part of speech": "名",
+    "translation": "volunteer"
+  },
+  {
+    "word": "制造",
+    "pinyin": "zhì zào",
+    "part of speech": "动",
+    "translation": "to manufacture"
+  },
+  {
+    "word": "制作",
+    "pinyin": "zhì zuò",
+    "part of speech": "动",
+    "translation": "manufacture"
+  },
+  {
+    "word": "中介",
+    "pinyin": "zhōng jiè",
+    "part of speech": "名",
+    "translation": "intermediary"
+  },
+  {
+    "word": "中心",
+    "pinyin": "zhōng xīn",
+    "part of speech": "名",
+    "translation": "centre"
+  },
+  {
+    "word": "中旬",
+    "pinyin": "zhōng xún",
+    "part of speech": "名",
+    "translation": "[the middle ten days of a month]"
+  },
+  {
+    "word": "种类",
+    "pinyin": "zhǒng lèi",
+    "part of speech": "名",
+    "translation": "kind"
+  },
+  {
+    "word": "重大",
+    "pinyin": "zhòng dà",
+    "part of speech": "形",
+    "translation": "important"
+  },
+  {
+    "word": "重量",
+    "pinyin": "zhòng liàng",
+    "part of speech": "名",
+    "translation": "weight; scale; heft"
+  },
+  {
+    "word": "周到",
+    "pinyin": "zhōu dao",
+    "part of speech": "形",
+    "translation": "attentive; considerate; thorough"
+  },
+  {
+    "word": "猪",
+    "pinyin": "zhū",
+    "part of speech": "名",
+    "translation": "pig"
+  },
+  {
+    "word": "逐步",
+    "pinyin": "zhú bù",
+    "part of speech": "副",
+    "translation": "step by step; progressively; gradually"
+  },
+  {
+    "word": "逐渐",
+    "pinyin": "zhú jiàn",
+    "part of speech": "副",
+    "translation": "gradually"
+  },
+  {
+    "word": "竹子",
+    "pinyin": "zhú zi",
+    "part of speech": "名",
+    "translation": "bamboo"
+  },
+  {
+    "word": "煮",
+    "pinyin": "zhǔ",
+    "part of speech": "动",
+    "translation": "boil; cook; stew"
+  },
+  {
+    "word": "主持",
+    "pinyin": "zhǔ chí",
+    "part of speech": "动",
+    "translation": "take charge of; manage; direct"
+  },
+  {
+    "word": "主动",
+    "pinyin": "zhǔ dòng",
+    "part of speech": "形",
+    "translation": "take the initiative"
+  },
+  {
+    "word": "主观",
+    "pinyin": "zhǔ guān",
+    "part of speech": "形",
+    "translation": "subjective"
+  },
+  {
+    "word": "主人",
+    "pinyin": "zhǔ rén",
+    "part of speech": "名",
+    "translation": "owner"
+  },
+  {
+    "word": "主任",
+    "pinyin": "zhǔ rèn",
+    "part of speech": "名",
+    "translation": "director"
+  },
+  {
+    "word": "主题",
+    "pinyin": "zhǔ tí",
+    "part of speech": "名",
+    "translation": "theme; subject; topic"
+  },
+  {
+    "word": "主席",
+    "pinyin": "zhǔ xí",
+    "part of speech": "名",
+    "translation": "chairperson"
+  },
+  {
+    "word": "主张",
+    "pinyin": "zhǔ zhāng",
+    "part of speech": "动",
+    "translation": "claim; assertionl; proposal"
+  },
+  {
+    "word": "注册",
+    "pinyin": "zhù cè",
+    "part of speech": "动",
+    "translation": "register"
+  },
+  {
+    "word": "祝福",
+    "pinyin": "zhù fú",
+    "part of speech": "动",
+    "translation": "blessing; benediction; wish happiness to"
+  },
+  {
+    "word": "抓",
+    "pinyin": "zhuā",
+    "part of speech": "动",
+    "translation": "to grab"
+  },
+  {
+    "word": "抓紧",
+    "pinyin": "zhuā jǐn",
+    "part of speech": "动",
+    "translation": "firmly grasp; pay close attention to"
+  },
+  {
+    "word": "专家",
+    "pinyin": "zhuān jiā",
+    "part of speech": "名",
+    "translation": "specialist; expert"
+  },
+  {
+    "word": "专心",
+    "pinyin": "zhuān xīn",
+    "part of speech": "形",
+    "translation": "engrossed; concentrating"
+  },
+  {
+    "word": "转变",
+    "pinyin": "zhuǎn biàn",
+    "part of speech": "动",
+    "translation": "change; convert; turn"
+  },
+  {
+    "word": "转告",
+    "pinyin": "zhuǎn gào",
+    "part of speech": "动",
+    "translation": "pass on; communicate; transmit"
+  },
+  {
+    "word": "装",
+    "pinyin": "zhuāng",
+    "part of speech": "动",
+    "translation": "dress; attire; clothing"
+  },
+  {
+    "word": "装饰",
+    "pinyin": "zhuāng shì",
+    "part of speech": "动",
+    "translation": "ornament; decorate; embellish"
+  },
+  {
+    "word": "装修",
+    "pinyin": "zhuāng xiū",
+    "part of speech": "动",
+    "translation": "to decroate"
+  },
+  {
+    "word": "撞",
+    "pinyin": "zhuàng",
+    "part of speech": "动",
+    "translation": "to hit"
+  },
+  {
+    "word": "状况",
+    "pinyin": "zhuàng kuàng",
+    "part of speech": "名",
+    "translation": "condition; state; status"
+  },
+  {
+    "word": "状态",
+    "pinyin": "zhuàng tài",
+    "part of speech": "名",
+    "translation": "status; condition; state of affairs"
+  },
+  {
+    "word": "追",
+    "pinyin": "zhuī",
+    "part of speech": "动",
+    "translation": "chase"
+  },
+  {
+    "word": "追求",
+    "pinyin": "zhuī qiú",
+    "part of speech": "动",
+    "translation": "seek; pursue; woo"
+  },
+  {
+    "word": "资格",
+    "pinyin": "zī gé",
+    "part of speech": "名",
+    "translation": "qualification; seniority"
+  },
+  {
+    "word": "资金",
+    "pinyin": "zī jīn",
+    "part of speech": "名",
+    "translation": "fund"
+  },
+  {
+    "word": "资料",
+    "pinyin": "zī liào",
+    "part of speech": "名",
+    "translation": "means; resources; materials"
+  },
+  {
+    "word": "姿势",
+    "pinyin": "zī shì",
+    "part of speech": "名",
+    "translation": "posture; gesture"
+  },
+  {
+    "word": "咨询",
+    "pinyin": "zī xún",
+    "part of speech": "动",
+    "translation": "seek advice from; consult"
+  },
+  {
+    "word": "资源",
+    "pinyin": "zī yuán",
+    "part of speech": "名",
+    "translation": "(natural) resources"
+  },
+  {
+    "word": "紫",
+    "pinyin": "zǐ",
+    "part of speech": "形",
+    "translation": "purple"
+  },
+  {
+    "word": "自从",
+    "pinyin": "zì cóng",
+    "part of speech": "介",
+    "translation": "since"
+  },
+  {
+    "word": "自动",
+    "pinyin": "zì dòng",
+    "part of speech": "形/副",
+    "translation": "voluntarily; of one's own accord; spontaneous"
+  },
+  {
+    "word": "自豪",
+    "pinyin": "zì háo",
+    "part of speech": "形",
+    "translation": "be proud of"
+  },
+  {
+    "word": "自觉",
+    "pinyin": "zì jué",
+    "part of speech": "动/形",
+    "translation": "be aware of; conscientious"
+  },
+  {
+    "word": "字母",
+    "pinyin": "zì mǔ",
+    "part of speech": "名",
+    "translation": "letters [of an alphabet]"
+  },
+  {
+    "word": "字幕",
+    "pinyin": "zì mù",
+    "part of speech": "名",
+    "translation": "captions; subtitles"
+  },
+  {
+    "word": "自私",
+    "pinyin": "zì sī",
+    "part of speech": "形",
+    "translation": "selfish; self-centred; self-seeking"
+  },
+  {
+    "word": "自由",
+    "pinyin": "zì yóu",
+    "part of speech": "形/名",
+    "translation": "freedom; liberty"
+  },
+  {
+    "word": "自愿",
+    "pinyin": "zì yuàn",
+    "part of speech": "动",
+    "translation": "of one's own free will; voluntarily"
+  },
+  {
+    "word": "综合",
+    "pinyin": "zōng hé",
+    "part of speech": "动",
+    "translation": "synthesise; comprehensive; multiple"
+  },
+  {
+    "word": "总裁",
+    "pinyin": "zǒng cái",
+    "part of speech": "名",
+    "translation": "president; director general"
+  },
+  {
+    "word": "总共",
+    "pinyin": "zǒng gòng",
+    "part of speech": "副",
+    "translation": "in all; altogether"
+  },
+  {
+    "word": "总理",
+    "pinyin": "zǒng lǐ",
+    "part of speech": "名",
+    "translation": "prime minister"
+  },
+  {
+    "word": "总算",
+    "pinyin": "zǒng suàn",
+    "part of speech": "副",
+    "translation": "at long last; finally"
+  },
+  {
+    "word": "总统",
+    "pinyin": "zǒng tǒng",
+    "part of speech": "名",
+    "translation": "president"
+  },
+  {
+    "word": "总之",
+    "pinyin": "zǒng zhī",
+    "part of speech": "连",
+    "translation": "in a word; in short; in brief"
+  },
+  {
+    "word": "组",
+    "pinyin": "zǔ",
+    "part of speech": "量",
+    "translation": "group; set; series"
+  },
+  {
+    "word": "组成",
+    "pinyin": "zǔ chéng",
+    "part of speech": "动",
+    "translation": "to form"
+  },
+  {
+    "word": "组合",
+    "pinyin": "zǔ hé",
+    "part of speech": "动/名",
+    "translation": "make up; compose; constitute"
+  },
+  {
+    "word": "组织",
+    "pinyin": "zǔ zhī",
+    "part of speech": "动/名",
+    "translation": "organisation"
+  },
+  {
+    "word": "阻止",
+    "pinyin": "zǔ zhǐ",
+    "part of speech": "动",
+    "translation": "arrest; stop; prevent"
+  },
+  {
+    "word": "醉",
+    "pinyin": "zuì",
+    "part of speech": "动",
+    "translation": "drunk; intoxicated"
+  },
+  {
+    "word": "最初",
+    "pinyin": "zuì chū",
+    "part of speech": "名",
+    "translation": "initial; first; prime"
+  },
+  {
+    "word": "尊敬",
+    "pinyin": "zūn jìng",
+    "part of speech": "动",
+    "translation": "respect; honour; esteem"
+  },
+  {
+    "word": "遵守",
+    "pinyin": "zūn shǒu",
+    "part of speech": "动",
+    "translation": "observe; abide by; comply with"
+  },
+  {
+    "word": "作品",
+    "pinyin": "zuò pǐn",
+    "part of speech": "名",
+    "translation": "works; opus"
+  },
+  {
+    "word": "作为",
+    "pinyin": "zuò wéi",
+    "part of speech": "介",
+    "translation": "to act as; conduct"
+  },
+  {
+    "word": "作文",
+    "pinyin": "zuò wén",
+    "part of speech": "名",
+    "translation": "write a composition"
+  }
+]

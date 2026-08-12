@@ -1,0 +1,902 @@
+[
+  {
+    "word": "爱",
+    "pinyin": "ài",
+    "part of speech": "动",
+    "translation": "to love"
+  },
+  {
+    "word": "八",
+    "pinyin": "bā",
+    "part of speech": "数",
+    "translation": "eight"
+  },
+  {
+    "word": "爸爸",
+    "pinyin": "bà ba",
+    "part of speech": "名",
+    "translation": "father"
+  },
+  {
+    "word": "杯子",
+    "pinyin": "bēi zi",
+    "part of speech": "名",
+    "translation": "cup; glass; mug"
+  },
+  {
+    "word": "北京",
+    "pinyin": "běi jīng",
+    "part of speech": "名",
+    "translation": "Beijing"
+  },
+  {
+    "word": "本",
+    "pinyin": "běn",
+    "part of speech": "量",
+    "translation": "root; [measure word for books]"
+  },
+  {
+    "word": "不客气",
+    "pinyin": "bú kè qi",
+    "part of speech": "",
+    "translation": "you're welcome; impolite"
+  },
+  {
+    "word": "不",
+    "pinyin": "bù",
+    "part of speech": "副",
+    "translation": "not; no"
+  },
+  {
+    "word": "菜",
+    "pinyin": "cài",
+    "part of speech": "名",
+    "translation": "vegetable"
+  },
+  {
+    "word": "茶",
+    "pinyin": "chá",
+    "part of speech": "名",
+    "translation": "tea"
+  },
+  {
+    "word": "吃",
+    "pinyin": "chī",
+    "part of speech": "动",
+    "translation": "to eat"
+  },
+  {
+    "word": "出租车",
+    "pinyin": "chū zū chē",
+    "part of speech": "名",
+    "translation": "taxi"
+  },
+  {
+    "word": "打电话",
+    "pinyin": "dǎ diàn huà",
+    "part of speech": "",
+    "translation": "to make a telephone call"
+  },
+  {
+    "word": "大",
+    "pinyin": "dà",
+    "part of speech": "形",
+    "translation": "big"
+  },
+  {
+    "word": "的",
+    "pinyin": "de",
+    "part of speech": "助",
+    "translation": "of"
+  },
+  {
+    "word": "点",
+    "pinyin": "diǎn",
+    "part of speech": "量",
+    "translation": "o’clock; spot; dot"
+  },
+  {
+    "word": "电脑",
+    "pinyin": "diàn nǎo",
+    "part of speech": "名",
+    "translation": "computer"
+  },
+  {
+    "word": "电视",
+    "pinyin": "diàn shì",
+    "part of speech": "名",
+    "translation": "TV"
+  },
+  {
+    "word": "电影",
+    "pinyin": "diàn yǐng",
+    "part of speech": "名",
+    "translation": "film; movie"
+  },
+  {
+    "word": "东西",
+    "pinyin": "dōng xi",
+    "part of speech": "名",
+    "translation": "thing"
+  },
+  {
+    "word": "都",
+    "pinyin": "dōu",
+    "part of speech": "副",
+    "translation": "both; all"
+  },
+  {
+    "word": "读",
+    "pinyin": "dú",
+    "part of speech": "动",
+    "translation": "read aloud"
+  },
+  {
+    "word": "对不起",
+    "pinyin": "duì bu qǐ",
+    "part of speech": "动",
+    "translation": "sorry"
+  },
+  {
+    "word": "多",
+    "pinyin": "duō",
+    "part of speech": "形/代",
+    "translation": "much/many; how [+adjective]"
+  },
+  {
+    "word": "多少",
+    "pinyin": "duō shǎo",
+    "part of speech": "代",
+    "translation": "how much/many?"
+  },
+  {
+    "word": "儿子",
+    "pinyin": "ér zi",
+    "part of speech": "名",
+    "translation": "son"
+  },
+  {
+    "word": "二",
+    "pinyin": "èr",
+    "part of speech": "数",
+    "translation": "two"
+  },
+  {
+    "word": "饭店",
+    "pinyin": "fàn diàn",
+    "part of speech": "名",
+    "translation": "restaurant"
+  },
+  {
+    "word": "飞机",
+    "pinyin": "fēi jī",
+    "part of speech": "名",
+    "translation": "plane"
+  },
+  {
+    "word": "分钟",
+    "pinyin": "fēn zhōng",
+    "part of speech": "量",
+    "translation": "minute"
+  },
+  {
+    "word": "高兴",
+    "pinyin": "gāo xìng",
+    "part of speech": "形",
+    "translation": "pleased; happy"
+  },
+  {
+    "word": "个",
+    "pinyin": "gè",
+    "part of speech": "量",
+    "translation": "individual; [general measure word]"
+  },
+  {
+    "word": "工作",
+    "pinyin": "gōng zuò",
+    "part of speech": "名/动",
+    "translation": "job; work"
+  },
+  {
+    "word": "狗",
+    "pinyin": "gǒu",
+    "part of speech": "名",
+    "translation": "dog"
+  },
+  {
+    "word": "汉语",
+    "pinyin": "hàn yǔ",
+    "part of speech": "名",
+    "translation": "Standard Chinese language"
+  },
+  {
+    "word": "好",
+    "pinyin": "hǎo",
+    "part of speech": "形",
+    "translation": "good"
+  },
+  {
+    "word": "号",
+    "pinyin": "hào",
+    "part of speech": "量",
+    "translation": "number; day of a month"
+  },
+  {
+    "word": "喝",
+    "pinyin": "hē",
+    "part of speech": "动",
+    "translation": "to drink"
+  },
+  {
+    "word": "和",
+    "pinyin": "hé",
+    "part of speech": "连/介",
+    "translation": "and"
+  },
+  {
+    "word": "很",
+    "pinyin": "hěn",
+    "part of speech": "副",
+    "translation": "very"
+  },
+  {
+    "word": "后面",
+    "pinyin": "hòu miàn",
+    "part of speech": "名",
+    "translation": "at the back; behind; later"
+  },
+  {
+    "word": "回",
+    "pinyin": "huí",
+    "part of speech": "动",
+    "translation": "to return"
+  },
+  {
+    "word": "会",
+    "pinyin": "huì",
+    "part of speech": "动",
+    "translation": "to know how to; can; meeting"
+  },
+  {
+    "word": "几",
+    "pinyin": "jǐ",
+    "part of speech": "代/数",
+    "translation": "how much/many? [expecting a small number]"
+  },
+  {
+    "word": "家",
+    "pinyin": "jiā",
+    "part of speech": "名",
+    "translation": "family; home"
+  },
+  {
+    "word": "叫",
+    "pinyin": "jiào",
+    "part of speech": "动",
+    "translation": "to call; to be named"
+  },
+  {
+    "word": "今天",
+    "pinyin": "jīn tiān",
+    "part of speech": "名",
+    "translation": "today"
+  },
+  {
+    "word": "九",
+    "pinyin": "jiǔ",
+    "part of speech": "数",
+    "translation": "nine"
+  },
+  {
+    "word": "开",
+    "pinyin": "kāi",
+    "part of speech": "动",
+    "translation": "to switch on; open"
+  },
+  {
+    "word": "看",
+    "pinyin": "kàn",
+    "part of speech": "动",
+    "translation": "to see; to read; to watch; to look at"
+  },
+  {
+    "word": "看见",
+    "pinyin": "kàn jiàn",
+    "part of speech": "动",
+    "translation": "see"
+  },
+  {
+    "word": "块",
+    "pinyin": "kuài",
+    "part of speech": "量",
+    "translation": "lump; piece"
+  },
+  {
+    "word": "来",
+    "pinyin": "lái",
+    "part of speech": "动",
+    "translation": "to come"
+  },
+  {
+    "word": "老师",
+    "pinyin": "lǎo shī",
+    "part of speech": "名",
+    "translation": "teacher"
+  },
+  {
+    "word": "了",
+    "pinyin": "le",
+    "part of speech": "助",
+    "translation": "[makes an exclamation]"
+  },
+  {
+    "word": "冷",
+    "pinyin": "lěng",
+    "part of speech": "形",
+    "translation": "cold"
+  },
+  {
+    "word": "里",
+    "pinyin": "lǐ",
+    "part of speech": "名",
+    "translation": "in"
+  },
+  {
+    "word": "六",
+    "pinyin": "liù",
+    "part of speech": "数",
+    "translation": "six"
+  },
+  {
+    "word": "妈妈",
+    "pinyin": "mā ma",
+    "part of speech": "名",
+    "translation": "mother"
+  },
+  {
+    "word": "吗",
+    "pinyin": "ma",
+    "part of speech": "助",
+    "translation": "[makes a yes; no question]"
+  },
+  {
+    "word": "买",
+    "pinyin": "mǎi",
+    "part of speech": "动",
+    "translation": "buy"
+  },
+  {
+    "word": "猫",
+    "pinyin": "māo",
+    "part of speech": "名",
+    "translation": "cat"
+  },
+  {
+    "word": "没关系",
+    "pinyin": "méi guān xi",
+    "part of speech": "",
+    "translation": "no problem"
+  },
+  {
+    "word": "没有",
+    "pinyin": "méi yǒu",
+    "part of speech": "动/副",
+    "translation": "don't have"
+  },
+  {
+    "word": "米饭",
+    "pinyin": "mǐ fàn",
+    "part of speech": "名",
+    "translation": "rice [cooked; boiled]"
+  },
+  {
+    "word": "明天",
+    "pinyin": "míng tiān",
+    "part of speech": "名",
+    "translation": "tomorrow"
+  },
+  {
+    "word": "名字",
+    "pinyin": "míng zi",
+    "part of speech": "名",
+    "translation": "given name"
+  },
+  {
+    "word": "哪",
+    "pinyin": "nǎ",
+    "part of speech": "代",
+    "translation": "which?"
+  },
+  {
+    "word": "哪儿",
+    "pinyin": "nǎ er",
+    "part of speech": "代",
+    "translation": "where?"
+  },
+  {
+    "word": "那",
+    "pinyin": "nà",
+    "part of speech": "代",
+    "translation": "that"
+  },
+  {
+    "word": "呢",
+    "pinyin": "ne",
+    "part of speech": "助",
+    "translation": "[returns; forwards a question]"
+  },
+  {
+    "word": "能",
+    "pinyin": "néng",
+    "part of speech": "动",
+    "translation": "to be able to; can"
+  },
+  {
+    "word": "你",
+    "pinyin": "nǐ",
+    "part of speech": "代",
+    "translation": "you"
+  },
+  {
+    "word": "年",
+    "pinyin": "nián",
+    "part of speech": "名/量",
+    "translation": "year"
+  },
+  {
+    "word": "女儿",
+    "pinyin": "nǚ ér",
+    "part of speech": "名",
+    "translation": "daughter"
+  },
+  {
+    "word": "朋友",
+    "pinyin": "péng you",
+    "part of speech": "名",
+    "translation": "friend"
+  },
+  {
+    "word": "漂亮",
+    "pinyin": "piào liang",
+    "part of speech": "形",
+    "translation": "beautiful"
+  },
+  {
+    "word": "苹果",
+    "pinyin": "píng guǒ",
+    "part of speech": "名",
+    "translation": "apple"
+  },
+  {
+    "word": "七",
+    "pinyin": "qī",
+    "part of speech": "数",
+    "translation": "seven"
+  },
+  {
+    "word": "钱",
+    "pinyin": "qián",
+    "part of speech": "名",
+    "translation": "money"
+  },
+  {
+    "word": "前面",
+    "pinyin": "qián miàn",
+    "part of speech": "名",
+    "translation": "front"
+  },
+  {
+    "word": "请",
+    "pinyin": "qǐng",
+    "part of speech": "动",
+    "translation": "to invite; please"
+  },
+  {
+    "word": "去",
+    "pinyin": "qù",
+    "part of speech": "动",
+    "translation": "to go"
+  },
+  {
+    "word": "热",
+    "pinyin": "rè",
+    "part of speech": "形",
+    "translation": "hot"
+  },
+  {
+    "word": "人",
+    "pinyin": "rén",
+    "part of speech": "名",
+    "translation": "person; people"
+  },
+  {
+    "word": "认识",
+    "pinyin": "rèn shi",
+    "part of speech": "动",
+    "translation": "to know [be familiar with]"
+  },
+  {
+    "word": "三",
+    "pinyin": "sān",
+    "part of speech": "数",
+    "translation": "three"
+  },
+  {
+    "word": "商店",
+    "pinyin": "shāng diàn",
+    "part of speech": "名",
+    "translation": "shop"
+  },
+  {
+    "word": "上",
+    "pinyin": "shàng",
+    "part of speech": "名",
+    "translation": "up; above"
+  },
+  {
+    "word": "上午",
+    "pinyin": "shàng wǔ",
+    "part of speech": "名",
+    "translation": "morning"
+  },
+  {
+    "word": "少",
+    "pinyin": "shǎo",
+    "part of speech": "形",
+    "translation": "few"
+  },
+  {
+    "word": "谁",
+    "pinyin": "shéi",
+    "part of speech": "代",
+    "translation": "who?"
+  },
+  {
+    "word": "什么",
+    "pinyin": "shén me",
+    "part of speech": "代",
+    "translation": "what?"
+  },
+  {
+    "word": "十",
+    "pinyin": "shí",
+    "part of speech": "数",
+    "translation": "ten"
+  },
+  {
+    "word": "时候",
+    "pinyin": "shí hou",
+    "part of speech": "名",
+    "translation": "[duration of] time"
+  },
+  {
+    "word": "是",
+    "pinyin": "shì",
+    "part of speech": "动",
+    "translation": "to be"
+  },
+  {
+    "word": "书",
+    "pinyin": "shū",
+    "part of speech": "名",
+    "translation": "book"
+  },
+  {
+    "word": "水",
+    "pinyin": "shuǐ",
+    "part of speech": "名",
+    "translation": "water"
+  },
+  {
+    "word": "水果",
+    "pinyin": "shuǐ guǒ",
+    "part of speech": "名",
+    "translation": "fruit"
+  },
+  {
+    "word": "睡觉",
+    "pinyin": "shuì jiào",
+    "part of speech": "动",
+    "translation": "to go to bed; to sleep"
+  },
+  {
+    "word": "说",
+    "pinyin": "shuō",
+    "part of speech": "动",
+    "translation": "speak"
+  },
+  {
+    "word": "四",
+    "pinyin": "sì",
+    "part of speech": "数",
+    "translation": "four"
+  },
+  {
+    "word": "岁",
+    "pinyin": "suì",
+    "part of speech": "量",
+    "translation": "year (of crop harvests)"
+  },
+  {
+    "word": "他",
+    "pinyin": "tā",
+    "part of speech": "代",
+    "translation": "he; him"
+  },
+  {
+    "word": "她",
+    "pinyin": "tā",
+    "part of speech": "代",
+    "translation": "she; her"
+  },
+  {
+    "word": "太",
+    "pinyin": "tài",
+    "part of speech": "副",
+    "translation": "very"
+  },
+  {
+    "word": "天气",
+    "pinyin": "tiān qì",
+    "part of speech": "名",
+    "translation": "weather"
+  },
+  {
+    "word": "听",
+    "pinyin": "tīng",
+    "part of speech": "动",
+    "translation": "to listen; hear"
+  },
+  {
+    "word": "同学",
+    "pinyin": "tóng xué",
+    "part of speech": "名",
+    "translation": "schoolmate; classmate"
+  },
+  {
+    "word": "喂",
+    "pinyin": "wèi",
+    "part of speech": "叹",
+    "translation": "hello"
+  },
+  {
+    "word": "我",
+    "pinyin": "wǒ",
+    "part of speech": "代",
+    "translation": "I; me"
+  },
+  {
+    "word": "我们",
+    "pinyin": "wǒ men",
+    "part of speech": "代",
+    "translation": "we; us"
+  },
+  {
+    "word": "五",
+    "pinyin": "wǔ",
+    "part of speech": "数",
+    "translation": "five"
+  },
+  {
+    "word": "喜欢",
+    "pinyin": "xǐ huan",
+    "part of speech": "动",
+    "translation": "to like"
+  },
+  {
+    "word": "下",
+    "pinyin": "xià",
+    "part of speech": "名",
+    "translation": "down; below"
+  },
+  {
+    "word": "下午",
+    "pinyin": "xià wǔ",
+    "part of speech": "名",
+    "translation": "afternoon"
+  },
+  {
+    "word": "下雨",
+    "pinyin": "xià yǔ",
+    "part of speech": "动",
+    "translation": "rain"
+  },
+  {
+    "word": "先生",
+    "pinyin": "xiān sheng",
+    "part of speech": "名",
+    "translation": "Mr; Sir"
+  },
+  {
+    "word": "现在",
+    "pinyin": "xiàn zài",
+    "part of speech": "名",
+    "translation": "now"
+  },
+  {
+    "word": "想",
+    "pinyin": "xiǎng",
+    "part of speech": "动",
+    "translation": "to want; to think"
+  },
+  {
+    "word": "小",
+    "pinyin": "xiǎo",
+    "part of speech": "形",
+    "translation": "small"
+  },
+  {
+    "word": "小姐",
+    "pinyin": "xiǎo jiě",
+    "part of speech": "名",
+    "translation": "Miss; young lady"
+  },
+  {
+    "word": "些",
+    "pinyin": "xiē",
+    "part of speech": "量",
+    "translation": "some"
+  },
+  {
+    "word": "写",
+    "pinyin": "xiě",
+    "part of speech": "动",
+    "translation": "to write"
+  },
+  {
+    "word": "谢谢",
+    "pinyin": "xiè xie",
+    "part of speech": "动",
+    "translation": "thank you"
+  },
+  {
+    "word": "星期",
+    "pinyin": "xīng qī",
+    "part of speech": "名",
+    "translation": "week"
+  },
+  {
+    "word": "学生",
+    "pinyin": "xué sheng",
+    "part of speech": "名",
+    "translation": "student"
+  },
+  {
+    "word": "学习",
+    "pinyin": "xué xí",
+    "part of speech": "动",
+    "translation": "to learn; to study"
+  },
+  {
+    "word": "学校",
+    "pinyin": "xué xiào",
+    "part of speech": "名",
+    "translation": "school"
+  },
+  {
+    "word": "一",
+    "pinyin": "yī",
+    "part of speech": "数",
+    "translation": "one; once; first; structural word between two of the same verb; as soon as; throughout"
+  },
+  {
+    "word": "一点儿",
+    "pinyin": "yī diǎn er",
+    "part of speech": "数量",
+    "translation": "a bit"
+  },
+  {
+    "word": "衣服",
+    "pinyin": "yī fu",
+    "part of speech": "名",
+    "translation": "clothes"
+  },
+  {
+    "word": "医生",
+    "pinyin": "yī shēng",
+    "part of speech": "名",
+    "translation": "doctor"
+  },
+  {
+    "word": "医院",
+    "pinyin": "yī yuàn",
+    "part of speech": "名",
+    "translation": "hospital"
+  },
+  {
+    "word": "椅子",
+    "pinyin": "yǐ zi",
+    "part of speech": "名",
+    "translation": "chair"
+  },
+  {
+    "word": "有",
+    "pinyin": "yǒu",
+    "part of speech": "动",
+    "translation": "to have"
+  },
+  {
+    "word": "月",
+    "pinyin": "yuè",
+    "part of speech": "名",
+    "translation": "month; moon"
+  },
+  {
+    "word": "在",
+    "pinyin": "zài",
+    "part of speech": "动/介",
+    "translation": "in; at; on"
+  },
+  {
+    "word": "再见",
+    "pinyin": "zài jiàn",
+    "part of speech": "动",
+    "translation": "goodbye"
+  },
+  {
+    "word": "怎么",
+    "pinyin": "zěn me",
+    "part of speech": "代",
+    "translation": "how?"
+  },
+  {
+    "word": "怎么样",
+    "pinyin": "zěn me yàng",
+    "part of speech": "代",
+    "translation": "how about it"
+  },
+  {
+    "word": "这",
+    "pinyin": "zhè",
+    "part of speech": "代",
+    "translation": "this"
+  },
+  {
+    "word": "中国",
+    "pinyin": "zhōng guó",
+    "part of speech": "名",
+    "translation": "China"
+  },
+  {
+    "word": "中午",
+    "pinyin": "zhōng wǔ",
+    "part of speech": "名",
+    "translation": "midday"
+  },
+  {
+    "word": "住",
+    "pinyin": "zhù",
+    "part of speech": "动",
+    "translation": "to live; stay (a number of nights)"
+  },
+  {
+    "word": "桌子",
+    "pinyin": "zhuō zi",
+    "part of speech": "名",
+    "translation": "table"
+  },
+  {
+    "word": "字",
+    "pinyin": "zì",
+    "part of speech": "名",
+    "translation": "(Chinese) character"
+  },
+  {
+    "word": "昨天",
+    "pinyin": "zuó tiān",
+    "part of speech": "名",
+    "translation": "yesterday"
+  },
+  {
+    "word": "坐",
+    "pinyin": "zuò",
+    "part of speech": "动",
+    "translation": "to sit"
+  },
+  {
+    "word": "做",
+    "pinyin": "zuò",
+    "part of speech": "动",
+    "translation": "to do; to be; become (an occupation)"
+  }
+]
