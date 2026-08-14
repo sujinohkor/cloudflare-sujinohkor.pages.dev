@@ -101,6 +101,9 @@
         .app-item.active .app-item-title { color: #fff; }
         .app-item-sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
 
+        .top-section h1 { color: #ff9e40; font-size: 1.5rem; margin-bottom: 5px; }
+        .top-section p { color: #aaa; font-size: 0.9rem; }
+
         /* 도트무늬 배경 적용 카드 (content-card) */
         .content-card {                     
             border: 2px solid #ff9e40;                     
@@ -171,7 +174,6 @@
             border-color: rgba(243, 128, 32, 0.4); 
         }
 
-        /* 라이트 모드일 때 타이틀 색상 대응 */
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
@@ -230,9 +232,9 @@
             </div>                                                
             <a href="../index" class="menu-btn">Home</a>
             
-            <div class="menu-section-title">Applications (50)</div>
+            <div class="menu-section-title" id="menuSectionTitle">Applications</div>
             <div class="app-list-container" id="appListContainer">
-                <!-- 자바스크립트로 50개 앱 리스트 동적 생성 -->
+                <!-- index.html 연동 데이터가 동적으로 생성됩니다 -->
             </div>
         </aside>
         
@@ -311,41 +313,79 @@
             } 
         });
 
-        /* --- 50개 앱 데이터 생성 및 연동 로직 --- */
-        const appsData = Array.from({ length: 50 }, (_, i) => {
-            const id = i + 1;
-            const names = [
-                "Guest Book", "Color Picker", "Markdown Editor", "JSON Formatter", "Regex Tester",
-                "Code Snippet Manager", "Pomodoro Timer", "Unit Converter", "Base64 Encoder", "QR Code Generator"
-            ];
-            const baseName = names[i % names.length];
-            const name = id <= 10 ? baseName : `${baseName} v${Math.floor(id/10)+1}`;
-            const slug = `app-module-${id}`;
-            
-            return {
-                id: id,
-                name: name,
-                slug: slug,
-                path: `/codes/${slug}/index.html`,
-                desc: `${name} 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
-                deps: [
-                    i % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
-                    i % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/${slug}/module.js`,
-                    "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-                ],
-                backends: [
-                    i % 2 === 0 ? "DB: Firebase Firestore" : "DB: Cloudflare Workers KV",
-                    i % 4 === 0 ? "Worker: auth-service.worker.js" : "Worker: api-router.worker.js",
-                    i % 5 === 0 ? "Automation: Google Apps Script" : "Static Hosting: Cloudflare Pages"
-                ]
-            };
-        });
-
+        /* --- index.html 연동 및 앱 데이터 구성 로직 --- */
         const appListContainer = document.getElementById('appListContainer');
+        const menuSectionTitle = document.getElementById('menuSectionTitle');
         const panelAppName = document.getElementById('panelAppName');
         const panelAppDesc = document.getElementById('panelAppDesc');
         const panelAppDeps = document.getElementById('panelAppDeps');
         const panelAppBackend = document.getElementById('panelAppBackend');
+
+        let appsData = [];
+
+        async function fetchAppsFromIndex() {
+            try {
+                const response = await fetch('../index.html');
+                if (!response.ok) throw new Error('index.html을 불러오지 못했습니다.');
+                
+                const htmlText = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+
+                const cardElements = doc.querySelectorAll('a.card');
+                
+                if (cardElements.length > 0) {
+                    appsData = Array.from(cardElements).map((card, index) => {
+                        const h3 = card.querySelector('h3');
+                        const p = card.querySelector('p');
+                        
+                        const name = h3 ? h3.textContent.trim() : `App ${index + 1}`;
+                        const slug = p ? p.textContent.trim() : `app-module-${index + 1}`;
+                        const id = index + 1;
+
+                        return {
+                            id: id,
+                            name: name,
+                            slug: slug,
+                            path: `/codes/${slug}/index.html`,
+                            desc: `${name} (${slug}) 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
+                            deps: [
+                                index % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
+                                index % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/${slug}/module.js`,
+                                "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+                            ],
+                            backends: [
+                                index % 2 === 0 ? "DB: Firebase Firestore" : "DB: Cloudflare Workers KV",
+                                index % 4 === 0 ? "Worker: auth-service.worker.js" : "Worker: api-router.worker.js",
+                                index % 5 === 0 ? "Automation: Google Apps Script" : "Static Hosting: Cloudflare Pages"
+                            ]
+                        };
+                    });
+                } else {
+                    throw new Error('카드를 찾지 못함');
+                }
+
+            } catch (error) {
+                console.warn("index.html 연동 실패, 기본 더미 데이터로 대체합니다.", error);
+                appsData = Array.from({ length: 10 }, (_, i) => ({
+                    id: i + 1,
+                    name: `App Module ${i + 1}`,
+                    slug: `app-module-${i + 1}`,
+                    path: `/codes/app-module-${i + 1}/index.html`,
+                    desc: `시스템은 독립적인 클라이언트 모듈로 동작합니다.`,
+                    deps: ["/assets/lib/core.min.js"],
+                    backends: ["Static Hosting: Cloudflare Pages"]
+                }));
+            }
+
+            // 메뉴 개수 타이틀 갱신
+            menuSectionTitle.textContent = `Applications (${appsData.length})`;
+
+            renderAppList();
+            if (appListContainer.firstChild) {
+                appListContainer.firstChild.click();
+            }
+        }
 
         function renderAppList() {
             appListContainer.innerHTML = '';
@@ -386,10 +426,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            renderAppList();
-            if (appListContainer.firstChild) {
-                appListContainer.firstChild.click();
-            }
+            fetchAppsFromIndex();
         });
     </script>
 </body>
