@@ -874,8 +874,9 @@
     }
 
     window.onload = function() {
-        renderList(db);
-        if (db.length > 0) selectHanzi(db[0].char);
+        //renderList(db);
+        //if (db.length > 0) selectHanzi(db[0].char);
+        switchMode('drawing');
     };
 
     // Results List 렌더링 (번체 및 간체 분할 및 점선 테두리 적용)
