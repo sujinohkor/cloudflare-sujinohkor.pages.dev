@@ -413,7 +413,7 @@
                 const translationKo = span.getAttribute('data-translation-ko');
                 
                 // 국기 이모지나 기타 코드가 들어가지 않도록 순수 번역 값만 조합
-                globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>${translationKo}<br>${translation}`;
+                globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>${translation}<br>${translationKo}`;
                 globalTooltip.style.display = 'block';
                 
                 const rect = span.getBoundingClientRect();
