@@ -108,6 +108,24 @@
             flex-shrink: 0;
         }
 
+        /* 번역 언어 선택 콤보박스 스타일 */
+        .lang-select {
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .lang-select:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+
         /* 입력기 영역 스타일 통합 */
         .candidate-box {
             min-height: 45px; background: rgba(255, 255, 255, 0.03);
@@ -226,6 +244,9 @@
         body.light-mode .candidate-box { background: #f5f5f5 !important; border-bottom-color: rgba(243, 128, 32, 0.35) !important; }
         body.light-mode .mini-action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+        
+        body.light-mode .lang-select { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .lang-select:hover { background: #F38020; color: #fff; border-color: #F38020; }
 
         body.light-mode .hsk-1 { background-color: #ebf8ff; color: #2b6cb0; }
         body.light-mode .hsk-2 { background-color: #f0fff4; color: #22543d; }
@@ -322,6 +343,14 @@
                 <div class="calc-card" style="flex: 0.8; border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:8px; min-height:0;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                         <h3>Translation</h3>
+                        <!-- 번역 언어 선택 콤보박스 추가 -->
+                        <select id="target-lang" class="lang-select">
+                            <option value="ko" selected>한국어 (Korean)</option>
+                            <option value="en">영어 (English)</option>
+                            <option value="ja">일본어 (Japanese)</option>
+                            <option value="zh-CN">중국어 간체 (Chinese S.)</option>
+                            <option value="zh-TW">중국어 번체 (Chinese T.)</option>
+                        </select>
                     </div>
                     <div id="translationResult" style="flex: 1; overflow-y: auto;">Translation results will appear here.</div>
                 </div>
@@ -369,6 +398,7 @@
     const pageIndicator = document.getElementById('page-indicator');
     const lineNumbers = document.getElementById('line-numbers');
     const translationResult = document.getElementById('translationResult');
+    const targetLangSelect = document.getElementById('target-lang');
 
     let currentMode = 'hsk'; // 'hsk' (간체) 또는 'tocfl' (번체)
     let currentMatches = [];
@@ -728,10 +758,11 @@
             viewer.innerHTML = htmlOutput;
             bindTooltipEvents();
 
-            // 구글 앱스 스크립트 번역 API 호출
+            // 구글 앱스 스크립트 번역 API 호출 (선택된 언어 반영)
             try {
                 const GAS_URL = "https://script.google.com/macros/s/AKfycbyUhLpSdxGzlRr1TvObdayUx2Qh966hees_EtqwW1o69e1XFQW3PY-Rbzoh5DNeyAsB/exec";
-                const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=ko`);
+                const selectedLang = targetLangSelect.value; // 콤보박스에서 선택된 언어 코드 가져오기
+                const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}`);
                 
                 if (transRes.ok) {
                     const translatedText = await transRes.text();
