@@ -510,8 +510,13 @@
 
         canvas.addEventListener('mousedown', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            //const x = e.clientX - rect.left;
+            //const y = e.clientY - rect.top;
+            // CSS 크기와 캔버스 내부 실제 픽셀 크기 비율을 비례식으로 정확히 계산
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
 
             if (currentTool === 'DELETE') {
                 const targetComp = components.find(c => x >= c.x && x <= c.x + c.width && y >= c.y && y <= c.y + c.height);
