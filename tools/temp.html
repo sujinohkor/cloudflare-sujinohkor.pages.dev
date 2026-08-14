@@ -101,6 +101,9 @@
         .app-item.active .app-item-title { color: #fff; }
         .app-item-sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
 
+        .top-section h1 { color: #ff9e40; font-size: 1.5rem; margin-bottom: 5px; }
+        .top-section p { color: #aaa; font-size: 0.9rem; }
+
         /* 도트무늬 배경 적용 카드 (content-card) */
         .content-card {                     
             border: 2px solid #ff9e40;                     
@@ -140,10 +143,30 @@
         .detail-panel.full-span {
             grid-column: span 2;
         }
+        
+        /* 세련된 상단 타이틀 및 패스 스타일 */
+        .app-title-large {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .path-box {
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            color: #ff9e40;
+            background: rgba(255, 158, 64, 0.08);
+            border: 1px solid rgba(255, 158, 64, 0.25);
+            padding: 8px 14px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
         .detail-panel h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 5px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); padding-bottom: 8px; }
         .detail-section { display: flex; flex-direction: column; gap: 6px; }
         .detail-section label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .detail-section p { font-size: 0.9rem; color: #ddd; line-height: 1.5; }
         .detail-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
         .detail-section li { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; color: #fff; }
 
@@ -181,8 +204,9 @@
         body.light-mode .app-item.active .app-item-sub { color: #eee; }
         body.light-mode .detail-panel { background: rgba(255, 255, 255, 0.9); border-color: rgba(243, 128, 32, 0.4); color: #202020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .detail-panel h3 { color: #F38020; border-bottom-color: rgba(243, 128, 32, 0.2); }
-        body.light-mode .detail-section p { color: #444; }
         body.light-mode .detail-section li { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.05); border-left-color: #F38020; color: #202020; }
+        body.light-mode .app-title-large { color: #202020; }
+        body.light-mode .path-box { background: rgba(243, 128, 32, 0.06); border-color: rgba(243, 128, 32, 0.25); color: #F38020; }
 
         body.light-mode .card, 
         body.light-mode .content-card {
@@ -245,10 +269,10 @@
                 <!-- 상세 내용 뷰어 영역 (Grid 구조) -->
                 <div class="detail-view">
                     <div class="detail-panel full-span">
-                        <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
+                        <div class="app-title-large" id="panelAppName">애플리케이션을 선택하세요</div>
                         <div class="detail-section">
                             <label>Path</label>
-                            <p id="panelAppDesc">-</p>
+                            <div class="path-box" id="panelAppDesc">PATH: -</div>
                         </div>
                     </div>
                     <div class="detail-panel">
@@ -334,35 +358,28 @@
                 if (cardElements.length > 0) {
                     appsData = Array.from(cardElements).map((card, index) => {
                         const h3 = card.querySelector('h3');
-                        const p = card.querySelector('p');
                         const href = card.getAttribute('href') || '';
                         
                         const name = h3 ? h3.textContent.trim() : `App ${index + 1}`;
-                        const slug = p ? p.textContent.trim() : `app-module-${index + 1}`;
                         const id = index + 1;
 
-                        // href에서 도메인 뒷부분 경로 추출 (예: https://sujinohkor.pages.dev/tools/guest-book -> /tools/guest-book)
                         let toolSubPath = '';
                         try {
-                            const urlObj = new URL(href);
-                            toolSubPath = urlObj.pathname; // 예: /tools/guest-book
+                            const urlObj = new URL(href, window.location.origin);
+                            toolSubPath = urlObj.pathname;
                         } catch (e) {
-                            // 상대 경로이거나 URL 형식이 아닐 경우 대비
                             toolSubPath = href.startsWith('http') ? '' : href;
                         }
 
-                        // 요구하신 path 형식 조합 (.html 붙이기)
-                        const customPath = toolSubPath ? `${toolSubPath}.html` : `/codes/${slug}/index.html`;
+                        const customPath = toolSubPath ? `${toolSubPath}.html` : `/tools/app-${id}.html`;
 
                         return {
                             id: id,
                             name: name,
-                            slug: slug,
-                            path: customPath, // 추출된 경로 적용
-                            desc: `${name} (${slug}) 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
+                            path: customPath,
                             deps: [
                                 index % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
-                                index % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/${slug}/module.js`,
+                                index % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/module-${id}.js`,
                                 "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
                             ],
                             backends: [
@@ -381,9 +398,7 @@
                 appsData = Array.from({ length: 10 }, (_, i) => ({
                     id: i + 1,
                     name: `App Module ${i + 1}`,
-                    slug: `app-module-${i + 1}`,
-                    path: `/tools/app-module-${i + 1}.html`,
-                    desc: `시스템은 독립적인 클라이언트 모듈로 동작합니다.`,
+                    path: `/tools/app-${i + 1}.html`,
                     deps: ["/assets/lib/core.min.js"],
                     backends: ["Static Hosting: Cloudflare Pages"]
                 }));
@@ -397,33 +412,6 @@
             }
         }
 
-        function selectApp(app, element) {
-            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            // 1. 큰 글씨로 앱 이름 표시
-            panelAppName.textContent = app.name;
-            
-            // 2. 바로 밑에 작은 글씨로 PATH 표시
-            panelAppDesc.textContent = `PATH: ${app.path}`;
-
-            panelAppDeps.innerHTML = '';
-            app.deps.forEach(dep => {
-                const li = document.createElement('li');
-                li.textContent = dep;
-                panelAppDeps.appendChild(li);
-            });
-
-            panelAppBackend.innerHTML = '';
-            app.backends.forEach(backend => {
-                const li = document.createElement('li');
-                li.textContent = backend;
-                panelAppBackend.appendChild(li);
-            });
-
-            if (window.innerWidth <= 900) closeSidebar();
-        }
-
         function renderAppList() {
             appListContainer.innerHTML = '';
             appsData.forEach((app, index) => {
@@ -431,7 +419,7 @@
                 item.className = 'app-item';
                 item.innerHTML = `
                     <div class="app-item-title">${index + 1}. ${app.name}</div>
-                    <div class="app-item-sub">/${app.slug}</div>
+                    <div class="app-item-sub">${app.path}</div>
                 `;
                 item.onclick = () => selectApp(app, item);
                 appListContainer.appendChild(item);
@@ -442,8 +430,11 @@
             document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            panelAppName.textContent = `${app.name} (${app.slug})`;
-            panelAppDesc.textContent = app.desc;
+            // 1. 큰 글씨로 앱 이름 표시
+            panelAppName.textContent = app.name;
+            
+            // 2. PATH 라벨 아래에 박스 형태로 경로 표시
+            panelAppDesc.textContent = `PATH: ${app.path}`;
 
             panelAppDeps.innerHTML = '';
             app.deps.forEach(dep => {
