@@ -24,9 +24,9 @@
             transition: opacity 0.3s ease;
         }
 
-        /* 플로팅 사이드바 */
+        /* 플로팅 사이드바 (기준 소스와 동일한 width: 260px 적용) */
         .sidebar {
-            width: 280px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
             background: rgba(16, 16, 16, 0.25);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -79,11 +79,12 @@
         .app-item.active .app-item-title { color: #fff; }
         .app-item-sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
 
+        /* 메인 콘텐츠 영역 (사이드바 폭에 맞춰 margin-left: 300px, width 수정) */
         .main-content {
-            margin-left: 320px; padding: 40px; flex: 1;
+            margin-left: 300px; padding: 40px; flex: 1;
             display: flex; flex-direction: column; height: 100vh;
             gap: 20px; overflow: hidden; transition: all 0.3s ease;
-            width: calc(100% - 320px);
+            width: calc(100% - 300px);
         }
         
         .top-section h1 { color: #ff9e40; font-size: 1.5rem; margin-bottom: 5px; }
@@ -158,7 +159,6 @@
         body.light-mode .app-item.active { background: #F38020; border-color: #F38020; color: #fff; }
         body.light-mode .app-item.active .app-item-title { color: #fff; }
         body.light-mode .app-item.active .app-item-sub { color: #eee; }
-        /* 오렌지빛 그림자 적용 */
         body.light-mode .detail-panel { background: rgba(255, 255, 255, 0.9); border-color: rgba(243, 128, 32, 0.4); color: #202020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .detail-panel h3 { color: #F38020; border-bottom-color: rgba(243, 128, 32, 0.2); }
         body.light-mode .detail-section p { color: #444; }
@@ -172,7 +172,7 @@
         @media (max-width: 900px) {                             
             .menu-toggle-btn { display: block; }                             
             .sidebar {
-                transform: translateX(-340px);
+                transform: translateX(-320px);
                 background: #101010 !important;
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
