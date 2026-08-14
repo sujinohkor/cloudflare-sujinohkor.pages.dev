@@ -339,17 +339,28 @@
                 <h3>Image to ASCII</h3>
                 <p>image-ascii</p>
                 <span class="arrow">Go to Image to ASCII →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "An image-to-ASCII art converter that allows users to upload or drag and drop image files, processes them locally in the browser using pixel brightness analysis, and converts them into ASCII characters. It also provides clipboard copying, text file export, reset functionality, responsive UI, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelector(), querySelectorAll(), element creation, and DOM manipulation",
+                        "HTML5 File API — Handles image file selection and drag-and-drop uploads",
+                        "FileReader API — Reads uploaded image files as Data URLs for browser-side processing",
+                        "HTMLImageElement API — Loads uploaded images before conversion",
+                        "Canvas API (2D Context) — Resizes images, draws image data, and extracts pixel data using getImageData()",
+                        "Blob API — Creates downloadable UTF-8 text files containing generated ASCII art",
+                        "File/URL API (URL.createObjectURL / URL.revokeObjectURL) — Generates temporary object URLs for text file downloads",
+                        "HTML5 Drag and Drop API — Supports dragover, dragleave, and drop events for image uploads",
+                        "Clipboard Support (document.execCommand) — Copies generated ASCII art to the clipboard",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, and light/dark theme styling",
+                        "JavaScript Events API — Handles click, change, dragover, dragleave, drop, and other user interactions",
+                        "Web APIs (window / alert) — Uses built-in browser APIs for viewport detection and user notifications"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Image Processing: Browser-based FileReader, Canvas, and JavaScript APIs",
+                        "No Server-Side Backend: All image conversion and ASCII generation are performed locally in the user's browser"
                     ]
                 }</script>
             </a>
