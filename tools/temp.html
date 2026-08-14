@@ -24,33 +24,33 @@
             transition: opacity 0.3s ease;
         }
 
-        /* 플로팅 사이드바 (기준 소스와 동일한 width: 260px 적용) */
-        .sidebar {
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
-            background: rgba(16, 16, 16, 0.25);
-            backdrop-filter: blur(16px);
+        /* 플로팅 사이드바 */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
-            padding: 25px 20px; z-index: 1000;
-            display: flex; flex-direction: column; gap: 12px;
-            border: 1px solid rgba(255, 158, 64, 0.35);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
             overflow: hidden;
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; flex-shrink: 0; }
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; flex-shrink: 0; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
-        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
         
         .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; flex-shrink: 0; }
-        .menu-btn {
+        .menu-btn { 
             width: 100%; padding: 10px 14px; cursor: pointer; text-align: center;
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
             border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center; line-height: normal; flex-shrink: 0;
-        }        
-        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }        
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         /* 앱 스크롤 리스트 컨테이너 */
         .app-list-container {
@@ -79,11 +79,11 @@
         .app-item.active .app-item-title { color: #fff; }
         .app-item-sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
 
-        /* 메인 콘텐츠 영역 (사이드바 폭에 맞춰 margin-left: 300px, width 수정) */
-        .main-content {
-            margin-left: 300px; padding: 40px; flex: 1;
-            display: flex; flex-direction: column; height: 100vh;
-            gap: 20px; overflow: hidden; transition: all 0.3s ease;
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
             width: calc(100% - 300px);
         }
         
@@ -137,23 +137,24 @@
         .detail-section li { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; color: #fff; }
 
         /* Light Mode */
-        body.light-mode { background-color: #fff; color: #202020; }                
-        body.light-mode .sidebar {
-            background: rgba(255, 255, 255, 0.4);
-            border-color: rgba(243, 128, 32, 0.35);
-            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);
-        }                         
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {
-            background: rgba(0, 0, 0, 0.02);
-            color: #F38020;
-            border-color: rgba(243, 128, 32, 0.5);
-        }        
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {
-            background: rgba(243, 128, 32, 0.15);
-            border-color: rgba(243, 128, 32, 0.4);
-        }                         
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }        
-        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }        
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .app-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.2); }
         body.light-mode .app-item-title { color: #F38020; }
         body.light-mode .app-item.active { background: #F38020; border-color: #F38020; color: #fff; }
@@ -163,40 +164,41 @@
         body.light-mode .detail-panel h3 { color: #F38020; border-bottom-color: rgba(243, 128, 32, 0.2); }
         body.light-mode .detail-section p { color: #444; }
         body.light-mode .detail-section li { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.05); border-left-color: #F38020; color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
 
-        .menu-toggle-btn {
-            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;
-            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;
-            font-weight: bold; cursor: pointer; color: #ffffff;
-        }                 
-        @media (max-width: 900px) {                             
-            .menu-toggle-btn { display: block; }                             
-            .sidebar {
-                transform: translateX(-320px);
-                background: #101010 !important;
+        /* Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;
-                z-index: 3000;
-            }                             
-            body.light-mode .sidebar {
-                background: #ffffff !important;
-                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;
-            }            
-            .sidebar.active { transform: translateX(0); }                             
-            .sidebar-backdrop.active { display: block; opacity: 1; }            
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                             
-            .content-card { min-height: 0; height: 100%; }            
-        }    </style>
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; overflow: hidden; display: flex; flex-direction: column; } 
+            .detail-view { display: flex; flex-direction: column; gap: 15px; padding: 15px; }
+        }
+    </style>
 </head>
-<body>    
+<body>
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
     
     <div class="app-container">
-        <!-- 사이드바 (50개 앱 리스트 스크롤 영역) -->
+        <!-- 사이드바 -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">Apps Directory</div>
+            <div class="sidebar-title">App Inspector</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
@@ -209,13 +211,14 @@
         </aside>
 
         <!-- 메인 콘텐츠 영역 -->
-        <main class="main-content" id="main-content">                    
-            <header class="top-section">                        
+        <main class="main-content" id="main-content">
+            <header class="top-section">
                 <h1 id="selectedAppTitle">App Architecture Inspector</h1>
                 <p id="selectedAppSub">좌측 목록에서 애플리케이션을 선택하여 상세 인프라 구성을 확인하세요.</p>
-            </header>                    
-            <section class="content-card" id="content-card">                        
-                <!-- 상세 정보 뷰어 영역 (Grid 구조) -->        
+            </header>
+            
+            <section class="content-card" id="content-card">
+                <!-- 상세 정보 뷰어 영역 (Grid 구조) -->
                 <div class="detail-view">
                     <div class="detail-panel full-span">
                         <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
@@ -241,7 +244,7 @@
                         </div>
                     </div>
                 </div>
-            </section>            
+            </section>
         </main>
     </div>
 
@@ -250,29 +253,40 @@
         const backdrop = document.getElementById('sidebar-backdrop');
         const mainContent = document.getElementById('main-content');
 
-        function toggleSidebar() {                      
-            const isActive = sidebar.classList.toggle('active');            
-            if (isActive) {                
-                backdrop.classList.add('active');            
-            } else {                
-                backdrop.classList.remove('active');            
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active');
+            if (sidebar.classList.contains('active')) {
+                backdrop.classList.add('active');
+                backdrop.style.display = 'block';
+                backdrop.style.opacity = '1';
+            } else {
+                backdrop.classList.remove('active');
+                backdrop.style.display = 'none';
+                backdrop.style.opacity = '0';
             }
         }
 
-        function closeSidebar() {            
-            sidebar.classList.remove('active');            
-            backdrop.classList.remove('active'); 
+        function closeSidebar() { 
+            sidebar.classList.remove('active'); 
+            backdrop.classList.remove('active');
+            backdrop.style.display = 'none';
+            backdrop.style.opacity = '0';
         }
 
-        document.getElementById('theme-toggle').addEventListener('click', () => {                      
-            document.body.classList.toggle('light-mode');            
-            if (window.innerWidth <= 900) closeSidebar();
+        sidebar.querySelectorAll('button, a').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) closeSidebar();
+            });
         });
 
-        mainContent.addEventListener('click', () => {                      
-            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                                  
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
+
+        mainContent.addEventListener('click', () => { 
+            if (sidebar.classList.contains('active')) { 
                 closeSidebar(); 
-            }             
+            } 
         });
 
         /* --- 50개 앱 데이터 생성 및 연동 로직 --- */
