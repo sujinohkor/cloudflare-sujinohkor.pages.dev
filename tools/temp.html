@@ -728,10 +728,20 @@
             viewer.innerHTML = htmlOutput;
             bindTooltipEvents();
 
-            if (data.fullTranslation || data.translationKo) {
-                translationResult.innerHTML = data.fullTranslation || data.translationKo;
-            } else {
-                translationResult.innerHTML = "Translation data synchronized.";
+            // 구글 앱스 스크립트 번역 API 호출
+            try {
+                const GAS_URL = "https://script.google.com/macros/s/AKfycbyUhLpSdxGzlRr1TvObdayUx2Qh966hees_EtqwW1o69e1XFQW3PY-Rbzoh5DNeyAsB/exec";
+                const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=ko`);
+                
+                if (transRes.ok) {
+                    const translatedText = await transRes.text();
+                    translationResult.innerHTML = translatedText;
+                } else {
+                    translationResult.innerHTML = "Translation error.";
+                }
+            } catch (err) {
+                console.error("Translation fetch error:", err);
+                translationResult.innerHTML = "Translation failed.";
             }
 
         } catch (error) {
