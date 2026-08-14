@@ -296,14 +296,29 @@
                 <span class="arrow guest-book-arrow">Go to Guest Book →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A real-time guest book module that allows visitors to submit nicknames and messages, automatically detects and records the visitor's country, displays character counts, and synchronizes guest book entries live using Firebase Firestore. It also supports responsive layouts and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles form validation, character counting, UI interactions, theme switching, and guest book logic",
+                        "Firebase JavaScript SDK (v10.8.0) — Provides Firebase application initialization and Firestore database integration",
+                        "Firebase App SDK — Used for initializeApp() and Firebase project configuration",
+                        "Cloud Firestore SDK — Uses getFirestore(), collection(), addDoc(), serverTimestamp(), query(), orderBy(), and onSnapshot() for real-time database operations",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElement(), DOM manipulation, and event handling",
+                        "Fetch API — Calls external IP geolocation APIs to detect the visitor's country",
+                        "ipwho.is API — Primary IP-based country detection service",
+                        "ipapi.co API — Fallback IP-based geolocation service",
+                        "freeipapi.com API — Additional fallback IP-based geolocation service",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, and light/dark theme styling",
+                        "HTML5 Form API — Uses <form>, <input>, required, maxlength, requestSubmit(), and form submission handling",
+                        "JavaScript Events API — Handles input, keydown, click, and submit events",
+                        "Web APIs (window / fetch / console) — Uses built-in browser APIs for responsive behavior, HTTP requests, and error logging"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Database Backend: Firebase Cloud Firestore",
+                        "Real-Time Data Synchronization: Firestore onSnapshot() listener",
+                        "Server-Side Timestamp Service: Firebase serverTimestamp()",
+                        "External Geolocation APIs: ipwho.is, ipapi.co, and freeipapi.com",
+                        "No Custom Application Server: Guest book data is sent directly from the browser to Firebase Firestore, while visitor country information is retrieved directly from external geolocation APIs"
                     ]
                 }</script>
             </a>
@@ -461,20 +476,31 @@
                 <h3>Color Picker</h3>
                 <p>color-picker</p>
                 <span class="arrow">Go to Color Picker →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "An interactive color picker module that allows users to select colors visually through an HSV color field and hue slider or enter colors manually via HEX and RGB values. It automatically converts and displays HEX, RGB, CMYK, HSV, and HSL values, identifies the nearest color name from a local color database, provides clipboard copying of color information, and generates downloadable PNG color swatches.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without external frameworks or package-based libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElement(), event handling, and dynamic UI updates",
+                        "HTML5 Canvas API — Used to render the interactive color field, hue slider, selection indicators, preview swatch, and downloadable PNG color card",
+                        "Local JavaScript Color Database (ntcColors.js) — Provides the ntcColors dataset used to identify the nearest matching color name",
+                        "Clipboard API (navigator.clipboard) — Copies HEX, RGB, CMYK, HSV, HSL, and color name information to the user's clipboard",
+                        "Canvas toDataURL() API — Converts the generated color swatch canvas into PNG image data for download",
+                        "HTML5 Download Attribute — Enables client-side downloading of generated PNG color swatches",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, box-shadow, responsive layouts, and light/dark theme styling",
+                        "JavaScript Events API — Handles input, click, mouse, touch, drag, resize, and keyboard-related interactions",
+                        "Touch Events API — Supports touchstart, touchmove, and touchend interactions for mobile color selection",
+                        "Web APIs (window / alert / navigator) — Uses built-in browser APIs for viewport detection, responsive canvas rendering, notifications, and clipboard access"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: All color conversion, color naming, clipboard operations, and PNG generation are performed directly in the browser",
+                        "Local Data Asset: ntcColors.js is loaded as a static client-side color name database",
+                        "No Server-Side Backend or Database Required"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/hash-generator" class="card" data-category="dev">
                 <div class="icon">🫆</div>
                 <h3>Hash Generator</h3>
@@ -483,71 +509,124 @@
 
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side hash generator module that calculates multiple cryptographic hash values from either user-entered text or uploaded files. It supports MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3, and RIPEMD-160, provides real-time text statistics including character, word, paragraph, and byte counts, supports drag-and-drop and file selection, allows hash values to be copied to the clipboard, and enables exporting results as a text file.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles application logic, hash generation, file processing, DOM manipulation, and user interactions without a frontend framework",
+                        "CryptoJS 4.2.0 — Provides cryptographic hashing algorithms including SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3, and RIPEMD-160",
+                        "CryptoJS MD5 Module 4.1.1 — Provides MD5 hash generation functionality",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelector(), dynamic element updates, event handling, and UI manipulation",
+                        "FileReader API — Reads uploaded files as ArrayBuffer data for client-side hash generation",
+                        "Drag and Drop API — Supports dropping files directly into the upload area",
+                        "File Input API — Allows users to select files through the native browser file picker",
+                        "CryptoJS WordArray API — Converts uploaded ArrayBuffer data into a format compatible with CryptoJS hashing functions",
+                        "Blob API — Creates downloadable text files containing generated hash values",
+                        "File/URL API (URL.createObjectURL / URL.revokeObjectURL) — Creates and releases temporary object URLs for text file downloads",
+                        "Document.execCommand('copy') — Copies generated hash values to the clipboard",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, box-shadow, responsive layouts, and light/dark theme styling",
+                        "HTML5 <textarea> — Provides text input and read-only hash output areas",
+                        "JavaScript Events API — Handles input, click, dragover, dragleave, drop, change, and other user interactions",
+                        "Web APIs (window / alert / FileReader) — Uses built-in browser APIs for file handling, notifications, responsive behavior, and client-side processing"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Hash Processing: All text and file hash calculations are performed locally in the user's browser",
+                        "Client-Side File Processing: Uploaded files are read locally through the FileReader API and are not uploaded to a server by this module",
+                        "No Server-Side Backend or Database Required"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/image-color-picker" class="card" data-category="design">
                 <div class="icon">🎨</div>
                 <h3>Image Color Picker</h3>
                 <p>image-color-picker</p>
                 <span class="arrow">Go to Image Color Picker →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "An image color extraction module that allows users to upload images via file selection or drag-and-drop, automatically identifies dominant colors, optionally filters out neutral colors, displays extracted HEX color values, copies individual colors to the clipboard, and generates downloadable PNG color swatches or a ZIP archive containing multiple swatches with matched color names.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles image processing, color extraction, palette generation, UI interactions, file handling, and download functionality without a framework",
+                        "JSZip 3.10.1 — Creates ZIP archives when multiple generated PNG color swatches are downloaded",
+                        "Custom Color Database (ntcColors.js) — Provides a color-name dataset used to identify the closest matching name for each extracted HEX color",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelector(), createElement(), innerHTML, event handling, and dynamic UI rendering",
+                        "HTML5 Canvas API — Reads image pixel data with getImageData(), analyzes colors, and generates PNG color swatch images",
+                        "FileReader API — Reads uploaded image files as Data URLs for browser-based image loading and processing",
+                        "File API — Handles image file selection and drag-and-drop uploads",
+                        "Drag and Drop API — Supports dragover, dragleave, and drop events for image uploads",
+                        "Image API — Loads uploaded images and provides naturalWidth and naturalHeight for Canvas processing",
+                        "Clipboard API (navigator.clipboard) — Copies selected HEX color values to the user's clipboard",
+                        "Blob API — Generates binary ZIP download data from JSZip",
+                        "URL API (URL.createObjectURL) — Creates temporary object URLs for ZIP file downloads",
+                        "Canvas toDataURL() API — Converts generated color swatch canvases into PNG Data URLs",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, shadows, and theme switching",
+                        "JavaScript Events API — Handles click, change, load, dragover, dragleave, and drop events",
+                        "Web APIs (window / alert) — Uses built-in browser APIs for notifications and browser interactions"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Image Processing: HTML5 Canvas API",
+                        "Client-Side File Processing: FileReader API",
+                        "No Server-Side Backend or Database — Image analysis, color extraction, color naming, PNG generation, and ZIP creation are performed entirely in the user's browser"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/get-my-ip" class="card" data-category="dev">
                 <div class="icon">🏡</div>
                 <h3>Get My IP</h3>
                 <p>get-my-ip</p>
                 <span class="arrow">Go to Get My IP →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A public IP and location lookup module that retrieves the user's public IP address, IP-based geographic and network information, optional GPS-based location data, and displays the location on an interactive map, with IP copying, refresh functionality, client environment detection, and responsive day/night theme support.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles IP lookup, asynchronous API requests, GPS access, map rendering, UI updates, and client environment detection without external frameworks",
+                        "Leaflet 1.9.4 — Provides the interactive map, map tiles, markers, popups, and location visualization",
+                        "Leaflet CSS 1.9.4 — Provides the required styles for the Leaflet interactive map components",
+                        "ipwho.is API — Retrieves the user's public IP address, IP-based geographic location, ISP, ASN, timezone, proxy status, and related network information",
+                        "OpenStreetMap — Provides map tile data used by the Leaflet map",
+                        "Nominatim Reverse Geocoding API — Converts GPS latitude and longitude coordinates into human-readable city, region, country, and postal code information",
+                        "Geolocation API — Requests the user's browser-based GPS location when permission is granted",
+                        "Fetch API — Performs asynchronous HTTP requests to the IP lookup and reverse geocoding APIs",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelector(), querySelectorAll(), innerHTML updates, and event handling",
+                        "Clipboard API — Copies the detected public IP address to the user's clipboard",
+                        "Navigator API — Accesses userAgent information and browser geolocation capabilities",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, and light/dark theme styling",
+                        "JavaScript Events API — Handles click, DOMContentLoaded, theme toggle, sidebar, refresh, and mobile interaction events",
+                        "Web APIs (window / navigator / alert / setTimeout) — Uses built-in browser APIs for environment detection, user notifications, timing, and responsive behavior"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "External IP Lookup Service: ipwho.is API",
+                        "External Reverse Geocoding Service: OpenStreetMap Nominatim API",
+                        "External Map Tile Service: OpenStreetMap",
+                        "Client-Side Location Service: Browser Geolocation API",
+                        "No Custom Server-Side Backend: All application logic runs in the browser and relies on external public APIs"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/date-calculator" class="card" data-category="utility">
                 <div class="icon">📆</div>
                 <h3>Date Calculator</h3>
                 <p>date-calculator</p>
                 <span class="arrow">Go to Date Calculator →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based date calculation module that provides an interactive monthly calendar, date interval calculation, date addition and subtraction, and day-of-the-week lookup functionality, featuring custom popup calendars, optional inclusive date counting, D-Day-style calculations, responsive layouts, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElement(), classList manipulation, and dynamic DOM rendering",
+                        "JavaScript Date API — Used for calendar generation, date interval calculations, date addition/subtraction, month navigation, and day-of-the-week determination",
+                        "JavaScript Events API — Handles click, input, change, load, and event propagation control for calendars, inputs, buttons, and responsive sidebar behavior",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, backdrop-filter, box shadows, and responsive styling",
+                        "CSS Grid — Used to construct the main monthly calendar and custom popup calendar layouts",
+                        "HTML5 Input Elements — Uses text inputs, number inputs, checkboxes, and buttons for date selection and calculation controls",
+                        "Web APIs (window / document) — Uses built-in browser APIs for viewport detection, page initialization, DOM manipulation, and responsive UI behavior"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "No Server-Side Backend Required — All date calculations and calendar rendering are performed entirely in the browser"
                     ]
                 }</script>
             </a>
