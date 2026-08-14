@@ -247,7 +247,8 @@
                     <div class="detail-panel full-span">
                         <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
                         <div class="detail-section">
-                            <label>Path</label>
+                            <!-- label에 id를 부여하여 동적으로 채울 수 있게 합니다 -->
+                            <label id="panelAppPathLabel">PATH</label>
                             <p id="panelAppDesc">-</p>
                         </div>
                     </div>
@@ -397,32 +398,38 @@
             }
         }
 
-        /*function selectApp(app, element) {
+        function selectApp(app, element) {
+            // 1. 활성 클래스 처리
             document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
-
-            // 1. 큰 글씨로 앱 이름 표시
-            panelAppName.textContent = app.name;
+        
+            // 2. 패널 제목 업데이트
+            panelAppName.textContent = app.name; 
             
-            // 2. 바로 밑에 작은 글씨로 PATH 표시
-            panelAppDesc.textContent = `PATH: ${app.path}`;
-
+            // 3. label에 "PATH: 경로"를 입력 (회색 글씨)
+            const pathLabel = document.getElementById('panelAppPathLabel');
+            pathLabel.textContent = `PATH: ${app.path}`;
+        
+            // 4. p 태그에 description을 입력 (흰 글씨)
+            panelAppDesc.textContent = app.desc;
+        
+            // 5. 나머지 리스트 처리 (기존과 동일)
             panelAppDeps.innerHTML = '';
             app.deps.forEach(dep => {
                 const li = document.createElement('li');
                 li.textContent = dep;
                 panelAppDeps.appendChild(li);
             });
-
+        
             panelAppBackend.innerHTML = '';
             app.backends.forEach(backend => {
                 const li = document.createElement('li');
                 li.textContent = backend;
                 panelAppBackend.appendChild(li);
             });
-
+        
             if (window.innerWidth <= 900) closeSidebar();
-        }*/
+        }
 
         function renderAppList() {
             appListContainer.innerHTML = '';
@@ -436,61 +443,6 @@
                 item.onclick = () => selectApp(app, item);
                 appListContainer.appendChild(item);
             });
-        }
-
-        /*function selectApp(app, element) {
-            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            panelAppName.textContent = `${app.name} (${app.slug})`;
-            panelAppDesc.textContent = app.desc;
-
-            panelAppDeps.innerHTML = '';
-            app.deps.forEach(dep => {
-                const li = document.createElement('li');
-                li.textContent = dep;
-                panelAppDeps.appendChild(li);
-            });
-
-            panelAppBackend.innerHTML = '';
-            app.backends.forEach(backend => {
-                const li = document.createElement('li');
-                li.textContent = backend;
-                panelAppBackend.appendChild(li);
-            });
-
-            if (window.innerWidth <= 900) closeSidebar();
-        }*/
-
-        function selectApp(app, element) {
-            // 1. 활성 클래스 처리
-            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            // 2. 패널 정보 업데이트
-            // panelAppName에는 제목을 표시
-            panelAppName.textContent = app.name; 
-            
-            // 3. panelAppDesc(Path 영역)에 PATH: + 경로를 명시적으로 출력
-            panelAppDesc.textContent = `PATH: ${app.path}`;
-
-            // 4. 의존성 및 백엔드 리스트 렌더링
-            panelAppDeps.innerHTML = '';
-            app.deps.forEach(dep => {
-                const li = document.createElement('li');
-                li.textContent = dep;
-                panelAppDeps.appendChild(li);
-            });
-
-            panelAppBackend.innerHTML = '';
-            app.backends.forEach(backend => {
-                const li = document.createElement('li');
-                li.textContent = backend;
-                panelAppBackend.appendChild(li);
-            });
-
-            // 5. 모바일 사이드바 닫기
-            if (window.innerWidth <= 900) closeSidebar();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
