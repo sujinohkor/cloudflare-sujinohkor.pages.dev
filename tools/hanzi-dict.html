@@ -806,6 +806,10 @@
             panelDrawing.style.display = 'none';
             resetListBtn.style.display = 'block';
             resetDrawingBtn.style.display = 'none';
+            
+            // 👉 이 부분이 빠져 있어서 목록이 비어 있던 것입니다.
+            renderList(db);
+            if (db.length > 0) selectHanzi(db[0].char);
         } else {
             btnDrawing.classList.add('active-mode');
             btnList.classList.remove('active-mode');
