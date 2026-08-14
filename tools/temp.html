@@ -4,87 +4,388 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Architecture Inspector</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
+        /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; height: 100%; background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; overflow: hidden; }
-        .sidebar { width: 320px; background: #181818; border-right: 1px solid rgba(255, 158, 64, 0.3); display: flex; flex-direction: column; height: 100vh; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); }
-        .sidebar-header h2 { color: #ff9e40; font-size: 1.1rem; }
-        .app-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .app-item { padding: 12px 15px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .app-item:hover { border-color: #ff9e40; background: #252525; }
-        .app-item.active { border-color: #ff9e40; background: rgba(255, 158, 64, 0.15); }
-        .app-item-title { font-weight: bold; font-size: 0.9rem; color: #fff; }
-        .app-item-sub { font-size: 0.75rem; color: #888; margin-top: 4px; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
         
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; background: radial-gradient(circle, #222 1px, transparent 1px) #101010; background-size: 20px 20px; }
-        .main-header { padding: 20px 30px; border-bottom: 1px solid rgba(255, 158, 64, 0.3); background: rgba(24, 24, 24, 0.8); backdrop-filter: blur(10px); }
-        .main-header h1 { color: #ff9e40; font-size: 1.4rem; }
-        .detail-view { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .detail-card { background: #181818; border: 2px solid #ff9e40; border-radius: 12px; padding: 30px; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .detail-card h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        /* 모바일 백드롭 오버레이 */        
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* 플로팅 사이드바 (앱 목록형으로 개조) */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
+            background: rgba(16, 16, 16, 0.25);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 12px;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;
+            overflow: hidden;
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; flex-shrink: 0; }
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; flex-shrink: 0; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }
+        
+        .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; flex-shrink: 0; }
+        .menu-btn {
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;
+        }        
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }        
+
+        /* 앱 스크롤 리스트 컨테이너 */
+        .app-list-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 4px;
+            margin-top: 5px;
+        }
+        .app-list-container::-webkit-scrollbar { width: 4px; }
+        .app-list-container::-webkit-scrollbar-thumb { background: rgba(255, 158, 64, 0.3); border-radius: 4px; }
+
+        .app-item {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 158, 64, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .app-item:hover { background: rgba(255, 158, 64, 0.1); border-color: rgba(255, 158, 64, 0.5); }
+        .app-item.active { background: rgba(255, 158, 64, 0.3); border-color: #ff9e40; color: #fff; }
+        .app-item-title { font-size: 0.85rem; font-weight: bold; color: #ff9e40; }
+        .app-item.active .app-item-title { color: #fff; }
+        .app-item-sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
+
+        .main-content {
+            margin-left: 320px; padding: 40px; flex: 1;
+            display: flex; flex-direction: column; height: 100vh;
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;
+            width: calc(100% - 320px);
+        }
+        
+        .top-section h1 { color: #ff9e40; font-size: 1.5rem; margin-bottom: 5px; }
+        .top-section p { color: #aaa; font-size: 0.9rem; }
+
+        /* 도트무늬 배경 적용 카드 (상세보기 뷰어) */
+        .content-card {                     
+            border: 2px solid #ff9e40;                     
+            border-radius: 16px;                     
+            flex: 1;                     
+            display: flex;                     
+            flex-direction: column;
+            overflow: hidden;                     
+            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;
+            background-size: 20px 20px;
+            position: relative;             
+            transition: all 0.3s ease;
+        }
+        
+        .card-btn-group {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2001;
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            background: #ff9e40;
+            color: #101010;
+        }
+
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 상세 내용 뷰어 영역 */
+        .detail-view {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            overflow-y: auto;
+            gap: 20px;
+            z-index: 15;
+        }
+        .detail-panel {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 700px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .detail-panel h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); padding-bottom: 8px; }
         .detail-section { margin-bottom: 15px; }
-        .detail-section label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-section label { font-size: 0.75rem; color: #888; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .detail-section p { font-size: 0.9rem; color: #ddd; line-height: 1.5; }
         .detail-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        .detail-section li { background: #222; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; }
-    </style>
+        .detail-section li { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; color: #fff; }
+
+        /* Light Mode 공조 */
+        body.light-mode { background-color: #fff; color: #202020; }                
+        body.light-mode .sidebar {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(243, 128, 32, 0.35);
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);
+        }                         
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.02);
+            color: #F38020;
+            border-color: rgba(243, 128, 32, 0.5);
+        }        
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {
+            background: rgba(243, 128, 32, 0.15);
+            border-color: rgba(243, 128, 32, 0.4);
+        }                         
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }        
+        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }        
+        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }        
+        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }        
+        body.light-mode .app-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.2); }
+        body.light-mode .app-item-title { color: #F38020; }
+        body.light-mode .app-item.active { background: #F38020; border-color: #F38020; color: #fff; }
+        body.light-mode .app-item.active .app-item-title { color: #fff; }
+        body.light-mode .app-item.active .app-item-sub { color: #eee; }
+        body.light-mode .detail-panel { background: rgba(255, 255, 255, 0.9); border-color: rgba(243, 128, 32, 0.4); color: #202020; }
+        body.light-mode .detail-panel h3 { color: #F38020; border-bottom-color: rgba(243, 128, 32, 0.2); }
+        body.light-mode .detail-section p { color: #444; }
+        body.light-mode .detail-section li { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.05); border-left-color: #F38020; color: #202020; }
+
+        .menu-toggle-btn {
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000;
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;
+            font-weight: bold; cursor: pointer; color: #ffffff;
+        }                 
+        @media (max-width: 900px) {                             
+            .menu-toggle-btn { display: block; }                             
+            .sidebar {
+                transform: translateX(-340px);
+                background: #101010 !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;
+                z-index: 3000;
+            }                             
+            body.light-mode .sidebar {
+                background: #ffffff !important;
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important;
+            }            
+            .sidebar.active { transform: translateX(0); }                             
+            .sidebar-backdrop.active { display: block; opacity: 1; }            
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                             
+            .content-card { min-height: 0; height: 100%; }            
+        }    </style>
 </head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Apps Directory (50)</h2>
-        </div>
-        <div class="app-list" id="appList"></div>
-    </div>
-    <div class="main-content">
-        <div class="main-header">
-            <h1 id="selectedTitle">Select an App</h1>
-        </div>
-        <div class="detail-view" id="detailView">
-            <div class="detail-card">
-                <h3>Architecture Detail</h3>
-                <div class="detail-section">
-                    <label>Description</label>
-                    <p id="selectedDesc" style="font-size: 0.9rem; color: #ccc;">좌측 목록에서 애플리케이션을 선택하면 상세 구성 정보가 표시됩니다.</p>
-                </div>
-                <div class="detail-section">
-                    <label>Libraries & Dependencies</label>
-                    <ul id="selectedDeps"></ul>
-                </div>
+<body>    
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+    
+    <div class="app-container">
+        <!-- 사이드바 (50개 앱 리스트 스크롤 영역) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Apps Directory</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>
-        </div>
+            <a href="../index" class="menu-btn">Home</a>
+            
+            <div class="menu-section-title">Applications (50)</div>
+            <div class="app-list-container" id="appListContainer">
+                <!-- 자바스크립트로 50개 앱 리스트 동적 생성 -->
+            </div>
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="main-content" id="main-content">                    
+            <header class="top-section">                        
+                <h1 id="selectedAppTitle">App Architecture Inspector</h1>
+                <p id="selectedAppSub">좌측 목록에서 애플리케이션을 선택하여 상세 인프라 구성을 확인하세요.</p>
+            </header>                    
+            <section class="content-card" id="content-card">                        
+                <div class="card-btn-group">    
+                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                        
+                </div>
+
+                <!-- 상세 정보 뷰어 영역 -->        
+                <div class="detail-view">
+                    <div class="detail-panel">
+                        <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
+                        <div class="detail-section">
+                            <label>Description / Path</label>
+                            <p id="panelAppDesc">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <label>Libraries & Dependencies</label>
+                            <ul id="panelAppDeps">
+                                <li>-</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <label>Backend Infrastructure</label>
+                            <ul id="panelAppBackend">
+                                <li>-</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>            
+        </main>
     </div>
 
     <script>
-        // 임의의 50개 앱 데이터 생성
-        const apps = Array.from({ length: 50 }, (_, i) => ({
-            id: i + 1,
-            name: `Application Node ${i + 1}`,
-            slug: `app-module-${i + 1}`,
-            desc: `이 모듈은 시스템 내에서 독립적으로 실행되는 ${i + 1}번 앱입니다.`,
-            deps: [
-                `https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js`,
-                `/codes/modules/lib-${i + 1}.js`,
-                i % 2 === 0 ? 'DB: Firebase Firestore' : 'DB: Cloudflare Workers KV'
-            ]
-        }));
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const mainContent = document.getElementById('main-content');
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-        const appListEl = document.getElementById('appList');
-        const selectedTitleEl = document.getElementById('selectedTitle');
-        const selectedDescEl = document.getElementById('selectedDesc');
-        const selectedDepsEl = document.getElementById('selectedDeps');
+        window.toggleFullscreen = function() {                    
+            contentCard.classList.toggle('fullscreen');            
+            document.body.classList.toggle('is-fullscreen');            
+            if (contentCard.classList.contains('fullscreen')) {                                
+                fullscreenBtn.textContent = 'Minimize 🗗';            
+            } else {                                
+                fullscreenBtn.textContent = 'Maximize ⛶';            
+            }
+        };
 
-        function renderList() {
-            appListEl.innerHTML = '';
-            apps.forEach(app => {
+        function toggleSidebar() {                      
+            const isActive = sidebar.classList.toggle('active');            
+            if (isActive) {                
+                backdrop.classList.add('active');            
+            } else {                
+                backdrop.classList.remove('active');            
+            }
+        }
+
+        function closeSidebar() {            
+            sidebar.classList.remove('active');            
+            backdrop.classList.remove('active'); 
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {                      
+            document.body.classList.toggle('light-mode');            
+            if (window.innerWidth <= 900) closeSidebar();
+        });
+
+        mainContent.addEventListener('click', () => {                      
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                                  
+                closeSidebar(); 
+            }             
+        });
+
+        /* --- 50개 앱 데이터 생성 및 연동 로직 --- */
+        const appsData = Array.from({ length: 50 }, (_, i) => {
+            const id = i + 1;
+            const names = [
+                "Guest Book", "Color Picker", "Markdown Editor", "JSON Formatter", "Regex Tester",
+                "Code Snippet Manager", "Pomodoro Timer", "Unit Converter", "Base64 Encoder", "QR Code Generator"
+            ];
+            const baseName = names[i % names.length];
+            const name = id <= 10 ? baseName : `${baseName} v${Math.floor(id/10)+1}`;
+            const slug = `app-module-${id}`;
+            
+            return {
+                id: id,
+                name: name,
+                slug: slug,
+                path: `/codes/${slug}/index.html`,
+                desc: `${name} 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
+                deps: [
+                    i % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
+                    i % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/${slug}/module.js`,
+                    "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+                ],
+                backends: [
+                    i % 2 === 0 ? "DB: Firebase Firestore" : "DB: Cloudflare Workers KV",
+                    i % 4 === 0 ? "Worker: auth-service.worker.js" : "Worker: api-router.worker.js",
+                    i % 5 === 0 ? "Automation: Google Apps Script" : "Static Hosting: Cloudflare Pages"
+                ]
+            };
+        });
+
+        const appListContainer = document.getElementById('appListContainer');
+        const selectedAppTitle = document.getElementById('selectedAppTitle');
+        const selectedAppSub = document.getElementById('selectedAppSub');
+        const panelAppName = document.getElementById('panelAppName');
+        const panelAppDesc = document.getElementById('panelAppDesc');
+        const panelAppDeps = document.getElementById('panelAppDeps');
+        const panelAppBackend = document.getElementById('panelAppBackend');
+
+        function renderAppList() {
+            appListContainer.innerHTML = '';
+            appsData.forEach((app, index) => {
                 const item = document.createElement('div');
                 item.className = 'app-item';
                 item.innerHTML = `
-                    <div class="app-item-title">${app.name}</div>
-                    <div class="app-item-sub">${app.slug}</div>
+                    <div class="app-item-title">${index + 1}. ${app.name}</div>
+                    <div class="app-item-sub">/${app.slug}</div>
                 `;
                 item.onclick = () => selectApp(app, item);
-                appListEl.appendChild(item);
+                appListContainer.appendChild(item);
             });
         }
 
@@ -92,24 +393,35 @@
             document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            selectedTitleEl.textContent = app.name;
-            selectedDescEl.textContent = app.desc;
+            selectedAppTitle.textContent = app.name;
+            selectedAppSub.textContent = `Path: ${app.path}`;
             
-            selectedDepsEl.innerHTML = '';
+            panelAppName.textContent = `${app.name} (${app.slug})`;
+            panelAppDesc.textContent = app.desc;
+
+            panelAppDeps.innerHTML = '';
             app.deps.forEach(dep => {
                 const li = document.createElement('li');
                 li.textContent = dep;
-                selectedDepsEl.appendChild(li);
+                panelAppDeps.appendChild(li);
             });
+
+            panelAppBackend.innerHTML = '';
+            app.backends.forEach(backend => {
+                const li = document.createElement('li');
+                li.textContent = backend;
+                panelAppBackend.appendChild(li);
+            });
+
+            if (window.innerWidth <= 900) closeSidebar();
         }
 
-        window.onload = () => {
-            renderList();
-            // 첫 번째 앱 기본 선택
-            if (appListEl.firstChild) {
-                appListEl.firstChild.click();
+        window.addEventListener('load', () => {
+            renderAppList();
+            if (appListContainer.firstChild) {
+                appListContainer.firstChild.click();
             }
-        };
+        });
     </script>
 </body>
 </html>
