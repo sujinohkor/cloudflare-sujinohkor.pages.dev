@@ -3,124 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architecture Schema Builder</title>
+    <title>Auto Schema Builder</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; height: 100%; background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .app-container { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
-        header { padding: 15px 30px; border-bottom: 1px solid rgba(255, 158, 64, 0.3); background: #181818; flex-shrink: 0; }
-        h1 { color: #ff9e40; font-size: 1.2rem; letter-spacing: 1px; }
-        .canvas-container { flex: 1; position: relative; background: radial-gradient(circle, #222 1px, transparent 1px) #101010; background-size: 20px 20px; width: 100%; height: 100%; overflow: hidden; }
+        html, body { width: 100%; height: 100%; background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; overflow: hidden; }
+        .sidebar { width: 350px; background: #181818; border-right: 1px solid rgba(255, 158, 64, 0.3); display: flex; flex-direction: column; padding: 20px; gap: 15px; }
+        .sidebar h2 { color: #ff9e40; font-size: 1.1rem; }
+        textarea { flex: 1; background: #111; color: #fff; border: 1px solid #444; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.85rem; resize: none; }
+        button { background: #ff9e40; color: #101010; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .canvas-area { flex: 1; position: relative; background: radial-gradient(circle, #222 1px, transparent 1px) #101010; background-size: 20px 20px; }
         canvas { display: block; width: 100%; height: 100%; }
-        .info-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(20, 20, 20, 0.85); border: 1px solid #ff9e40; padding: 15px 20px; border-radius: 12px; backdrop-filter: blur(10px); max-width: 300px; z-index: 10; }
-        .info-panel h3 { color: #ff9e40; font-size: 0.95rem; margin-bottom: 6px; }
-        .info-panel p { font-size: 0.8rem; color: #ccc; line-height: 1.4; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header>
-            <h1>System Architecture Schema</h1>
-        </header>
-        <div class="canvas-container" id="canvasContainer">
-            <canvas id="schemaCanvas"></canvas>
-            <div class="info-panel">
-                <h3>Structure Guide</h3>
-                <p>클라이언트 앱들이 Cloudflare Workers, Firebase, Apps Script 및 오픈소스 라이브러리와 연결되는 구조를 나타낸 모식도입니다. 노드를 드래그하여 이동할 수 있습니다.</p>
-            </div>
-        </div>
+    <div class="sidebar">
+        <h2>Project List Input</h2>
+        <textarea id="inputText">Guest Book (guest-book)
+- https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js
+- https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js
+- DB: firebase
+
+Color Picker (color-picker)
+- /codes/color-picker/ntcColors.js</textarea>
+        <button onclick="generateSchema()">Generate Schema</button>
+    </div>
+    <div class="canvas-area">
+        <canvas id="schemaCanvas"></canvas>
     </div>
 
     <script>
         const canvas = document.getElementById('schemaCanvas');
         const ctx = canvas.getContext('2d');
-        const container = document.getElementById('canvasContainer');
 
         function resize() {
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-            draw();
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            generateSchema();
         }
         window.addEventListener('resize', resize);
 
-        const nodes = [
-            { id: 'client', label: 'Client Apps (50+)', x: 200, y: 300, color: '#ff9e40' },
-            { id: 'workers', label: 'Cloudflare Workers', x: 550, y: 150, color: '#f38020' },
-            { id: 'firebase', label: 'Firebase Backend', x: 550, y: 300, color: '#ffca28' },
-            { id: 'appscript', label: 'Google Apps Script', x: 550, y: 450, color: '#34a853' },
-            { id: 'opensource', label: 'Open Source Libs', x: 200, y: 150, color: '#64748b' }
-        ];
+        function parseText(text) {
+            const lines = text.split('\n');
+            const projects = [];
+            let currentProj = null;
 
-        const connections = [
-            { from: 'client', to: 'workers' },
-            { from: 'client', to: 'firebase' },
-            { from: 'client', to: 'appscript' },
-            { from: 'opensource', to: 'client' }
-        ];
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
 
-        let draggedNode = null;
-        let offsetX = 0, offsetY = 0;
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            connections.forEach(conn => {
-                const fromNode = nodes.find(n => n.id === conn.from);
-                const toNode = nodes.find(n => n.id === conn.to);
-                if (fromNode && toNode) {
-                    ctx.beginPath();
-                    ctx.moveTo(fromNode.x, fromNode.y);
-                    ctx.bezierCurveTo(fromNode.x + 80, fromNode.y, toNode.x - 80, toNode.y, toNode.x, toNode.y);
-                    ctx.strokeStyle = '#444';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
+                if (!trimmed.startsWith('-')) {
+                    if (currentProj) projects.push(currentProj);
+                    currentProj = { name: trimmed, dependencies: [] };
+                } else if (currentProj) {
+                    currentProj.dependencies.push(trimmed.substring(1).trim());
                 }
             });
-
-            nodes.forEach(node => {
-                ctx.fillStyle = '#1e293b';
-                ctx.strokeStyle = node.color;
-                ctx.lineWidth = 2;
-                
-                const w = 180, h = 50;
-                ctx.fillRect(node.x - w/2, node.y - h/2, w, h);
-                ctx.strokeRect(node.x - w/2, node.y - h/2, w, h);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 13px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(node.label, node.x, node.y);
-            });
+            if (currentProj) projects.push(currentProj);
+            return projects;
         }
 
-        canvas.addEventListener('mousedown', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
+        function generateSchema() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            nodes.forEach(node => {
-                if (Math.abs(x - node.x) < 90 && Math.abs(y - node.y) < 25) {
-                    draggedNode = node;
-                    offsetX = x - node.x;
-                    offsetY = y - node.y;
-                }
+            const rawText = document.getElementById('inputText').value;
+            const projects = parseText(rawText);
+
+            let startX = 100;
+            let startY = 100;
+            const boxWidth = 220;
+            const boxHeight = 80;
+
+            projects.forEach((proj, index) => {
+                let x = startX + (index % 3) * 280;
+                let y = startY + Math.floor(index / 3) * 160;
+
+                // 프로젝트 박스 그리기
+                ctx.fillStyle = '#1e293b';
+                ctx.strokeStyle = '#ff9e40';
+                ctx.lineWidth = 2;
+                ctx.fillRect(x, y, boxWidth, boxHeight);
+                ctx.strokeRect(x, y, boxWidth, boxHeight);
+
+                // 텍스트 출력
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 13px Segoe UI';
+                ctx.fillText(proj.name, x + 15, y + 25);
+
+                ctx.font = '11px Segoe UI';
+                ctx.fillStyle = '#aaa';
+                proj.dependencies.forEach((dep, dIdx) => {
+                    if (dIdx < 2) {
+                        ctx.fillText(`- ${dep.length > 28 ? dep.substring(0, 25) + '...' : dep}`, x + 15, y + 45 + (dIdx * 16));
+                    }
+                });
             });
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            if (!draggedNode) return;
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            draggedNode.x = (e.clientX - rect.left) * scaleX - offsetX;
-            draggedNode.y = (e.clientY - rect.top) * scaleY - offsetY;
-            draw();
-        });
-
-        canvas.addEventListener('mouseup', () => { draggedNode = null; });
+        }
 
         window.onload = resize;
     </script>
