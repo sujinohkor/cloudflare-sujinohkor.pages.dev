@@ -174,7 +174,9 @@
             border-color: rgba(243, 128, 32, 0.4); 
         }
 
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        /* 라이트 모드일 때 타이틀 색상 대응 */
+        body.light-mode .top-section h1 { color: #202020; }
+        body.light-mode .top-section p { color: #555; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
         body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
         body.light-mode .app-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.2); }
