@@ -70,7 +70,7 @@ for level_key, input_filename in file_mappings.items():
     print(f"'{input_filename}' 처리 완료 (레벨 {level})")
 
 # 3. 최종 통합된 딕셔너리를 하나의 JSON 파일로 저장
-output_path = 'hsk-combined-words.json'
+output_path = 'hsk-without-ko-words.json'
 with open(output_path, 'w', encoding='utf-8') as f:
     json.dump(combined_dict, f, ensure_ascii=False, indent=2)
 
