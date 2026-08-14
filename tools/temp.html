@@ -758,15 +758,17 @@
             viewer.innerHTML = htmlOutput;
             bindTooltipEvents();
 
-            // 구글 앱스 스크립트 번역 API 호출 및 결과 적용
+            // 구글 앱스 스크립트 번역 API 호출 (캐시 방지용 무작위 파라미터 추가)
             try {
                 const GAS_URL = "https://script.google.com/macros/s/AKfycbw14p-L4Y_bqarTgy5DO34WLzNgit1dlTnt6crk7bGrkS_VwrtqE9aptOhfF93u31Fn/exec";
                 const selectedLang = targetLangSelect.value;
-                const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}`);
+                
+                // _t=Date.now()를 붙여 매번 새로운 요청으로 인식하게 만듭니다.
+                const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}&_t=${Date.now()}`);
                 
                 if (transRes.ok) {
-                    const data = await transRes.json(); // JSON으로 파싱
-                    translationResult.innerHTML = data.translatedText || "No translation.";
+                    const translatedText = await transRes.text();
+                    translationResult.innerHTML = translatedText || "No translation.";
                 } else {
                     translationResult.innerHTML = "Translation error.";
                 }
