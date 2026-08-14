@@ -401,6 +401,7 @@
     }
 
     // 마우스 호버 시 툴팁에 한국어/영어 번역 동시 표시
+    // 마우스 호버 시 툴팁 표시 함수 (순수 번역 내용만 출력)
     function bindTooltipEvents() {
         const wordSpans = document.querySelectorAll('.word-span');
         
@@ -411,7 +412,8 @@
                 const translation = span.getAttribute('data-translation');
                 const translationKo = span.getAttribute('data-translation-ko');
                 
-                globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>🇰🇷 ${translationKo}<br>🇬🇧 ${translation}`;
+                // 국기 이모지나 기타 코드가 들어가지 않도록 순수 번역 값만 조합
+                globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>${translationKo}<br>${translation}`;
                 globalTooltip.style.display = 'block';
                 
                 const rect = span.getBoundingClientRect();
