@@ -344,7 +344,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                         <h3>Translation</h3>
                         <!-- 번역 언어 선택 콤보박스 추가 -->
-                        <select id="target-lang" class="lang-select">
+                        <select id="target-lang" class="lang-select" onchange="updateTranslation()">
                             <option value="ko" selected>한국어 (Korean)</option>
                             <option value="en">영어 (English)</option>
                             <option value="ja">일본어 (Japanese)</option>
@@ -758,27 +758,37 @@
             viewer.innerHTML = htmlOutput;
             bindTooltipEvents();
 
-            // 구글 앱스 스크립트 번역 API 호출 및 결과 적용
-            try {
-                const GAS_URL = "https://script.google.com/macros/s/AKfycbw14p-L4Y_bqarTgy5DO34WLzNgit1dlTnt6crk7bGrkS_VwrtqE9aptOhfF93u31Fn/exec";
-                const selectedLang = targetLangSelect.value;
-                
-                const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}&_t=${Date.now()}`);
-                
-                if (transRes.ok) {
-                    const data = await transRes.json(); // JSON 형태로 파싱
-                    // translatedText 속성값만 꺼내서 출력
-                    translationResult.innerHTML = data.translatedText || "No translation.";
-                } else {
-                    translationResult.innerHTML = "Translation error.";
-                }
-            } catch (err) {
-                console.error("Translation fetch error:", err);
-                translationResult.innerHTML = "Translation failed.";
-            }
+            // 분리된 번역 함수 호출
+            updateTranslation();
+
         } catch (error) {
             console.error(error);
             viewer.innerHTML = "An error occurred. Please check the console.";
+            translationResult.innerHTML = "Translation failed.";
+        }
+    }
+
+    // 언어 선택을 바꾸거나 분석할 때 호출되는 독립된 번역 함수
+    async function updateTranslation() {
+        const text = textInput.value.trim();
+        if (!text) return;
+
+        translationResult.innerHTML = "Translating...";
+
+        try {
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbw14p-L4Y_bqarTgy5DO34WLzNgit1dlTnt6crk7bGrkS_VwrtqE9aptOhfF93u31Fn/exec";
+            const selectedLang = targetLangSelect.value;
+            
+            const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}&_t=${Date.now()}`);
+            
+            if (transRes.ok) {
+                const data = await transRes.json();
+                translationResult.innerHTML = data.translatedText || "No translation.";
+            } else {
+                translationResult.innerHTML = "Translation error.";
+            }
+        } catch (err) {
+            console.error("Translation fetch error:", err);
             translationResult.innerHTML = "Translation failed.";
         }
     }
