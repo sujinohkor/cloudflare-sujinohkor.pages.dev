@@ -260,8 +260,8 @@
         </div>
         <button class="menu-btn" onclick="location.href='../index'">Home</button>
         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
-            <button class="mode-btn">HSK</button>
-            <button class="mode-btn">TOCFL</button>
+            <button class="mode-btn active-mode" id="btnHsk" onclick="switchMode('hsk')">HSK</button>
+            <button class="mode-btn" id="btnTocfl" onclick="switchMode('tocfl')">TOCFL</button>
         </div>
         <button class="menu-btn" id="resetBtn" onclick="resetAll()">Reset</button>
     </aside>
@@ -310,6 +310,21 @@
     const WORKER_URL = "https://mandarin-segmenter.sujinohkor.workers.dev";
     const globalTooltip = document.getElementById('global-tooltip');
 
+    function switchMode(type) {
+        const btnHsk = document.getElementById('btnHsk');
+        const btnTocfl = document.getElementById('btnTocfl');
+    
+        if (type === 'hsk') {
+            btnHsk.classList.add('active-mode');
+            btnTocfl.classList.remove('active-mode');
+            // 추후 HSK 분석 모드 관련 로직을 여기에 추가할 수 있습니다.
+        } else {
+            btnTocfl.classList.add('active-mode');
+            btnHsk.classList.remove('active-mode');
+            // 추후 TOCFL 분석 모드 관련 로직을 여기에 추가할 수 있습니다.
+        }
+    }
+    
     async function analyzeText() {
         const text = document.getElementById('inputText').value.trim();
         const viewer = document.getElementById('viewerResult');
