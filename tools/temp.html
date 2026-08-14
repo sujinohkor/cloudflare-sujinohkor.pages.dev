@@ -338,16 +338,30 @@
                     appsData = Array.from(cardElements).map((card, index) => {
                         const h3 = card.querySelector('h3');
                         const p = card.querySelector('p');
+                        const href = card.getAttribute('href') || '';
                         
                         const name = h3 ? h3.textContent.trim() : `App ${index + 1}`;
                         const slug = p ? p.textContent.trim() : `app-module-${index + 1}`;
                         const id = index + 1;
 
+                        // href에서 도메인 뒷부분 경로 추출 (예: https://sujinohkor.pages.dev/tools/guest-book -> /tools/guest-book)
+                        let toolSubPath = '';
+                        try {
+                            const urlObj = new URL(href);
+                            toolSubPath = urlObj.pathname; // 예: /tools/guest-book
+                        } catch (e) {
+                            // 상대 경로이거나 URL 형식이 아닐 경우 대비
+                            toolSubPath = href.startsWith('http') ? '' : href;
+                        }
+
+                        // 요구하신 path 형식 조합 (.html 붙이기)
+                        const customPath = toolSubPath ? `${toolSubPath}.html` : `/codes/${slug}/index.html`;
+
                         return {
                             id: id,
                             name: name,
                             slug: slug,
-                            path: `/codes/${slug}/index.html`,
+                            path: customPath, // 추출된 경로 적용
                             desc: `${name} (${slug}) 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
                             deps: [
                                 index % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
@@ -371,20 +385,46 @@
                     id: i + 1,
                     name: `App Module ${i + 1}`,
                     slug: `app-module-${i + 1}`,
-                    path: `/codes/app-module-${i + 1}/index.html`,
+                    path: `/tools/app-module-${i + 1}.html`,
                     desc: `시스템은 독립적인 클라이언트 모듈로 동작합니다.`,
                     deps: ["/assets/lib/core.min.js"],
                     backends: ["Static Hosting: Cloudflare Pages"]
                 }));
             }
 
-            // 메뉴 개수 타이틀 갱신
             menuSectionTitle.textContent = `Applications (${appsData.length})`;
 
             renderAppList();
             if (appListContainer.firstChild) {
                 appListContainer.firstChild.click();
             }
+        }
+
+        function selectApp(app, element) {
+            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // 1. 큰 글씨로 앱 이름 표시
+            panelAppName.textContent = app.name;
+            
+            // 2. 바로 밑에 작은 글씨로 PATH 표시
+            panelAppDesc.textContent = `PATH: ${app.path}`;
+
+            panelAppDeps.innerHTML = '';
+            app.deps.forEach(dep => {
+                const li = document.createElement('li');
+                li.textContent = dep;
+                panelAppDeps.appendChild(li);
+            });
+
+            panelAppBackend.innerHTML = '';
+            app.backends.forEach(backend => {
+                const li = document.createElement('li');
+                li.textContent = backend;
+                panelAppBackend.appendChild(li);
+            });
+
+            if (window.innerWidth <= 900) closeSidebar();
         }
 
         function renderAppList() {
