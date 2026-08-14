@@ -290,7 +290,10 @@
 
         document.getElementById('theme-toggle').addEventListener('click', () => {                          
             document.body.classList.toggle('light-mode');            
-            if (window.innerWidth <= 900) closeSidebar();        });
+            if (window.innerWidth <= 900) closeSidebar();
+            // 테마 전환 직후 레이아웃 변경을 반영하여 캔버스 크기 재계산
+            setTimeout(resizeCanvas, 50);
+        });
 
         mainContent.addEventListener('click', () => {                          
             if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                                  
