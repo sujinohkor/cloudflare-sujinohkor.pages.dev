@@ -120,7 +120,7 @@
         }
         textarea.viewer-textarea:focus { border-color: #ff9e40; }
 
-        /* HSK 및 기타 레벨 스타일 */
+        /* HSK 레벨 스타일 */
         .hsk-1 { background-color: #1a365d; color: #90cdf4; }
         .hsk-2 { background-color: #1c4532; color: #9ae6b4; }
         .hsk-3 { background-color: #593e1a; color: #fbd38d; }
@@ -130,7 +130,7 @@
         .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
         .hsk-unknown { background-color: transparent; color: inherit; }
 
-        /* HSK 및 기타 레벨 스타일 */
+        /* TOCFL 레벨 스타일 */
         .novice-1 { background-color: #1a365d; color: #90cdf4; }
         .novice-2 { background-color: #1c4532; color: #9ae6b4; }
         .level-1 { background-color: #593e1a; color: #fbd38d; }
@@ -338,7 +338,6 @@
     const WORKER_URL = "https://mandarin-segmenter.sujinohkor.workers.dev";
     const globalTooltip = document.getElementById('global-tooltip');
 
-    // 현재 선택된 모드 상태 관리 (기본값: hsk)
     let currentMode = 'hsk';
 
     function switchMode(type) {
@@ -353,6 +352,25 @@
             btnTocfl.classList.add('active-mode');
             btnHsk.classList.remove('active-mode');
         }
+    }
+
+    // TOCFL 등급 문자열을 CSS 클래스명으로 변환하는 함수
+    function getLevelClassName(level) {
+        if (!level) return 'tocfl-unknown';
+        const str = String(level).toLowerCase();
+        
+        if (str.includes('novice')) {
+            if (str.includes('1') || str.includes('一')) return 'novice-1';
+            if (str.includes('2') || str.includes('二')) return 'novice-2';
+        }
+        if (str.includes('level') || str.includes('級') || str.includes('级')) {
+            if (str.includes('1') || str.includes('一')) return 'level-1';
+            if (str.includes('2') || str.includes('二')) return 'level-2';
+            if (str.includes('3') || str.includes('三')) return 'level-3';
+            if (str.includes('4') || str.includes('四')) return 'level-4';
+            if (str.includes('5') || str.includes('五')) return 'level-5';
+        }
+        return 'tocfl-unknown';
     }
     
     async function analyzeText() {
@@ -372,7 +390,6 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
-                // 백엔드로 텍스트와 현재 모드(type) 함께 전송
                 body: JSON.stringify({ text: text, type: currentMode })
             });
 
@@ -394,8 +411,15 @@
 
                     if (part) {
                         if (token.found) {
-                            // 영어 번역과 한국어 번역을 data 속성에 각각 바인딩
-                            htmlOutput += `<span class="word-span hsk-${token.level}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}" data-translation-ko="${token.translationKo}">`;
+                            // 모드에 따라 올바른 레벨 클래스 결정
+                            let levelClass = '';
+                            if (currentMode === 'tocfl') {
+                                levelClass = getLevelClassName(token.level);
+                            } else {
+                                levelClass = `hsk-${token.level}`;
+                            }
+
+                            htmlOutput += `<span class="word-span ${levelClass}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}" data-translation-ko="${token.translationKo}">`;
                             for (let i = 0; i < part.length; i++) {
                                 htmlOutput += `<span class="word-char">${part[i]}</span>`;
                             }
@@ -418,8 +442,6 @@
         }
     }
 
-    // 마우스 호버 시 툴팁에 한국어/영어 번역 동시 표시
-    // 마우스 호버 시 툴팁 표시 함수 (순수 번역 내용만 출력)
     function bindTooltipEvents() {
         const wordSpans = document.querySelectorAll('.word-span');
         
@@ -430,7 +452,7 @@
                 const translation = span.getAttribute('data-translation');
                 const translationKo = span.getAttribute('data-translation-ko');
                 
-                // 국기 이모지나 기타 코드가 들어가지 않도록 순수 번역 값만 조합
+                // 영어 번역(translation)이 한국어 번역보다 먼저 오도록 배치
                 globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>${translation}<br>${translationKo}`;
                 globalTooltip.style.display = 'block';
                 
