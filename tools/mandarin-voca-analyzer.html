@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head> 
+<head>    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandarin Vocabulary Analyzer & Reading Viewer</title>
@@ -15,7 +15,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
         a { text-decoration: none; color: inherit; display: block; }
-                
+
         .app-container { display: flex; min-height: 100vh; width: 100%; }
 
         /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
@@ -62,7 +62,7 @@
             display: flex; align-items: center; justify-content: center; line-height: 1;
         }
         .mode-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-        
+
         .mode-btn.active-mode {
             background: #ff9e40;
             color: #101010;
@@ -83,10 +83,10 @@
             overflow: hidden; padding: 20px; background: transparent; gap: 15px; 
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-                
+
         .content-right { 
             flex: 1.6; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow-y: auto; padding: 25px; background: transparent; gap: 15px; 
+            overflow: hidden; padding: 25px; background: transparent; gap: 15px; 
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -106,6 +106,24 @@
             font-size: 0.9rem;
             color: #ff9e40;
             flex-shrink: 0;
+        }
+
+        /* 번역 언어 선택 콤보박스 스타일 */
+        .lang-select {
+            background: #202020;
+            color: #ff9e40;
+            border: 1px solid #ff9e40;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .lang-select:hover {
+            background: #ff9e40;
+            color: #101010;
         }
 
         /* 입력기 영역 스타일 통합 */
@@ -189,6 +207,13 @@
             word-break: keep-all; overflow-wrap: break-word; white-space: pre-wrap;
         }
 
+        #translationResult {
+            line-height: 1.6; font-size: 15px; padding: 15px;
+            background: #202020; border: 1px solid #333; border-radius: 8px;
+            height: 100%; overflow-y: auto; overflow-x: hidden;
+            word-break: keep-all; overflow-wrap: break-word; white-space: pre-wrap;
+        }
+
         .mini-action-btn {
             background: #202020; color: #ff9e40; border: 1px solid #ff9e40; 
             padding: 5px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; 
@@ -207,18 +232,21 @@
         body.light-mode textarea.viewer-textarea { color: #000; }
         body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #999; }
         body.light-mode #viewerResult { background: #fff; color: #202020; border-color: #ccc; }
+        body.light-mode #translationResult { background: #fff; color: #202020; border-color: #ccc; }
         body.light-mode #global-tooltip { background-color: #fff; color: #202020; border-color: #F38020; box-shadow: 0px 4px 10px rgba(243, 128, 32, 0.2); }
         body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
         body.light-mode .candidate-item { background: rgba(243, 128, 32, 0.1); border-color: rgba(243, 128, 32, 0.4); color: #202020; }
         body.light-mode .candidate-item:hover, body.light-mode .candidate-item.selected { background: #F38020; color: #fff; }
         body.light-mode #ruby-viewer { background: #fff; color: #202020; }
         body.light-mode rt { color: #F38020; }
-        /* 라이트 모드 추가 보완 스타일 */
         body.light-mode .editor-wrapper { background: #fff !important; border-color: #ccc !important; }
         body.light-mode textarea.viewer-textarea { color: #202020 !important; }
         body.light-mode .candidate-box { background: #f5f5f5 !important; border-bottom-color: rgba(243, 128, 32, 0.35) !important; }
         body.light-mode .mini-action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
         body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
+
+        body.light-mode .lang-select { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
+        body.light-mode .lang-select:hover { background: #F38020; color: #fff; border-color: #F38020; }
 
         body.light-mode .hsk-1 { background-color: #ebf8ff; color: #2b6cb0; }
         body.light-mode .hsk-2 { background-color: #f0fff4; color: #22543d; }
@@ -250,7 +278,7 @@
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }                
             .workspace-container { flex-direction: column; overflow: visible; }                
             .content-left { height: auto; min-height: 300px; }                
-            .content-right { height: auto; min-height: 300px; }                
+            .content-right { height: auto; min-height: 500px; }                
         }
     </style>
 </head>
@@ -284,7 +312,7 @@
                         <h3>Text Input</h3>
                         <button class="mini-action-btn" onclick="analyzeText()">Analyze</button>
                     </div>
-                    
+
                     <!-- 병음 입력 후보군 박스 -->
                     <div class="candidate-box">
                         <div id="candidates-container" class="candidates-list">
@@ -301,13 +329,30 @@
                 </div>
             </section>
 
-            <!-- Right Panel: Analysis Results -->
+            <!-- Right Panel: Analysis Results & Translation (Split Top/Bottom) -->
             <section class="content-right">
-                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:12px; height:100%;">
+                <!-- 상단: 어휘 분석 결과 -->
+                <div class="calc-card" style="flex: 1.2; border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:8px; min-height:0;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                         <h3>Viewer Results</h3>
                     </div>
-                    <div id="viewerResult">Analysis results will appear here.</div>
+                    <div id="viewerResult" style="flex: 1; overflow-y: auto;">Analysis results will appear here.</div>
+                </div>
+
+                <!-- 하단: 번역 결과 영역 -->
+                <div class="calc-card" style="flex: 0.8; border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:8px; min-height:0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <h3>Translation</h3>
+                        <!-- 번역 언어 선택 콤보박스 추가 -->
+                        <select id="target-lang" class="lang-select" onchange="updateTranslation()">
+                            <option value="ko" selected>Korean (한국어)</option>
+                            <option value="en">English (영어)</option>
+                            <!--<option value="ja">일본어 (Japanese)</option>
+                            <option value="zh-CN">중국어 간체 (Chinese S.)</option>
+                            <option value="zh-TW">중국어 번체 (Chinese T.)</option>-->
+                        </select>
+                    </div>
+                    <div id="translationResult" style="flex: 1; overflow-y: auto;">Translation results will appear here.</div>
                 </div>
             </section>
         </div>
@@ -321,7 +366,7 @@
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
-    // 사이드바 내부의 버튼을 누르면 모바일에서 자동으로 닫히도록 설정
+    // 모바일에서 사이드바 내부 버튼 클릭 시 닫기
     sidebar.querySelectorAll('button').forEach(element => {
         element.addEventListener('click', () => {
             if (window.innerWidth <= 900) {
@@ -330,14 +375,14 @@
         });
     });
 
-    // 메인 콘텐츠 영역을 누를 때 사이드바가 열려있다면 닫기
+    // 모바일에서 사이드바 외부 영역 클릭 시 닫기
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
         if (sidebar.classList.contains('active')) {
             sidebar.classList.remove('active');
         }
     });
-    
+
     document.getElementById('theme-toggle').addEventListener('click', () => { 
         document.body.classList.toggle('light-mode'); 
     });
@@ -352,6 +397,8 @@
     const candidatesContainer = document.getElementById('candidates-container');
     const pageIndicator = document.getElementById('page-indicator');
     const lineNumbers = document.getElementById('line-numbers');
+    const translationResult = document.getElementById('translationResult');
+    const targetLangSelect = document.getElementById('target-lang');
 
     let currentMode = 'hsk'; // 'hsk' (간체) 또는 'tocfl' (번체)
     let currentMatches = [];
@@ -381,7 +428,7 @@
         currentMode = type;
         const btnHsk = document.getElementById('btnHsk');
         const btnTocfl = document.getElementById('btnTocfl');
-    
+
         if (type === 'hsk') {
             btnHsk.classList.add('active-mode');
             btnTocfl.classList.remove('active-mode');
@@ -390,7 +437,6 @@
             btnHsk.classList.remove('active-mode');
         }
 
-        // 모드 전환 시 기존 입력된 텍스트를 간체/번체로 자동 변환
         let text = textInput.value;
         if (text) {
             textInput.value = type === 'tocfl' ? toTraditional(text) : toSimplified(text);
@@ -555,13 +601,13 @@
     function selectHanzi(hanzi) {
         const val = textInput.value;
         const cursorPos = textInput.selectionStart;
-                    
+
         const newVal = val.substring(0, currentPinyinStart) + hanzi + val.substring(cursorPos);
         textInput.value = newVal;
-                    
+
         const newCursorPos = currentPinyinStart + hanzi.length;
         textInput.setSelectionRange(newCursorPos, newCursorPos);
-                    
+
         clearCandidates();
         textInput.focus();
         updateEditorState();
@@ -631,11 +677,10 @@
     textInput.addEventListener('scroll', () => { lineNumbers.scrollTop = textInput.scrollTop; });
     window.addEventListener('resize', updateLineNumbers);
 
-    // TOCFL 등급 문자열을 CSS 클래스명으로 변환하는 함수
     function getLevelClassName(level) {
         if (!level) return 'tocfl-unknown';
         const str = String(level).toLowerCase();
-        
+
         if (str.includes('novice')) {
             if (str.includes('1') || str.includes('一')) return 'novice-1';
             if (str.includes('2') || str.includes('二')) return 'novice-2';
@@ -649,18 +694,18 @@
         }
         return 'tocfl-unknown';
     }
-    
-    // 어휘 분석 및 하이라이트 실행 함수
+
     async function analyzeText() {
         const text = textInput.value.trim();
         const viewer = document.getElementById('viewerResult');
-        
+
         if (!text) {
             alert("Please enter some text.");
             return;
         }
 
         viewer.innerHTML = "Analyzing...";
+        translationResult.innerHTML = "Translating...";
 
         try {
             const response = await fetch(WORKER_URL, {
@@ -677,11 +722,11 @@
 
             const data = await response.json();
             const tokens = data.tokens;
-            
+
             let htmlOutput = '';
             tokens.forEach(token => {
                 const parts = token.word.split('\n');
-                
+
                 parts.forEach((part, index) => {
                     if (index > 0) {
                         htmlOutput += '<br>';
@@ -709,51 +754,79 @@
                     }
                 });
             });
-            
+
             viewer.innerHTML = htmlOutput;
             bindTooltipEvents();
+
+            // 분리된 번역 함수 호출
+            updateTranslation();
 
         } catch (error) {
             console.error(error);
             viewer.innerHTML = "An error occurred. Please check the console.";
+            translationResult.innerHTML = "Translation failed.";
         }
     }
 
-    // 마우스 호버 시 툴팁 표시 함수
+    // 언어 선택을 바꾸거나 분석할 때 호출되는 독립된 번역 함수
+    async function updateTranslation() {
+        const text = textInput.value.trim();
+        if (!text) return;
+
+        translationResult.innerHTML = "Translating...";
+
+        try {
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbw14p-L4Y_bqarTgy5DO34WLzNgit1dlTnt6crk7bGrkS_VwrtqE9aptOhfF93u31Fn/exec";
+            const selectedLang = targetLangSelect.value;
+
+            const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}&_t=${Date.now()}`);
+
+            if (transRes.ok) {
+                const data = await transRes.json();
+                translationResult.innerHTML = data.translatedText || "No translation.";
+            } else {
+                translationResult.innerHTML = "Translation error.";
+            }
+        } catch (err) {
+            console.error("Translation fetch error:", err);
+            translationResult.innerHTML = "Translation failed.";
+        }
+    }
+
     function bindTooltipEvents() {
         const wordSpans = document.querySelectorAll('.word-span');
-        
+
         wordSpans.forEach(span => {
             span.addEventListener('mouseenter', (e) => {
                 const level = span.getAttribute('data-level');
                 const pinyin = span.getAttribute('data-pinyin');
                 const translation = span.getAttribute('data-translation');
                 const translationKo = span.getAttribute('data-translation-ko');
-                
+
                 globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>${translation}<br>${translationKo}`;
                 globalTooltip.style.display = 'block';
-                
+
                 const rect = span.getBoundingClientRect();
                 const tooltipRect = globalTooltip.getBoundingClientRect();
-                
+
                 let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
                 let top = rect.top - tooltipRect.height - 8;
-                
+
                 if (top < 10) {
                     top = rect.bottom + 8;
                 }
-                
+
                 if (left < 10) {
                     left = 10;
                 } else if (left + tooltipRect.width > window.innerWidth - 10) {
                     left = window.innerWidth - tooltipRect.width - 10;
                 }
-                
+
                 globalTooltip.style.left = `${left}px`;
                 globalTooltip.style.top = `${top}px`;
                 globalTooltip.style.opacity = '1';
             });
-            
+
             span.addEventListener('mouseleave', () => {
                 globalTooltip.style.opacity = '0';
                 globalTooltip.style.display = 'none';
@@ -765,6 +838,7 @@
         if (confirm('Are you sure you want to clear all text?')) {
             textInput.value = '';
             document.getElementById('viewerResult').innerHTML = 'Analysis results will appear here.';
+            translationResult.innerHTML = 'Translation results will appear here.';
             clearCandidates();
             globalTooltip.style.display = 'none';
             if (isGuideMode) updatePinyinGuide();
