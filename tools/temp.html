@@ -102,62 +102,8 @@
             position: relative;             
             transition: all 0.3s ease;
         }
-        
-        .card-btn-group {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 2001;
-            display: flex;
-            gap: 8px;
-        }
-        .action-btn {
-            background: #202020;
-            color: #ff9e40;
-            border: 1px solid #ff9e40;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s;
-        }
-        .action-btn:hover {
-            background: #ff9e40;
-            color: #101010;
-        }
 
-        body.is-fullscreen .sidebar {
-            transform: translateX(-120%);
-            opacity: 0;
-            pointer-events: none;
-        }
-        body.is-fullscreen .main-content {
-            margin-left: 0 !important;
-            width: 100vw !important;
-            padding: 0 !important;
-            height: 100vh !important;
-        }
-        body.is-fullscreen .top-section {
-            display: none !important;
-        }
-        body.is-fullscreen .content-card {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999 !important;
-            border-radius: 0 !important;
-            border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        /* 상세 내용 뷰어 영역 (Grid 구조로 여백 최소화 및 균형 배치) */
+        /* 상세 내용 뷰어 영역 (Grid 구조) */
         .detail-view {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -206,8 +152,6 @@
             border-color: rgba(243, 128, 32, 0.4);
         }                         
         body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }        
-        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }        
-        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }        
         body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }        
         body.light-mode .app-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.2); }
         body.light-mode .app-item-title { color: #F38020; }
@@ -270,11 +214,7 @@
                 <p id="selectedAppSub">좌측 목록에서 애플리케이션을 선택하여 상세 인프라 구성을 확인하세요.</p>
             </header>                    
             <section class="content-card" id="content-card">                        
-                <div class="card-btn-group">    
-                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                        
-                </div>
-
-                <!-- 상세 정보 뷰어 영역 (그리드 적용) -->        
+                <!-- 상세 정보 뷰어 영역 (Grid 구조) -->        
                 <div class="detail-view">
                     <div class="detail-panel full-span">
                         <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
@@ -308,18 +248,6 @@
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('sidebar-backdrop');
         const mainContent = document.getElementById('main-content');
-        const contentCard = document.getElementById('content-card');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-
-        window.toggleFullscreen = function() {                    
-            contentCard.classList.toggle('fullscreen');            
-            document.body.classList.toggle('is-fullscreen');            
-            if (contentCard.classList.contains('fullscreen')) {                                
-                fullscreenBtn.textContent = 'Minimize 🗗';            
-            } else {                                
-                fullscreenBtn.textContent = 'Maximize ⛶';            
-            }
-        };
 
         function toggleSidebar() {                      
             const isActive = sidebar.classList.toggle('active');            
