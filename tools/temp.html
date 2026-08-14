@@ -1,851 +1,123 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>    
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandarin Vocabulary Analyzer & Reading Viewer</title>
-    <!-- Favicon settings -->
-    <link rel="icon" type="image/png" href="https://sujinohkor.pages.dev/assets/LOGO-orange.png">
-    <!-- OpenCC-JS (간체/번체 변환용) -->
-    <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
-    <!-- pinyin-pro (성조가 포함된 정확한 병음 변환용 라이브러리) -->
-    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.16.0/dist/index.js"></script>
+    <title>Architecture Schema Builder</title>
     <style>
-        /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }
-                
-        .app-container { display: flex; min-height: 100vh; width: 100%; }
-
-        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
-        .sidebar { 
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
-            background: rgba(16, 16, 16, 0.25); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            padding: 25px 20px; z-index: 2000; 
-            display: flex; flex-direction: column; gap: 12px; 
-            border: 1px solid rgba(255, 158, 64, 0.35); 
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
-            overflow-y: auto;
-        }
-        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
-
-        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
-        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
-        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-
-        /* 메인 콘텐츠 영역 */
-        .main-content { 
-            margin-left: 300px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; 
-            gap: 20px; overflow: hidden; transition: 0.3s; 
-            width: calc(100% - 300px);
-        }
-
-        .menu-btn { 
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
-            display: flex; align-items: center; justify-content: center; line-height: 1;
-        }
-        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-        .menu-btn.active-guide { background: rgba(255, 158, 64, 0.3); border-color: rgba(255, 158, 64, 0.8); }
-
-        .mode-btn {
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
-            display: flex; align-items: center; justify-content: center; line-height: 1;
-        }
-        .mode-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
-        
-        .mode-btn.active-mode {
-            background: #ff9e40;
-            color: #101010;
-            border-color: #ff9e40;
-        }
-
-        .workspace-container {
-            display: flex;
-            flex-direction: row;
-            flex: 1;
-            gap: 20px;
-            min-height: 0;
-            position: relative;
-        }
-
-        .content-left { 
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow: hidden; padding: 20px; background: transparent; gap: 15px; 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-        }
-                
-        .content-right { 
-            flex: 1.6; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
-            overflow: hidden; padding: 25px; background: transparent; gap: 15px; 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .calc-card {
-            background: #1c1c1c;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex: 1;
-            min-height: 0;
-            position: relative;
-        }
-        .calc-card h3 {
-            font-size: 0.9rem;
-            color: #ff9e40;
-            flex-shrink: 0;
-        }
-
-        /* 번역 언어 선택 콤보박스 스타일 */
-        .lang-select {
-            background: #202020;
-            color: #ff9e40;
-            border: 1px solid #ff9e40;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s;
-        }
-        .lang-select:hover {
-            background: #ff9e40;
-            color: #101010;
-        }
-
-        /* 입력기 영역 스타일 통합 */
-        .candidate-box {
-            min-height: 45px; background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 158, 64, 0.25);
-            display: flex; align-items: center; justify-content: space-between; padding: 8px 15px; font-size: 0.9rem;
-            border-radius: 8px 8px 0 0;
-        }
-        .candidates-list { display: flex; gap: 8px; flex-wrap: wrap; min-height: 24px; align-items: center; flex: 1; }
-        .candidate-item {
-            background: rgba(255, 158, 64, 0.15); border: 1px solid rgba(255, 158, 64, 0.4);
-            color: #fff; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; transition: 0.2s;
-        }
-        .candidate-item:hover, .candidate-item.selected { background: #ff9e40; color: #101010; }
-        .page-indicator { font-size: 0.8rem; color: #ff9e40; margin-left: 10px; white-space: nowrap; font-weight: bold; }
-
-        .editor-wrapper { display: flex; width: 100%; flex: 1; overflow: hidden; position: relative; }
-        .line-numbers { 
-            width: 45px; padding: 12px 10px 12px 0; background: rgba(0, 0, 0, 0.2); 
-            color: #666; font-family: 'Consolas', sans-serif; font-size: 1rem; 
-            text-align: right; user-select: none; overflow: hidden; line-height: 1.5; 
-        }
-        textarea.viewer-textarea {
-            flex: 1; height: 100%; min-height: 200px;
-            padding: 12px; font-size: 16px;
-            background: transparent; color: #fff;
-            border: none; border-radius: 8px;
-            resize: none; outline: none;
-            line-height: 1.5;
-            white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word;
-            overflow-y: auto; overflow-x: hidden;
-            font-family: 'Consolas', sans-serif;
-        }
-        #ruby-viewer {
-            position: absolute; top: 0; left: 45px; right: 0; bottom: 0;
-            padding: 12px; background: #202020; color: #fff;
-            font-family: 'Segoe UI', sans-serif; font-size: 1.5rem; 
-            line-height: 2.8;
-            white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word;
-            overflow-y: auto; overflow-x: hidden;
-            display: none; z-index: 5;
-        }
-        ruby { ruby-position: over; -webkit-ruby-position: over; display: inline-ruby; text-align: center; margin: 0 4px; }
-        rt { font-size: 0.7rem; color: #ff9e40; font-family: 'Consolas', sans-serif; font-weight: normal; }
-
-        /* HSK 및 TOCFL 레벨 스타일 */
-        .hsk-1 { background-color: #1a365d; color: #90cdf4; }
-        .hsk-2 { background-color: #1c4532; color: #9ae6b4; }
-        .hsk-3 { background-color: #593e1a; color: #fbd38d; }
-        .hsk-4 { background-color: #522d1f; color: #fbd38d; }
-        .hsk-5 { background-color: #5b2121; color: #feb2b2; }
-        .hsk-6 { background-color: #3b2c56; color: #d6bcfa; }
-        .hsk-7 { background-color: #1a4944; color: #4fd1c5; }
-        .hsk-unknown { background-color: transparent; color: inherit; }
-
-        .novice-1 { background-color: #1a365d; color: #90cdf4; }
-        .novice-2 { background-color: #1c4532; color: #9ae6b4; }
-        .level-1 { background-color: #593e1a; color: #fbd38d; }
-        .level-2 { background-color: #522d1f; color: #fbd38d; }
-        .level-3 { background-color: #5b2121; color: #feb2b2; }
-        .level-4 { background-color: #3b2c56; color: #d6bcfa; }
-        .level-5 { background-color: #1a4944; color: #4fd1c5; }
-        .tocfl-unknown { background-color: transparent; color: inherit; }
-
-        .word-span { position: relative; cursor: pointer; padding: 2px 4px; margin: 0 1px; border-radius: 3px; display: inline; }
-        .word-char { display: inline; }
-
-        #global-tooltip {
-            position: fixed; z-index: 99999; width: 220px;
-            background-color: #222; color: #fff; text-align: center;
-            border-radius: 6px; padding: 8px; font-size: 13px;
-            border: 1px solid #ff9e40; box-shadow: 0px 4px 6px rgba(0,0,0,0.5);
-            pointer-events: none; display: none; opacity: 0; transition: opacity 0.2s ease;
-        }
-
-        #viewerResult {
-            line-height: 2.2; font-size: 18px; padding: 15px;
-            background: #202020; border: 1px solid #333; border-radius: 8px;
-            height: 100%; overflow-y: auto; overflow-x: hidden;
-            word-break: keep-all; overflow-wrap: break-word; white-space: pre-wrap;
-        }
-
-        #translationResult {
-            line-height: 1.6; font-size: 15px; padding: 15px;
-            background: #202020; border: 1px solid #333; border-radius: 8px;
-            height: 100%; overflow-y: auto; overflow-x: hidden;
-            word-break: keep-all; overflow-wrap: break-word; white-space: pre-wrap;
-        }
-
-        .mini-action-btn {
-            background: #202020; color: #ff9e40; border: 1px solid #ff9e40; 
-            padding: 5px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; 
-            cursor: pointer; transition: all 0.3s; 
-        }
-        .mini-action-btn:hover { background: #ff9e40; color: #101010; }
-
-        /* Light Mode */
-        body.light-mode { background-color: #fff; color: #202020; }
-        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.3); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn, body.light-mode .mode-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover, body.light-mode .mode-btn:hover { background: rgba(243, 128, 32, 0.15); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
-        body.light-mode .mode-btn.active-mode { background: #F38020; color: #fff; border-color: #F38020; }
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
-        body.light-mode .content-left, body.light-mode .content-right, body.light-mode .calc-card { background-color: #fafafa; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
-        body.light-mode textarea.viewer-textarea { color: #000; }
-        body.light-mode .line-numbers { background: rgba(0, 0, 0, 0.05); color: #999; }
-        body.light-mode #viewerResult { background: #fff; color: #202020; border-color: #ccc; }
-        body.light-mode #translationResult { background: #fff; color: #202020; border-color: #ccc; }
-        body.light-mode #global-tooltip { background-color: #fff; color: #202020; border-color: #F38020; box-shadow: 0px 4px 10px rgba(243, 128, 32, 0.2); }
-        body.light-mode .candidate-box { background: rgba(0, 0, 0, 0.02); border-bottom-color: rgba(243, 128, 32, 0.35); }
-        body.light-mode .candidate-item { background: rgba(243, 128, 32, 0.1); border-color: rgba(243, 128, 32, 0.4); color: #202020; }
-        body.light-mode .candidate-item:hover, body.light-mode .candidate-item.selected { background: #F38020; color: #fff; }
-        body.light-mode #ruby-viewer { background: #fff; color: #202020; }
-        body.light-mode rt { color: #F38020; }
-        body.light-mode .editor-wrapper { background: #fff !important; border-color: #ccc !important; }
-        body.light-mode textarea.viewer-textarea { color: #202020 !important; }
-        body.light-mode .candidate-box { background: #f5f5f5 !important; border-bottom-color: rgba(243, 128, 32, 0.35) !important; }
-        body.light-mode .mini-action-btn { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .mini-action-btn:hover { background: #F38020; color: #fff; border-color: #F38020; }
-        
-        body.light-mode .lang-select { background: #FDF5E6; color: #e68a35; border-color: #e68a35; }
-        body.light-mode .lang-select:hover { background: #F38020; color: #fff; border-color: #F38020; }
-
-        body.light-mode .hsk-1 { background-color: #ebf8ff; color: #2b6cb0; }
-        body.light-mode .hsk-2 { background-color: #f0fff4; color: #22543d; }
-        body.light-mode .hsk-3 { background-color: #fffaf0; color: #744210; }
-        body.light-mode .hsk-4 { background-color: #fefcbf; color: #744210; }
-        body.light-mode .hsk-5 { background-color: #fff5f5; color: #742a2a; }
-        body.light-mode .hsk-6 { background-color: #faf5ff; color: #44337a; }
-        body.light-mode .hsk-7 { background-color: #e6fffa; color: #234e52; }
-
-        body.light-mode .novice-1 { background-color: #ebf8ff; color: #2b6cb0; }
-        body.light-mode .novice-2 { background-color: #f0fff4; color: #22543d; }
-        body.light-mode .level-1 { background-color: #fffaf0; color: #744210; }
-        body.light-mode .level-2 { background-color: #fefcbf; color: #744210; }
-        body.light-mode .level-3 { background-color: #fff5f5; color: #742a2a; }
-        body.light-mode .level-4 { background-color: #faf5ff; color: #44337a; }
-        body.light-mode .level-5 { background-color: #e6fffa; color: #234e52; }
-
-        /* Mobile Responsive */
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 3000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }
-        @media (max-width: 900px) {
-            body { overflow: auto; height: auto; }                
-            .menu-toggle-btn { display: block; }                
-            .sidebar { 
-                transform: translateX(-320px); background: #101010 !important; 
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
-            }                
-            body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }
-            .sidebar.active { transform: translateX(0); }                
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow: visible; }                
-            .workspace-container { flex-direction: column; overflow: visible; }                
-            .content-left { height: auto; min-height: 300px; }                
-            .content-right { height: auto; min-height: 500px; }                
-        }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { padding: 20px 30px; border-bottom: 1px solid rgba(255, 158, 64, 0.3); display: flex; justify-content: space-between; align-items: center; background: #181818; }
+        h1 { color: #ff9e40; font-size: 1.2rem; letter-spacing: 1px; }
+        .canvas-container { flex: 1; position: relative; background: radial-gradient(circle, #222 1px, transparent 1px) #101010; background-size: 20px 20px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; }
+        .info-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(20, 20, 20, 0.85); border: 1px solid #ff9e40; padding: 15px 20px; border-radius: 12px; backdrop-filter: blur(10px); max-width: 300px; }
+        .info-panel h3 { color: #ff9e40; font-size: 0.95rem; margin-bottom: 6px; }
+        .info-panel p { font-size: 0.8rem; color: #ccc; line-height: 1.4; }
     </style>
 </head>
 <body>
-<button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-<div class="app-container">
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-title">Mandarin Voca Analyzer</div>
-        <div class="sidebar-top">
-            <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+    <header>
+        <h1>System Architecture Schema</h1>
+    </header>
+    <div class="canvas-container">
+        <canvas id="schemaCanvas"></canvas>
+        <div class="info-panel">
+            <h3>Structure Guide</h3>
+            <p>클라이언트 앱들이 Cloudflare Workers, Firebase, Apps Script 등 백엔드 인프라와 연결되는 구조를 나타낸 모식도입니다. 노드를 드래그하여 이동할 수 있습니다.</p>
         </div>
-        <button class="menu-btn" onclick="location.href='../index'">Home</button>
-        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
-            <button class="mode-btn active-mode" id="btnHsk" onclick="switchMode('hsk')">HSK (简体)</button>
-            <button class="mode-btn" id="btnTocfl" onclick="switchMode('tocfl')">TOCFL (繁體)</button>
-        </div>
-        <button class="menu-btn" id="guide-toggle-btn" onclick="togglePinyinGuide()">Pinyin Guide View</button>
-        <button class="menu-btn" id="resetBtn" onclick="resetAll()">Reset</button>
-    </aside>
-    <main class="main-content" id="main-content">
-        <header class="top-section">
-            <h1>Mandarin Vocabulary Analyzer & Reading Viewer</h1>
-            <p>Type pinyin to input Chinese text and analyze words by HSK/TOCFL level.</p>
-        </header>
+    </div>
 
-        <div class="workspace-container">
-            <!-- Left Panel: Text Input with Pinyin Converter -->
-            <section class="content-left">
-                <div class="calc-card" style="border:none; padding:0; background:transparent; display:flex; flex-direction:column; height:100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; margin-bottom: 5px;">
-                        <h3>Text Input</h3>
-                        <button class="mini-action-btn" onclick="analyzeText()">Analyze</button>
-                    </div>
-                    
-                    <!-- 병음 입력 후보군 박스 -->
-                    <div class="candidate-box">
-                        <div id="candidates-container" class="candidates-list">
-                            <span style="color: #666; font-size: 0.85rem;">Candidates will appear as you type...</span>
-                        </div>
-                        <div id="page-indicator" class="page-indicator" style="display: none;"></div>
-                    </div>
+    <script>
+        const canvas = document.getElementById('schemaCanvas');
+        const ctx = canvas.getContext('2d');
 
-                    <div class="editor-wrapper" style="flex: 1; border: 1px solid #333; border-radius: 0 0 8px 8px; background: #202020;">
-                        <div id="line-numbers" class="line-numbers">1</div>
-                        <textarea id="text-input" class="viewer-textarea" placeholder="Type Chinese pinyin or text here..." autocomplete="off" spellcheck="false"></textarea>
-                        <div id="ruby-viewer"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Right Panel: Analysis Results & Translation (Split Top/Bottom) -->
-            <section class="content-right">
-                <!-- 상단: 어휘 분석 결과 -->
-                <div class="calc-card" style="flex: 1.2; border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:8px; min-height:0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-                        <h3>Viewer Results</h3>
-                    </div>
-                    <div id="viewerResult" style="flex: 1; overflow-y: auto;">Analysis results will appear here.</div>
-                </div>
-
-                <!-- 하단: 번역 결과 영역 -->
-                <div class="calc-card" style="flex: 0.8; border:none; padding:0; background:transparent; display:flex; flex-direction:column; gap:8px; min-height:0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-                        <h3>Translation</h3>
-                        <!-- 번역 언어 선택 콤보박스 추가 -->
-                        <select id="target-lang" class="lang-select" onchange="updateTranslation()">
-                            <option value="ko" selected>한국어 (Korean)</option>
-                            <option value="en">영어 (English)</option>
-                            <option value="ja">일본어 (Japanese)</option>
-                            <option value="zh-CN">중국어 간체 (Chinese S.)</option>
-                            <option value="zh-TW">중국어 번체 (Chinese T.)</option>
-                        </select>
-                    </div>
-                    <div id="translationResult" style="flex: 1; overflow-y: auto;">Translation results will appear here.</div>
-                </div>
-            </section>
-        </div>
-    </main>
-</div>
-
-<!-- 최상위 Body 전역 툴팁 요소 생성 -->
-<div id="global-tooltip"></div>
-
-<script>
-    const sidebar = document.getElementById('sidebar');
-    function toggleSidebar() { sidebar.classList.toggle('active'); }
-
-    // 모바일에서 사이드바 내부 버튼 클릭 시 닫기
-    sidebar.querySelectorAll('button').forEach(element => {
-        element.addEventListener('click', () => {
-            if (window.innerWidth <= 900) {
-                sidebar.classList.remove('active');
-            }
-        });
-    });
-
-    // 모바일에서 사이드바 외부 영역 클릭 시 닫기
-    const mainContent = document.getElementById('main-content');
-    mainContent.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('active')) {
-            sidebar.classList.remove('active');
+        function resize() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            draw();
         }
-    });
+        window.addEventListener('resize', resize);
 
-    document.getElementById('theme-toggle').addEventListener('click', () => { 
-        document.body.classList.toggle('light-mode'); 
-    });
+        // 노드 및 연결 정의
+        const nodes = [
+            { id: 'client', label: 'Client Apps (50+)', x: 150, y: 250, color: '#ff9e40', type: 'Frontend' },
+            { id: 'workers', label: 'Cloudflare Workers', x: 450, y: 130, color: '#f38020', type: 'Backend' },
+            { id: 'firebase', label: 'Firebase Backend', x: 450, y: 250, color: '#ffca28', type: 'Database' },
+            { id: 'appscript', label: 'Google Apps Script', x: 450, y: 370, color: '#34a853', type: 'Automation' },
+            { id: 'opensource', label: 'Open Source Libs', x: 150, y: 100, color: '#64748b', type: 'Library' }
+        ];
 
-    const WORKER_URL = "https://mandarin-segmenter.sujinohkor.workers.dev";
-    const PROXY_URL = "https://pinyin-proxy.sujinohkor.workers.dev";
-    const globalTooltip = document.getElementById('global-tooltip');
+        const connections = [
+            { from: 'client', to: 'workers' },
+            { from: 'client', to: 'firebase' },
+            { from: 'client', to: 'appscript' },
+            { from: 'opensource', to: 'client' }
+        ];
 
-    const textInput = document.getElementById('text-input');
-    const rubyViewer = document.getElementById('ruby-viewer');
-    const guideToggleBtn = document.getElementById('guide-toggle-btn');
-    const candidatesContainer = document.getElementById('candidates-container');
-    const pageIndicator = document.getElementById('page-indicator');
-    const lineNumbers = document.getElementById('line-numbers');
-    const translationResult = document.getElementById('translationResult');
-    const targetLangSelect = document.getElementById('target-lang');
+        let draggedNode = null;
+        let offsetX = 0, offsetY = 0;
 
-    let currentMode = 'hsk'; // 'hsk' (간체) 또는 'tocfl' (번체)
-    let currentMatches = [];
-    let currentPinyinToken = ''; 
-    let currentPinyinStart = 0; 
-    let currentPage = 0;
-    let isGuideMode = false;
-    const pageSize = 9;
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const toTraditional = OpenCC.Converter({ from: 'cn', to: 't' });
-    const toSimplified = OpenCC.Converter({ from: 't', to: 'cn' });
-
-    const punctuationMap = {
-        '.': ['。', '…', '·'],
-        ',': ['，', '、', '·'],
-        '?': ['？'],
-        '!': ['！'],
-        '"': ['“', '”', '『', '』'],
-        "'": ['‘', '’', '「', '」'],
-        '~': ['～', '〜'],
-        ':': ['：'],
-        ';': ['；'],
-        '-': ['—', '–', '-']
-    };
-
-    function switchMode(type) {
-        currentMode = type;
-        const btnHsk = document.getElementById('btnHsk');
-        const btnTocfl = document.getElementById('btnTocfl');
-    
-        if (type === 'hsk') {
-            btnHsk.classList.add('active-mode');
-            btnTocfl.classList.remove('active-mode');
-        } else {
-            btnTocfl.classList.add('active-mode');
-            btnHsk.classList.remove('active-mode');
-        }
-
-        let text = textInput.value;
-        if (text) {
-            textInput.value = type === 'tocfl' ? toTraditional(text) : toSimplified(text);
-            updateEditorState();
-        }
-    }
-
-    function togglePinyinGuide() {
-        isGuideMode = !isGuideMode;
-        guideToggleBtn.classList.toggle('active-guide', isGuideMode);
-        if (isGuideMode) {
-            textInput.style.display = 'none';
-            lineNumbers.style.display = 'none';
-            rubyViewer.style.display = 'block';
-            updatePinyinGuide();
-        } else {
-            textInput.style.display = 'block';
-            lineNumbers.style.display = 'block';
-            rubyViewer.style.display = 'none';
-            textInput.focus();
-        }
-    }
-
-    function updatePinyinGuide() {
-        const text = textInput.value;
-        if (!text.trim()) {
-            rubyViewer.innerHTML = '<span style="color: #666; font-size: 0.9rem;">No text to display...</span>';
-            return;
-        }
-
-        let htmlResult = '';
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            if (char === '\n') {
-                htmlResult += '<br>';
-                continue;
-            }
-            if (char === ' ' || /[\u0000-\u007F]/.test(char) || /[0-9\s\p{P}]/u.test(char)) {
-                htmlResult += char;
-                continue;
-            }
-
-            const pinyin = pinyinPro.pinyin(char, { toneType: 'symbol', type: 'string' });
-            if (pinyin) {
-                htmlResult += `<ruby>${char}<rt>${pinyin}</rt></ruby>`;
-            } else {
-                htmlResult += char;
-            }
-        }
-        rubyViewer.innerHTML = htmlResult;
-    }
-
-    let debounceTimer;
-    textInput.addEventListener('input', (e) => {
-        const val = textInput.value;
-        const cursorPos = textInput.selectionStart;
-
-        const charBeforeCursor = val[cursorPos - 1];
-        if (punctuationMap[charBeforeCursor]) {
-            currentPinyinStart = cursorPos - 1;
-            currentPinyinToken = charBeforeCursor;
-            currentMatches = punctuationMap[charBeforeCursor];
-            currentPage = 0;
-            renderCandidates();
-            updateEditorState();
-            return;
-        }
-
-        let start = cursorPos;
-        while (start > 0 && /[a-zA-Z]/.test(val[start - 1])) {
-            start--;
-        }
-
-        currentPinyinStart = start;
-        currentPinyinToken = val.substring(start, cursorPos).toLowerCase();
-        if (!currentPinyinToken) {
-            clearCandidates();
-            return;
-        }
-
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(async () => {
-            if (!currentPinyinToken) return;
-            try {
-                const res = await fetch(`${PROXY_URL}?text=${encodeURIComponent(currentPinyinToken)}`);
-                const data = await res.json();
-
-                if (data && data[0] === 'SUCCESS' && data[1]) {
-                    let matches = [];
-                    data[1].forEach(block => {
-                        if (Array.isArray(block)) {
-                            block.forEach(sub => {
-                                if (Array.isArray(sub)) {
-                                    sub.forEach(val => {
-                                        if (Array.isArray(val)) {
-                                            matches = matches.concat(val);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-
-                    let uniqueMatches = [...new Set(matches.filter(item => typeof item === 'string' && item.length > 0))];
-                    if (uniqueMatches.length === 0 && data[1][0] && data[1][0][1]) {
-                        uniqueMatches = data[1][0][1];
-                    }
-
-                    currentMatches = uniqueMatches.length > 0 ? uniqueMatches : [currentPinyinToken];
-                    currentPage = 0;
-                    renderCandidates();
-                } else {
-                    currentMatches = [currentPinyinToken];
-                    currentPage = 0;
-                    renderCandidates();
+            // 연결선 그리기
+            connections.forEach(conn => {
+                const fromNode = nodes.find(n => n.id === conn.from);
+                const toNode = nodes.find(n => n.id === conn.to);
+                if (fromNode && toNode) {
+                    ctx.beginPath();
+                    ctx.moveTo(fromNode.x, fromNode.y);
+                    ctx.bezierCurveTo(fromNode.x + 80, fromNode.y, toNode.x - 80, toNode.y, toNode.x, toNode.y);
+                    ctx.strokeStyle = '#444';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
                 }
-            } catch (err) {
-                console.error("Proxy fetch error:", err);
-            }
-        }, 150);
-
-        updateEditorState();
-    });
-
-    function clearCandidates() {
-        currentMatches = [];
-        currentPinyinToken = '';
-        currentPage = 0;
-        candidatesContainer.innerHTML = `<span style="color: #666; font-size: 0.85rem;">Candidates will appear as you type...</span>`;
-        pageIndicator.style.display = 'none';
-        updateEditorState();
-    }
-
-    function renderCandidates() {
-        candidatesContainer.innerHTML = '';
-        if (currentMatches.length === 0) {
-            pageIndicator.style.display = 'none';
-            return;
-        }
-
-        const totalPages = Math.ceil(currentMatches.length / pageSize);
-        const startIdx = currentPage * pageSize;
-        const pageItems = currentMatches.slice(startIdx, startIdx + pageSize);
-
-        pageItems.forEach((hanzi, index) => {
-            let converted = punctuationMap[currentPinyinToken] ? hanzi : (currentMode === 'tocfl' ? toTraditional(hanzi) : toSimplified(hanzi));
-            let btn = document.createElement('div');
-            btn.className = 'candidate-item' + (index === 0 ? ' selected' : '');
-            btn.innerHTML = `<b>${index + 1}</b>. ${converted}`;
-            btn.onclick = () => selectHanzi(converted);
-            candidatesContainer.appendChild(btn);
-        });
-
-        if (totalPages > 1) {
-            pageIndicator.style.display = 'block';
-            pageIndicator.textContent = `${currentPage + 1}/${totalPages}`;
-        } else {
-            pageIndicator.style.display = 'none';
-        }
-    }
-
-    function selectHanzi(hanzi) {
-        const val = textInput.value;
-        const cursorPos = textInput.selectionStart;
-                    
-        const newVal = val.substring(0, currentPinyinStart) + hanzi + val.substring(cursorPos);
-        textInput.value = newVal;
-                    
-        const newCursorPos = currentPinyinStart + hanzi.length;
-        textInput.setSelectionRange(newCursorPos, newCursorPos);
-                    
-        clearCandidates();
-        textInput.focus();
-        updateEditorState();
-    }
-
-    textInput.addEventListener('keydown', (e) => {
-        if (currentMatches.length > 0) {
-            if (e.key === 'Tab' || e.key === ' ') {
-                e.preventDefault();
-                const totalPages = Math.ceil(currentMatches.length / pageSize);
-                if (totalPages > 1) {
-                    currentPage = (currentPage + 1) % totalPages;
-                    renderCandidates();
-                }
-                return;
-            } else if (e.key === 'Enter') {
-                e.preventDefault();
-                const firstCandidate = candidatesContainer.querySelector('.candidate-item');
-                if (firstCandidate) firstCandidate.click();
-                return;
-            } else if (/^[1-9]$/.test(e.key)) {
-                const index = parseInt(e.key) - 1;
-                const candidateItems = candidatesContainer.querySelectorAll('.candidate-item');
-                if (candidateItems[index]) {
-                    e.preventDefault();
-                    candidateItems[index].click();
-                    return;
-                }
-            }
-        }
-    });
-
-    function updateEditorState() {
-        const text = textInput.value;
-        updateLineNumbers();
-        if (isGuideMode) updatePinyinGuide();
-    }
-
-    function updateLineNumbers() {
-        const text = textInput.value;
-        const lines = text.split('\n');
-        const measureDiv = document.createElement('div');
-        measureDiv.style.font = window.getComputedStyle(textInput).font;
-        measureDiv.style.width = (textInput.clientWidth - 40) + 'px';
-        measureDiv.style.visibility = 'hidden';
-        measureDiv.style.position = 'absolute';
-        measureDiv.style.whiteSpace = 'pre-wrap';
-        measureDiv.style.wordBreak = 'break-all';
-        document.body.appendChild(measureDiv);
-
-        let simpleResult = '';
-        let currentLine = 1;
-
-        lines.forEach((line) => {
-            measureDiv.textContent = line === '' ? ' ' : line;
-            const lineCount = Math.max(1, Math.round(measureDiv.clientHeight / parseFloat(window.getComputedStyle(textInput).lineHeight)));
-            for (let i = 0; i < lineCount; i++) {
-                simpleResult += (i === 0 ? currentLine : '&nbsp;') + '<br>';
-            }
-            currentLine++;
-        });
-
-        document.body.removeChild(measureDiv);
-        lineNumbers.innerHTML = simpleResult || '1';
-    }
-
-    textInput.addEventListener('scroll', () => { lineNumbers.scrollTop = textInput.scrollTop; });
-    window.addEventListener('resize', updateLineNumbers);
-
-    function getLevelClassName(level) {
-        if (!level) return 'tocfl-unknown';
-        const str = String(level).toLowerCase();
-        
-        if (str.includes('novice')) {
-            if (str.includes('1') || str.includes('一')) return 'novice-1';
-            if (str.includes('2') || str.includes('二')) return 'novice-2';
-        }
-        if (str.includes('level') || str.includes('級') || str.includes('级')) {
-            if (str.includes('1') || str.includes('一')) return 'level-1';
-            if (str.includes('2') || str.includes('二')) return 'level-2';
-            if (str.includes('3') || str.includes('三')) return 'level-3';
-            if (str.includes('4') || str.includes('四')) return 'level-4';
-            if (str.includes('5') || str.includes('五')) return 'level-5';
-        }
-        return 'tocfl-unknown';
-    }
-    
-    async function analyzeText() {
-        const text = textInput.value.trim();
-        const viewer = document.getElementById('viewerResult');
-        
-        if (!text) {
-            alert("Please enter some text.");
-            return;
-        }
-
-        viewer.innerHTML = "Analyzing...";
-        translationResult.innerHTML = "Translating...";
-
-        try {
-            const response = await fetch(WORKER_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ text: text, type: currentMode })
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to communicate with the server.");
-            }
-
-            const data = await response.json();
-            const tokens = data.tokens;
-            
-            let htmlOutput = '';
-            tokens.forEach(token => {
-                const parts = token.word.split('\n');
+            // 노드 그리기
+            nodes.forEach(node => {
+                ctx.fillStyle = '#1e293b';
+                ctx.strokeStyle = node.color;
+                ctx.lineWidth = 2;
                 
-                parts.forEach((part, index) => {
-                    if (index > 0) {
-                        htmlOutput += '<br>';
-                    }
+                const w = 160, h = 50;
+                ctx.fillRect(node.x - w/2, node.y - h/2, w, h);
+                ctx.strokeRect(node.x - w/2, node.y - h/2, w, h);
 
-                    if (part) {
-                        if (token.found) {
-                            let levelClass = '';
-                            if (currentMode === 'tocfl') {
-                                levelClass = getLevelClassName(token.level);
-                            } else {
-                                levelClass = `hsk-${token.level}`;
-                            }
-
-                            htmlOutput += `<span class="word-span ${levelClass}" data-level="${token.level}" data-pinyin="${token.pinyin}" data-translation="${token.translation}" data-translation-ko="${token.translationKo}">`;
-                            for (let i = 0; i < part.length; i++) {
-                                htmlOutput += `<span class="word-char">${part[i]}</span>`;
-                            }
-                            htmlOutput += `</span>`;
-                        } else {
-                            for (let i = 0; i < part.length; i++) {
-                                htmlOutput += `<span class="hsk-unknown">${part[i]}</span>`;
-                            }
-                        }
-                    }
-                });
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 13px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.label, node.x, node.y);
             });
-            
-            viewer.innerHTML = htmlOutput;
-            bindTooltipEvents();
-
-            // 분리된 번역 함수 호출
-            updateTranslation();
-
-        } catch (error) {
-            console.error(error);
-            viewer.innerHTML = "An error occurred. Please check the console.";
-            translationResult.innerHTML = "Translation failed.";
         }
-    }
 
-    // 언어 선택을 바꾸거나 분석할 때 호출되는 독립된 번역 함수
-    async function updateTranslation() {
-        const text = textInput.value.trim();
-        if (!text) return;
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-        translationResult.innerHTML = "Translating...";
-
-        try {
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbw14p-L4Y_bqarTgy5DO34WLzNgit1dlTnt6crk7bGrkS_VwrtqE9aptOhfF93u31Fn/exec";
-            const selectedLang = targetLangSelect.value;
-            
-            const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}&_t=${Date.now()}`);
-            
-            if (transRes.ok) {
-                const data = await transRes.json();
-                translationResult.innerHTML = data.translatedText || "No translation.";
-            } else {
-                translationResult.innerHTML = "Translation error.";
-            }
-        } catch (err) {
-            console.error("Translation fetch error:", err);
-            translationResult.innerHTML = "Translation failed.";
-        }
-    }
-
-    function bindTooltipEvents() {
-        const wordSpans = document.querySelectorAll('.word-span');
-        
-        wordSpans.forEach(span => {
-            span.addEventListener('mouseenter', (e) => {
-                const level = span.getAttribute('data-level');
-                const pinyin = span.getAttribute('data-pinyin');
-                const translation = span.getAttribute('data-translation');
-                const translationKo = span.getAttribute('data-translation-ko');
-                
-                globalTooltip.innerHTML = `<strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>${pinyin}<br>${translation}<br>${translationKo}`;
-                globalTooltip.style.display = 'block';
-                
-                const rect = span.getBoundingClientRect();
-                const tooltipRect = globalTooltip.getBoundingClientRect();
-                
-                let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-                let top = rect.top - tooltipRect.height - 8;
-                
-                if (top < 10) {
-                    top = rect.bottom + 8;
+            nodes.forEach(node => {
+                if (Math.abs(x - node.x) < 80 && Math.abs(y - node.y) < 25) {
+                    draggedNode = node;
+                    offsetX = x - node.x;
+                    offsetY = y - node.y;
                 }
-                
-                if (left < 10) {
-                    left = 10;
-                } else if (left + tooltipRect.width > window.innerWidth - 10) {
-                    left = window.innerWidth - tooltipRect.width - 10;
-                }
-                
-                globalTooltip.style.left = `${left}px`;
-                globalTooltip.style.top = `${top}px`;
-                globalTooltip.style.opacity = '1';
-            });
-            
-            span.addEventListener('mouseleave', () => {
-                globalTooltip.style.opacity = '0';
-                globalTooltip.style.display = 'none';
             });
         });
-    }
 
-    function resetAll() {
-        if (confirm('Are you sure you want to clear all text?')) {
-            textInput.value = '';
-            document.getElementById('viewerResult').innerHTML = 'Analysis results will appear here.';
-            translationResult.innerHTML = 'Translation results will appear here.';
-            clearCandidates();
-            globalTooltip.style.display = 'none';
-            if (isGuideMode) updatePinyinGuide();
-        }
-    }
+        canvas.addEventListener('mousemove', (e) => {
+            if (!draggedNode) return;
+            const rect = canvas.getBoundingClientRect();
+            draggedNode.x = (e.clientX - rect.left) * (canvas.width / rect.width) - offsetX;
+            draggedNode.y = (e.clientY - rect.top) * (canvas.height / rect.height) - offsetY;
+            draw();
+        });
 
-    updateLineNumbers();
-</script>
+        canvas.addEventListener('mouseup', () => { draggedNode = null; });
+
+        window.onload = resize;
+    </script>
 </body>
 </html>
