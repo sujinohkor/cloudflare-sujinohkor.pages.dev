@@ -317,9 +317,15 @@
                 <script type="application/json" class="app-meta">{
                     "desc": "A text analysis editor module that provides real-time calculation of character counts (with/without spaces), word counts, paragraph counts, and byte sizes, featuring local storage backup and text file download functionality.",
                     "deps": [
-                        "Vanilla JavaScript (ES6+)",
-                        "HTML5 DOM & Blob API",
-                        "Web LocalStorage API"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), event handling, etc.",
+                        "Web Storage API (localStorage) — Stores and restores text data directly in the browser",
+                        "Blob API — Creates and downloads text files (.txt)",
+                        "File/URL API (URL.createObjectURL) — Converts a Blob into a downloadable object URL",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, etc.",
+                        "HTML5 <textarea> — Provides the text input and editing area",
+                        "JavaScript Events API — Handles input, scroll, resize, click, and other events",
+                        "Web APIs (window / confirm / alert) — Uses built-in browser APIs for window operations, confirmation dialogs, and alert messages"
                     ],
                     "backends": [
                         "Static Hosting: Cloudflare Pages",
