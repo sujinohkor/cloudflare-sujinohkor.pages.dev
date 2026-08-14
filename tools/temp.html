@@ -229,7 +229,7 @@
             <div class="sidebar-title">App Inspector</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                    
+            </div>                                                
             <a href="../index" class="menu-btn">Home</a>
             
             <div class="menu-section-title">Applications (50)</div>
@@ -240,10 +240,10 @@
         
         <main class="main-content" id="main-content">
             <header class="top-section">
-                <h1 id="selectedAppTitle">App Architecture Inspector</h1>
-                <p id="selectedAppSub">좌측 목록에서 애플리케이션을 선택하여 상세 인프라 구성을 확인하세요.</p>
+                <h1>App Architecture Inspector</h1>
+                <p>App Architecture Inspector</p>
             </header>
-                        
+                    
             <section class="content-card" id="content-card">
                 <!-- 상세 내용 뷰어 영역 (Grid 구조) -->
                 <div class="detail-view">
@@ -344,8 +344,6 @@
         });
 
         const appListContainer = document.getElementById('appListContainer');
-        const selectedAppTitle = document.getElementById('selectedAppTitle');
-        const selectedAppSub = document.getElementById('selectedAppSub');
         const panelAppName = document.getElementById('panelAppName');
         const panelAppDesc = document.getElementById('panelAppDesc');
         const panelAppDeps = document.getElementById('panelAppDeps');
@@ -369,9 +367,6 @@
             document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            selectedAppTitle.textContent = app.name;
-            selectedAppSub.textContent = `Path: ${app.path}`;
-            
             panelAppName.textContent = `${app.name} (${app.slug})`;
             panelAppDesc.textContent = app.desc;
 
