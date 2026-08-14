@@ -230,7 +230,7 @@
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>                                                
-            <a href="/index" class="menu-btn">Home</a>
+            <a href="../index" class="menu-btn">Home</a>
             
             <div class="menu-section-title" id="menuSectionTitle">Applications</div>
             <div class="app-list-container" id="appListContainer">
@@ -325,7 +325,7 @@
 
         async function fetchAppsFromIndex() {
             try {
-                const response = await fetch('../index.html');
+                const response = await fetch('/index.html');
                 if (!response.ok) throw new Error('index.html을 불러오지 못했습니다.');
                 
                 const htmlText = await response.text();
