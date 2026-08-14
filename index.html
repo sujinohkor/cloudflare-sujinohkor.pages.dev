@@ -659,69 +659,105 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/mouse-effector" class="card" data-category="design">
                 <div class="icon">✨</div>
                 <h3>Mouse Effector</h3>
                 <p>mouse-effector</p>
                 <span class="arrow">Go to Mouse Effector →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based mouse effect generator and preview module that allows users to enter custom text and interactively preview multiple mouse effects, including character trails, falling/scattering text, and custom text cursors. It also generates the corresponding HTML/JavaScript implementation for each selected effect with syntax highlighting and one-click code copying.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "HTML5 DOM API — Used for DOM element selection, dynamic element creation, class manipulation, and event handling",
+                        "JavaScript Events API — Handles click, input, mousemove, mouseleave, scroll, and other browser events",
+                        "requestAnimationFrame API — Provides smooth real-time animation for mouse trails",
+                        "Clipboard API (navigator.clipboard) — Copies generated HTML/JavaScript code to the clipboard",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, transforms, backdrop-filter, shadows, and responsive layouts",
+                        "HTML5 Input API — Provides the text input field for custom effect text",
+                        "Browser Timing APIs (setTimeout, Date.now) — Controls effect timing, cooldown intervals, and element cleanup",
+                        "Window API — Uses window.innerWidth and browser-level mouse event handling for responsive behavior",
+                        "CSS Custom Classes — Controls dynamic states such as active menu items, light/dark mode, hidden cursor, and mouse effect elements"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: Browser JavaScript Runtime",
+                        "No Server-Side Backend: All effect generation, preview rendering, and code generation are performed locally in the browser"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/psd-ai-reader" class="card" data-category="design">
                 <div class="icon">🖼️</div>
                 <h3>PSD AI Reader</h3>
                 <p>psd-ai-reader</p>
                 <span class="arrow">Go to PSD AI Reader →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based PSD and AI file reader module that allows users to upload, drag and drop, preview, and convert PSD, AI, SVG, and image files directly in the browser. It uses PSD.js to parse and render PSD files, PDF.js to render PDF-compatible AI files onto an HTML5 canvas, supports image previews, displays file dimensions and parsing status, and provides PNG export functionality.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles file processing, UI state management, rendering logic, and application interactions without an application framework",
+                        "PSD.js — Parses Adobe Photoshop PSD files and converts PSD image data into PNG previews",
+                        "PDF.js 2.16.105 — Parses and renders PDF-compatible Adobe Illustrator (AI) files using the browser's canvas",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), class manipulation, dynamic element creation, and event handling",
+                        "File API — Provides access to user-selected files and file metadata through the browser",
+                        "FileReader API — Reads PSD and image files as ArrayBuffer or Data URL representations",
+                        "Blob / ArrayBuffer APIs — Handles binary file data for PSD and AI file processing",
+                        "HTML5 Canvas API — Renders PDF-compatible AI documents and converts rendered content to PNG",
+                        "Canvas 2D Rendering Context — Draws and exports AI document previews as rasterized images",
+                        "URL / Data URL APIs — Handles image data and browser-side preview/export operations",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, shadows, responsive layouts, and drag-and-drop visual states",
+                        "JavaScript Events API — Handles click, change, dragover, dragleave, drop, and other user interaction events",
+                        "Browser Web APIs (window / alert / console) — Uses built-in browser APIs for viewport detection, user notifications, and error logging"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: Browser JavaScript Runtime",
+                        "No Application Server: File parsing, rendering, preview generation, and PNG export are performed locally in the user's browser",
+                        "External CDN Dependencies: unpkg CDN and cdnjs CDN for PSD.js and PDF.js library delivery",
+                        "Local Library Fallback: /codes/psd-ai/psd.min.js and /codes/psd-ai/pdf.min.js"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/html-editor" class="card" data-category="dev">
                 <div class="icon">🖥️</div>
                 <h3>HTML Editor</h3>
                 <p>html-editor</p>
                 <span class="arrow">Go to HTML Editor →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based HTML editor module that provides real-time HTML, CSS, and JavaScript editing with live preview rendering, syntax highlighting, line numbering, code copying, local storage backup, HTML file download, and resizable editor/preview workspace modes.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "HTML5 DOM API — Used for DOM element selection, manipulation, dynamic content updates, and event handling",
+                        "Web Storage API (localStorage) — Stores and restores the user's HTML source code directly in the browser",
+                        "Blob API — Creates downloadable HTML files from the edited source code",
+                        "File/URL API (URL.createObjectURL / URL.revokeObjectURL) — Generates and releases temporary object URLs for HTML file downloads",
+                        "HTML5 <textarea> — Provides the editable source code input area",
+                        "HTML5 <iframe> — Renders the edited HTML/CSS/JavaScript code as a live preview",
+                        "HTML5 DOM Document API — Uses iframe.contentDocument and document.write() to update the live preview dynamically",
+                        "Clipboard API (navigator.clipboard) — Copies the current source code to the system clipboard",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, transforms, backdrop-filter, shadows, and responsive layouts",
+                        "JavaScript Events API — Handles input, keydown, scroll, click, and other user interaction events",
+                        "Regular Expressions (RegExp) — Implements custom syntax highlighting for HTML tags, attributes, strings, JavaScript keywords, built-ins, numbers, and comments",
+                        "Browser Web APIs (window / confirm / alert) — Uses viewport detection, confirmation dialogs, and browser notifications"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: Browser JavaScript Runtime",
+                        "Client Storage: Web LocalStorage",
+                        "No Application Server: Code editing, syntax highlighting, preview rendering, persistence, and file generation are performed locally in the browser"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/weather-time" class="card" data-category="utility">
                 <div class="icon">☀️</div>
                 <h3>Weather and Time</h3>
                 <p>weather-time</p>
                 <span class="arrow">Go to Weather and Time →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -735,12 +771,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/chrome-trex" class="card" data-category="fun">
                 <div class="icon trex-icon">🦖</div>
                 <h3>Chrome Dino Game</h3>
                 <p>chrome-trex</p>
                 <span class="arrow">Go to Chrome Dino Game →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -754,12 +790,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/glassmorphism" class="card" data-category="design">
                 <div class="icon">🫧</div>
                 <h3>Glassmorphism</h3>
                 <p>glassmorphism</p>
                 <span class="arrow">Go to Glassmorphism →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -773,12 +809,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/hwp-hwpx-editor" class="card" data-category="utility">
                 <div class="icon">🇰🇷</div>
                 <h3>HWP HWPX Editor</h3>
                 <p>hwp-hwpx-editor</p>
                 <span class="arrow">Go to HWP HWPX Editor →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -792,12 +828,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/markdown-editor" class="card" data-category="dev">
                 <div class="icon">🖥️</div>
                 <h3>Markdown Editor</h3>
                 <p>markdown-editor</p>
                 <span class="arrow">Go to Markdown Editor →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -811,12 +847,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/url-short" class="card" data-category="dev">
                 <div class="icon">🏷️</div>
                 <h3>URL Shortener</h3>
                 <p>url-short</p>
                 <span class="arrow">Go to URL Shortener →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -830,12 +866,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/bongsuk-nukki" class="card" data-category="design">
                 <div class="icon">✨</div>
                 <h3>AI BG Remover</h3>
                 <p>bongsuk-nukki</p>
                 <span class="arrow">Go to AI BG Remover →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -849,12 +885,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/image-explainer" class="card" data-category="utility">
                 <div class="icon">✨</div>
                 <h3>AI Img Explainer</h3>
                 <p>image-explainer</p>
                 <span class="arrow">Go to AI Img Explainer →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -868,12 +904,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/bongsuk-bongsuk" class="card" data-category="fun">
                 <div class="icon">❤️</div>
                 <h3>Bongsuk Bongsuk</h3>
                 <p>bongsuk-bongsuk</p>
                 <span class="arrow">Go to Bongsuk Bongsuk →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -887,12 +923,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/image-base64" class="card" data-category="design">
                 <div class="icon">🌀</div>
                 <h3>Image to Base64</h3>
                 <p>image-base64</p>
                 <span class="arrow">Go to Image to Base64 →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -906,12 +942,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/clock" class="card" data-category="utility">
                 <div class="icon">⏰</div>
                 <h3>Clock</h3>
                 <p>clock</p>
                 <span class="arrow">Go to Clock →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -925,12 +961,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/sticky-notes" class="card" data-category="utility">
                 <div class="icon">📌</div>
                 <h3>Sticky Notes</h3>
                 <p>sticky-notes</p>
                 <span class="arrow">Go to Sticky Notes →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -944,12 +980,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/mandarin-editor" class="card" data-category="utility">
                 <div class="icon">🍊</div>
                 <h3>Pinyin to Mandarin</h3>
                 <p>mandarin-editor</p>
                 <span class="arrow">Go to Pinyin to Mandarin →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -963,12 +999,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/diff-checker" class="card" data-category="utility">
                 <div class="icon">🔍</div>
                 <h3>Diff Checker</h3>
                 <p>diff-checker</p>
                 <span class="arrow">Go to Diff Checker →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -982,12 +1018,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/puny-url" class="card" data-category="dev">
                 <div class="icon">🔄</div>
                 <h3>Punycode and URL</h3>
                 <p>puny-url</p>
                 <span class="arrow">Go to Punycode and URL →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1001,12 +1037,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/code-formatter" class="card" data-category="dev">
                 <div class="icon">🪄</div>
                 <h3>Code Formatter</h3>
                 <p>code-formatter</p>
                 <span class="arrow">Go to Code Formatter →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1020,12 +1056,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/pixel-board" class="card" data-category="design">
                 <div class="icon">🖍️</div>
                 <h3>Pixel Board</h3>
                 <p>pixel-board</p>
                 <span class="arrow">Go to Pixel Board →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1039,12 +1075,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/emoji-canvas" class="card" data-category="design">
                 <div class="icon">👾</div>
                 <h3>Emoji Canvas</h3>
                 <p>emoji-canvas</p>
                 <span class="arrow">Go to Emoji Canvas →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1058,12 +1094,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/kpt-board" class="card" data-category="utility">
                 <div class="icon">🚀</div>
                 <h3>KPT Board</h3>
                 <p>kpt-board</p>
                 <span class="arrow">Go to KPT Board →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1077,12 +1113,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/treasure-hunt" class="card" data-category="fun">
                 <div class="icon">😊</div>
                 <h3>Treasure Hunt</h3>
                 <p>treasure-hunt</p>
                 <span class="arrow">Go to Treasure Hunt →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1096,12 +1132,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/win-solitaire" class="card" data-category="fun">
                 <div class="icon">👑</div>
                 <h3>Windows Solitaire</h3>
                 <p>win-solitaire</p>
                 <span class="arrow">Go to Windows Solitaire →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1115,12 +1151,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/html-visualizer" class="card" data-category="dev">
                 <div class="icon">🔗</div>
                 <h3>HTML Visualizer</h3>
                 <p>html-visualizer</p>
                 <span class="arrow">Go to HTML Visualizer →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1134,12 +1170,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/sorting-algo" class="card" data-category="dev">
                 <div class="icon">📊</div>
                 <h3>Sorting Algorithm</h3>
                 <p>sorting-algo</p>
                 <span class="arrow">Go to Sorting Algorithm →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1153,18 +1189,19 @@
                     ]
                 }</script>
             </a>
+            
             <!--<a href="https://sujinohkor.pages.dev/tools/pokemon" class="card" data-category="fun">
                 <div class="icon">🎮</div>
                 <h3>Pokemon Games</h3>
                 <p>pokemon</p>
                 <span class="arrow">Go to Pokemon Games →</span>
             </a>-->
+            
             <a href="https://sujinohkor.pages.dev/tools/yt-live-news" class="card" data-category="fun">
                 <div class="icon">📺</div>
                 <h3>YouTube Live News</h3>
                 <p>yt-live-news</p>
                 <span class="arrow">Go to Live News →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1178,12 +1215,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/starry-canvas" class="card" data-category="fun">
                 <div class="icon">🌟</div>
                 <h3>Starry Canvas</h3>
                 <p>starry-canvas</p>
                 <span class="arrow">Go to Starry Canvas →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1197,12 +1234,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/web-emulator" class="card" data-category="fun">
                 <div class="icon">🎮</div>
                 <h3>Retro Game Emulator</h3>
                 <p>web-emulator</p>
                 <span class="arrow">Go to Retro Game Emulator →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1216,12 +1253,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/solar-term" class="card" data-category="utility">
                 <div class="icon">🌞</div>
                 <h3>24 Solar Term</h3>
                 <p>solar-term</p>
                 <span class="arrow">Go to 24 Solar Term →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1235,12 +1272,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/interactive-effects" class="card" data-category="design">
                 <div class="icon">✨</div>
                 <h3>Interactive Effects</h3>
                 <p>interactive-effects</p>
                 <span class="arrow">Go to Interactive Effects →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1254,12 +1291,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/hanzi-dict" class="card" data-category="utility">
                 <div class="icon">📖</div>
                 <h3>Hanzi Dictionary</h3>
                 <p>hanzi-dict</p>
                 <span class="arrow">Go to Hanzi Dictionary →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1273,12 +1310,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/logic-builder" class="card" data-category="dev">
                 <div class="icon">💡</div>
                 <h3>Logic Builder</h3>
                 <p>logic-builder</p>
                 <span class="arrow">Go to Logic Builder →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1292,12 +1329,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/tower-defense" class="card" data-category="fun">
                 <div class="icon">🏰</div>
                 <h3>Tower Defense</h3>
                 <p>tower-defense</p>
                 <span class="arrow">Go to Tower Defense →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
@@ -1311,12 +1348,12 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/mandarin-voca-analyzer" class="card" data-category="utility">
                 <div class="icon">🀄</div>
                 <h3>Mandarin Analyzer</h3>
                 <p>mandarin-voca-analyzer</p>
                 <span class="arrow">Go to Mandarin Analyzer →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
                     "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
