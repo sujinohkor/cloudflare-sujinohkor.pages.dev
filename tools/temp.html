@@ -70,32 +70,51 @@ Color Picker (color-picker)
             const rawText = document.getElementById('inputText').value;
             const projects = parseText(rawText);
 
-            let startX = 100;
-            let startY = 100;
-            const boxWidth = 220;
-            const boxHeight = 80;
+            let startX = 60;
+            let startY = 60;
+            const boxWidth = 260;
+            const boxHeight = 110;
 
             projects.forEach((proj, index) => {
-                let x = startX + (index % 3) * 280;
-                let y = startY + Math.floor(index / 3) * 160;
+                let x = startX + (index % 3) * 300;
+                let y = startY + Math.floor(index / 3) * 140;
 
-                // 프로젝트 박스 그리기
+                // 상자 배경 및 테두리
                 ctx.fillStyle = '#1e293b';
                 ctx.strokeStyle = '#ff9e40';
                 ctx.lineWidth = 2;
                 ctx.fillRect(x, y, boxWidth, boxHeight);
                 ctx.strokeRect(x, y, boxWidth, boxHeight);
 
-                // 텍스트 출력
+                // 프로젝트 이름
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 13px Segoe UI';
                 ctx.fillText(proj.name, x + 15, y + 25);
 
+                // 구분선
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x + 15, y + 35);
+                ctx.lineTo(x + boxWidth - 15, y + 35);
+                ctx.stroke();
+
+                // 의존성 목록 출력
                 ctx.font = '11px Segoe UI';
-                ctx.fillStyle = '#aaa';
+                ctx.fillStyle = '#94a3b8';
                 proj.dependencies.forEach((dep, dIdx) => {
-                    if (dIdx < 2) {
-                        ctx.fillText(`- ${dep.length > 28 ? dep.substring(0, 25) + '...' : dep}`, x + 15, y + 45 + (dIdx * 16));
+                    if (dIdx < 3) {
+                        let displayDep = dep;
+                        if (displayDep.startsWith('https://')) {
+                            try {
+                                const url = new URL(displayDep);
+                                displayDep = url.pathname;
+                            } catch (e) {}
+                        }
+                        if (displayDep.length > 32) {
+                            displayDep = displayDep.substring(0, 29) + '...';
+                        }
+                        ctx.fillText(`• ${displayDep}`, x + 15, y + 55 + (dIdx * 18));
                     }
                 });
             });
