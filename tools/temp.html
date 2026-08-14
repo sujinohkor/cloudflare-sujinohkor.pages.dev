@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock</title>
+    <title>App Architecture Inspector</title>
     <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }                        
-        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
         
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+
         /* 모바일 백드롭 오버레이 */        
         .sidebar-backdrop {
             display: none;
@@ -24,37 +25,54 @@
             transition: opacity 0.3s ease;
         }
 
-        /* 완전 투명한 플로팅 사이드바 */        
-        .sidebar {             
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;             
-            background: rgba(16, 16, 16, 0.25);             
-            backdrop-filter: blur(16px);             
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
-            padding: 25px 20px; z-index: 1000;             
-            display: flex; flex-direction: column; gap: 12px;             
-            border: 1px solid rgba(255, 158, 64, 0.35);             
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, background 0.3s, border 0.3s;         
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
             overflow: hidden;
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; flex-shrink: 0; }
-        
-        /* DAY/NIGHT 버튼 최상단 배치 스타일 */        
-        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; flex-shrink: 0; }        
-        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }        
+
+        /* DAY/NIGHT 버튼 최상단 배치 스타일 (데스크톱용) */
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; flex-shrink: 0; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
 
         .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; flex-shrink: 0; }
 
-        /* 3. Components */        
-        .menu-btn {             
-            width: 100%; padding: 10px 14px; cursor: pointer; text-align: center;            
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);             
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;            
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
+        }
+
+        /* 3. Components */
+        .menu-btn { 
+            width: 100%; padding: 10px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center; line-height: normal; flex-shrink: 0;
-        }        
+        }
         .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bottom-btns > .menu-btn {
+            margin-bottom: 0;
+        }
 
         /* 앱 스크롤 리스트 컨테이너 */
         .app-list-container {
@@ -83,179 +101,136 @@
         .app-item.active .app-item-title { color: #fff; }
         .app-item-sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
 
-        /* 메인 콘텐츠 영역 */        
-        .main-content {             
-            margin-left: 300px; padding: 40px; flex: 1;             
-            display: flex; flex-direction: column; height: 100vh;             
-            gap: 20px; overflow: hidden; transition: 0.3s;             
-            width: calc(100% - 300px);
-        }
-
         .top-section h1 { color: #ff9e40; font-size: 1.5rem; margin-bottom: 5px; }
         .top-section p { color: #aaa; font-size: 0.9rem; }
 
-        .content-top {             
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px;             
-            display: flex; flex-direction: column; align-items: center; justify-content: center;            
-            background: rgba(255, 158, 64, 0.02); min-height: 140px; padding: 15px; position: relative;        
-        }        
-        .time-title { font-size: 1.1rem; color: #ff9e40; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }        
-        .time-display { font-size: 5rem; font-weight: bold; font-family: 'Consolas', monospace; color: #fff; text-align: center; width: 100%; word-break: break-all; line-height: 1.1; }        
-        .time-sub-group { margin-top: 8px; text-align: center; display: flex; gap: 12px; align-items: center; justify-content: center; }        
-        .time-sub { font-size: 1.1rem; color: #aaa; }        
-        .time-zone-sub { font-size: 1.1rem; color: #ff9e40; font-family: 'Consolas', monospace; font-weight: bold; }                        
-        
-        .content-down {             
-            flex: 2; display: flex; flex-direction: row; gap: 20px; overflow: hidden;         }                        
-        
-        /* Half-box 기본 스타일 설정 */        
-        .half-box {             
-            flex: 1; border: 2px solid #ff9e40; border-radius: 16px;             
-            overflow: hidden; display: flex; flex-direction: column; position: relative;            
-            background: rgba(255, 158, 64, 0.02); padding: 20px; align-items: center; justify-content: center;        
+        /* 도트무늬 배경 적용 카드 (content-card) */
+        .content-card {                     
+            border: 2px solid #ff9e40;                     
+            border-radius: 16px;                     
+            flex: 1;                     
+            display: flex;                     
+            flex-direction: column;
+            overflow: hidden;                     
+            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;
+            background-size: 20px 20px;
+            position: relative;             
+            transition: all 0.3s ease;
+        }
+
+        /* 상세 내용 뷰어 영역 (Grid 구조) */
+        .detail-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            padding: 30px;
+            overflow-y: auto;
+            z-index: 15;
+        }
+        .detail-panel {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .detail-panel.full-span {
+            grid-column: span 2;
+        }
+        .detail-panel h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 5px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); padding-bottom: 8px; }
+        .detail-section { display: flex; flex-direction: column; gap: 6px; }
+        .detail-section label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .detail-section p { font-size: 0.9rem; color: #ddd; line-height: 1.5; }
+        .detail-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .detail-section li { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; color: #fff; }
+
+        /* 다크 모드 카드/패널 그림자 */
+        .card, .content-card {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
         }
         
-        /* 전체화면 버튼 스타일 (우측 상단 고정) */        .fullscreen-btn {             
-            position: absolute;             
-            top: 15px;             
-            right: 15px;             
-            z-index: 10;             
-            background: #202020;             
-            color: #ff9e40;             
-            border: 1px solid #ff9e40;             
-            padding: 6px 14px;             
-            border-radius: 8px;             
-            cursor: pointer;             
-            font-size: 0.8rem;             
-            font-weight: bold;             
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
-            transition: all 0.3s;         }        
-        .fullscreen-btn:hover {             
-            background: #ff9e40;             
-            color: #101010;         }
+        body.light-mode .menu-btn, body.light-mode .theme-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .app-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(243, 128, 32, 0.2); }
+        body.light-mode .app-item-title { color: #F38020; }
+        body.light-mode .app-item.active { background: #F38020; border-color: #F38020; color: #fff; }
+        body.light-mode .app-item.active .app-item-title { color: #fff; }
+        body.light-mode .app-item.active .app-item-sub { color: #eee; }
+        body.light-mode .detail-panel { background: rgba(255, 255, 255, 0.9); border-color: rgba(243, 128, 32, 0.4); color: #202020; box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); }
+        body.light-mode .detail-panel h3 { color: #F38020; border-bottom-color: rgba(243, 128, 32, 0.2); }
+        body.light-mode .detail-section p { color: #444; }
+        body.light-mode .detail-section li { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.05); border-left-color: #F38020; color: #202020; }
+
+        body.light-mode .card, 
+        body.light-mode .content-card {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
         
-        /* 전체화면 활성화 클래스 (공통) */        .content-top.fullscreen, .half-box.fullscreen {             
-            position: fixed !important;             
-            top: 0 !important;             
-            left: 0 !important;             
-            right: 0 !important;             
-            bottom: 0 !important;             
-            width: 100vw !important;             
-            height: 100vh !important;             
-            z-index: 999 !important;             
-            border-radius: 0 !important;             
-            border: none !important;             
-            padding: 40px !important;             
-            margin: 0 !important;             
-            background: #101010 !important;         }
-        
-        /* 전체화면 상태일 때 다른 박스들의 버튼을 숨기는 클래스 */        body.has-fullscreen .fullscreen-btn:not(.active-fullscreen) {            display: none !important;        }
-        
-        .box-title { font-size: 1.1rem; color: #ff9e40; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }        
-        .tool-display { font-size: 5rem; font-weight: bold; font-family: 'Consolas', monospace; color: #fff; margin-bottom: 20px; text-align: center; line-height: 1.1; }                        
-        
-        .timer-inputs { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }        
-        .timer-inputs input {            
-            width: 90px; height: 80px; background: #151515; border: 2px solid #ff9e40; border-radius: 12px;            
-            color: #fff; font-size: 3rem; font-family: 'Consolas', monospace; text-align: center; outline: none;        }        
-        .timer-inputs span { font-size: 3rem; font-weight: bold; color: #ff9e40; }        
-        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 100%; }        
-        .control-btn {            
-            padding: 10px 24px; background: #202020; color: #ff9e40; border: 2px solid #ff9e40;            
-            border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem;        }        
-        .control-btn:hover { background: #ff9e40; color: #101010; }        
-        .laps-container {            
-            width: 100%; max-height: 120px; overflow-y: auto; margin-top: 15px; border-top: 1px solid rgba(255, 158, 64, 0.2);            
-            padding-top: 10px; font-family: 'Consolas', monospace; font-size: 0.95rem; color: #ccc; display: flex; flex-direction: column; gap: 5px; align-items: center;        }
-        
-        /* 다크 모드 카드/패널 그림자 */        .content-top, .half-box {            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);        }
-        
-        /* 4. Theme (Light Mode) */        body.light-mode { background-color: #fff; color: #202020; }        body.light-mode .sidebar {             
-            background: rgba(255, 255, 255, 0.3);             
-            border-color: rgba(243, 128, 32, 0.35);             
-            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15);         }                        
-        
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn {             
-            background: rgba(0, 0, 0, 0.02);             
-            color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.5);         }        
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover {             
-            background: rgba(243, 128, 32, 0.15);             
-            color: #F38020;             
-            border-color: rgba(243, 128, 32, 0.4);         }
-        
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }        
-        body.light-mode .time-display, body.light-mode .tool-display { color: #000; }        
-        body.light-mode .menu-toggle-btn { color: #ffffff; }        
-        body.light-mode .time-sub { color: #555; }        
-        body.light-mode .timer-inputs input { background: #fff; color: #000; }        
-        body.light-mode .content-top.fullscreen, body.light-mode .half-box.fullscreen { background: #fff !important; }                        
-        
-        body.light-mode .control-btn {            
-            background: rgba(0, 0, 0, 0.02);            
-            color: #F38020;            
-            border-color: rgba(243, 128, 32, 0.5);        }
-        body.light-mode .control-btn:hover {            
-            background: #F38020;            
-            color: #ffffff;        }
-        
-        body.light-mode .fullscreen-btn {             
-            background: #FDF5E6;             
-            color: #F38020;             
-            border-color: #F38020;         }        
-        body.light-mode .fullscreen-btn:hover {             
-            background: #F38020;             
-            color: #ffffff;         }        
-        body.light-mode .content-top, body.light-mode .half-box {            
-            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);        }
-        
-        /* 5. Mobile Responsive */        .menu-toggle-btn {             
-            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000;             
-            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px;             
-            font-weight: bold; cursor: pointer; color: #ffffff;         }                        
-        
-        @media (max-width: 900px) {             
-            .menu-toggle-btn { display: block; }             
-            .sidebar {                 
-                transform: translateX(-320px);                 
-                background: #101010 !important;                 
-                backdrop-filter: none !important;                
-                -webkit-backdrop-filter: none !important;                
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
                 z-index: 3000;
-            }             
-            body.light-mode .sidebar {                 
-                background: #ffffff !important;                 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
-            }            
-            .sidebar.active { transform: translateX(0); }             
+            }
+            .sidebar.active { transform: translateX(0); } 
             .sidebar-backdrop.active { display: block; opacity: 1; }
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; max-height: 100svh; overflow-y: auto; height: auto; }             
-            .content-top { min-height: 120px; padding: 10px; }             
-            .time-display { font-size: 2.3rem; }             
-            .content-down { flex-direction: column; flex: none; height: auto; min-height: auto; gap: 15px; }             
-            .half-box { padding: 15px 10px; }             
-            .tool-display { font-size: 2.5rem; margin-bottom: 15px; }             
-            .timer-inputs input { width: 55px; height: 50px; font-size: 1.6rem; border-radius: 8px; }             
-            .timer-inputs span { font-size: 1.6rem; }             
-            .control-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 15px; border-width: 1.5px; }             
-            .btn-group { gap: 5px; }             
-            .fullscreen-btn { padding: 4px 10px; font-size: 0.7rem; top: 10px; right: 10px; }         
-        }    
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; overflow: hidden; display: flex; flex-direction: column; } 
+            .detail-view { display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: auto; }
+        }
     </style>
 </head>
-<body>    
+<body>
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
     
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">Clock</div>
+            <div class="sidebar-title">App Architecture Inspector</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                                
-            <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <button class="menu-btn" onclick="fetchIPInfo()">Refresh Clock</button>
+            </div>                                    
+            <a href="../index" class="menu-btn">Home</a>
             
             <div class="menu-section-title">Applications (50)</div>
             <div class="app-list-container" id="appListContainer">
@@ -264,322 +239,81 @@
         </aside>
         
         <main class="main-content" id="main-content">
-            <header class="top-section">                
-                <h1>Clock</h1>                
-                <p>Live clock, customizable timer, and stopwatch.</p>            
-            </header>                                        
-            
-            <!-- Current Time Box -->            
-            <section class="content-top" id="time-box">                
-                <button class="fullscreen-btn" id="time-fullscreen-btn" onclick="toggleTimeFullscreen()">Maximize ⛶</button>                
-                <div class="time-title" id="time-title">CURRENT TIME (IP)</div>                
-                <div class="time-display" id="current-time">Loading...</div>                
-                <div class="time-sub-group">                    
-                    <span class="time-sub" id="time-sub-label">Syncing timezone...</span>                    
-                    <span class="time-zone-sub" id="time-zone-sub"></span>                
-                </div>            
-            </section>
-
-            <section class="content-down">                
-                <!-- 왼쪽 박스: 타이머 (99:59:59 지원) -->                
-                <div class="half-box" id="timer-box">                    
-                    <button class="fullscreen-btn" id="timer-fullscreen-btn" onclick="toggleTimerFullscreen()">Maximize ⛶</button>                    
-                    <div class="box-title">TIMER (Max 99:59:59)</div>                    
-                    <div class="timer-inputs" id="timer-input-area">                        
-                        <input type="number" id="t-hour" min="0" max="99" value="00" placeholder="HH">                        
-                        <span>:</span>                        
-                        <input type="number" id="t-min" min="0" max="59" value="05" placeholder="MM">                        
-                        <span>:</span>                        
-                        <input type="number" id="t-sec" min="0" max="59" value="00" placeholder="SS">                    
-                    </div>                    
-                    <div class="tool-display" id="timer-display" style="display: none;">00:05:00</div>                    
-                    <div class="btn-group">                        
-                        <button class="control-btn" id="timer-start-btn" onclick="startTimer()">Start</button>                        
-                        <button class="control-btn" onclick="pauseTimer()">Pause</button>                        
-                        <button class="control-btn" onclick="resetTimer()">Reset</button>                    
-                    </div>                
+            <header class="top-section">
+                <h1 id="selectedAppTitle">App Architecture Inspector</h1>
+                <p id="selectedAppSub">좌측 목록에서 애플리케이션을 선택하여 상세 인프라 구성을 확인하세요.</p>
+            </header>
+                        
+            <section class="content-card" id="content-card">
+                <!-- 상세 내용 뷰어 영역 (Grid 구조) -->
+                <div class="detail-view">
+                    <div class="detail-panel full-span">
+                        <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
+                        <div class="detail-section">
+                            <label>Description / Path</label>
+                            <p id="panelAppDesc">-</p>
+                        </div>
+                    </div>
+                    <div class="detail-panel">
+                        <h3>Libraries & Dependencies</h3>
+                        <div class="detail-section">
+                            <ul id="panelAppDeps">
+                                <li>-</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="detail-panel">
+                        <h3>Backend Infrastructure</h3>
+                        <div class="detail-section">
+                            <ul id="panelAppBackend">
+                                <li>-</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- 오른쪽 박스: 스톱워치 -->                
-                <div class="half-box" id="stopwatch-box">                    
-                    <button class="fullscreen-btn" id="stopwatch-fullscreen-btn" onclick="toggleStopwatchFullscreen()">Maximize ⛶</button>                    
-                    <div class="box-title">STOPWATCH</div>                    
-                    <div class="tool-display" id="stopwatch-display">00:00:00</div>                    
-                    <div class="btn-group">                        
-                        <button class="control-btn" onclick="startStopwatch()">Start</button>                        
-                        <button class="control-btn" onclick="pauseStopwatch()">Pause</button>                        
-                        <button class="control-btn" onclick="lapStopwatch()">Lap</button>                        
-                        <button class="control-btn" onclick="resetStopwatch()">Reset</button>                    
-                    </div>                    
-                    <div class="laps-container" id="laps-list"></div>                </div>            
-            </section>        
+            </section>
         </main>
     </div>
-
+    
     <script>
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('sidebar-backdrop');
         const mainContent = document.getElementById('main-content');
-        
-        const currentTimeElement = document.getElementById('current-time');
-        const timeTitleElement = document.getElementById('time-title');
-        const timeSubLabel = document.getElementById('time-sub-label');
-        const timeZoneSub = document.getElementById('time-zone-sub');
 
-        let timeInterval = null;        
-        let timeOffsetSeconds = null;
-
-        function toggleSidebar() {             
-            const isActive = sidebar.classList.toggle('active');            
-            if (isActive) {                
-                backdrop.classList.add('active');            
-            } else {                
-                backdrop.classList.remove('active');            
+        function toggleSidebar() { 
+            const isActive = sidebar.classList.toggle('active');
+            if (isActive) {
+                backdrop.classList.add('active');
+            } else {
+                backdrop.classList.remove('active');
             }
         }
 
-        function closeSidebar() {            
-            sidebar.classList.remove('active');            
+        function closeSidebar() { 
+            sidebar.classList.remove('active'); 
             backdrop.classList.remove('active'); 
         }
 
-        sidebar.querySelectorAll('button, a').forEach(element => {            
-            element.addEventListener('click', () => {                
-                if (window.innerWidth <= 900) {                    
+        sidebar.querySelectorAll('button, a').forEach(element => {
+            element.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
                     closeSidebar();
-                }            
-            });        });
+                }
+            });
+        });
 
-        document.getElementById('theme-toggle').addEventListener('click', () => {             
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
             document.body.classList.toggle('light-mode');
             if (window.innerWidth <= 900) closeSidebar();
         });
 
-        mainContent.addEventListener('click', () => {             
-            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {                 
+        mainContent.addEventListener('click', () => { 
+            if (window.innerWidth <= 900 && sidebar.classList.contains('active')) { 
                 closeSidebar(); 
-            }         
+            } 
         });
 
-        const timeBox = document.getElementById('time-box');        
-        const timeFullscreenBtn = document.getElementById('time-fullscreen-btn');                        
-        const timerBox = document.getElementById('timer-box');        
-        const timerFullscreenBtn = document.getElementById('timer-fullscreen-btn');        
-        const stopwatchBox = document.getElementById('stopwatch-box');        
-        const stopwatchFullscreenBtn = document.getElementById('stopwatch-fullscreen-btn');
-
-        function toggleTimeFullscreen() {            
-            timerBox.classList.remove('fullscreen');            
-            timerFullscreenBtn.classList.remove('active-fullscreen');            
-            timerFullscreenBtn.textContent = 'Maximize ⛶';
-
-            stopwatchBox.classList.remove('fullscreen');            
-            stopwatchFullscreenBtn.classList.remove('active-fullscreen');            
-            stopwatchFullscreenBtn.textContent = 'Maximize ⛶';
-
-            timeBox.classList.toggle('fullscreen');            
-            if (timeBox.classList.contains('fullscreen')) {                
-                timeFullscreenBtn.classList.add('active-fullscreen');                
-                timeFullscreenBtn.textContent = 'Minimize 🗗';                
-                document.body.classList.add('has-fullscreen');            
-            } else {                
-                timeFullscreenBtn.classList.remove('active-fullscreen');                
-                timeFullscreenBtn.textContent = 'Maximize ⛶';                
-                document.body.classList.remove('has-fullscreen');            
-            }        }
-
-        function toggleTimerFullscreen() {            
-            timeBox.classList.remove('fullscreen');            
-            timeFullscreenBtn.classList.remove('active-fullscreen');            
-            timeFullscreenBtn.textContent = 'Maximize ⛶';
-
-            stopwatchBox.classList.remove('fullscreen');            
-            stopwatchFullscreenBtn.classList.remove('active-fullscreen');            
-            stopwatchFullscreenBtn.textContent = 'Maximize ⛶';
-
-            timerBox.classList.toggle('fullscreen');            
-            if (timerBox.classList.contains('fullscreen')) {                
-                timerFullscreenBtn.classList.add('active-fullscreen');                
-                timerFullscreenBtn.textContent = 'Minimize 🗗';                
-                document.body.classList.add('has-fullscreen');            } else {                
-                timerFullscreenBtn.classList.remove('active-fullscreen');                
-                timerFullscreenBtn.textContent = 'Maximize ⛶';                
-                document.body.classList.remove('has-fullscreen');            }        }
-
-        function toggleStopwatchFullscreen() {            
-            timeBox.classList.remove('fullscreen');            
-            timeFullscreenBtn.classList.remove('active-fullscreen');            
-            timeFullscreenBtn.textContent = 'Maximize ⛶';
-
-            timerBox.classList.remove('fullscreen');            
-            timerFullscreenBtn.classList.remove('active-fullscreen');            
-            timerFullscreenBtn.textContent = 'Maximize ⛶';
-
-            stopwatchBox.classList.toggle('fullscreen');            
-            if (stopwatchBox.classList.contains('fullscreen')) {                
-                stopwatchFullscreenBtn.classList.add('active-fullscreen');                
-                stopwatchFullscreenBtn.textContent = 'Minimize 🗗';                
-                document.body.classList.add('has-fullscreen');            } else {                
-                stopwatchFullscreenBtn.classList.remove('active-fullscreen');                
-                stopwatchFullscreenBtn.textContent = 'Maximize ⛶';                
-                document.body.classList.remove('has-fullscreen');            }        }
-
-        function startTimeClock(offsetSeconds, labelText, tzString = "") {            
-            if (timeInterval) clearInterval(timeInterval);
-
-            function updateClock() {                
-                const now = new Date(new Date().getTime() + (offsetSeconds * 1000));                
-                const hours = String(now.getUTCHours()).padStart(2, '0');                
-                const minutes = String(now.getUTCMinutes()).padStart(2, '0');                
-                const seconds = String(now.getUTCSeconds()).padStart(2, '0');                
-                currentTimeElement.innerText = `${hours}:${minutes}:${seconds}`;            }
-
-            updateClock();            
-            timeInterval = setInterval(updateClock, 1000);            
-            timeSubLabel.innerText = labelText;            
-            timeZoneSub.innerText = tzString ? `(${tzString})` : "";        }
-
-        function formatTzOffset(offsetSeconds) {            
-            const hours = offsetSeconds / 3600;            
-            const sign = hours >= 0 ? "+" : "-";            
-            const absHours = Math.abs(hours).toString().padStart(2, '0');            
-            return `UTC ${sign}${absHours}:00`;        }
-
-        async function fetchIPInfo() {            
-            currentTimeElement.innerText = "Loading...";            
-            try {                
-                const response = await fetch('https://ipwho.is/');                
-                if (!response.ok) throw new Error('Network response was not ok');
-
-                const data = await response.json();                
-                if (!data.success) throw new Error(data.message || 'IP lookup failed');
-
-                let tzOffsetStr = "UTC";                
-                if (data.timezone && data.timezone.offset !== undefined) {                    
-                    timeOffsetSeconds = data.timezone.offset;                    
-                    tzOffsetStr = formatTzOffset(timeOffsetSeconds);                    
-                    timeTitleElement.innerText = "CURRENT TIME (IP)";                    
-                    startTimeClock(timeOffsetSeconds, data.timezone.id || "IP-based", tzOffsetStr);                
-                } else {                    
-                    timeOffsetSeconds = -new Date().getTimezoneOffset() * 60;                    
-                    tzOffsetStr = formatTzOffset(timeOffsetSeconds);                    
-                    startTimeClock(timeOffsetSeconds, "Local System", tzOffsetStr);                
-                }            } catch (error) {                
-                console.error("IP Fetch Error:", error);                
-                timeOffsetSeconds = -new Date().getTimezoneOffset() * 60;                
-                startTimeClock(timeOffsetSeconds, "Local System (Fallback)", formatTzOffset(timeOffsetSeconds));            }
-
-            if ("geolocation" in navigator) {                
-                navigator.geolocation.getCurrentPosition(                    
-                    (position) => {                        
-                        try {                            
-                            const browserOffset = -new Date().getTimezoneOffset() * 60;                            
-                            timeOffsetSeconds = browserOffset;                            
-                            const gpsTzStr = formatTzOffset(timeOffsetSeconds);                            
-                            timeTitleElement.innerText = "CURRENT TIME (GPS)";                            
-                            startTimeClock(timeOffsetSeconds, "Accurate GPS Location", gpsTzStr);                        } catch (e) {                            
-                            console.warn("GPS 타임존 계산 실패", e);                        }                    },                    
-                    (geoError) => {                        
-                        console.warn("GPS 권한 거부 또는 조회 불가:", geoError);                    },                    
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }                );            }        }
-
-        /* --- TIMER LOGIC (Max 99:59:59) --- */        
-        let timerInterval = null;        
-        let totalSecondsLeft = 0;        
-        let isTimerRunning = false;
-
-        const tHourInput = document.getElementById('t-hour');        
-        const tMinInput = document.getElementById('t-min');        
-        const tSecInput = document.getElementById('t-sec');        
-        const timerDisplay = document.getElementById('timer-display');        
-        const timerInputArea = document.getElementById('timer-input-area');
-
-        function formatPad(num) {            
-            return String(num).padStart(2, '0');        }
-
-        function startTimer() {            
-            if (!isTimerRunning) {                
-                if (timerDisplay.style.display === "none") {                    
-                    let h = parseInt(tHourInput.value) || 0;                    
-                    let m = parseInt(tMinInput.value) || 0;                    
-                    let s = parseInt(tSecInput.value) || 0;
-
-                    if (h > 99) h = 99;                    
-                    if (m > 59) m = 59;                    
-                    if (s > 59) s = 59;
-
-                    totalSecondsLeft = (h * 3600) + (m * 60) + s;                    
-                    if (totalSecondsLeft <= 0) {                        
-                        alert("Please set a valid time up to 99:59:59.");                        
-                        return;                    
-                    }
-
-                    timerInputArea.style.display = "none";                    
-                    timerDisplay.style.display = "block";                }                
-                if (totalSecondsLeft > 0) {                    
-                    isTimerRunning = true;                    
-                    timerInterval = setInterval(() => {                        
-                        if (totalSecondsLeft > 0) {                            
-                            totalSecondsLeft--;                            
-                            updateTimerDisplay();                        } else {                            
-                            pauseTimer();                            
-                            alert("Timer Finished!");                        }                    }, 1000);                }            }        }
-
-        function updateTimerDisplay() {            
-            let h = Math.floor(totalSecondsLeft / 3600);            
-            let m = Math.floor((totalSecondsLeft % 3600) / 60);            
-            let s = totalSecondsLeft % 60;            
-            timerDisplay.innerText = `${formatPad(h)}:${formatPad(m)}:${formatPad(s)}`;        }
-
-        function pauseTimer() {            
-            isTimerRunning = false;            
-            clearInterval(timerInterval);        }
-
-        function resetTimer() {            
-            pauseTimer();            
-            timerDisplay.style.display = "none";            
-            timerInputArea.style.display = "flex";            
-            tHourInput.value = "00";            
-            tMinInput.value = "05";            
-            tSecInput.value = "00";        }
-
-        /* --- STOPWATCH LOGIC --- */        
-        let swInterval = null;        
-        let swTotalSeconds = 0;        
-        let isSwRunning = false;        
-        const stopwatchDisplay = document.getElementById('stopwatch-display');        
-        const lapsList = document.getElementById('laps-list');
-
-        function startStopwatch() {            
-            if (!isSwRunning) {                
-                isSwRunning = true;                
-                swInterval = setInterval(() => {                    
-                    swTotalSeconds++;                    
-                    updateStopwatchDisplay();                }, 1000);            }        }
-
-        function updateStopwatchDisplay() {            
-            let h = Math.floor(swTotalSeconds / 3600);            
-            let m = Math.floor((swTotalSeconds % 3600) / 60);            
-            let s = swTotalSeconds % 60;            
-            stopwatchDisplay.innerText = `${formatPad(h)}:${formatPad(m)}:${formatPad(s)}`;        }
-
-        function pauseStopwatch() {            
-            isSwRunning = false;            
-            clearInterval(swInterval);        }
-
-        function lapStopwatch() {            
-            if (isSwRunning) {                
-                const lapItem = document.createElement('div');                
-                lapItem.innerText = `Lap: ${stopwatchDisplay.innerText}`;                
-                lapsList.prepend(lapItem);            }        }
-
-        function resetStopwatch() {            
-            pauseStopwatch();            
-            swTotalSeconds = 0;            
-            updateStopwatchDisplay();            
-            lapsList.innerHTML = "";        }
-
-        /* --- 50개 앱 데이터 생성 및 연동 로직 (사이드바 리스트용) --- */
+        /* --- 50개 앱 데이터 생성 및 연동 로직 --- */
         const appsData = Array.from({ length: 50 }, (_, i) => {
             const id = i + 1;
             const names = [
@@ -594,11 +328,28 @@
                 id: id,
                 name: name,
                 slug: slug,
-                path: `/codes/${slug}/index.html`
+                path: `/codes/${slug}/index.html`,
+                desc: `${name} 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
+                deps: [
+                    i % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
+                    i % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/${slug}/module.js`,
+                    "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+                ],
+                backends: [
+                    i % 2 === 0 ? "DB: Firebase Firestore" : "DB: Cloudflare Workers KV",
+                    i % 4 === 0 ? "Worker: auth-service.worker.js" : "Worker: api-router.worker.js",
+                    i % 5 === 0 ? "Automation: Google Apps Script" : "Static Hosting: Cloudflare Pages"
+                ]
             };
         });
 
         const appListContainer = document.getElementById('appListContainer');
+        const selectedAppTitle = document.getElementById('selectedAppTitle');
+        const selectedAppSub = document.getElementById('selectedAppSub');
+        const panelAppName = document.getElementById('panelAppName');
+        const panelAppDesc = document.getElementById('panelAppDesc');
+        const panelAppDeps = document.getElementById('panelAppDeps');
+        const panelAppBackend = document.getElementById('panelAppBackend');
 
         function renderAppList() {
             appListContainer.innerHTML = '';
@@ -609,16 +360,43 @@
                     <div class="app-item-title">${index + 1}. ${app.name}</div>
                     <div class="app-item-sub">/${app.slug}</div>
                 `;
-                item.onclick = () => {
-                    location.href = app.path;
-                };
+                item.onclick = () => selectApp(app, item);
                 appListContainer.appendChild(item);
             });
         }
 
+        function selectApp(app, element) {
+            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            selectedAppTitle.textContent = app.name;
+            selectedAppSub.textContent = `Path: ${app.path}`;
+            
+            panelAppName.textContent = `${app.name} (${app.slug})`;
+            panelAppDesc.textContent = app.desc;
+
+            panelAppDeps.innerHTML = '';
+            app.deps.forEach(dep => {
+                const li = document.createElement('li');
+                li.textContent = dep;
+                panelAppDeps.appendChild(li);
+            });
+
+            panelAppBackend.innerHTML = '';
+            app.backends.forEach(backend => {
+                const li = document.createElement('li');
+                li.textContent = backend;
+                panelAppBackend.appendChild(li);
+            });
+
+            if (window.innerWidth <= 900) closeSidebar();
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
-            fetchIPInfo();
             renderAppList();
+            if (appListContainer.firstChild) {
+                appListContainer.firstChild.click();
+            }
         });
     </script>
 </body>
