@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 웹사이트</title>
+</head>
+<body>
+
+    <!-- 1. 번역 선택 박스가 나타날 위치 -->
+    <div id="google_translate_element"></div>
+
+    <h1>환영합니다!</h1>
+    <p>이 웹사이트는 구글 번역기를 통해 다국어로 전환될 수 있습니다.</p>
+
+    <!-- 2. 구글 번역 초기화 스크립트 -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'ko', // 내 사이트의 기본 언어 (예: 한국어는 'ko')
+                includedLanguages: 'en,ja,zh-CN,es,ko', // 노출할 언어 목록 (콤마로 구분, 생략 시 전체 언어)
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    
+    <!-- 3. 구글 번역 API 스크립트 호출 -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
