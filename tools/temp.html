@@ -758,15 +758,15 @@
             viewer.innerHTML = htmlOutput;
             bindTooltipEvents();
 
-            // 구글 앱스 스크립트 번역 API 호출 (선택된 언어 반영)
+            // 구글 앱스 스크립트 번역 API 호출 및 결과 적용
             try {
-                const GAS_URL = "https://script.google.com/macros/s/AKfycbyUhLpSdxGzlRr1TvObdayUx2Qh966hees_EtqwW1o69e1XFQW3PY-Rbzoh5DNeyAsB/exec";
-                const selectedLang = targetLangSelect.value; // 콤보박스에서 선택된 언어 코드 가져오기
+                const GAS_URL = "https://script.google.com/macros/s/AKfycbw14p-L4Y_bqarTgy5DO34WLzNgit1dlTnt6crk7bGrkS_VwrtqE9aptOhfF93u31Fn/exec";
+                const selectedLang = targetLangSelect.value;
                 const transRes = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${selectedLang}`);
                 
                 if (transRes.ok) {
-                    const translatedText = await transRes.text();
-                    translationResult.innerHTML = translatedText;
+                    const data = await transRes.json(); // JSON으로 파싱
+                    translationResult.innerHTML = data.translatedText || "No translation.";
                 } else {
                     translationResult.innerHTML = "Translation error.";
                 }
