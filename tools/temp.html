@@ -3,124 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Schema Builder</title>
+    <title>App Architecture Inspector</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { width: 100%; height: 100%; background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; overflow: hidden; }
-        .sidebar { width: 350px; background: #181818; border-right: 1px solid rgba(255, 158, 64, 0.3); display: flex; flex-direction: column; padding: 20px; gap: 15px; }
-        .sidebar h2 { color: #ff9e40; font-size: 1.1rem; }
-        textarea { flex: 1; background: #111; color: #fff; border: 1px solid #444; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.85rem; resize: none; }
-        button { background: #ff9e40; color: #101010; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .canvas-area { flex: 1; position: relative; background: radial-gradient(circle, #222 1px, transparent 1px) #101010; background-size: 20px 20px; }
-        canvas { display: block; width: 100%; height: 100%; }
+        .sidebar { width: 320px; background: #181818; border-right: 1px solid rgba(255, 158, 64, 0.3); display: flex; flex-direction: column; height: 100vh; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); }
+        .sidebar-header h2 { color: #ff9e40; font-size: 1.1rem; }
+        .app-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .app-item { padding: 12px 15px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .app-item:hover { border-color: #ff9e40; background: #252525; }
+        .app-item.active { border-color: #ff9e40; background: rgba(255, 158, 64, 0.15); }
+        .app-item-title { font-weight: bold; font-size: 0.9rem; color: #fff; }
+        .app-item-sub { font-size: 0.75rem; color: #888; margin-top: 4px; }
+        
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; background: radial-gradient(circle, #222 1px, transparent 1px) #101010; background-size: 20px 20px; }
+        .main-header { padding: 20px 30px; border-bottom: 1px solid rgba(255, 158, 64, 0.3); background: rgba(24, 24, 24, 0.8); backdrop-filter: blur(10px); }
+        .main-header h1 { color: #ff9e40; font-size: 1.4rem; }
+        .detail-view { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        .detail-card { background: #181818; border: 2px solid #ff9e40; border-radius: 12px; padding: 30px; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .detail-card h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .detail-section { margin-bottom: 15px; }
+        .detail-section label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .detail-section li { background: #222; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Project List Input</h2>
-        <textarea id="inputText">Guest Book (guest-book)
-- https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js
-- https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js
-- DB: firebase
-
-Color Picker (color-picker)
-- /codes/color-picker/ntcColors.js</textarea>
-        <button onclick="generateSchema()">Generate Schema</button>
+        <div class="sidebar-header">
+            <h2>Apps Directory (50)</h2>
+        </div>
+        <div class="app-list" id="appList"></div>
     </div>
-    <div class="canvas-area">
-        <canvas id="schemaCanvas"></canvas>
+    <div class="main-content">
+        <div class="main-header">
+            <h1 id="selectedTitle">Select an App</h1>
+        </div>
+        <div class="detail-view" id="detailView">
+            <div class="detail-card">
+                <h3>Architecture Detail</h3>
+                <div class="detail-section">
+                    <label>Description</label>
+                    <p id="selectedDesc" style="font-size: 0.9rem; color: #ccc;">좌측 목록에서 애플리케이션을 선택하면 상세 구성 정보가 표시됩니다.</p>
+                </div>
+                <div class="detail-section">
+                    <label>Libraries & Dependencies</label>
+                    <ul id="selectedDeps"></ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('schemaCanvas');
-        const ctx = canvas.getContext('2d');
+        // 임의의 50개 앱 데이터 생성
+        const apps = Array.from({ length: 50 }, (_, i) => ({
+            id: i + 1,
+            name: `Application Node ${i + 1}`,
+            slug: `app-module-${i + 1}`,
+            desc: `이 모듈은 시스템 내에서 독립적으로 실행되는 ${i + 1}번 앱입니다.`,
+            deps: [
+                `https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js`,
+                `/codes/modules/lib-${i + 1}.js`,
+                i % 2 === 0 ? 'DB: Firebase Firestore' : 'DB: Cloudflare Workers KV'
+            ]
+        }));
 
-        function resize() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            generateSchema();
-        }
-        window.addEventListener('resize', resize);
+        const appListEl = document.getElementById('appList');
+        const selectedTitleEl = document.getElementById('selectedTitle');
+        const selectedDescEl = document.getElementById('selectedDesc');
+        const selectedDepsEl = document.getElementById('selectedDeps');
 
-        function parseText(text) {
-            const lines = text.split('\n');
-            const projects = [];
-            let currentProj = null;
-
-            lines.forEach(line => {
-                const trimmed = line.trim();
-                if (!trimmed) return;
-
-                if (!trimmed.startsWith('-')) {
-                    if (currentProj) projects.push(currentProj);
-                    currentProj = { name: trimmed, dependencies: [] };
-                } else if (currentProj) {
-                    currentProj.dependencies.push(trimmed.substring(1).trim());
-                }
-            });
-            if (currentProj) projects.push(currentProj);
-            return projects;
-        }
-
-        function generateSchema() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const rawText = document.getElementById('inputText').value;
-            const projects = parseText(rawText);
-
-            let startX = 60;
-            let startY = 60;
-            const boxWidth = 260;
-            const boxHeight = 110;
-
-            projects.forEach((proj, index) => {
-                let x = startX + (index % 3) * 300;
-                let y = startY + Math.floor(index / 3) * 140;
-
-                // 상자 배경 및 테두리
-                ctx.fillStyle = '#1e293b';
-                ctx.strokeStyle = '#ff9e40';
-                ctx.lineWidth = 2;
-                ctx.fillRect(x, y, boxWidth, boxHeight);
-                ctx.strokeRect(x, y, boxWidth, boxHeight);
-
-                // 프로젝트 이름
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 13px Segoe UI';
-                ctx.fillText(proj.name, x + 15, y + 25);
-
-                // 구분선
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(x + 15, y + 35);
-                ctx.lineTo(x + boxWidth - 15, y + 35);
-                ctx.stroke();
-
-                // 의존성 목록 출력
-                ctx.font = '11px Segoe UI';
-                ctx.fillStyle = '#94a3b8';
-                proj.dependencies.forEach((dep, dIdx) => {
-                    if (dIdx < 3) {
-                        let displayDep = dep;
-                        if (displayDep.startsWith('https://')) {
-                            try {
-                                const url = new URL(displayDep);
-                                displayDep = url.pathname;
-                            } catch (e) {}
-                        }
-                        if (displayDep.length > 32) {
-                            displayDep = displayDep.substring(0, 29) + '...';
-                        }
-                        ctx.fillText(`• ${displayDep}`, x + 15, y + 55 + (dIdx * 18));
-                    }
-                });
+        function renderList() {
+            appListEl.innerHTML = '';
+            apps.forEach(app => {
+                const item = document.createElement('div');
+                item.className = 'app-item';
+                item.innerHTML = `
+                    <div class="app-item-title">${app.name}</div>
+                    <div class="app-item-sub">${app.slug}</div>
+                `;
+                item.onclick = () => selectApp(app, item);
+                appListEl.appendChild(item);
             });
         }
 
-        window.onload = resize;
+        function selectApp(app, element) {
+            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            selectedTitleEl.textContent = app.name;
+            selectedDescEl.textContent = app.desc;
+            
+            selectedDepsEl.innerHTML = '';
+            app.deps.forEach(dep => {
+                const li = document.createElement('li');
+                li.textContent = dep;
+                selectedDepsEl.appendChild(li);
+            });
+        }
+
+        window.onload = () => {
+            renderList();
+            // 첫 번째 앱 기본 선택
+            if (appListEl.firstChild) {
+                appListEl.firstChild.click();
+            }
+        };
     </script>
 </body>
 </html>
