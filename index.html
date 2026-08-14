@@ -364,63 +364,98 @@
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/qr-generator" class="card" data-category="dev">
                 <div class="icon">🏷️</div>
                 <h3>QR Generator</h3>
                 <p>qr-generator</p>
                 <span class="arrow">Go to QR Code Generator →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A QR code generator and decoder module that allows users to create QR codes from text or URLs, monitor UTF-8 byte usage with a 1,000-byte limit, download generated QR images, and decode uploaded QR code images through an external QR code API.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), DOM manipulation, and event handling",
+                        "Fetch API — Communicates with the external QR code generation and decoding API",
+                        "TextEncoder API — Calculates UTF-8 byte lengths and enforces the 1,000-byte input limit",
+                        "FormData API — Packages uploaded QR image files for decoding requests",
+                        "HTML5 File API — Handles QR image file selection and upload",
+                        "Blob API — Processes generated QR images for download",
+                        "File/URL API (URL.createObjectURL) — Converts downloaded image Blobs into temporary downloadable object URLs",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, and light/dark theme styling",
+                        "HTML5 <textarea> — Provides text input and decoded result display areas",
+                        "HTML5 <input type=\"file\"> — Allows users to select QR code image files for decoding",
+                        "JavaScript Events API — Handles input, change, click, and other user interactions",
+                        "Web APIs (window / alert) — Uses built-in browser APIs for viewport detection, object URLs, and alert messages"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "External QR Code Generation API: api.qrserver.com/v1/create-qr-code/",
+                        "External QR Code Decoding API: api.qrserver.com/v1/read-qr-code/",
+                        "No Custom Server-Side Backend: QR generation and decoding requests are sent directly from the browser to the external API"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/text-ascii" class="card" data-category="design">
                 <div class="icon">✏️</div>
                 <h3>Text to ASCII</h3>
                 <p>text-ascii</p>
                 <span class="arrow">Go to Text to ASCII →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A text-to-ASCII art generator that converts user-entered ASCII text into stylized ASCII art using the Figlet library, while providing real-time character, word, paragraph, and byte counts, clipboard copying, and text file download functionality.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles application logic and user interactions without external frameworks",
+                        "Figlet.js (v1.8.0) — Converts user-entered text into stylized ASCII art using the Standard font",
+                        "jsDelivr CDN — Loads the Figlet.js library and font resources",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), DOM manipulation, and event handling",
+                        "Blob API — Creates and downloads generated ASCII art as a UTF-8 text file (.txt)",
+                        "File/URL API (URL.createObjectURL / URL.revokeObjectURL) — Creates and releases temporary object URLs for text file downloads",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, and light/dark theme styling",
+                        "HTML5 <textarea> — Provides text input and generated ASCII art output areas",
+                        "JavaScript Events API — Handles input, click, and other user interactions",
+                        "Clipboard Support (document.execCommand) — Copies generated ASCII art to the clipboard",
+                        "Web APIs (window / alert / Event) — Uses built-in browser APIs for viewport detection, alert messages, and event dispatching"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "External CDN: jsDelivr — Delivers the Figlet.js library and font files",
+                        "No Custom Server-Side Backend: Text conversion and statistics calculations are performed client-side in the browser"
                     ]
                 }</script>
             </a>
+
             <a href="https://sujinohkor.pages.dev/tools/bounce-svg" class="card" data-category="design">
                 <div class="icon">📽️</div>
                 <h3>Bounce SVG</h3>
                 <p>bounce-svg</p>
                 <span class="arrow">Go to Bounce SVG →</span>
-
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A customizable animated text SVG generator that creates per-character bouncing text animations with configurable fonts, colors, opacity, font size, bounce height, alignment, borders, and canvas dimensions. It provides real-time SVG preview, downloadable SVG files, and automatically generated Markdown and HTML embed code for use in GitHub READMEs and web projects.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles SVG generation, parameter processing, real-time preview updates, source code generation, and user interactions without external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelector(), querySelectorAll(), DOM manipulation, and event handling",
+                        "SVG (Scalable Vector Graphics) — Generates animated text graphics using SVG elements, embedded CSS, <text>, <rect>, <g>, and @keyframes animations",
+                        "URLSearchParams API — Converts generator settings into URL query parameters for the remote SVG rendering service",
+                        "Blob API — Creates downloadable SVG files from generated SVG source strings",
+                        "File/URL API (URL.createObjectURL / URL.revokeObjectURL) — Creates and releases temporary object URLs for SVG file downloads",
+                        "Clipboard API (navigator.clipboard.writeText) — Copies generated Markdown and HTML source code to the clipboard",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, light/dark theme styling, and SVG keyframe animations",
+                        "HTML5 Form Controls — Uses <input>, <select>, <input type=\"color\">, <input type=\"range\">, <input type=\"number\">, and <input type=\"checkbox\"> for generator settings",
+                        "JavaScript Events API — Handles input, change, click, and other user interactions for real-time SVG generation",
+                        "Web APIs (window / location / alert) — Uses built-in browser APIs for initialization, navigation, user notifications, and responsive behavior"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Serverless SVG Rendering Service: Cloudflare Workers (text-bounce-svg.sujinohkor.workers.dev)",
+                        "Query Parameter API: Sends text, font, colors, opacity, size, bounce height, alignment, border, width, and height settings to the Cloudflare Worker through URL query parameters",
+                        "No Traditional Server-Side Application Backend: Local SVG preview and SVG file generation are performed directly in the browser, while externally embeddable animated SVG URLs are generated through the Cloudflare Worker"
                     ]
                 }</script>
             </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/color-picker" class="card" data-category="design">
                 <div class="icon">🎨</div>
                 <h3>Color Picker</h3>
