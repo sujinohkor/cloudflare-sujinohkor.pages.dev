@@ -419,16 +419,50 @@
         
             // 5. 나머지 리스트 처리 (기존과 동일)
             panelAppDeps.innerHTML = '';
-            app.deps.forEach(dep => {
+            /*app.deps.forEach(dep => {
                 const li = document.createElement('li');
                 li.textContent = dep;
+                panelAppDeps.appendChild(li);
+            });*/
+            app.deps.forEach(dep => {
+                const li = document.createElement('li');
+            
+                const parts = dep.split(' — ');
+                
+                if (parts.length > 1) {
+                    const strong = document.createElement('strong');
+                    strong.textContent = parts[0];
+                    
+                    li.appendChild(strong);
+                    li.appendChild(document.createTextNode(' — ' + parts.slice(1).join(' — ')));
+                } else {
+                    li.textContent = dep;
+                }
+            
                 panelAppDeps.appendChild(li);
             });
         
             panelAppBackend.innerHTML = '';
-            app.backends.forEach(backend => {
+            /*app.backends.forEach(backend => {
                 const li = document.createElement('li');
                 li.textContent = backend;
+                panelAppBackend.appendChild(li);
+            });*/
+            app.backends.forEach(backend => {
+                const li = document.createElement('li');
+            
+                const parts = backend.split(':');
+            
+                if (parts.length > 1) {
+                    const strong = document.createElement('strong');
+                    strong.textContent = parts[0] + ':';
+            
+                    li.appendChild(strong);
+                    li.appendChild(document.createTextNode(parts.slice(1).join(':')));
+                } else {
+                    li.textContent = backend;
+                }
+            
                 panelAppBackend.appendChild(li);
             });
         
