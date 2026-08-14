@@ -315,6 +315,23 @@
     const sidebar = document.getElementById('sidebar');
     function toggleSidebar() { sidebar.classList.toggle('active'); }
 
+    // 사이드바 내부의 버튼을 누르면 모바일에서 자동으로 닫히도록 설정
+    sidebar.querySelectorAll('button').forEach(element => {
+        element.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+
+    // 메인 콘텐츠 영역을 누를 때 사이드바가 열려있다면 닫기
+    const mainContent = document.getElementById('main-content');
+    mainContent.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+    
     document.getElementById('theme-toggle').addEventListener('click', () => { 
         document.body.classList.toggle('light-mode'); 
     });
