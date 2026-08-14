@@ -355,22 +355,26 @@
                         // 요구하신 path 형식 조합 (.html 붙이기)
                         const customPath = toolSubPath ? `${toolSubPath}.html` : `/codes/${slug}/index.html`;
 
+                        // appsData를 만드는 부분 (map 내부)
+                        const metaScript = card.querySelector('.app-meta');
+                        let meta = { desc: "설명 없음", deps: [], backends: [] };
+                        
+                        if (metaScript) {
+                            try {
+                                meta = JSON.parse(metaScript.textContent);
+                            } catch (e) {
+                                console.error("JSON 파싱 에러:", e);
+                            }
+                        }
+                        
                         return {
                             id: id,
                             name: name,
                             slug: slug,
-                            path: customPath, // 추출된 경로 적용
-                            desc: `${name} (${slug}) 시스템은 독립적인 클라이언트 모듈로 동작하며, 실시간 데이터 처리와 사용자 인터랙션을 지원합니다.`,
-                            deps: [
-                                index % 3 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js" : "/assets/lib/core.min.js",
-                                index % 2 === 0 ? "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js" : `/codes/${slug}/module.js`,
-                                "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-                            ],
-                            backends: [
-                                index % 2 === 0 ? "DB: Firebase Firestore" : "DB: Cloudflare Workers KV",
-                                index % 4 === 0 ? "Worker: auth-service.worker.js" : "Worker: api-router.worker.js",
-                                index % 5 === 0 ? "Automation: Google Apps Script" : "Static Hosting: Cloudflare Pages"
-                            ]
+                            path: customPath,
+                            desc: meta.desc,      // 이제 여기에 상세 설명이 들어감
+                            deps: meta.deps,      // 여기엔 라이브러리 리스트가 들어감
+                            backends: meta.backends // 여기엔 백엔드 정보가 들어감
                         };
                     });
                 } else {
