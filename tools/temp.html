@@ -24,7 +24,7 @@
             transition: opacity 0.3s ease;
         }
 
-        /* 플로팅 사이드바 (앱 목록형으로 개조) */
+        /* 플로팅 사이드바 */
         .sidebar {
             width: 280px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;
             background: rgba(16, 16, 16, 0.25);
@@ -89,7 +89,7 @@
         .top-section h1 { color: #ff9e40; font-size: 1.5rem; margin-bottom: 5px; }
         .top-section p { color: #aaa; font-size: 0.9rem; }
 
-        /* 도트무늬 배경 적용 카드 (상세보기 뷰어) */
+        /* 도트무늬 배경 적용 카드 */
         .content-card {                     
             border: 2px solid #ff9e40;                     
             border-radius: 16px;                     
@@ -157,15 +157,15 @@
             margin: 0 !important;
         }
 
-        /* 상세 내용 뷰어 영역 */
+        /* 상세 내용 뷰어 영역 (Grid 구조로 여백 최소화 및 균형 배치) */
         .detail-view {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             width: 100%;
             height: 100%;
-            padding: 40px;
+            padding: 30px;
             overflow-y: auto;
-            gap: 20px;
             z-index: 15;
         }
         .detail-panel {
@@ -173,18 +173,23 @@
             border: 1px solid rgba(255, 158, 64, 0.4);
             border-radius: 12px;
             padding: 25px;
-            max-width: 700px;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
-        .detail-panel h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); padding-bottom: 8px; }
-        .detail-section { margin-bottom: 15px; }
-        .detail-section label { font-size: 0.75rem; color: #888; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .detail-panel.full-span {
+            grid-column: span 2;
+        }
+        .detail-panel h3 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 5px; border-bottom: 1px solid rgba(255, 158, 64, 0.2); padding-bottom: 8px; }
+        .detail-section { display: flex; flex-direction: column; gap: 6px; }
+        .detail-section label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         .detail-section p { font-size: 0.9rem; color: #ddd; line-height: 1.5; }
         .detail-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
         .detail-section li { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; border-left: 3px solid #ff9e40; color: #fff; }
 
-        /* Light Mode 공조 */
+        /* Light Mode */
         body.light-mode { background-color: #fff; color: #202020; }                
         body.light-mode .sidebar {
             background: rgba(255, 255, 255, 0.4);
@@ -269,22 +274,26 @@
                     <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                        
                 </div>
 
-                <!-- 상세 정보 뷰어 영역 -->        
+                <!-- 상세 정보 뷰어 영역 (그리드 적용) -->        
                 <div class="detail-view">
-                    <div class="detail-panel">
+                    <div class="detail-panel full-span">
                         <h3 id="panelAppName">애플리케이션을 선택하세요</h3>
                         <div class="detail-section">
                             <label>Description / Path</label>
                             <p id="panelAppDesc">-</p>
                         </div>
+                    </div>
+                    <div class="detail-panel">
+                        <h3>Libraries & Dependencies</h3>
                         <div class="detail-section">
-                            <label>Libraries & Dependencies</label>
                             <ul id="panelAppDeps">
                                 <li>-</li>
                             </ul>
                         </div>
+                    </div>
+                    <div class="detail-panel">
+                        <h3>Backend Infrastructure</h3>
                         <div class="detail-section">
-                            <label>Backend Infrastructure</label>
                             <ul id="panelAppBackend">
                                 <li>-</li>
                             </ul>
