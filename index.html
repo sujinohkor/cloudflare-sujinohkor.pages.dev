@@ -322,35 +322,6 @@
                     ]
                 }</script>
             </a>
-
-            <a href="https://sujinohkor.pages.dev/tools/app-inspector" class="card guest-book-card" data-category="fun">
-                <div class="icon">📁</div>
-                <h3>App Inspector</h3>
-                <p>app-inspector</p>
-                <span class="arrow guest-book-arrow">Go to App Inspector →</span>
-                <!-- 안 보이는 데이터 블록 -->
-                <script type="application/json" class="app-meta">{
-                    "desc": "An application architecture inspection module that dynamically loads application metadata from the main index page and displays each application's description, file path, dependencies, and backend infrastructure in an interactive detail viewer.",
-                    "deps": [
-                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
-                        "Fetch API — Retrieves and loads /index.html asynchronously to extract application information",
-                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElement(), classList manipulation, and dynamic UI rendering",
-                        "DOMParser API — Parses the fetched index.html content into a queryable HTML document",
-                        "URL API — Extracts and processes pathname information from application href values",
-                        "JavaScript Events API — Handles click, DOMContentLoaded, and responsive sidebar interaction events",
-                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, gradients, backdrop-filter, custom scrollbars, and responsive layouts",
-                        "HTML5 Fetch and Async/Await — Supports asynchronous loading and processing of application metadata",
-                        "JSON API — Parses embedded .app-meta JSON metadata containing descriptions, dependencies, and backend information",
-                        "Web APIs (window / document / console) — Uses built-in browser APIs for responsive behavior, DOM access, logging, and viewport detection"
-                    ],
-                    "backends": [
-                        "Static Hosting: Cloudflare Pages",
-                        "Static Data Source: /index.html",
-                        "Client-Side Processing: Fetch API and DOMParser",
-                        "No Dedicated Server-Side Backend or Database"
-                    ]
-                }</script>
-            </a>
             
             <a href="https://sujinohkor.pages.dev/tools/word-counter" class="card" data-category="utility">
                 <div class="icon">📝</div>
@@ -880,14 +851,28 @@
                 <span class="arrow">Go to HWP HWPX Editor →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based HWP/HWPX document editor that embeds the @rhwp/editor package directly into a responsive web interface, allowing users to initialize a full-featured editor, select local .hwp or .hwpx files, read them as ArrayBuffer data, load them into the editor instance, display the active file name, switch between light and dark themes, manage a responsive mobile sidebar, and toggle the editor workspace into a custom full-screen mode.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "@rhwp/editor — External HWP/HWPX document editor library loaded as an ES module from the jsDelivr CDN and initialized through createEditor()",
+                        "Vanilla JavaScript (ES6+) — Handles editor initialization, asynchronous file loading, theme switching, sidebar control, full-screen state management, error handling, and page reset logic without additional frameworks",
+                        "JavaScript ES Modules — Uses import syntax to load createEditor from the CDN-hosted @rhwp/editor package",
+                        "HTML5 File API — Uses an <input type=\"file\"> element with .hwp and .hwpx file restrictions to select local documents",
+                        "Blob/File ArrayBuffer API — Converts the selected local document into binary ArrayBuffer data through file.arrayBuffer() before passing it to the editor",
+                        "Async/Await and Promise API — Supports asynchronous editor initialization, local file reading, and editor document loading",
+                        "HTML5 DOM API — Uses getElementById(), querySelectorAll(), classList, textContent, innerHTML, and dynamic event-driven UI manipulation",
+                        "JavaScript Events API — Handles click and change events for theme switching, sidebar interaction, file selection, mobile behavior, and workspace interaction",
+                        "Window and Location APIs — Uses window.innerWidth for responsive sidebar behavior, exposes functions globally, changes location.href for navigation, and uses location.reload() for reset functionality",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, fixed positioning, responsive sizing, border-radius, box-shadow, gradients/rgba transparency, custom scrollbars, and full-screen layout switching",
+                        "CSS backdrop-filter — Provides a blurred translucent glass-style sidebar effect with WebKit compatibility support",
+                        "Console API — Logs editor initialization status, loading warnings, and runtime errors for debugging"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with static web hosting environments",
+                        "External CDN Dependency: jsDelivr CDN serves the @rhwp/editor ES module",
+                        "Client-Side Document Processing: Local HWP/HWPX files are selected through the browser File API and converted to ArrayBuffer data in the client",
+                        "Client-Side Editor Engine: @rhwp/editor processes and displays documents directly within the browser",
+                        "No Dedicated Server-Side Backend, API, or Database",
+                        "No File Upload to a Server: The provided source processes selected files locally within the browser runtime"
                     ]
                 }</script>
             </a>
@@ -899,14 +884,31 @@
                 <span class="arrow">Go to Markdown Editor →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based Markdown editor that provides a side-by-side writing and live preview workspace, converts Markdown input into rendered HTML in real time using the Marked.js parser, dynamically synchronizes visual line numbers with wrapped text, supports Tab-based indentation, clipboard copying, local browser persistence, Markdown file export, theme switching, responsive sidebar navigation, and a four-stage workspace maximize cycle for focusing on the editor, full split-screen view, preview, or the default layout.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Marked.js — External Markdown parsing library loaded from the jsDelivr CDN and used through marked.parse() to convert Markdown source into rendered HTML",
+                        "Vanilla JavaScript (ES6+) — Handles real-time Markdown processing, workspace state management, line-number generation, keyboard handling, file export, local persistence, clipboard operations, theme switching, and responsive sidebar interaction without a frontend framework",
+                        "HTML5 DOM API — Uses getElementById(), querySelector(), createElement(), appendChild(), removeChild(), classList, innerHTML, textContent, style manipulation, and dynamic UI rendering",
+                        "JavaScript Events API — Handles click, input, scroll, keydown, and theme/sidebar interaction events",
+                        "Clipboard API — Uses navigator.clipboard.writeText() to copy Markdown source text to the system clipboard",
+                        "Web Storage API (localStorage) — Stores and restores the user's Markdown content locally under the saved_markdown_text key",
+                        "Blob API — Creates a text/markdown Blob containing the current editor content for client-side file generation",
+                        "URL API — Uses URL.createObjectURL() and URL.revokeObjectURL() to create and release temporary browser URLs for Markdown file downloads",
+                        "HTML5 Download API — Dynamically creates an anchor element with the download attribute to export editor content as MarkdownNote.md without server-side processing",
+                        "Window API — Uses window.getComputedStyle() to measure editor typography and calculate wrapped visual lines for synchronized line numbering",
+                        "Async Clipboard and Promise API — Handles asynchronous clipboard write completion and updates the Copy button state",
+                        "Browser Dialog APIs — Uses alert() and confirm() for save validation and reset confirmation",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, fixed positioning, responsive layouts, box-shadow, border-radius, rgba transparency, custom full-screen state layouts, and word wrapping",
+                        "CSS backdrop-filter — Provides a translucent glass-style sidebar with blur effects and WebKit compatibility support"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with static web hosting environments",
+                        "External CDN Dependency: jsDelivr CDN serves the Marked.js Markdown parsing library",
+                        "Client-Side Markdown Processing: Marked.js converts Markdown source into HTML directly in the browser",
+                        "Client-Side Persistence: Browser localStorage stores and restores saved Markdown text",
+                        "Client-Side File Generation: Blob API and the HTML download mechanism generate MarkdownNote.md locally in the browser",
+                        "No Dedicated Server-Side Backend, API, or Database",
+                        "No Server-Side File Storage or Upload: Markdown content remains in browser storage or is exported directly to the user's local device"
                     ]
                 }</script>
             </a>
@@ -918,14 +920,33 @@
                 <span class="arrow">Go to URL Shortener →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A web-based URL shortening application that validates long URLs, optionally accepts custom alphanumeric slugs, sends shortening requests to a dedicated REST API, displays the generated short URL and creation time, generates a QR code preview through an external QR code service, supports clipboard copying, and maintains up to 10 recent shortening records locally in the browser.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles URL validation, custom slug management, asynchronous API communication, result rendering, QR code display, local history management, clipboard copying, theme switching, and responsive sidebar behavior without external frontend frameworks",
+                        "Fetch API — Sends asynchronous POST requests to the URL shortening endpoint at https://sjoh.kr/api/shorten",
+                        "REST API — Communicates with a dedicated backend service using JSON request data containing the original URL, custom URL option, and optional slug",
+                        "JSON API — Uses JSON.stringify() to serialize shortening requests and response.json() / JSON.parse() to process API responses and locally stored history data",
+                        "HTML5 DOM API — Uses getElementById(), querySelector(), createElement(), appendChild(), innerHTML, innerText, classList, and style manipulation for dynamic interface rendering",
+                        "JavaScript Events API — Handles click, change, and DOMContentLoaded events for sidebar control, theme switching, custom URL options, history loading, and user interactions",
+                        "Async/Await and Promise API — Supports asynchronous URL shortening requests and clipboard operations with error handling",
+                        "Clipboard API — Uses navigator.clipboard.writeText() to copy generated and previously created short URLs",
+                        "Web Storage API (localStorage) — Stores up to 10 recent URL shortening records locally under the url_history key",
+                        "Date API and Intl.DateTimeFormat — Converts API-provided creation timestamps into Korean locale date and time strings using the Asia/Seoul time zone",
+                        "URL Encoding API — Uses encodeURIComponent() to safely pass generated short URLs as QR code service query parameters",
+                        "External QR Code Generation API — Requests dynamically generated QR code images from api.qrserver.com based on the shortened URL",
+                        "Regular Expressions API — Validates ASCII-only URLs and restricts custom slugs to 1–10 English letters and numbers",
+                        "Browser Dialog APIs — Uses alert() for copy notifications and confirm() before permanently clearing local history",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, fixed positioning, responsive layouts, box-shadow, border-radius, rgba transparency, and custom interface components",
+                        "CSS backdrop-filter — Provides a translucent glass-style sidebar with blur effects and WebKit compatibility support"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Frontend Hosting: Compatible with static web hosting environments, with the favicon loaded from a Cloudflare Pages domain",
+                        "URL Shortening Backend API: https://sjoh.kr/api/shorten receives POST requests containing URL and custom slug data and returns generated short URL information",
+                        "Server-Side URL Processing: The dedicated shortening API performs actual short URL generation and returns creation metadata",
+                        "External QR Code Service: https://api.qrserver.com/v1/create-qr-code/ generates QR code images from the returned shortened URLs",
+                        "Client-Side History Storage: Browser localStorage retains up to 10 recent shortening records",
+                        "Backend Database: Not directly identifiable from the frontend source, but server-side persistent storage is likely required for shortened URL mappings and the stated 30-day link validity",
+                        "No Direct Database Access from the Client: The browser communicates only with the shortening API and external QR code service"
                     ]
                 }</script>
             </a>
@@ -1400,14 +1421,19 @@
                 <span class="arrow">Go to Tower Defense →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based mini tower defense game implemented entirely with native HTML, CSS, and JavaScript. It generates a procedurally shaped path for each reset, allows players to place defensive towers, automatically attacks incoming enemies, manages gold/life/wave progression, and provides responsive desktop/mobile UI with light/dark mode and fullscreen gameplay.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "HTML5 — Application structure and semantic UI elements",
+                        "CSS3 — Responsive layout, floating sidebar, light/dark themes, fullscreen mode, dotted game-board background, and visual styling",
+                        "Vanilla JavaScript (ES6+) — Game state management, procedural map generation, tower/enemy/bullet classes, wave control, collision detection, UI updates, and responsive behavior",
+                        "HTML5 Canvas API — Real-time rendering of the map path, towers, enemies, health bars, and projectiles",
+                        "Browser requestAnimationFrame API — Continuous game-loop animation and rendering",
+                        "Browser DOM API — Sidebar controls, status updates, fullscreen toggling, theme switching, and responsive UI interactions",
+                        "Browser Math API — Procedural path generation, distance calculations, enemy movement, and targeting calculations",
+                        "Browser setInterval / clearInterval APIs — Timed enemy spawning during each wave"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "None — Fully client-side application. No external API, server, database, or backend service is required."
                     ]
                 }</script>
             </a>
@@ -1419,14 +1445,49 @@
                 <span class="arrow">Go to Mandarin Analyzer →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based Mandarin learning application that combines pinyin-to-Chinese input, HSK/TOCFL vocabulary analysis, pinyin reading guidance, simplified/traditional Chinese conversion, interactive word tooltips, and Korean or English translation in a dual-panel interface.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Core application logic, DOM manipulation, event handling, asynchronous API communication, and UI state management",
+                        "OpenCC-JS 1.0.5 — Converts Chinese text between Simplified Chinese (简体) and Traditional Chinese (繁體) when switching between HSK and TOCFL modes",
+                        "pinyin-pro 3.16.0 — Generates Mandarin pinyin with tone marks for the interactive Pinyin Guide View",
+                        "Cloudflare Worker: mandarin-segmenter.sujinohkor.workers.dev — Backend API for Chinese text segmentation, vocabulary lookup, HSK/TOCFL level detection, pinyin, and translation metadata",
+                        "Cloudflare Worker: pinyin-proxy.sujinohkor.workers.dev — Proxy service that retrieves Chinese character or word candidates from typed pinyin input",
+                        "Google Apps Script Web App — Provides external machine translation functionality for Korean and English output",
+                        "JSDelivr CDN — Delivers OpenCC-JS and pinyin-pro browser libraries"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Cloudflare Workers — Serverless backend infrastructure used for Mandarin vocabulary segmentation and pinyin candidate retrieval",
+                        "Google Apps Script Web App — Serverless translation endpoint accessed through HTTP GET requests",
+                        "External CDN Services — Loads required JavaScript libraries directly in the browser"
+                    ]
+                }</script>
+            </a>
+
+            <a href="https://sujinohkor.pages.dev/tools/app-inspector" class="card guest-book-card" data-category="fun">
+                <div class="icon">📁</div>
+                <h3>App Inspector</h3>
+                <p>app-inspector</p>
+                <span class="arrow guest-book-arrow">Go to App Inspector →</span>
+                <!-- 안 보이는 데이터 블록 -->
+                <script type="application/json" class="app-meta">{
+                    "desc": "An application architecture inspection module that dynamically loads application metadata from the main index page and displays each application's description, file path, dependencies, and backend infrastructure in an interactive detail viewer.",
+                    "deps": [
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "Fetch API — Retrieves and loads /index.html asynchronously to extract application information",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElement(), classList manipulation, and dynamic UI rendering",
+                        "DOMParser API — Parses the fetched index.html content into a queryable HTML document",
+                        "URL API — Extracts and processes pathname information from application href values",
+                        "JavaScript Events API — Handles click, DOMContentLoaded, and responsive sidebar interaction events",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, gradients, backdrop-filter, custom scrollbars, and responsive layouts",
+                        "HTML5 Fetch and Async/Await — Supports asynchronous loading and processing of application metadata",
+                        "JSON API — Parses embedded .app-meta JSON metadata containing descriptions, dependencies, and backend information",
+                        "Web APIs (window / document / console) — Uses built-in browser APIs for responsive behavior, DOM access, logging, and viewport detection"
+                    ],
+                    "backends": [
+                        "Static Hosting: Cloudflare Pages",
+                        "Static Data Source: /index.html",
+                        "Client-Side Processing: Fetch API and DOMParser",
+                        "No Dedicated Server-Side Backend or Database"
                     ]
                 }</script>
             </a>
