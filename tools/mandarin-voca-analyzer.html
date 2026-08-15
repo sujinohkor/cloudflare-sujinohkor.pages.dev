@@ -1085,64 +1085,97 @@
     }
 
     /* Tooltip */
+    let isPinned = false; // 클릭으로 고정되었는지 여부
+
     function hideTooltip() {
+        isPinned = false;
         globalTooltip.style.opacity = '0';
         globalTooltip.style.display = 'none';
         globalTooltip.innerHTML = '';
+    }
+
+    function showTooltip(span) {
+        const level = span.getAttribute('data-level');
+        const pinyin = span.getAttribute('data-pinyin');
+        const translation = span.getAttribute('data-translation');
+        const translationKo = span.getAttribute('data-translation-ko');
+        const word = decodeURIComponent(span.getAttribute('data-word') || '');
+
+        const ttsButton = currentMode === 'hsk' ? `<br><button class="tts-play-btn" type="button" data-audio-word="${encodeURIComponent(word)}">🔊 Play</button>` : '';
+
+        globalTooltip.innerHTML = `
+            <strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>
+            ${pinyin}<br>${translation}<br>${translationKo}${ttsButton}
+        `;
+        globalTooltip.style.display = 'block';
+
+        const rect = span.getBoundingClientRect();
+        const tooltipRect = globalTooltip.getBoundingClientRect();
+        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        let top = rect.top - tooltipRect.height - 8;
+
+        if (top < 10) top = rect.bottom + 8;
+        if (left < 10) left = 10;
+        else if (left + tooltipRect.width > window.innerWidth - 10) left = window.innerWidth - tooltipRect.width - 10;
+
+        globalTooltip.style.left = `${left}px`;
+        globalTooltip.style.top = `${top}px`;
+        globalTooltip.style.opacity = '1';
+
+        if (currentMode === 'hsk') {
+            const playBtn = globalTooltip.querySelector('.tts-play-btn');
+            if (playBtn) {
+                playBtn.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+                    const audioWord = decodeURIComponent(playBtn.getAttribute('data-audio-word'));
+                    await playHskAudio(audioWord, playBtn);
+                });
+            }
+        }
     }
 
     function bindTooltipEvents() {
         const wordSpans = document.querySelectorAll('.word-span');
         wordSpans.forEach(span => {
             span.addEventListener('mouseenter', () => {
-                const level = span.getAttribute('data-level');
-                const pinyin = span.getAttribute('data-pinyin');
-                const translation = span.getAttribute('data-translation');
-                const translationKo = span.getAttribute('data-translation-ko');
-                const word = decodeURIComponent(span.getAttribute('data-word') || '');
-
-                const ttsButton = currentMode === 'hsk' ? `<br><button class="tts-play-btn" type="button" data-audio-word="${encodeURIComponent(word)}">🔊 Play</button>` : '';
-
-                globalTooltip.innerHTML = `
-                    <strong>[${currentMode.toUpperCase()} Level ${level}]</strong><br>
-                    ${pinyin}<br>${translation}<br>${translationKo}${ttsButton}
-                `;
-                globalTooltip.style.display = 'block';
-
-                const rect = span.getBoundingClientRect();
-                const tooltipRect = globalTooltip.getBoundingClientRect();
-                let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-                let top = rect.top - tooltipRect.height - 8;
-
-                if (top < 10) top = rect.bottom + 8;
-                if (left < 10) left = 10;
-                else if (left + tooltipRect.width > window.innerWidth - 10) left = window.innerWidth - tooltipRect.width - 10;
-
-                globalTooltip.style.left = `${left}px`;
-                globalTooltip.style.top = `${top}px`;
-                globalTooltip.style.opacity = '1';
-
-                if (currentMode === 'hsk') {
-                    const playBtn = globalTooltip.querySelector('.tts-play-btn');
-                    if (playBtn) {
-                        playBtn.addEventListener('click', async (event) => {
-                            event.stopPropagation();
-                            const audioWord = decodeURIComponent(playBtn.getAttribute('data-audio-word'));
-                            await playHskAudio(audioWord, playBtn);
-                        });
-                    }
-                }
+                showTooltip(span);
             });
 
             span.addEventListener('mouseleave', () => {
                 setTimeout(() => {
-                    if (!globalTooltip.matches(':hover')) hideTooltip();
+                    // 마우스가 단어나 툴팁 둘 다 위에 있지 않을 때만 숨김
+                    if (!span.matches(':hover') && !globalTooltip.matches(':hover')) {
+                        hideTooltip();
+                    }
                 }, 100);
+            });
+
+            // 클릭 시 툴팁 고정
+            span.addEventListener('click', (event) => {
+                event.stopPropagation();
+                isPinned = true;
+                showTooltip(span);
             });
         });
 
-        globalTooltip.addEventListener('mouseleave', () => { hideTooltip(); });
+        // 툴팁 영역에서 마우스가 벗어날 때
+        globalTooltip.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                // 현재 마우스가 어떤 단어 위에도 있지 않고 툴팁 위에도 없다면 숨김
+                const hoveredSpan = document.querySelector('.word-span:hover');
+                if (!hoveredSpan && !globalTooltip.matches(':hover')) {
+                    hideTooltip();
+                }
+            }, 100);
+        });
     }
+
+    // 문서 빈 곳을 누르면 고정 해제 및 닫기
+    document.addEventListener('click', (event) => {
+        if (!globalTooltip.contains(event.target) && !event.target.classList.contains('word-span')) {
+            hideTooltip();
+        }
+    });
 
     /* HSK Audio */
     async function playHskAudio(word, button) {
