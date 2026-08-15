@@ -760,6 +760,8 @@
         if (text) {
             textInput.value = type === 'tocfl' ? toTraditional(text) : toSimplified(text);
             updateEditorState();
+            analyzeText(); // <-- 이 부분을 추가해 주면 글자가 있을 때 모드 전환 시 분석과 번역이 함께 실행됩니다!
+            return;        // (analyzeText 내부에서 updateTranslation도 함께 실행되므로 여기서 종료)
         }
 
         document.getElementById('viewerResult').innerHTML = 'Analysis results will appear here.';
