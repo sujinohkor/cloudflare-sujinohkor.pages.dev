@@ -760,14 +760,41 @@
                 <span class="arrow">Go to Weather and Time →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based weather, location, world time, 2D map, and 3D globe module that retrieves the user's current location or searched city, displays real-time weather and forecasts from multiple public weather APIs, supports interactive Leaflet and Globe.gl world views with city markers and local times, provides GPS/IP-based location detection, reverse geocoding, API switching, light/dark themes, responsive layouts, and mobile sidebar controls.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements all application logic, asynchronous API requests, state management, view switching, weather rendering, location handling, and event processing without a frontend framework",
+                        "HTML5 DOM API — Used for DOM element selection, text updates, dynamic forecast rendering, CSS class management, and interactive UI control",
+                        "Fetch API — Sends asynchronous HTTP requests to weather, geocoding, reverse geocoding, and IP geolocation services",
+                        "Geolocation API (navigator.geolocation) — Attempts to obtain the user's current geographic coordinates through the browser's location service",
+                        "AbortController API — Applies a timeout to the IP-based geolocation request",
+                        "Intl.DateTimeFormat API — Calculates and formats the current local date and time for cities in different IANA time zones",
+                        "Open-Meteo Weather Forecast API — Provides current weather, hourly temperature, humidity, precipitation probability, wind speed, weather codes, UV index, and up to 16 days of forecast data",
+                        "Open-Meteo Geocoding API — Converts searched city names into latitude and longitude coordinates",
+                        "wttr.in JSON API — Provides current weather conditions and multi-day weather forecast data",
+                        "ipwho.is API — Provides IP-based fallback geolocation when browser GPS/location access is unavailable",
+                        "OpenStreetMap Nominatim Reverse Geocoding API — Converts GPS latitude and longitude coordinates into a nearby city or administrative area name",
+                        "Leaflet 1.9.4 — Renders the interactive 2D world map, manages map bounds and zoom levels, and displays clickable city markers and popups",
+                        "OpenStreetMap Tile Service — Supplies the map tiles displayed by the Leaflet world map",
+                        "Three.js — Provides the underlying WebGL-based 3D rendering infrastructure used by the Globe.gl visualization",
+                        "Globe.gl — Creates the interactive 3D globe, Earth and space imagery, city labels, clickable markers, and automatic globe rotation",
+                        "three-globe Image Assets — Supplies the Earth night texture and starry background image used by the 3D globe",
+                        "HTML5 <datalist> — Provides predefined city suggestions while allowing users to enter custom city names",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, transforms, backdrop-filter, fixed positioning, shadows, responsive layouts, and custom scrollbars",
+                        "JavaScript Events API — Handles click, keydown, change, and responsive sidebar interaction events",
+                        "Browser Timer API (setTimeout / clearTimeout) — Controls API request timeouts and delayed Leaflet map size recalculation",
+                        "Browser Web APIs (window / navigator / console) — Uses viewport detection, browser geolocation capability detection, logging, and runtime environment APIs"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: Browser JavaScript Runtime",
+                        "Weather Data Service: wttr.in JSON API",
+                        "Weather Data Service: Open-Meteo Forecast API",
+                        "Geocoding Service: Open-Meteo Geocoding API",
+                        "Reverse Geocoding Service: OpenStreetMap Nominatim API",
+                        "IP Geolocation Service: ipwho.is API",
+                        "Map Tile Service: OpenStreetMap",
+                        "3D Visualization CDN: Three.js and Globe.gl loaded from unpkg CDN",
+                        "No Application Server: UI rendering, weather API requests, location detection, geocoding, timezone calculation, map interaction, 3D globe rendering, and state management are performed directly in the browser"
                     ]
                 }</script>
             </a>
@@ -779,14 +806,29 @@
                 <span class="arrow">Go to Chrome Dino Game →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based Chrome Dino-style endless runner game module that uses the HTML5 Canvas API to render a dinosaur, randomly generated cactus obstacles, and a real-time score. The game supports keyboard, mouse, and touch controls for jumping, applies gravity-based movement and collision detection, continuously updates gameplay through requestAnimationFrame, handles game-over detection and automatic restart, and includes light/dark themes with a responsive floating sidebar layout.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements the complete game logic, player movement, obstacle generation, collision detection, scoring, animation loop, theme switching, sidebar controls, and responsive interaction without external frameworks or libraries",
+                        "HTML5 Canvas API — Provides the 2D game rendering surface used to draw the dinosaur, cactus obstacles, score text, and animated game frames",
+                        "CanvasRenderingContext2D — Used for clearing the canvas, drawing text-based game sprites, setting fonts and colors, applying coordinate transformations, and rendering the score",
+                        "requestAnimationFrame API — Runs the continuous browser-synchronized game loop for updating game state and rendering animation frames",
+                        "JavaScript Math API — Uses Math.random() for randomized cactus spawning and Math.floor() for integer score display",
+                        "JavaScript Timer API (setTimeout) — Delays the game-over alert briefly before restarting the game",
+                        "JavaScript Location API (location.reload) — Reloads the page to automatically restart the game after a game-over event",
+                        "JavaScript Events API — Handles keyboard, mouse click, touchstart, and button click interactions",
+                        "KeyboardEvent API — Detects the Space key and prevents its default browser behavior before triggering the jump action",
+                        "Touch Events API — Allows mobile users to trigger dinosaur jumps through touch input",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, transforms, backdrop-filter, gradients, shadows, fixed positioning, responsive layouts, and light/dark theme styling",
+                        "CSS Canvas Rendering — Uses emoji-based dinosaur and cactus characters rendered through Canvas text drawing instead of external image assets or sprite sheets",
+                        "Browser Web APIs (window / alert / location) — Handles global user input, displays the game-over score dialog, and restarts the browser application",
+                        "HTML5 <canvas> — Provides the fixed internal 800×250 game coordinate system while CSS scales the game display to fit the available content area"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: Browser JavaScript Runtime",
+                        "Client-Side Rendering: HTML5 Canvas 2D Rendering Context",
+                        "Client-Side Game Loop: requestAnimationFrame",
+                        "No Application Server: Game physics, jumping, gravity, obstacle spawning, collision detection, score calculation, rendering, game-over handling, restart processing, theme switching, and responsive UI behavior are performed entirely in the browser"
                     ]
                 }</script>
             </a>
@@ -798,14 +840,35 @@
                 <span class="arrow">Go to Glassmorphism →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based Glassmorphism CSS generator module that allows users to interactively customize a glass-effect element using range sliders. The module updates the preview in real time, generates the corresponding CSS code automatically, applies custom syntax highlighting and line numbers, synchronizes code scrolling, supports one-click clipboard copying and reset functionality, and includes light/dark themes with a responsive floating sidebar layout.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements slider-based style customization, real-time preview updates, CSS code generation, syntax highlighting, line-number generation, scroll synchronization, clipboard copying, reset functionality, theme switching, sidebar controls, and responsive interaction without external frameworks or libraries",
+                        "HTML5 DOM API — Provides access to input sliders, preview elements, code display containers, buttons, labels, and other interface elements through document.getElementById and querySelector methods",
+                        "CSSStyleDeclaration API — Dynamically applies generated Glassmorphism styles directly to the preview element, including width, height, background, backdrop-filter, border-radius, border, and box-shadow properties",
+                        "JavaScript Events API — Handles input, click, and scroll events for sliders, buttons, sidebar interactions, theme switching, and code display synchronization",
+                        "JavaScript Clipboard API (navigator.clipboard) — Copies the automatically generated CSS code to the user's clipboard",
+                        "JavaScript Timer API (setTimeout) — Temporarily changes the Copy button text to 'Copied!' before restoring its original label",
+                        "JavaScript String API — Builds the CSS output using template literals, splits generated code into lines, and processes text for syntax highlighting",
+                        "JavaScript Array API (Array.from) — Dynamically generates line numbers based on the number of lines in the generated CSS code",
+                        "JavaScript Regular Expression API — Parses CSS properties, values, numbers, units, and functions to generate custom syntax-highlighted HTML output",
+                        "HTML <textarea> and <pre> — Uses layered elements to separate the underlying CSS code data and scroll behavior from the syntax-highlighted visual representation",
+                        "CSS3 Glassmorphism Features — Uses rgba transparency, backdrop-filter, -webkit-backdrop-filter, blur effects, semi-transparent borders, border-radius, and box-shadow to create the glass-effect preview",
+                        "CSS Flexbox — Organizes the sidebar, main content, controls, code editor, and preview areas into responsive layouts",
+                        "CSS Media Queries — Converts the desktop two-column workspace into a mobile vertical layout and enables the collapsible mobile sidebar",
+                        "CSS Transitions and Transforms — Provides smooth theme, sidebar, button, and mobile navigation animations",
+                        "CSS Custom Syntax Highlighting — Uses dynamically generated span elements and predefined CSS classes to visually distinguish CSS properties, punctuation, numeric values, units, and other code components",
+                        "Browser Web APIs (window / document / navigator) — Handles global browser interaction, DOM manipulation, responsive behavior, and clipboard access",
+                        "No External Libraries or Frameworks — The entire Glassmorphism generator, code editor behavior, syntax highlighting, preview rendering, and UI functionality are implemented with native browser technologies only"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Processing: Browser JavaScript Runtime",
+                        "Client-Side UI Rendering: HTML DOM and CSS Rendering Engine",
+                        "Client-Side Style Generation: Dynamic CSSStyleDeclaration Updates",
+                        "Client-Side Code Generation: JavaScript Template Literals and String Processing",
+                        "Client-Side Syntax Highlighting: Regular Expression-Based CSS Parsing",
+                        "Client-Side Clipboard Processing: Browser Clipboard API",
+                        "No Application Server: Slider processing, Glassmorphism style generation, preview rendering, CSS code generation, syntax highlighting, line-number generation, code copying, reset processing, theme switching, sidebar controls, and responsive UI behavior are performed entirely in the browser"
                     ]
                 }</script>
             </a>
