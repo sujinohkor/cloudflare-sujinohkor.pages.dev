@@ -1098,14 +1098,27 @@
                 <span class="arrow">Go to Clock →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based clock and time utility module that displays the user's current time based on IP-derived timezone information, optionally refines the timezone using browser geolocation, and provides a customizable countdown timer and stopwatch with lap recording. It also supports fullscreen panels, responsive mobile layouts, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles clock synchronization, IP timezone detection, geolocation processing, timer/stopwatch logic, fullscreen controls, sidebar interactions, and theme switching",
+                        "Fetch API — Requests IP and timezone information from the external ipwho.is service",
+                        "ipwho.is API — Retrieves the visitor's IP-based timezone, timezone ID, and UTC offset for the primary clock display",
+                        "HTML5 Geolocation API — Uses navigator.geolocation.getCurrentPosition() to obtain the user's location and refine the displayed clock timezone",
+                        "HTML5 DOM API — Uses getElementById(), querySelector(), querySelectorAll(), createElement(), classList, innerText, innerHTML, and DOM event handling",
+                        "JavaScript Timers API — Uses setInterval() and clearInterval() for real-time clock updates, countdown timer execution, and stopwatch timing",
+                        "JavaScript Events API — Handles click, DOMContentLoaded, and responsive UI interactions",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, fixed positioning, responsive layouts, fullscreen states, shadows, and light/dark theme styling",
+                        "HTML5 Input API — Uses number inputs with min/max constraints for configurable hours, minutes, and seconds",
+                        "Browser Date/Time API — Uses Date, getTime(), getUTCHours(), getUTCMinutes(), getUTCSeconds(), and getTimezoneOffset() for timezone calculations and time formatting",
+                        "Web APIs (window / navigator / fetch / console / alert) — Provides browser-level timing, geolocation, HTTP requests, viewport handling, logging, and user notifications"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "External Time/Timezone Backend: ipwho.is API",
+                        "IP-Based Timezone Detection: ipwho.is provides timezone ID and UTC offset based on the visitor's public IP",
+                        "Browser Geolocation: HTML5 Geolocation API can be used to refine the displayed timezone when the user grants location permission",
+                        "Local Timezone Fallback: Browser Date API and getTimezoneOffset() provide a local-system timezone fallback when IP lookup fails or timezone data is unavailable",
+                        "No Custom Application Server: All clock calculations, timer/stopwatch operations, UI state management, and fullscreen behavior execute entirely in the browser"
                     ]
                 }</script>
             </a>
@@ -1117,14 +1130,30 @@
                 <span class="arrow">Go to Sticky Notes →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side sticky notes module that allows users to create, edit, search, drag, rotate, resize, reorder, export, import, and delete color-coded notes on a corkboard-style workspace. Notes are automatically persisted in the browser's localStorage, preserving their content, position, rotation, font size, color, and stacking order across page reloads. It also supports responsive mobile layouts, light/dark theme switching, and fullscreen corkboard mode.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles note creation, editing, deletion, dragging, rotation, font-size adjustment, searching, import/export, local persistence, fullscreen mode, sidebar controls, and theme switching",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelector(), querySelectorAll(), createElement(), classList, style manipulation, DOM event handling, and dynamic element generation",
+                        "Web Storage API (localStorage) — Persists sticky note data including text, color, position, rotation, font size, note ID, and z-index directly in the browser",
+                        "File API / FileReader API — Reads imported JSON files from the user's local device for restoring previously exported sticky note data",
+                        "Blob API — Generates downloadable JSON data for the sticky note export function",
+                        "URL API (createObjectURL / revokeObjectURL) — Creates temporary browser URLs for downloading exported note data",
+                        "HTML5 File Input API — Uses a hidden <input type=\"file\"> element with JSON file filtering to import saved notes",
+                        "JavaScript Mouse Events API — Handles mousedown, mousemove, and mouseup events for dragging notes and interactively rotating notes",
+                        "CSS3 — Uses Flexbox, CSS Grid, absolute positioning, transforms, box shadows, transitions, backdrop-filter, pseudo-elements, and responsive Media Queries",
+                        "CSS Responsive Design — Provides mobile-specific sidebar behavior, responsive workspace sizing, mobile menu controls, and layouts for screens up to 900px wide",
+                        "HTML5 Form/Input Elements — Uses textarea and text input elements for note content and keyword-based note searching",
+                        "External Texture Asset — Uses transparenttextures.com cork-board.png as the corkboard background texture",
+                        "External Image Asset — Uses Flaticon pushpin image as the visual pin decoration for each sticky note"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side Persistence: Browser localStorage",
+                        "Data Storage Model: Sticky note data is stored entirely in the user's browser under the 'corkboard_notes' localStorage key",
+                        "Import/Export Storage: JSON files are generated and read locally through browser File, Blob, and URL APIs",
+                        "No Custom Application Server: All note creation, editing, searching, positioning, persistence, import/export, and deletion operations are performed entirely in the browser",
+                        "No Remote Database: The application does not use Firebase, Firestore, a custom backend, or any server-side database for note storage",
+                        "External Static Assets: Corkboard texture and pushpin graphics are loaded directly from external CDN/web resources"
                     ]
                 }</script>
             </a>
@@ -1136,14 +1165,31 @@
                 <span class="arrow">Go to Pinyin to Mandarin →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side Pinyin-to-Mandarin input and conversion tool that converts typed Pinyin into Chinese character candidates through a remote Pinyin proxy, supports simplified/traditional Chinese conversion, punctuation candidate selection, keyboard-based candidate navigation, character counting, line numbering, local text persistence, text copying and file export, and an optional Pinyin guide view that displays pronunciation above Chinese characters. It also supports responsive layouts, fullscreen editing, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles Pinyin input detection, candidate management, Chinese conversion, keyboard navigation, text editing, line numbering, local storage, file export, fullscreen mode, responsive sidebar behavior, and theme switching",
+                        "OpenCC-JS (v1.0.5) — Converts Chinese text between Simplified Chinese (简体) and Traditional Chinese (繁體)",
+                        "pinyin-pro (v3.16.0) — Generates accurate Pinyin with tone symbols for the Pinyin Guide View using ruby annotations",
+                        "Pinyin Proxy API — Sends the currently typed Pinyin token to a remote proxy service and retrieves Chinese character candidate data",
+                        "Cloudflare Workers-based Proxy — The application uses https://pinyin-proxy.sujinohkor.workers.dev as the remote Pinyin conversion endpoint",
+                        "HTML5 DOM API — Uses getElementById(), querySelector(), querySelectorAll(), createElement(), classList, innerHTML, event listeners, and DOM manipulation for the editor and candidate interface",
+                        "Fetch API — Performs asynchronous HTTP requests to the remote Pinyin proxy endpoint",
+                        "Web Storage API (localStorage) — Persists the user's current Chinese text locally under the saved_pinyin_text key and restores it when the application is reopened",
+                        "HTML5 File/Blob APIs — Uses Blob and dynamically generated download links to export the edited Chinese text as a UTF-8 text file",
+                        "Clipboard API / Document Command API — Uses document.execCommand('copy') to copy the current editor contents to the clipboard",
+                        "HTML5 Textarea API — Provides the main text editor, cursor position tracking, text selection, scrolling, and keyboard input handling",
+                        "HTML5 Ruby Annotation API — Uses <ruby> and <rt> elements to display Pinyin pronunciation above Chinese characters in Pinyin Guide View",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, fullscreen layouts, responsive sidebar behavior, and light/dark theme styling",
+                        "JavaScript Events API — Handles input, keydown, click, scroll, resize, focus, and button interaction events",
+                        "Web APIs (window / document / fetch / Blob / URL / File APIs) — Provides browser-level DOM manipulation, HTTP communication, file generation, viewport handling, and user interaction functionality"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Remote Conversion Backend: Cloudflare Workers-based Pinyin proxy at pinyin-proxy.sujinohkor.workers.dev",
+                        "Pinyin Candidate Service: Chinese character candidates are retrieved through the remote proxy based on the currently typed Pinyin token",
+                        "No Application Database: The application does not use a persistent server-side database",
+                        "Client-Side Persistence: Current editor text is stored locally in the browser using localStorage",
+                        "External Processing Architecture: Pinyin candidate lookup is performed through the remote proxy, while Simplified/Traditional conversion, Pinyin guide rendering, editing, and persistence are handled entirely in the browser"
                     ]
                 }</script>
             </a>
@@ -1155,14 +1201,24 @@
                 <span class="arrow">Go to Diff Checker →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side text comparison tool that compares two text or code inputs line by line in real time, highlights added and removed lines, and displays unchanged lines for quick visual inspection. It provides a responsive three-pane workspace, mobile sidebar navigation, reset functionality, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles text comparison, real-time input processing, UI interactions, reset functionality, sidebar behavior, and theme switching",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), classList, innerHTML, textContent, and event handling for dynamic UI manipulation",
+                        "JavaScript Array and String APIs — Uses split(), Math.max(), and indexed iteration to divide input into lines and compare corresponding lines",
+                        "JavaScript Events API — Handles input, click, and responsive sidebar interaction events",
+                        "HTML5 Textarea API — Uses <textarea> elements and their value/input properties for collecting and processing original and modified text",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, shadows, borders, and light/dark theme styling",
+                        "HTML5 Responsive Web APIs — Uses viewport-based CSS media queries and window.innerWidth for mobile sidebar behavior and responsive layout changes",
+                        "Browser DOM Rendering — Dynamically generates comparison results using HTML span elements and CSS classes for added, removed, and unchanged lines"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages or other static web hosting",
+                        "Processing Backend: None — All text comparison is performed directly in the user's browser",
+                        "Data Storage: None — Input text is held only in the current page DOM and is not persisted",
+                        "External APIs: None",
+                        "Server-Side Processing: None — The comparison algorithm executes entirely through client-side JavaScript",
+                        "No Custom Application Server: The application is a fully client-side tool with no database, API server, or backend dependency"
                     ]
                 }</script>
             </a>
@@ -1174,14 +1230,26 @@
                 <span class="arrow">Go to Punycode and URL →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side Punycode and URL conversion utility that converts Unicode domain names into browser-resolved ASCII/Punycode hostnames and automatically encodes or decodes URL text. It provides preset examples, clipboard copy functionality, reset controls, responsive layouts, mobile sidebar navigation, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles Punycode conversion, URL encoding/decoding, preset loading, clipboard operations, reset functionality, UI interactions, sidebar behavior, and theme switching",
+                        "WHATWG URL API — Uses the browser's native URL constructor and hostname normalization to convert Unicode domain names into ASCII/Punycode-compatible hostnames",
+                        "encodeURIComponent() / decodeURIComponent() — Uses native JavaScript URI encoding and decoding functions for URL text conversion",
+                        "Clipboard API — Uses navigator.clipboard.writeText() to copy converted Punycode and URL results to the system clipboard",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), classList, value, and event handling for dynamic UI manipulation",
+                        "JavaScript Events API — Handles input and click events for real-time conversion, preset buttons, copy actions, theme switching, sidebar navigation, and reset operations",
+                        "HTML5 Textarea API — Uses editable and readonly <textarea> elements for Unicode domains, Punycode results, URL input, and conversion results",
+                        "CSS3 — Uses CSS Grid, Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, shadows, borders, and light/dark theme styling",
+                        "Responsive Web Design — Uses CSS media queries and window.innerWidth to switch the two-column conversion layout to a single-column mobile layout and control the mobile sidebar"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages or other static web hosting",
+                        "Processing Backend: None — All Punycode and URL conversion is performed directly in the user's browser",
+                        "Punycode Conversion Backend: Browser-native WHATWG URL implementation — Unicode domain normalization and ASCII hostname conversion are handled by the browser's URL parser",
+                        "URL Conversion Backend: None — encodeURIComponent() and decodeURIComponent() execute entirely client-side",
+                        "External APIs: None",
+                        "Data Storage: None — Input and conversion results are not persisted",
+                        "No Custom Application Server: The application is fully client-side and has no database, API server, or backend dependency"
                     ]
                 }</script>
             </a>
@@ -1193,14 +1261,26 @@
                 <span class="arrow">Go to Code Formatter →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side automatic code formatting module that detects the language of pasted source code and formats JSON, HTML, XML, CSS, and JavaScript directly in the browser. It provides real-time formatting while typing, displays the detected language, supports copying formatted output, resetting the workspace, responsive layouts, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles language detection, code formatting, UI interactions, clipboard operations, theme switching, sidebar behavior, and reset logic",
+                        "JSON.parse() / JSON.stringify() — Used to validate JSON input and produce consistently indented JSON output",
+                        "HTML DOM API — Uses document.getElementById(), querySelectorAll(), classList, textContent, value, and event handling for UI manipulation",
+                        "Clipboard API — Uses navigator.clipboard.writeText() to copy formatted code to the system clipboard",
+                        "JavaScript String / RegExp APIs — Used for source-code inspection, language detection, whitespace normalization, pattern matching, and formatting transformations",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, backdrop-filter, borders, shadows, responsive layouts, and light/dark theme styling",
+                        "HTML5 Textarea API — Uses editable and readonly <textarea> elements for source-code input and formatted output",
+                        "JavaScript Events API — Handles input and click events for real-time formatting, copying, navigation, theme switching, sidebar control, and reset operations",
+                        "Web APIs (window / navigator / document) — Uses browser APIs for responsive viewport detection, clipboard access, DOM manipulation, and UI behavior",
+                        "No External Formatting Library — JSON, HTML/XML, CSS, and JavaScript formatting are implemented with custom client-side JavaScript functions"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages or equivalent static web hosting",
+                        "Processing Backend: None — All language detection and code formatting are performed directly in the user's browser",
+                        "Data Storage: None — User-entered source code is not persisted to a database or server by this application",
+                        "External API Dependency: None — The formatter does not make external HTTP/API requests",
+                        "Client-Side Processing: detectLanguage(), formatHtmlXml(), formatCss(), and formatJs() perform all core processing locally",
+                        "No Custom Application Server: The application operates as a standalone static client-side web application with no server-side processing or database integration"
                     ]
                 }</script>
             </a>
