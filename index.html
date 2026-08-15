@@ -1292,14 +1292,30 @@
                 <span class="arrow">Go to Pixel Board →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based pixel drawing board that allows users to create pixel art with 1px × 1px precision, select drawing colors, draw continuously with mouse or touch input, clear the canvas, persist artwork locally, export the drawing as a PNG image, toggle between light and dark themes, and expand the canvas into a fullscreen workspace. It supports responsive sidebar controls for desktop and mobile layouts.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles canvas drawing, mouse/touch input, color selection, fullscreen mode, theme switching, local persistence, responsive sidebar behavior, and PNG export",
+                        "HTML5 Canvas API — Provides the pixel-based drawing surface through canvas.getContext('2d'), fillRect(), image rendering, and canvas.toDataURL()",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElement(), classList manipulation, DOM event handling, and dynamic UI updates",
+                        "Canvas 2D Rendering Context — Uses fillStyle, fillRect(), imageSmoothingEnabled, drawImage(), and clearRect() for pixel rendering and canvas management",
+                        "Web Storage API (localStorage) — Persists the user's pixel artwork locally in the browser using a data URL",
+                        "HTML5 File/Download APIs — Uses a dynamically created <a> element with the download attribute to export pixel artwork as a PNG",
+                        "JavaScript Events API — Handles mousedown, mousemove, mouseup, touchstart, touchmove, touchend, click, resize, load, and document-level click events",
+                        "Touch Events API — Enables drawing on touch-enabled mobile devices through touchstart, touchmove, and touchend",
+                        "Mouse Events API — Enables desktop drawing through mousedown, mousemove, and mouseup events",
+                        "Responsive CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, backdrop-filter, fixed positioning, and responsive sidebar behavior",
+                        "CSS3 Light/Dark Theme Styling — Implements theme switching through the body.light-mode class and corresponding light-mode color and layout rules",
+                        "CSS3 Fullscreen Layout Styling — Uses the body.is-fullscreen class to hide the sidebar and header and expand the canvas to the full viewport",
+                        "Browser Image API — Uses Image() objects to restore locally saved canvas data and preserve artwork when the canvas is resized or fullscreen mode changes",
+                        "Bresenham-style Line Drawing Algorithm — Implements drawLine() to calculate continuous pixel paths between mouse/touch coordinates for smooth 1px drawing"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Client-Side Application — The entire drawing application runs directly in the user's browser without a custom application server",
+                        "Local Persistence Backend: Browser localStorage — Pixel artwork is serialized using canvas.toDataURL() and stored under the pixel_paint_data key",
+                        "No Remote Database — Drawings are not synchronized to a server or shared between users",
+                        "No External API Dependencies — The application does not call external APIs or third-party backend services",
+                        "PNG Export: Browser Canvas API — Artwork is converted to a PNG data URL using canvas.toDataURL() and downloaded through the browser",
+                        "No Custom Application Server — All drawing, persistence, theme management, responsive behavior, and export operations are handled client-side"
                     ]
                 }</script>
             </a>
@@ -1311,14 +1327,32 @@
                 <span class="arrow">Go to Emoji Canvas →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side emoji canvas application that allows users to place text or emoji items on an interactive board, drag them freely, resize them with the mouse wheel, rotate them with right-click dragging, change their stacking order, search/filter placed items, and persist the canvas state in browser localStorage. It also supports JSON export/import, full-canvas maximize mode, mobile-responsive sidebar navigation, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles emoji creation, dragging, resizing, rotation, searching, deletion, persistence, import/export, fullscreen mode, responsive sidebar behavior, and theme switching",
+                        "HTML5 DOM API — Uses getElementById(), querySelectorAll(), createElement(), appendChild(), removeChild(), classList, style manipulation, and DOM event handling",
+                        "Browser localStorage API — Persists canvas items including position, size, rotation, character content, and z-index across page reloads",
+                        "HTML5 File API — Uses input type=file and FileReader to import previously exported JSON canvas data",
+                        "Blob API — Generates downloadable JSON files for canvas data export",
+                        "URL.createObjectURL() — Creates temporary object URLs for client-side JSON file downloads",
+                        "JavaScript Events API — Handles click, mousedown, mousemove, mouseup, wheel, input, contextmenu, load, and button interaction events",
+                        "Mouse Pointer Events — Uses mouse coordinates and button states to implement item dragging and right-click rotation",
+                        "CSS3 — Uses Flexbox, CSS Grid, transitions, transforms, backdrop-filter, border-radius, box-shadow, fixed positioning, and responsive styling",
+                        "CSS Media Queries — Provides mobile layouts and sidebar behavior at viewport widths of 900px or below",
+                        "CSS Transform API — Uses rotate() to dynamically rotate canvas items",
+                        "HTML5 Responsive Design APIs — Uses viewport metadata and clientWidth/clientHeight calculations to position and constrain canvas items",
+                        "HTML5 Download API — Uses an anchor element with the download attribute to export canvas data as emoji_canvas.json",
+                        "No External JavaScript Libraries — The application is implemented entirely with native HTML, CSS, and JavaScript APIs"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with static web hosting such as Cloudflare Pages",
+                        "Data Persistence: Browser localStorage",
+                        "File Storage: No server-side file storage; JSON import/export is performed entirely in the browser",
+                        "Application Backend: No custom application server",
+                        "Database Backend: None; canvas state is stored locally in the user's browser",
+                        "Real-Time Synchronization: None; the application operates as a single-client local canvas",
+                        "External APIs: None",
+                        "Client-Side State Management: localStorage key 'emoji_canvas_data' stores all canvas item metadata"
                     ]
                 }</script>
             </a>
@@ -1330,14 +1364,34 @@
                 <span class="arrow">Go to KPT Board →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side KPT (Keep, Problem, Try) retrospective board that allows users to create color-coded retrospective cards, write feedback, add author-attributed comments, freely drag and arrange cards, search notes by content/category/comments, and persist the entire board state in browser localStorage. It supports randomized initial card placement and slight rotation for a physical sticky-note effect, card stacking order management, JSON export/import, board reset, author-name persistence, fullscreen board mode, mobile-responsive navigation, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles KPT card creation, editing, dragging, searching, commenting, deletion, z-index management, persistence, import/export, fullscreen mode, responsive sidebar behavior, and theme switching",
+                        "HTML5 DOM API — Uses getElementById(), querySelectorAll(), querySelector(), createElement(), appendChild(), removeChild(), classList, innerHTML, style manipulation, and DOM event handling",
+                        "Browser localStorage API — Persists author name and complete KPT board data including card position, category, content, comments, rotation, CSS class, and z-index",
+                        "HTML5 File API — Uses input type=file and FileReader to import previously exported KPT JSON data",
+                        "Blob API — Generates downloadable JSON files containing retrospective board data",
+                        "URL.createObjectURL() — Creates temporary browser URLs for client-side JSON file downloads",
+                        "JavaScript Events API — Handles click, mousedown, mousemove, mouseup, input, load, and button interactions",
+                        "Mouse Event API — Uses mouse coordinates and button interactions to implement draggable card positioning",
+                        "CSS3 — Uses Flexbox, CSS Grid, absolute/fixed positioning, transitions, transforms, backdrop-filter, box-shadow, border-radius, opacity, and responsive styling",
+                        "CSS Transform API — Uses rotate() to apply and persist the randomized or restored rotation angle of KPT cards",
+                        "CSS Media Queries — Provides mobile-responsive sidebar behavior and layout changes at viewport widths of 900px or below",
+                        "HTML5 Form Controls — Uses input and textarea elements for author names, retrospective content, search terms, and comments",
+                        "HTML5 Download API — Uses an anchor element with the download attribute to export data as kpt_retrospective.json",
+                        "External Image Resources — Loads a cork-board texture from transparenttextures.com and a pushpin icon from flaticon.com for the visual board and card decoration",
+                        "No External JavaScript Libraries — All application logic is implemented using native HTML, CSS, and JavaScript APIs"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with static hosting platforms such as Cloudflare Pages",
+                        "Database Backend: None; all retrospective data is stored locally in the browser",
+                        "Data Persistence: Browser localStorage using 'kpt_board_data' and 'kpt_author_name' keys",
+                        "Real-Time Synchronization: None; the board is local to the current browser/device and has no server-side collaboration layer",
+                        "File Storage: No server-side storage; JSON import/export is handled entirely on the client",
+                        "External APIs: None for application logic or data processing",
+                        "External Static Assets: transparenttextures.com for cork-board background texture and flaticon.com for pushpin decoration",
+                        "Application Server: No custom backend server",
+                        "Client-Side State Management: localStorage stores KPT cards, comments, author name, positions, rotations, categories, and stacking order"
                     ]
                 }</script>
             </a>
@@ -1349,14 +1403,32 @@
                 <span class="arrow">Go to Treasure Hunt →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side compass treasure hunt game that challenges the player to navigate through a dark, fog-covered canvas using Arrow Keys or WASD to locate a randomly positioned hidden treasure. It provides a real-time compass HUD that points toward the treasure, continuously displays the distance to the target, limits player movement within the canvas boundaries, reveals the treasure when the player approaches, and automatically starts a new hunt after discovery. It also supports fullscreen gameplay, responsive mobile navigation, canvas resizing, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements player movement, random treasure placement, collision/distance detection, compass calculations, game state management, rendering, restart logic, fullscreen mode, theme switching, and responsive behavior",
+                        "HTML5 Canvas API — Uses <canvas>, getContext('2d'), clearRect(), arc(), fill(), fillRect(), createRadialGradient(), fillText(), and compositing operations for game rendering and fog-of-war effects",
+                        "Canvas 2D Rendering Context — Draws the player, treasure indicator, dark fog layer, radial visibility area, and game elements directly on the canvas",
+                        "Canvas Composite Operations — Uses globalCompositeOperation='destination-out' to carve a transparent visibility area through the fog surrounding the player",
+                        "JavaScript Keyboard Events API — Uses keydown and keyup events to track Arrow Keys and WASD movement",
+                        "JavaScript Animation API — Uses requestAnimationFrame() to implement the continuous game loop",
+                        "JavaScript Math API — Uses Math.random(), Math.sqrt(), Math.atan2(), Math.PI, Math.max(), Math.min(), and Math.round() for random positioning, distance calculation, compass direction, movement constraints, and HUD values",
+                        "HTML5 DOM API — Uses getElementById(), classList, textContent, style manipulation, querySelectorAll(), and event listeners for game controls and UI updates",
+                        "CSS3 — Uses Flexbox, fixed positioning, transitions, transforms, backdrop-filter, border-radius, box-shadow, and responsive styling",
+                        "CSS Media Queries — Provides mobile-responsive sidebar behavior at viewport widths of 900px or below",
+                        "CSS Transform API — Dynamically rotates the compass needle according to the calculated direction of the treasure",
+                        "Responsive Canvas Handling — Uses clientWidth/clientHeight and the window resize event to synchronize the canvas dimensions with the game container",
+                        "Browser Alert API — Displays a completion message when the player reaches the treasure",
+                        "No External JavaScript Libraries — The game is implemented entirely with native HTML, CSS, JavaScript, and Canvas APIs"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with static hosting platforms such as Cloudflare Pages",
+                        "Game Backend: None; all game logic and state are executed locally in the browser",
+                        "Database Backend: None",
+                        "Data Persistence: None; player position, treasure position, and game state exist only during the current page session",
+                        "Real-Time Synchronization: None; the game is a single-player local experience",
+                        "External APIs: None",
+                        "Server-Side Processing: None; random treasure generation, movement, distance calculation, rendering, and win detection are entirely client-side",
+                        "Application Server: No custom backend server"
                     ]
                 }</script>
             </a>
@@ -1368,14 +1440,30 @@
                 <span class="arrow">Go to Windows Solitaire →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based Windows Solitaire game module that implements a playable Klondike-style card game with deck generation, Fisher-Yates-style shuffling, automatic card dealing, stock and waste piles, seven tableau columns, four foundation piles, drag-and-drop card movement, card flipping, scoring, elapsed-time tracking, win detection, new-game reset, responsive layouts, fullscreen mode, and light/dark theme switching. The entire game state and gameplay logic run locally in the browser without a database or custom application server.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements deck generation, shuffling, card dealing, game state management, movement validation, scoring, timer logic, rendering, win detection, fullscreen behavior, sidebar controls, and theme switching",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), createElement(), innerHTML, className, style manipulation, and event listeners for dynamic game-board rendering and UI control",
+                        "JavaScript Array API — Uses arrays and methods such as push(), pop(), splice(), slice(), reverse(), map(), forEach(), and reduce() to manage the deck, tableau, stock, waste, and foundation piles",
+                        "JavaScript Math API — Uses Math.random() for card shuffling and Math.floor() for selecting random deck positions",
+                        "HTML5 Drag and Drop API — Uses draggable, dragstart, dragover, drop, and DataTransfer to support moving cards between the waste pile, tableau columns, and foundation piles",
+                        "JavaScript Timer API — Uses setInterval() and clearInterval() to maintain the elapsed game time in seconds",
+                        "JavaScript Events API — Handles click, dragstart, dragover, drop, load, and other browser events for gameplay and interface interactions",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, gradients, positioning, shadows, border styling, responsive layouts, and light/dark theme styling",
+                        "HTML5 Responsive Design — Uses viewport configuration and CSS media queries to adapt the sidebar, game board, and controls to desktop and mobile screen sizes",
+                        "Fullscreen UI Logic — Implements application-level fullscreen presentation by dynamically toggling CSS classes and expanding the game content to the viewport",
+                        "Unicode Card Symbols — Uses Unicode suit characters ♠, ♣, ♥, and ♦ for rendering playing-card suits without external card-image assets",
+                        "Browser Local Execution — All deck state, game rules, score, timer, and gameplay interactions are processed entirely within the client browser"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Cloudflare Pages",
+                        "Game Backend: None — The game operates entirely client-side and does not require a server-side game engine",
+                        "Database Backend: None — No persistent database or external data store is used",
+                        "Real-Time Data Synchronization: None — Game state exists only in the current browser session",
+                        "Server-Side Processing: None — Deck generation, shuffling, dealing, card validation, scoring, timing, and win detection are executed in JavaScript on the client",
+                        "External APIs: None — The application does not call external APIs or web services",
+                        "Persistence: None — Score, elapsed time, card arrangement, and game progress are reset when a new game starts or the page is reloaded",
+                        "No Custom Application Server: Game logic is executed directly in the browser, while Cloudflare Pages serves the static HTML, CSS, and JavaScript files"
                     ]
                 }</script>
             </a>
@@ -1387,14 +1475,33 @@
                 <span class="arrow">Go to HTML Visualizer →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side HTML dependency visualization and architecture analysis tool that allows users to upload a web project folder, automatically parses HTML, CSS, JavaScript, image, and linked resources, discovers cross-file dependencies, detects circular dependency paths, and renders the resulting architecture as an interactive Canvas-based network graph. It provides node inspection, dependency statistics, keyword filtering, draggable nodes, canvas panning and zooming, cycle highlighting, force-circle layout recalculation, JSON architecture export, sample project loading, fullscreen mode, responsive sidebar controls, and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements project file parsing, dependency extraction, graph construction, cycle detection, Canvas rendering, node interaction, filtering, layout calculation, export, fullscreen mode, theme switching, and UI state management",
+                        "HTML5 File API — Uses <input type=\"file\"> with webkitdirectory/directory/multiple to allow users to select and upload an entire project folder, and File.text() to read source files directly in the browser",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), createElement(), classList, event listeners, and DOM manipulation for UI controls and project analysis",
+                        "DOMParser API — Parses uploaded HTML documents into a DOM structure so that <link>, <script>, <img>, and <a> references can be inspected and converted into dependency edges",
+                        "HTML5 Canvas API — Uses <canvas>, getContext('2d'), drawing primitives, paths, roundRect(), transformations, text rendering, shadows, and coordinate transformations to render the dependency network graph",
+                        "Canvas Interaction APIs — Handles mousedown, mousemove, mouseup, and wheel events for node dragging, graph panning, node selection, hover detection, and zoom control",
+                        "JavaScript Regular Expressions — Uses regex-based import extraction to identify ES module import statements from external JavaScript and inline script content",
+                        "JavaScript Map API — Uses Map to associate uploaded project relative paths with File objects and their source text for dependency resolution",
+                        "JavaScript Blob API — Creates a JSON Blob containing nodes, edges, and detected cycles for client-side architecture analysis export",
+                        "URL.createObjectURL() API — Generates a temporary browser URL for downloading the exported JSON analysis without a server",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, shadows, rounded borders, responsive layouts, fullscreen styling, and light/dark theme rules",
+                        "HTML5 Responsive APIs — Uses window.innerWidth, resize events, viewport sizing, and responsive CSS breakpoints to adapt the interface for desktop and mobile screens",
+                        "JavaScript Graph Algorithms — Uses depth-first search (DFS), adjacency lists, visited/stack tracking, and path tracking to detect circular dependency relationships",
+                        "JavaScript Array/Object APIs — Uses map(), filter(), reduce(), find(), some(), forEach(), push(), splice(), slice(), and object structures to manage graph nodes, edges, cycles, and project metadata",
+                        "Font Awesome 6.5.1 CDN — External icon font stylesheet is included through cdnjs, although no Font Awesome icons are actively used in the provided interface"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Client-Side Processing: All project files are read and analyzed locally in the user's browser",
+                        "No Application Server: The uploaded source files are not sent to a custom backend; dependency extraction, graph construction, cycle analysis, and visualization are performed entirely client-side",
+                        "No Database Backend: No persistent database or remote data storage is used",
+                        "No External Analysis API: HTML, CSS, JavaScript, image, and link dependency analysis is performed locally using browser APIs",
+                        "Client-Side File Export: Architecture analysis is exported directly from the browser as html_dependency_analysis.json using Blob and URL.createObjectURL()",
+                        "External CDN Dependency: Font Awesome 6.5.1 is loaded from cdnjs.cloudflare.com",
+                        "Static Hosting Compatible: The application can be deployed as a static HTML application on platforms such as Cloudflare Pages, GitHub Pages, or any conventional static web host",
+                        "Sample Data Mode: Includes an embedded sample project graph for demonstration without requiring an uploaded project folder"
                     ]
                 }</script>
             </a>
@@ -1406,14 +1513,30 @@
                 <span class="arrow">Go to Sorting Algorithm →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "An interactive sorting algorithm education module that visualizes Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, and Heap Sort in real time. It provides synchronized source-code highlighting, comparison counting, time-complexity information, random data generation, pause/reset controls, and a head-to-head algorithm race mode. It also supports responsive mobile layouts and light/dark theme switching.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Implements sorting algorithms, visualization control, algorithm selection, race mode, code synchronization, comparison counting, random data generation, pause/reset functionality, and theme/sidebar interactions",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), createElement(), classList, innerHTML, textContent, style, and DOM manipulation for dynamic visualization",
+                        "JavaScript Async/Await — Used to execute sorting algorithms step-by-step while synchronizing animation and visualization updates",
+                        "JavaScript Promise API — Uses Promise and Promise.all() to control animation delays and execute two sorting algorithms concurrently in race mode",
+                        "JavaScript Array API — Uses array operations including push(), slice(), spread syntax, Array.from(), and destructuring assignment for sorting data management",
+                        "JavaScript Math API — Uses Math.random(), Math.floor(), and mathematical calculations for random data generation, midpoint calculation, and heap indexing",
+                        "JavaScript Events API — Handles click, change, load, and button interactions for navigation, algorithm selection, visualization controls, sidebar operations, and theme switching",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, gradients/transparency, shadows, borders, and light/dark theme styling",
+                        "CSS Custom Properties — Uses the --count variable to dynamically calculate sorting bar widths",
+                        "HTML5 Select API — Uses <select> and <option> elements for algorithm and race-mode selection",
+                        "HTML5 Button API — Uses button elements and onclick handlers for mode switching, sorting controls, navigation, sidebar controls, and theme switching",
+                        "Browser Window API — Uses window.onload and window.innerWidth for initialization and responsive sidebar behavior",
+                        "No External JavaScript Libraries — The module is implemented entirely with native browser APIs and custom JavaScript",
+                        "No External Database or API — Sorting data is generated locally in the browser and is not persisted or transmitted to an external service"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: The HTML, CSS, and JavaScript can be served directly from a static web server or static hosting platform",
+                        "Client-Side Processing: All sorting algorithms and visualization logic execute directly in the visitor's browser",
+                        "No Database Backend: Random sorting arrays and visualization state exist only in browser memory",
+                        "No Real-Time Backend: Algorithm animations are synchronized locally using JavaScript async/await and Promise-based delays",
+                        "No Custom Application Server: The module does not require a server-side application layer or API for its core functionality",
+                        "No External API Integration: The source contains no fetch(), XMLHttpRequest, WebSocket, Firebase, or other network-based data operations"
                     ]
                 }</script>
             </a>
@@ -1423,6 +1546,30 @@
                 <h3>Pokemon Games</h3>
                 <p>pokemon</p>
                 <span class="arrow">Go to Pokemon Games →</span>
+                <script type="application/json" class="app-meta">{
+                    "desc": "A browser-based retro Pokémon game launcher that provides a categorized menu for selecting and loading multiple Pokémon game variants through dynamically generated iframes. It supports English and Korean game versions, different difficulty and ROM-hack editions, responsive mobile sidebar navigation, and light/dark theme switching. The selected game is loaded directly from local HTML game resources under the /tools/ directory, with no database, external API, or custom application server logic implemented in this source.",
+                    "deps": [
+                        "Vanilla JavaScript (ES6+) — Handles game selection, dynamic iframe generation, active menu state management, sidebar interactions, and light/dark theme switching",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), innerHTML, classList, and DOM event handling",
+                        "HTML5 iframe — Embeds and displays the selected Pokémon game as a separate local HTML document inside the main content area",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, fixed positioning, responsive layouts, borders, shadows, and light/dark theme styling",
+                        "CSS Media Queries — Provides responsive behavior for screens 900px wide or smaller, including mobile sidebar navigation",
+                        "JavaScript Events API — Handles window.onload, click events, sidebar interactions, and theme switching",
+                        "Window / Location Web APIs — Uses window.onload, window.innerWidth, and location.href for page initialization, responsive behavior, and navigation",
+                        "Local Static Game Resources — Loads Pokémon game HTML files from the site's /tools/ directory, including Pokémon Red, Blue, Yellow, and Team Rocket variants",
+                        "HTML5 Responsive Design — Uses viewport metadata and responsive CSS to adapt the launcher interface to desktop and mobile devices"
+                    ],
+                    "backends": [
+                        "Static Hosting: The launcher and referenced Pokémon game HTML files are designed to be served as static web resources",
+                        "Game Runtime Backend: No backend service is implemented in this source; the actual game is executed inside locally hosted iframe documents",
+                        "Game Resource Loading: Selected games are loaded directly from local /tools/*.html resources through iframe src attributes",
+                        "External API: None",
+                        "Database Backend: None",
+                        "Real-Time Data Synchronization: None",
+                        "Custom Application Server: None — Game selection and UI behavior are handled entirely in the browser, while game content is loaded from static local HTML files",
+                        "Client-Side State: The currently selected game, active menu state, sidebar state, and theme state exist only in browser memory and are not persisted"
+                    ]
+                }</script>
             </a>-->
             
             <a href="https://sujinohkor.pages.dev/tools/yt-live-news" class="card" data-category="fun">
@@ -1432,14 +1579,31 @@
                 <span class="arrow">Go to Live News →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A responsive YouTube Live News aggregator that embeds and switches between six live news channels from English and Mandarin-speaking broadcasters. It provides client-side channel selection, dynamically replaces the embedded YouTube player, highlights the currently selected channel, supports YouTube's privacy-enhanced embed domain, autoplay, fullscreen playback, mobile sidebar navigation, and light/dark theme switching. The application itself contains no custom database, application server, or persistent data layer.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles channel switching, dynamic iframe generation, active channel state, sidebar controls, mobile navigation, and theme switching",
+                        "YouTube Embedded Player — Provides live video playback through YouTube's embedded iframe player",
+                        "YouTube Privacy-Enhanced Mode (youtube-nocookie.com) — Used as the iframe host for embedded YouTube content with privacy-enhanced embedding",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), innerHTML, classList, and DOM event listeners to manipulate the interface",
+                        "HTML5 iframe API — Uses dynamically generated <iframe> elements to embed external YouTube live streams",
+                        "JavaScript Window API — Uses window.onload, window.location.origin, and window.innerWidth for initialization, origin handling, and responsive behavior",
+                        "JavaScript Events API — Handles load, click, and button interactions for channel selection, sidebar navigation, and theme switching",
+                        "URL / Encoding API — Uses encodeURIComponent() to safely insert the current page origin into the YouTube embed URL",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, fixed positioning, borders, shadows, and light/dark theme styling",
+                        "CSS Media Queries — Provides mobile-specific sidebar behavior and responsive content sizing at a 900px breakpoint",
+                        "Referrer Policy — Uses strict-origin-when-cross-origin through both the HTML meta referrer policy and iframe referrerpolicy attribute",
+                        "YouTube Player Permissions — Uses iframe allow attributes for autoplay, encrypted-media, picture-in-picture, clipboard-write, accelerometer, and fullscreen playback"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "External Video Backend: YouTube Live — All actual live news video streams are provided by external YouTube servers",
+                        "Video Embedding: YouTube Privacy-Enhanced Embed — The page loads selected broadcasts through youtube-nocookie.com/embed endpoints",
+                        "No Database Backend: The application does not store channel selections, users, or other application data",
+                        "No Custom Application Server: Channel switching and iframe generation are performed entirely in the browser",
+                        "No Custom API: The source does not call a REST API, GraphQL API, Firebase service, or other application backend",
+                        "External Content Sources: CNN News Live, ABC News Live, Sky News Live, TVBS News Live, 民視新聞網 News Live, and CTS News Live are embedded as predefined YouTube video/live-stream IDs",
+                        "Client-Side Channel Routing: switchChannel() selects a predefined YouTube embed URL and replaces board.innerHTML with the corresponding iframe",
+                        "No Persistent Storage: The selected channel is not saved to localStorage, cookies, a database, or another persistent storage mechanism",
+                        "Static Hosting Compatible: The application can be served as a static HTML/CSS/JavaScript page because it has no custom server-side processing"
                     ]
                 }</script>
             </a>
@@ -1451,14 +1615,28 @@
                 <span class="arrow">Go to Starry Canvas →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A browser-based interactive starry canvas that allows users to create animated stars by clicking, dragging, or touching the canvas. It supports temporary fading stars and persistent pinned stars, with animated pulsing effects, responsive canvas resizing, fullscreen mode, mobile sidebar controls, and light/dark theme switching. The application runs entirely client-side using the HTML Canvas 2D API and does not use a database, custom backend server, external API, or persistent storage.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles star generation, animation state, pinning mode, reset functionality, fullscreen mode, sidebar controls, theme switching, and responsive behavior",
+                        "HTML5 Canvas 2D API — Uses canvas.getContext('2d'), clearRect(), beginPath(), arc(), fill(), save(), restore(), globalAlpha, shadowBlur, and shadowColor to render and animate stars",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), classList, createElement(), getBoundingClientRect(), clientWidth, and clientHeight for DOM manipulation and layout calculations",
+                        "JavaScript Events API — Handles click, mousedown, mousemove, mouseup, touchstart, touchmove, touchend, resize, and button interactions",
+                        "Web Animation API via requestAnimationFrame() — Provides the continuous rendering loop used to animate fading and pulsing stars",
+                        "Pointer / Touch Events — Supports mouse and touchscreen interaction for drawing stars directly on the canvas",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, gradients, responsive layouts, fixed positioning, fullscreen styling, and light/dark theme styling",
+                        "CSS Media Queries — Provides responsive behavior for screens at or below 900px, including the collapsible mobile sidebar and mobile layout adjustments",
+                        "HTML5 Canvas Coordinate API — Uses getBoundingClientRect() to convert client mouse/touch coordinates into canvas-local coordinates",
+                        "Browser Window API — Uses window.addEventListener(), window.innerWidth, and window.requestAnimationFrame() for viewport, input, resizing, and animation handling"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "No Database Backend: The application does not store star data in a database",
+                        "No Custom Application Server: All application logic executes directly in the user's browser",
+                        "No External API: The source does not make HTTP/API requests to external services",
+                        "No Real-Time Remote Synchronization: Star states exist only in the current browser session and are not synchronized between users or devices",
+                        "Client-Side Rendering: Stars are generated and rendered locally through the HTML Canvas 2D API",
+                        "In-Memory State: fadingStars and lockedStars arrays hold the current star objects only in JavaScript memory",
+                        "No Persistent Storage: Reloading the page clears all generated stars and resets the application state",
+                        "Static Hosting Compatible: Because there is no server-side application logic, database, or API dependency, the page can be deployed as a static HTML/CSS/JavaScript application on services such as Cloudflare Pages"
                     ]
                 }</script>
             </a>
@@ -1470,14 +1648,30 @@
                 <span class="arrow">Go to Retro Game Emulator →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side retro game emulator module that allows users to upload or drag and drop supported ROM files (.gba, .gb, .gbc, .nes, .snes/.smc), automatically determines the appropriate emulator core from the file extension, and launches the selected game directly in the browser using EmulatorJS. It provides a responsive emulator workspace, ROM file status display, drag-and-drop interaction, game reset functionality, mobile sidebar navigation, and light/dark theme switching. ROM files are handled locally in the browser through object URLs and are not uploaded to a custom application server.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles ROM file selection, extension detection, emulator configuration, drag-and-drop interactions, UI state management, theme switching, sidebar behavior, and reset functionality",
+                        "EmulatorJS — Browser-based emulation framework loaded dynamically from the EmulatorJS CDN to execute supported retro game ROMs",
+                        "EmulatorJS Loader — Uses https://cdn.emulatorjs.org/latest/data/loader.js to initialize the emulator after a ROM is selected",
+                        "EmulatorJS Emulator Cores — Selects the GBA, NES, SNES, or Game Boy/Game Boy Color core based on the uploaded ROM extension",
+                        "HTML5 File API — Uses <input type=\"file\">, File objects, file.name, and file selection events to receive ROM files from the user",
+                        "URL Web API — Uses URL.createObjectURL() to create a temporary browser-local URL for the selected ROM file",
+                        "HTML5 Drag and Drop API — Handles dragover, dragleave, and drop events for direct ROM file loading",
+                        "HTML5 DOM API — Uses document.getElementById(), createElement(), appendChild(), classList, style manipulation, and event listeners for dynamic emulator initialization and UI control",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, responsive layouts, gradients, borders, shadows, and light/dark theme styling",
+                        "Responsive Web Design — Uses a 900px Media Query to switch the floating sidebar into a mobile navigation menu and adapt the emulator workspace to smaller screens",
+                        "JavaScript Events API — Handles click, change, dragover, dragleave, drop, and dynamically registered UI events",
+                        "No Application Database — Game state, ROM metadata, and user interface state are maintained in the browser session rather than a database"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with Cloudflare Pages or other static web hosting",
+                        "External Emulator Backend/Runtime: EmulatorJS is loaded from the official EmulatorJS CDN at cdn.emulatorjs.org",
+                        "ROM Processing: Selected ROM files are processed locally in the browser using File objects and URL.createObjectURL()",
+                        "No Custom Application Server: ROM files are not submitted to an application backend; the browser passes the local object URL to EmulatorJS",
+                        "No Database Backend: The module does not use Firebase, Firestore, or any persistent database",
+                        "External CDN Dependency: EmulatorJS loader and emulator runtime assets are retrieved from cdn.emulatorjs.org",
+                        "Client-Side Architecture: File selection, ROM detection, emulator configuration, UI interaction, and game execution are performed in the browser",
+                        "Temporary Client-Side File Access: Uploaded ROM data is exposed to the emulator through a browser-generated object URL rather than a permanent server-side file URL"
                     ]
                 }</script>
             </a>
@@ -1489,14 +1683,26 @@
                 <span class="arrow">Go to 24 Solar Term →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "사용자들이 자유롭게 방명록을 남길 수 있는 커뮤니티 모듈입니다.",
+                    "desc": "A client-side interactive 24 Solar Terms visualization module that presents the 24 traditional solar terms in a continuously rotating circular wheel. Users can hover over or click individual terms to view descriptions, dynamically change the seasonal background and falling seasonal emoji effects, search and filter terms, toggle light/dark mode, and switch to a fullscreen presentation. The module is fully responsive for desktop and mobile layouts and operates without external libraries, databases, or custom application servers.",
                     "deps": [
-                        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-                        "/codes/guest-book/module.js"
+                        "Vanilla JavaScript (ES6+) — Handles solar-term data rendering, circular positioning, search/filtering, seasonal interactions, falling emoji animation, fullscreen mode, theme switching, sidebar behavior, and state reset logic",
+                        "HTML5 DOM API — Uses document.getElementById(), querySelectorAll(), createElement(), classList, style manipulation, and event listeners for dynamic UI generation and interaction",
+                        "CSS3 — Uses Flexbox, CSS Grid, Media Queries, transitions, transforms, animations, backdrop-filter, gradients, responsive layouts, and light/dark theme styling",
+                        "CSS Animations — Uses @keyframes for continuous wheel rotation, counter-rotation of solar-term labels, and falling seasonal emoji effects",
+                        "JavaScript Math API — Uses Math.PI, Math.cos(), Math.sin(), Math.random(), and mathematical positioning calculations to arrange the 24 solar terms around a circular wheel and randomize falling effects",
+                        "JavaScript Events API — Handles click, mouseenter, input, animationend, and dynamically registered event interactions",
+                        "Fullscreen UI Logic — Implements application-level fullscreen presentation by toggling the is-fullscreen CSS state rather than using the browser Fullscreen API",
+                        "Responsive Web Design — Uses CSS Media Queries at 900px to switch the sidebar to a mobile menu and scale the solar-term wheel for smaller screens",
+                        "HTML5 Input API — Uses the text input element and input events for real-time solar-term search and filtering",
+                        "No External JavaScript Libraries — The application is implemented entirely with native HTML, CSS, and JavaScript"
                     ],
                     "backends": [
-                        "DB: Firestore",
-                        "Worker: api-router.js"
+                        "Static Hosting: Compatible with Cloudflare Pages or other static web hosting",
+                        "No Database Backend: All 24 solar-term data is embedded directly in the JavaScript source",
+                        "No Custom Application Server: All visualization, filtering, animation, and interaction logic executes entirely in the browser",
+                        "No External API Dependency: The application does not make network requests or depend on third-party APIs",
+                        "Client-Side Data Storage: Solar-term names, descriptions, seasons, colors, and gradients are defined in the local terms JavaScript array",
+                        "Pure Client-Side Architecture: The module operates independently after the HTML, CSS, and JavaScript assets have been loaded"
                     ]
                 }</script>
             </a>
