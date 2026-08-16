@@ -1851,20 +1851,22 @@
                 <span class="arrow">Go to Mandarin Analyzer →</span>
                 <!-- 안 보이는 데이터 블록 -->
                 <script type="application/json" class="app-meta">{
-                    "desc": "A browser-based Mandarin learning application that combines pinyin-to-Chinese input, HSK/TOCFL vocabulary analysis, pinyin reading guidance, simplified/traditional Chinese conversion, interactive word tooltips, and Korean or English translation in a dual-panel interface.",
+                    "desc": "A browser-based Mandarin learning and reading application that supports pinyin-to-Chinese text input with selectable candidate characters, HSK and TOCFL vocabulary analysis, automatic Simplified and Traditional Chinese conversion, interactive word-level tooltips, pinyin reading guidance, Korean or English translation, and HSK vocabulary audio playback through a dual-panel interface.",
                     "deps": [
-                        "Vanilla JavaScript (ES6+) — Core application logic, DOM manipulation, event handling, asynchronous API communication, and UI state management",
-                        "OpenCC-JS 1.0.5 — Converts Chinese text between Simplified Chinese (简体) and Traditional Chinese (繁體) when switching between HSK and TOCFL modes",
-                        "pinyin-pro 3.16.0 — Generates Mandarin pinyin with tone marks for the interactive Pinyin Guide View",
-                        "Cloudflare Worker: mandarin-segmenter.sujinohkor.workers.dev — Backend API for Chinese text segmentation, vocabulary lookup, HSK/TOCFL level detection, pinyin, and translation metadata",
+                        "Vanilla JavaScript (ES6+) — Core application logic, DOM manipulation, event handling, asynchronous API communication, text editor state management, candidate selection, pagination, tooltip interaction, audio playback, theme switching, and responsive UI behavior",
+                        "OpenCC-JS 1.0.5 — Converts Chinese text and pinyin input candidates between Simplified Chinese and Traditional Chinese when switching between HSK and TOCFL modes",
+                        "pinyin-pro 3.16.0 — Generates Mandarin pinyin with tone marks for the interactive Pinyin Guide View using Ruby annotations",
+                        "Cloudflare Worker: mandarin-segmenter.sujinohkor.workers.dev — Backend API for Chinese text segmentation, vocabulary recognition, HSK/TOCFL level detection, pinyin retrieval, and word-level English and Korean translation metadata",
                         "Cloudflare Worker: pinyin-proxy.sujinohkor.workers.dev — Proxy service that retrieves Chinese character or word candidates from typed pinyin input",
-                        "Google Apps Script Web App — Provides external machine translation functionality for Korean and English output",
+                        "Google Apps Script Web App — External machine translation endpoint that translates the complete input text into Korean or English",
+                        "Static HSK TTS MP3 Files: sujinohkor.pages.dev/codes/hsk-tts/ — Provides pre-generated Simplified Chinese vocabulary audio files for HSK word playback from interactive tooltips",
                         "JSDelivr CDN — Delivers OpenCC-JS and pinyin-pro browser libraries"
                     ],
                     "backends": [
-                        "Cloudflare Workers — Serverless backend infrastructure used for Mandarin vocabulary segmentation and pinyin candidate retrieval",
-                        "Google Apps Script Web App — Serverless translation endpoint accessed through HTTP GET requests",
-                        "External CDN Services — Loads required JavaScript libraries directly in the browser"
+                        "Cloudflare Workers — Serverless backend infrastructure used for Chinese text segmentation, vocabulary analysis, HSK/TOCFL level detection, word metadata retrieval, and pinyin candidate lookup",
+                        "Google Apps Script Web App — Serverless HTTP translation endpoint accessed from the browser for Korean and English full-text translation",
+                        "Cloudflare Pages Static Hosting — Hosts pre-generated HSK vocabulary MP3 files that are loaded dynamically for word-level audio playback",
+                        "External CDN Services — Loads required OpenCC-JS and pinyin-pro JavaScript libraries directly in the browser"
                     ]
                 }</script>
             </a>
