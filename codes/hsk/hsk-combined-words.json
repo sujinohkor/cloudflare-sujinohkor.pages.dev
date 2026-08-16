@@ -417,7 +417,7 @@
     "pinyin": "ma",
     "part of speech": "助",
     "translation": "[makes a yes; no question]",
-    "translation(ko)": "엄마"
+    "translation(ko)": "~인가요"
   },
   "买": {
     "level": "1",
@@ -1742,6 +1742,20 @@
     "translation": "although",
     "translation(ko)": "비록…하지만…"
   },
+  "虽然": {
+    "level": "2",
+    "pinyin": "suī rán ……dàn shì ……",
+    "part of speech": "关联",
+    "translation": "although",
+    "translation(ko)": "비록(虽然)… 하지만(但是)…"
+  },
+  "但是": {
+    "level": "2",
+    "pinyin": "suī rán ……dàn shì ……",
+    "part of speech": "关联",
+    "translation": "although",
+    "translation(ko)": "비록(虽然)… 하지만(但是)…"
+  },
   "它": {
     "level": "2",
     "pinyin": "tā",
@@ -1972,6 +1986,20 @@
     "part of speech": "关联",
     "translation": "because",
     "translation(ko)": "왜냐하면…그러므로…"
+  },
+  "因为": {
+    "level": "2",
+    "pinyin": "yīn wèi ……suǒ yǐ ……",
+    "part of speech": "关联",
+    "translation": "because",
+    "translation(ko)": "왜냐하면(因为)… 그러므로(所以)…"
+  },
+  "所以": {
+    "level": "2",
+    "pinyin": "yīn wèi ……suǒ yǐ ……",
+    "part of speech": "关联",
+    "translation": "because",
+    "translation(ko)": "왜냐하면(因为)… 그러므로(所以)…"
   },
   "游泳": {
     "level": "2",
@@ -2272,7 +2300,21 @@
     "pinyin": "bù dàn ……ér qiě ……",
     "part of speech": "关联",
     "translation": "not only……but also……",
-    "translation(ko)": "뿐만 아니라... 또한..."
+    "translation(ko)": "뿐만 아니라… 또한…"
+  },
+  "不但": {
+    "level": "3",
+    "pinyin": "bù dàn ……ér qiě ……",
+    "part of speech": "关联",
+    "translation": "not only(不但)…… but also(而且)……",
+    "translation(ko)": "뿐만 아니라… 또한…"
+  },
+  "不但": {
+    "level": "3",
+    "pinyin": "bù dàn ……ér qiě ……",
+    "part of speech": "关联",
+    "translation": "not only(不但)…… but also(而且)……",
+    "translation(ko)": "뿐만 아니라… 또한…"
   },
   "菜单": {
     "level": "3",
@@ -4056,7 +4098,21 @@
     "level": "3",
     "pinyin": "zhǐ yǒu ……cái",
     "part of speech": "关联",
-    "translation": "only if…then...",
+    "translation": "only if… then…",
+    "translation(ko)": "만약…라면…"
+  },
+  "只有": {
+    "level": "3",
+    "pinyin": "zhǐ yǒu ……cái",
+    "part of speech": "关联",
+    "translation": "only if(只有)… then(才)…",
+    "translation(ko)": "만약…라면…"
+  },
+  "才": {
+    "level": "3",
+    "pinyin": "zhǐ yǒu ……cái",
+    "part of speech": "关联",
+    "translation": "only if(只有)… then(才)…",
     "translation(ko)": "만약…라면…"
   },
   "中间": {
