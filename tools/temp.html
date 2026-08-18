@@ -138,15 +138,15 @@
             }
 
             let currentTime = 0;
-            let totalHeight = 20;
+            let currentHeight = 10;
 
             lines.forEach((text, index) => {
-                const yOffset = totalHeight;
+                const yOffset = currentHeight;
                 const bubbleHeight = 42;
-                const typingDuration = 1.2;
+                const typingDuration = 1.0;
                 const waitTime = currentTime;
 
-                // 타이핑 애니메이션 추가
+                // 1. 타이핑 점 3개 표시 (해당 위치에 잠깐 나타남)
                 const typingGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 typingGroup.setAttribute("transform", `translate(10, ${yOffset})`);
                 typingGroup.style.opacity = "0";
@@ -168,16 +168,13 @@
                 `;
                 svgContent.appendChild(typingGroup);
 
+                // 2. 타이핑이 끝난 후 실제 말풍선이 유지된 채로 고정
                 const msgTime = waitTime + typingDuration;
-                
-                // 실제 메시지 그룹 추가
                 const msgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 msgGroup.setAttribute("transform", `translate(10, ${yOffset})`);
                 msgGroup.style.opacity = "0";
                 
-                // 대략적인 텍스트 너비 계산 (폰트 크기 고려)
                 const estimatedWidth = Math.max(120, text.length * 11 + 30);
-
                 msgGroup.style.animation = `msg-appear 0.2s ${msgTime}s forwards`;
 
                 msgGroup.innerHTML = `
@@ -186,35 +183,34 @@
                 `;
                 svgContent.appendChild(msgGroup);
 
-                currentTime = msgTime + 0.5;
-                totalHeight += 50;
+                // 다음 말풍선은 아래쪽에 위치하도록 간격 조절
+                currentTime = msgTime + 0.3;
+                currentHeight += 50;
             });
 
-            svgElement.setAttribute('height', totalHeight + 10);
+            svgElement.setAttribute('height', currentHeight + 20);
         }
 
-        // 동적 애니메이션 키프레임 주입
         const styleSheet = document.createElement("style");
         styleSheet.type = "text/css";
-        styleSheet.styleSheet ? styleSheet.styleSheet.cssText = getKeys() : styleSheet.appendChild(document.createTextNode(getKeys()));
+        styleSheet.appendChild(document.createTextNode(`
+            @keyframes fade-in-out {
+                0%, 100% { opacity: 0; }
+                25%, 90% { opacity: 1; }
+            }
+            @keyframes msg-appear {
+                0% { opacity: 0; transform: translate(10px, 5px); }
+                100% { opacity: 1; transform: translate(10px, 0); }
+            }
+        `));
         document.head.appendChild(styleSheet);
 
-        function getKeys() {
-            return `
-                @keyframes fade-in-out {
-                    0%, 100% { opacity: 0; }
-                    25%, 90% { opacity: 1; }
-                }
-                @keyframes msg-appear {
-                    0% { opacity: 0; transform: translate(10px, 5px); }
-                    100% { opacity: 1; transform: translate(10px, 0); }
-                }
-            `;
-        }
-
-        // 초기 실행
         window.onload = () => {
-            document.getElementById('messageInput').value = "Hi, I'm Chansung\nSoftware Engineer and Researcher\nBuilding SDN for Optical Access Network\nHave a great day!";
+            document.getElementById('messageInput').value = 
+`Hi, I'm Chansung
+Software Engineer and Researcher
+Building SDN for Optical Access Network
+Have a great day!`;
             generateAnimation();
         };
     </script>
