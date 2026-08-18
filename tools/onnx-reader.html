@@ -1,94 +1,194 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple ONNX Reader</title>
+    <meta charset="utf-8">
+    <meta name="description" content="Visualizer for neural network, deep learning and machine learning models." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'; frame-src 'none'">
+    <meta name="version" content="9.2.2">
+    <meta name="date" content="2026-08-14 18:02:52">
+    <title>Netron - ONNX Reader</title>
+    
+    <!-- 같은 폴더 내의 CSS 및 아이콘 경로 매칭 -->
+    <link rel="stylesheet" type="text/css" href="./grapher.css">
+    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" href="./icon.png">
+    <link rel="apple-touch-icon" type="image/png" href="./icon.png">
+    
+    <!-- 같은 폴더 내의 JS 스크립트 매칭 -->
+    <script type="text/javascript" src="./index.js"></script>
+    
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 30px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { color: #ff9e40; margin-bottom: 10px; font-size: 1.8rem; }
-        p { color: #888; margin-bottom: 20px; font-size: 0.95rem; }
-        .upload-box { border: 2px dashed rgba(255, 158, 64, 0.4); padding: 40px; text-align: center; border-radius: 16px; background: rgba(16, 16, 16, 0.6); cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
-        .upload-box:hover { border-color: #ff9e40; background: rgba(255, 158, 64, 0.05); }
-        input[type="file"] { display: none; }
-        .info-card { background: #1a1a1a; border: 1px solid rgba(255, 158, 64, 0.2); border-radius: 12px; padding: 20px; margin-top: 20px; display: none; }
-        .info-card h2 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 12px; }
-        pre { background: #111; padding: 15px; border-radius: 8px; overflow-x: auto; color: #38bdf8; font-family: Consolas, monospace; font-size: 0.85rem; max-height: 400px; }
+        html { touch-action: none; overflow: hidden; width: 100%; height: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-font-smoothing: antialiased; }
+        body { touch-action: none; overflow: hidden; width: 100%; height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "PingFang SC"; font-size: 12px; text-rendering: geometricPrecision; }
+        button { font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "PingFang SC"; }
+        .center { position: absolute; margin: auto; top: 0; right: 0; bottom: 0; left: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; }
+        .select { user-select: text; -webkit-user-select: text; -moz-user-select: text; }
+        .target { display: flex; height: 100%; width: 100%; overflow: auto; outline: none; touch-action: pan-x pan-y; }
+        .canvas { margin: auto; flex-shrink: 0; text-rendering: geometricPrecision; user-select: none; -webkit-user-select: none; -moz-user-select: none; }
+        .open-file-dialog { display: none; }
+        .default { background-color: #ffffff; }
+        .default .logo { display: none; }
+        .default .target { display: flex; opacity: 1; }
+        .default .toolbar { display: flex; }
+        .toolbar { display: flex; align-items: center; position: absolute; bottom: 10px; left: 10px; padding: 0; margin: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; }
+        .toolbar button:focus { outline: 0; }
+        .toolbar-button { background: None; border-radius: 6px; border: 0; margin: 0; margin-right: 1px; padding: 0; fill: None; stroke: #777; cursor: pointer; width: 32px; height: 32px; user-select: none; }
+        .toolbar-path { display: flex; align-items: center; }
+        .toolbar-select { background: transparent; position: relative; width: 170px; margin: 4px; }
+        .toolbar-select select { width: 100%; appearance: none; -webkit-appearance: none; -moz-appearance: none; font-family: inherit; font-size: 12px; line-height: 16px; border: 1px solid; padding: 3px 18px 3px 10px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; background: #777; border-color: #777; color: #fff; }
+        .toolbar-select-arrow { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); pointer-events: none; fill: #ffffff; }
+        .toolbar-select select:hover { background: #000000; border-color: #000000; }
+        .toolbar-select select:focus { outline: 0; }
+        .toolbar-path-back-button { background: #777; border-top-left-radius: 6px; border-bottom-left-radius: 6px; border: 1px solid #777; margin: 4px 0px 4px 4px; padding: 5px 8px; cursor: pointer; color: #ffffff; font-size: 12px; line-height: 12px; transition: 0.1s; }
+        .toolbar-path-back-button:hover { background: #000000; border-color: #000000; }
+        .toolbar-path-name-button { background: #777; border: 0px; color: #ffffff; border-left: 1px solid #ffffff; margin: 4px 0 4px 1px; padding: 6px 8px; cursor: pointer; width: auto; font-size: 12px; line-height: 12px; transition: 0.1s; }
+        .toolbar-path-name-button:hover { background: #000000; border-color: #000000; }
+        .toolbar-path-name-button:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .toolbar-icon .border { stroke: #fff; }
+        .toolbar-icon .stroke { stroke: #808080; }
+        .toolbar-icon .fill { fill: #808080; }
+        .toolbar-icon:hover .stroke { stroke: #000000; }
+        .toolbar-icon:hover .fill { fill: #000000; }
+        .message { display: none; opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; justify-content: flex-start; }
+        .message-text { display: inline; text-align: center; width: 562px; font-size: 13px; line-height: 20px; margin-top: 50vh; padding-top: 56px; padding-bottom: 20px; margin-left: auto; margin-right: auto; user-select: text; }
+        .welcome .message-text a { text-decoration: none; color: #666666; }
+        .welcome .message-text a:visited { color: inherit; }
+        .welcome .message-text a:hover { color: #242424; text-decoration: underline; }
+        .message-button { display: inline; text-align: center; width: 125px; margin-left: auto; margin-right: auto; }
+        .logo-text { top: -57px; width: 582px; transition: 0.1s; }
+        .logo-name { top: -170px; width: 582px; transition: 0.1s; }
+        .logo-icon { left: 248px; top: -18px; width: 106px; height: 106px; transition: 0.1s; }
+        .logo-spinner { left: 248px; top: -18px; width: 106px; height: 106px; display: none; }
+        .logo-stroke { stroke: #444444; }
+        .logo-fill { fill: #444444; }
+        .logo-border { stroke: #555555; }
+        .logo-glyph { fill: #444444; }
+        .logo-button { font-size: 12px; font-weight: bold; line-height: 1.25; text-align: center; vertical-align: middle; min-width: 5em; height: 2.7em; border-radius: 1.3em; transition: 0.1s; user-select: none; color: #444444; background-color: #ececec; border: 1px solid #444444; }
+        .logo-button:hover { color: #ececec; background-color: #444444; cursor: pointer; transition: 0.2s; }
+        .logo-button:focus { outline: 0; }
+        .logo-message { display: none; height: 0px; }
+        .logo-github { display: none; }
+        .open-file-button { top: 170px; left: 0px; width: 10.5em; }
+        .progress { top: 120px; height: 2px; width: 400px; }
+        .progress-bar { height: 100%; width: 0%; background-color: #444444; }
+        .notification .logo-name, .notification .open-file-button, .notification .progress { display: none; }
+        .welcome body, .welcome { background-color: #ececec; color: #242424; }
+        .welcome .message-text, .welcome .message-button, .welcome .target { display: none; opacity: 0; }
+        .welcome .menu { background-color: #ffffff; }
+        .welcome.spinner .logo-spinner { display: block; animation: orbit 0.5s infinite linear; cursor: wait; }
+        .welcome.spinner .menu-button, .welcome.notification .menu-button { display: none; }
+        .notification body { background-color: #ececec; }
+        .notification .message, .notification .message-text, .notification .message-button { display: flex; opacity: 1; }
+        .alert { background-color: #ececec; color: #242424; }
+        .alert .target, .alert .toolbar, .alert .menu, .alert .logo { display: none; opacity: 0; }
+        .alert .message { display: flex; opacity: 1; }
+        .alert .message-text { display: inline; opacity: 1; width: 50%; padding-top: 0px; }
+        .alert .message-button { display: inline; opacity: 1; }
+        .about { overflow: hidden; }
+        .about .toolbar, .about .open-file-button, .about .logo-name, .about .notification, .about .progress, .about .menu-button { display: none; }
+        .about .logo { display: block; background-color: #ececec; color: #666666; }
+        .about .logo-message { display: block; top: 132px; font-size: 14px; }
+        .about .logo-github { display: block; top: 340px; width: 48px; height: 48px; }
+        .about a { text-decoration: none; color: #666666; }
+        .about a:visited { color: inherit; }
+        .about a:hover { color: #242424; }
+        .titlebar { color: #aaaaaa; display: none; height: 32px; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2; }
+        .titlebar-visible { display: block; }
+        .titlebar-content { display: block; padding: 0 142px; height: 100%; text-align: center; font-size: 14px; line-height: 32px; user-select: none; }
+        .titlebar-content-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .spinner .titlebar-content { opacity: 0; }
+        .active .titlebar { color: #464646; }
+        .titlebar-control-box { display: none; align-items: center; flex-direction: row-reverse; height: 100%; position: absolute; top: 0; right: 0; width: 138px; }
+        .titlebar-control-box-visible { display: flex; }
+        .titlebar-icon { width: 1em; height: 1em; vertical-align: -0.15em; fill: currentColor; overflow: hidden; }
+        .titlebar-button { display: flex; justify-content: center; align-items: center; width: 46px; height: 32px; user-select: none; }
+        .titlebar-button:hover { color: #000000; background-color: rgba(0, 0, 0, 0.15); }
+        .titlebar-button-close:hover { color: #ffffff; background-color: #b43029; }
+        .menu-button { display: flex; justify-content: center; align-items: center; color: #aaaaaa; font-size: 20px; height: 32px; width: 32px; position: fixed; top: 0; left: 0; z-index: 2; user-select: none; cursor: pointer; }
+        .menu-button:hover { color: #000000; }
+        .menu { display: block; position: absolute; left: -17em; width: 17em; top: 0; height: 100%; z-index: 2; background-color: #ececec; border-right: 1px solid rgba(255, 255, 255, 0.5); padding-top: 40px; overflow: hidden; transition: 0.1s; }
+        .menu .menu-group { margin-bottom: 12px; }
+        .menu .menu-group .menu-group-header { display: block; border: none; width: 100%; text-align: left; margin: 4px 12px 5px 12px; font-size: 11px; font-weight: bold; color: #bbbbbb; white-space: nowrap; }
+        .menu .menu-group .menu-command { display: block; border: none; background-color: transparent; color: black; width: 100%; text-align: left; padding: 4px 12px 5px 12px; font-size: 12px; cursor: pointer; }
+        .menu .menu-group .menu-command:focus { color: #ffffff; background-color: #2e6bd2; outline: none; }
+        .menu .menu-group .menu-command:disabled { color: #888888; }
+        .menu .menu-group .menu-command .menu-label { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .menu .menu-group .menu-command .menu-shortcut { display: block; float: right; margin-left: 25px; color: #888888; }
+        .menu .menu-group .menu-separator { border-top: 1px solid #e5e5e5; margin: 0 12px; }
+        @keyframes orbit { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        @media (prefers-color-scheme: dark) {
+            :root { color-scheme: dark; }
+            .default, .target { background-color: #404040; }
+            .welcome, .alert { background-color: #1e1e1e; color: #888888; }
+            .logo-stroke { stroke: #888888; }
+            .logo-fill { fill: #888888; }
+            .logo-border { stroke: #000000; }
+            .logo-glyph { fill: #888888; }
+            .logo-spinner-stroke { stroke: #ffffff; }
+            .logo-button { color: #888888; background-color: #1e1e1e; border-color: #888888; }
+            .logo-button:hover { color: #1e1e1e; background-color: #888888; }
+            .welcome .progress-bar { background-color: #888888; }
+            .welcome .menu { background-color: #2d2d2d; }
+            .about .logo { background-color: #1e1e1e; color: #888888; }
+            .about a { color: #c6c6c6; }
+            .about a:hover { color: #565656; }
+            .toolbar-icon .border { stroke: #333333; }
+            .toolbar-icon .stroke, .toolbar-icon .fill { stroke: #aaaaaa; fill: #aaaaaa; }
+            .toolbar-icon:hover .stroke, .toolbar-icon:hover .fill { stroke: #dfdfdf; fill: #dfdfdf; }
+            .toolbar-path-back-button, .toolbar-path-name-button, .toolbar-select select { background: #aaaaaa; border-color: #aaaaaa; color: #404040; }
+            .toolbar-path-back-button:hover, .toolbar-path-name-button:hover, .toolbar-select select:hover { background: #dfdfdf; border-color: #dfdfdf; color: #404040; }
+            .toolbar-select-arrow { fill: #404040; }
+            .titlebar { color: #949494; }
+            .welcome body, .default body { background-color: #1e1e1e; }
+            .menu { background-color: #2d2d2d; border-color: transparent; }
+            .menu .menu-group .menu-group-header { color: #666666; }
+            .menu .menu-group .menu-command { color: #ffffff; }
+            .menu .menu-group .menu-command:focus { background-color: #2e6bd2; }
+            .menu .menu-group .menu-separator { border-color: #363636; }
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Simple ONNX Reader</h1>
-        <p>브라우저에서 .onnx 파일을 업로드하여 기본 구조를 확인하는 단일 페이지 뷰어입니다.</p>
-        
-        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-            <p style="color: #ff9e40; font-weight: bold; font-size: 1.1rem;">클릭하여 ONNX 파일 업로드 (.onnx)</p>
-            <p style="margin-top: 5px; font-size: 0.8rem;">파일은 서버로 전송되지 않고 브라우저 내부에서만 분석됩니다.</p>
-            <input type="file" id="fileInput" accept=".onnx">
-        </div>
-
-        <div id="resultCard" class="info-card">
-            <h2>모델 분석 정보</h2>
-            <pre id="output">분석 대기 중...</pre>
-        </div>
+<body class="welcome spinner">
+    <div id="target" class="target" tabindex="0"></div>
+    <div id="sidebar" class="sidebar">
+        <h1 id="sidebar-title" class="sidebar-title"></h1>
+        <a id="sidebar-closebutton" class="sidebar-closebutton" href="javascript:void(0)" draggable="false">&times;</a>
+        <div id="sidebar-content" class="sidebar-content"></div>
     </div>
-
-    <!-- Protocol Buffers 라이브러리 (ONNX 파싱용) -->
-    <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.2.5/dist/protobuf.min.js"></script>
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const resultCard = document.getElementById('resultCard');
-        const output = document.getElementById('output');
-
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            output.textContent = "파일을 읽고 파싱하는 중입니다...";
-            resultCard.style.display = 'block';
-
-            try {
-                const buffer = await file.arrayBuffer();
-                
-                // ONNX의 기본 스키마 정의 (ModelProto 구조 중 핵심 필드)
-                const root = await protobuf.load("https://onnx.ai/onnx.proto").catch(() => {
-                    // 외부 프로토 로드 실패 시 대체 기본 파싱 시도 메시지
-                    throw new Error("ONNX Schema 로드 실패. 네트워크 연결을 확인해주세요.");
-                });
-                
-                const ModelProto = root.lookupType("onnx.ModelProto");
-                const message = ModelProto.decode(new Uint8Array(buffer));
-                
-                let summary = `파일명: ${file.name}\n`;
-                summary += `IR Version: ${message.irVersion || 'N/A'}\n`;
-                summary += `Producer: ${message.producerName || 'N/A'}\n`;
-                summary += `Domain: ${message.domain || 'N/A'}\n\n`;
-                
-                if (message.graph) {
-                    summary += `--- Graph Info ---\n`;
-                    summary += `Graph Name: ${message.graph.name || 'N/A'}\n`;
-                    summary += `Node 개수: ${message.graph.node ? message.graph.node.length : 0}개\n`;
-                    summary += `Input 개수: ${message.graph.input ? message.graph.input.length : 0}개\n`;
-                    summary += `Output 개수: ${message.graph.output ? message.graph.output.length : 0}개\n\n`;
-                    
-                    summary += `--- 주요 노드(OpType) 목록 요약 ---\n`;
-                    const opTypes = {};
-                    message.graph.node.forEach(node => {
-                        opTypes[node.opType] = (opTypes[node.opType] || 0) + 1;
-                    });
-                    for (const [op, count] of Object.entries(opTypes)) {
-                        summary += `- ${op}: ${count}개\n`;
-                    }
-                }
-
-                output.textContent = summary;
-            } catch (err) {
-                // 간이 파싱 에러 시 파일 크기와 기본 정보 출력
-                output.textContent = `[안내] Protobuf 상세 스키마 로딩 중 문제가 발생했습니다.\n기본 파일 정보:\n- 파일명: ${file.name}\n- 크기: ${(file.size / (1024*1024)).toFixed(2)} MB\n\n(참고: 전체 시각화를 원하시는 경우 공식 Netron 구조 빌드 파일을 사용하는 것이 좋습니다.)`;
-            }
-        });
-    </script>
+    <div id="toolbar" class="toolbar">
+        <button id="zoom-in-button" class="toolbar-button" title="Zoom In">
+            <svg class="toolbar-icon" viewBox="0 0 100 100">
+                <circle class="border" cx="50" cy="50" r="35" stroke-width="8" stroke="#fff"></circle>
+                <line class="border" x1="50" y1="38" x2="50" y2="62" stroke-width="8" stroke-linecap="round" stroke="#fff"></line>
+                <line class="border" x1="38" y1="50" x2="62" y2="50" stroke-width="8" stroke-linecap="round" stroke="#fff"></line>
+                <circle class="stroke" cx="50" cy="50" r="35" stroke-width="4"></circle>
+                <line class="stroke" x1="50" y1="38" x2="50" y2="62" stroke-width="4" stroke-linecap="round"></line>
+                <line class="stroke" x1="38" y1="50" x2="62" y2="50" stroke-width="4" stroke-linecap="round"></line>
+            </svg>
+        </button>
+        <button id="zoom-out-button" class="toolbar-button" title="Zoom Out">
+            <svg class="toolbar-icon" viewBox="0 0 100 100">
+                <circle class="border" cx="50" cy="50" r="35" stroke-width="8" stroke="#fff"></circle>
+                <line class="border" x1="38" y1="50" x2="62" y2="50" stroke-width="8" stroke-linecap="round" stroke="#fff"></line>
+                <circle class="stroke" cx="50" cy="50" r="35" stroke-width="4"></circle>
+                <line class="stroke" x1="38" y1="50" x2="62" y2="50" stroke-width="4" stroke-linecap="round"></line>
+            </svg>
+        </button>
+    </div>
+    <div id="logo" class="center logo">
+        <button id="open-file-button" class="center logo-button open-file-button" tabindex="0">Open Model&hellip;</button>
+        <div class="center progress">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <input type="file" id="open-file-dialog" class="open-file-dialog" multiple="false" accept=".onnx,.pb,.tflite,.h5,.mlmodel">
+    </div>
+    <div id="message" class="message">
+        <div id="message-text" class="message-text"></div>
+        <button id="message-button" class="logo-button message-button" tabindex="0">OK</button>
+    </div>
+    <div id="menu" class="menu"></div>
+    <div id="menu-button" class="menu-button">&#8801;</div>
 </body>
 </html>
