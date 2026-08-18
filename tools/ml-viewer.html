@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning Model Reader</title>
+    <title>Machine Learning Model Viewer</title>
     <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
@@ -158,19 +158,20 @@
 
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">ML Model Reader</div>
+            <div class="sidebar-title">ML Model Viewer</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
             </div>                                                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <div class="bottom-btns">
                 <button class="menu-btn" id="btn-onnx-netron" onclick="switchApp('onnx-netron')">Netron</button>
+                <button class="menu-btn" id="btn-hugging-face" onclick="switchApp('hugging-face')">Hugging Face</button>
             </div>        
         </aside>
         <main class="main-content" id="main-content">            
             <header class="top-section">                
-                <h1>ML Model Reader</h1>
-                <p>ONNX Reader</p>
+                <h1>ML Model Viewer</h1>
+                <p>ONNX Viewer</p>
             </header>            
             <section class="content-card" id="content-card">                
                 <div class="board-container" id="board">                    
@@ -198,7 +199,10 @@
             
             if (appType === 'onnx-netron') {
                 document.getElementById('btn-onnx-netron').classList.add('active');
-                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/onnx-netron.html"></iframe>`;
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/ml-onnx-netron.html"></iframe>`;
+            } else if (appType === 'hugging-face') {
+                document.getElementById('btn-hugging-face').classList.add('active');
+                iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/ml-hugging-face.html"></iframe>`;
             }
 
             board.innerHTML = iframeHTML;
