@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple ONNX Reader</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 30px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #ff9e40; margin-bottom: 10px; font-size: 1.8rem; }
+        p { color: #888; margin-bottom: 20px; font-size: 0.95rem; }
+        .upload-box { border: 2px dashed rgba(255, 158, 64, 0.4); padding: 40px; text-align: center; border-radius: 16px; background: rgba(16, 16, 16, 0.6); cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
+        .upload-box:hover { border-color: #ff9e40; background: rgba(255, 158, 64, 0.05); }
+        input[type="file"] { display: none; }
+        .info-card { background: #1a1a1a; border: 1px solid rgba(255, 158, 64, 0.2); border-radius: 12px; padding: 20px; margin-top: 20px; display: none; }
+        .info-card h2 { color: #ff9e40; font-size: 1.2rem; margin-bottom: 12px; }
+        pre { background: #111; padding: 15px; border-radius: 8px; overflow-x: auto; color: #38bdf8; font-family: Consolas, monospace; font-size: 0.85rem; max-height: 400px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple ONNX Reader</h1>
+        <p>브라우저에서 .onnx 파일을 업로드하여 기본 구조를 확인하는 단일 페이지 뷰어입니다.</p>
+        
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            <p style="color: #ff9e40; font-weight: bold; font-size: 1.1rem;">클릭하여 ONNX 파일 업로드 (.onnx)</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">파일은 서버로 전송되지 않고 브라우저 내부에서만 분석됩니다.</p>
+            <input type="file" id="fileInput" accept=".onnx">
+        </div>
+
+        <div id="resultCard" class="info-card">
+            <h2>모델 분석 정보</h2>
+            <pre id="output">분석 대기 중...</pre>
+        </div>
+    </div>
+
+    <!-- Protocol Buffers 라이브러리 (ONNX 파싱용) -->
+    <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.2.5/dist/protobuf.min.js"></script>
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const resultCard = document.getElementById('resultCard');
+        const output = document.getElementById('output');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            output.textContent = "파일을 읽고 파싱하는 중입니다...";
+            resultCard.style.display = 'block';
+
+            try {
+                const buffer = await file.arrayBuffer();
+                
+                // ONNX의 기본 스키마 정의 (ModelProto 구조 중 핵심 필드)
+                const root = await protobuf.load("https://onnx.ai/onnx.proto").catch(() => {
+                    // 외부 프로토 로드 실패 시 대체 기본 파싱 시도 메시지
+                    throw new Error("ONNX Schema 로드 실패. 네트워크 연결을 확인해주세요.");
+                });
+                
+                const ModelProto = root.lookupType("onnx.ModelProto");
+                const message = ModelProto.decode(new Uint8Array(buffer));
+                
+                let summary = `파일명: ${file.name}\n`;
+                summary += `IR Version: ${message.irVersion || 'N/A'}\n`;
+                summary += `Producer: ${message.producerName || 'N/A'}\n`;
+                summary += `Domain: ${message.domain || 'N/A'}\n\n`;
+                
+                if (message.graph) {
+                    summary += `--- Graph Info ---\n`;
+                    summary += `Graph Name: ${message.graph.name || 'N/A'}\n`;
+                    summary += `Node 개수: ${message.graph.node ? message.graph.node.length : 0}개\n`;
+                    summary += `Input 개수: ${message.graph.input ? message.graph.input.length : 0}개\n`;
+                    summary += `Output 개수: ${message.graph.output ? message.graph.output.length : 0}개\n\n`;
+                    
+                    summary += `--- 주요 노드(OpType) 목록 요약 ---\n`;
+                    const opTypes = {};
+                    message.graph.node.forEach(node => {
+                        opTypes[node.opType] = (opTypes[node.opType] || 0) + 1;
+                    });
+                    for (const [op, count] of Object.entries(opTypes)) {
+                        summary += `- ${op}: ${count}개\n`;
+                    }
+                }
+
+                output.textContent = summary;
+            } catch (err) {
+                // 간이 파싱 에러 시 파일 크기와 기본 정보 출력
+                output.textContent = `[안내] Protobuf 상세 스키마 로딩 중 문제가 발생했습니다.\n기본 파일 정보:\n- 파일명: ${file.name}\n- 크기: ${(file.size / (1024*1024)).toFixed(2)} MB\n\n(참고: 전체 시각화를 원하시는 경우 공식 Netron 구조 빌드 파일을 사용하는 것이 좋습니다.)`;
+            }
+        });
+    </script>
+</body>
+</html>
