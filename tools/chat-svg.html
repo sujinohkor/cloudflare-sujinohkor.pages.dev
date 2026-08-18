@@ -87,11 +87,13 @@
             position: relative;
         }
 
-        /* SVG가 컨테이너 폭에 맞추되 왼쪽 정렬되도록 수정 */
-        svg {
-            width: 100%;
+        /* Preview SVG: 실제 450px 기준 크기를 유지하고, 내용이 길면 컨테이너에서 스크롤 */
+        .content-right svg {
+            width: 450px;
+            min-width: 450px;
             height: auto;
             display: block;
+            flex: 0 0 auto;
         }
 
         .bubble {
@@ -179,7 +181,9 @@
 
             <div class="bottom-btns">
                 <button class="menu-btn" onclick="generateAnimation()">Apply Animation</button>
+                <button class="menu-btn" onclick="replayAnimation()">Replay</button>
                 <button class="menu-btn" onclick="copySvgCode()">Copy SVG Code</button>
+                <button class="menu-btn" onclick="downloadSvg()">Download SVG</button>
                 <button class="menu-btn" onclick="resetAll()">Reset</button>
             </div>
         </aside>
@@ -435,35 +439,61 @@
             svgElement.setAttribute('viewBox', `0 0 450 ${totalSvgHeight}`);
         }
 
-        function copySvgCode() {
+        function replayAnimation() {
+            // SVG 요소를 다시 생성하여 모든 애니메이션을 처음부터 재생
+            generateAnimation();
+        }
+
+        function getStandaloneSvgString() {
             const svgClone = svgElement.cloneNode(true);
-        
+
             const cleanKeyframes = formatCss(dynamicKeyframes.innerHTML);
-        
+
             const styleTag = document.createElementNS(
                 "http://www.w3.org/2000/svg",
                 "style"
             );
-        
+
             styleTag.textContent =
                 cleanKeyframes +
                 " .bubble { fill: #3b3b3d; }" +
                 " text { fill: #ffffff; font-size: 18px; letter-spacing: -0.02em; font-family: 'Segoe UI', sans-serif; }";
-        
+
             svgClone.insertBefore(styleTag, svgClone.firstChild);
-        
+
             const serializer = new XMLSerializer();
             let svgString = serializer.serializeToString(svgClone);
-        
-            // SVG 태그별 줄바꿈 및 인덴트 적용
-            svgString = formatSvg(svgString);
-        
+
+            return formatSvg(svgString);
+        }
+
+        function copySvgCode() {
+            const svgString = getStandaloneSvgString();
+
             navigator.clipboard.writeText(svgString).then(() => {
                 alert("SVG code copied to clipboard!");
             }).catch(err => {
                 alert("Failed to copy SVG code.");
                 console.error(err);
             });
+        }
+
+        function downloadSvg() {
+            const svgString = getStandaloneSvgString();
+            const blob = new Blob([svgString], {
+                type: "image/svg+xml;charset=utf-8"
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "chat-animation.svg";
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            URL.revokeObjectURL(url);
         }
 
         function formatSvg(svgString) {
@@ -566,6 +596,17 @@
             dynamicKeyframes.innerHTML = '';
             svgElement.setAttribute('viewBox', '0 0 350 100');
         }
+
+        let inputRenderTimer = null;
+
+        messageInput.addEventListener('input', () => {
+            clearTimeout(inputRenderTimer);
+
+            // 입력 중 과도한 재렌더링을 막으면서 거의 실시간으로 갱신
+            inputRenderTimer = setTimeout(() => {
+                generateAnimation();
+            }, 120);
+        });
 
         window.onload = () => {
             messageInput.value = 
