@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tetris Simulator</title>
+    <title>Tetris Game Viewer</title>
     <!-- Favicon settings -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
@@ -23,61 +23,59 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        
+                
         /* 플로팅 사이드바 */
-        .sidebar {                         
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                         
-            background: rgba(16, 16, 16, 0.25);                         
-            backdrop-filter: blur(16px);                         
-            -webkit-backdrop-filter: blur(16px);                        
-            padding: 25px 20px; z-index: 1000;                         
-            display: flex; flex-direction: column; gap: 12px;                         
-            border: 1px solid rgba(255, 158, 64, 0.35);                         
-            border-radius: 24px;                        
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                        
-            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;            
-            overflow-y: auto;                 
+        .sidebar {                                     
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                                     
+            background: rgba(16, 16, 16, 0.25);                                     
+            backdrop-filter: blur(16px);                                     
+            -webkit-backdrop-filter: blur(16px);                                    
+            padding: 25px 20px; z-index: 1000;                                     
+            display: flex; flex-direction: column; gap: 12px;                                     
+            border: 1px solid rgba(255, 158, 64, 0.35);                                     
+            border-radius: 24px;                                    
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                                    
+            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;                        
+            overflow-y: auto;                         
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }                
-
-        .main-content {                         
-            margin-left: 300px; padding: 40px; flex: 1;                         
-            display: flex; flex-direction: column; height: 100vh;                         
-            gap: 20px; overflow: hidden; transition: all 0.3s ease;                         
+        
+        .main-content {                                     
+            margin-left: 300px; padding: 40px; flex: 1;                                     
+            display: flex; flex-direction: column; height: 100vh;                                     
+            gap: 20px; overflow: hidden; transition: all 0.3s ease;                                     
             width: calc(100% - 300px);
         }                
 
         .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; }
-        .menu-btn {                         
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                        
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                         
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                        
-            display: flex; align-items: center; justify-content: center; line-height: 1;       
-        }                
-        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }                
-        .menu-btn.active-tool { background: rgba(255, 158, 64, 0.35); color: #fff; border-color: #ff9e40; }                
+        .menu-btn {                                     
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                                    
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                                     
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                                    
+            display: flex; align-items: center; justify-content: center; line-height: 1;               
+        }                        
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }                        
         
-        .status-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 12px; padding: 12px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 6px; }        
-        .status-item { display: flex; justify-content: space-between; font-weight: bold; }
-        
+        .status-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 12px; padding: 12px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 6px; }                
+        .status-item { display: flex; justify-content: space-between; font-weight: bold; }                
         .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
 
-        /* 도트무늬 배경 적용 카드 */        
-        .content-card {                                     
-            border: 2px solid #ff9e40;                                     
-            border-radius: 16px;                                     
-            flex: 1;                                     
-            display: flex;                                     
-            overflow: hidden;                                     
-            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;            
-            background-size: 20px 20px;            
-            position: relative;                         
-            transition: all 0.3s ease;       
+        /* 도트무늬 배경 적용 카드 */                
+        .content-card {                                                 
+            border: 2px solid #ff9e40;                                                 
+            border-radius: 16px;                                                 
+            flex: 1;                                                 
+            display: flex;                                                 
+            overflow: hidden;                                                 
+            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;                        
+            background-size: 20px 20px;                        
+            position: relative;                                     
+            transition: all 0.3s ease;               
         }                
-
+        
         .card-btn-group {            
             position: absolute;            
             top: 15px;            
@@ -85,118 +83,97 @@
             z-index: 2001;            
             display: flex;            
             gap: 8px;        }
-        .action-btn {                         
-            background: #202020;                         
-            color: #ff9e40;                         
-            border: 1px solid #ff9e40;                         
-            padding: 6px 14px;                         
-            border-radius: 8px;                         
-            cursor: pointer;                         
-            font-size: 0.8rem;                         
-            font-weight: bold;                         
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                         
-            transition: all 0.3s;       
-        }        
+        .action-btn {                                     
+            background: #202020;                                     
+            color: #ff9e40;                                     
+            border: 1px solid #ff9e40;                                     
+            padding: 6px 14px;                                     
+            border-radius: 8px;                                     
+            cursor: pointer;                                     
+            font-size: 0.8rem;                                     
+            font-weight: bold;                                     
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                                     
+            transition: all 0.3s;               
+        }                
         .action-btn:hover { background: #ff9e40; color: #101010; }
 
-        /* 풀스크린 스타일 */
+        /* 풀스크린 스타일 */        
         body.is-fullscreen .sidebar { transform: translateX(-120%); opacity: 0; pointer-events: none; }
         body.is-fullscreen .main-content { margin-left: 0 !important; width: 100vw !important; padding: 0 !important; height: 100vh !important; }
         body.is-fullscreen .top-section { display: none !important; }
         body.is-fullscreen .content-card { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 9999 !important; border-radius: 0 !important; border: none !important; padding: 0 !important; margin: 0 !important; }
 
-        /* 가로 레이아웃 맞춤형 게임 구역 (테트리스 + AI 대시보드 패널) */
-        .game-layout-view {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0; left: 0;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            padding: 20px;
-        }
+        /* 대형 테트리스 뷰 레이아웃 */        
+        .game-layout-view {            
+            display: flex;            
+            width: 100%;            
+            height: 100%;            
+            position: absolute;            
+            top: 0; left: 0;            
+            justify-content: center;            
+            align-items: center;            
+            gap: 35px;            
+            padding: 20px;        }
 
-        /* 테트리스 캔버스 */
-        #tetrisCanvas {
-            background: #000;
-            border: 2px solid #ff9e40;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            display: block;
-        }
+        /* 확대된 테트리스 캔버스 (세로 20칸 기준 블록 크기 대폭 확장) */
+        #tetrisCanvas {            
+            background: #000;            
+            border: 3px solid #ff9e40;            
+            border-radius: 10px;            
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);            
+            display: block;            
+            height: 85vh; /* 화면 높이에 맞게 대형화 */            
+            max-height: 650px;            
+            width: auto;        }
 
-        /* 여백을 채워줄 우측 AI 대시보드 패널 */
-        .ai-dashboard {
-            width: 280px;
-            height: 400px;
-            background: rgba(16, 16, 16, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 158, 64, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        .ai-dashboard h3 {
-            color: #ff9e40;
-            font-size: 0.95rem;
-            border-bottom: 1px solid rgba(255, 158, 64, 0.2);
-            padding-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-        }
-        .metric-row span:last-child {
-            font-weight: bold;
-            color: #38bdf8;
-        }
+        /* 우측 미니 패널 (NEXT 블록 확인용) */
+        .side-info-panel {            
+            width: 160px;            
+            height: 220px;            
+            background: rgba(16, 16, 16, 0.6);            
+            backdrop-filter: blur(10px);            
+            border: 1px solid rgba(255, 158, 64, 0.3);            
+            border-radius: 12px;            
+            padding: 15px;            
+            display: flex;            
+            flex-direction: column;            
+            align-items: center;            
+            gap: 12px;            
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);        }
         
-        .next-preview-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(0,0,0,0.4);
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid rgba(255, 158, 64, 0.2);
-        }
-        #nextCanvas {
-            background: #000;
-            border: 1px solid rgba(255, 158, 64, 0.4);
-            border-radius: 4px;
-            margin-top: 5px;
-        }
+        .side-info-panel h3 {            
+            color: #ff9e40;            
+            font-size: 0.9rem;            
+            letter-spacing: 0.5px;        }
 
-        /* Light Mode */
-        body.light-mode { background-color: #fff; color: #202020; }                        
-        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.4); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }                                 
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }                
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.4); }                                 
-        body.light-mode .menu-btn.active-tool { background: #F38020; color: #fff; }                
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }                
-        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }                
-        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }                
-        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; } 
-        body.light-mode .ai-dashboard { background: rgba(255, 255, 255, 0.7); border-color: rgba(243, 128, 32, 0.4); }
+        #nextCanvas {            
+            background: #000;            
+            border: 1px solid rgba(255, 158, 64, 0.4);            
+            border-radius: 6px;        }
 
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }                         
+        /* Light Mode */        
+        body.light-mode { background-color: #fff; color: #202020; }                                
+        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.4); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }                                         
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }                        
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.4); }                                         
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }                        
+        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }                        
+        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }                        
+        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; }         
+        body.light-mode .side-info-panel { background: rgba(255, 255, 255, 0.7); border-color: rgba(243, 128, 32, 0.4); }
+
+        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }                                         
         
-        @media (max-width: 900px) {                                     
-            .menu-toggle-btn { display: block; }                                     
-            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; z-index: 3000; }                                     
-            body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }                        
-            .sidebar.active { transform: translateX(0); }                                     
-            .sidebar-backdrop.active { display: block; opacity: 1; }                        
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                                     
-            .game-layout-view { flex-direction: column; gap: 10px; }
-            .ai-dashboard { width: 240px; height: auto; padding: 10px; }
+        @media (max-width: 900px) {                                                 
+            .menu-toggle-btn { display: block; }                                                 
+            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; z-index: 3000; }                                                 
+            body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }                                    
+            .sidebar.active { transform: translateX(0); }                                                 
+            .sidebar-backdrop.active { display: block; opacity: 1; }                                    
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                                                 
+            .game-layout-view { flex-direction: column; gap: 15px; }            
+            #tetrisCanvas { height: 60vh; max-height: none; }
+            .side-info-panel { width: 100%; height: auto; flex-direction: row; justify-content: space-around; align-items: center; padding: 10px; }
         }
     </style>
 </head>
@@ -207,63 +184,54 @@
     <div class="app-container">
         <!-- 사이드바 -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">AI Tetris Viewer</div>
+            <div class="sidebar-title">Tetris Arcade</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                        
-            <a href="../index" class="menu-btn" style="margin-bottom: 5px;">Home</a>                        
-            <div class="status-box">                
-                <div class="status-item"><span>Score:</span> <span id="stat-score" style="color: #ff9e40;">0</span></div>                
-                <div class="status-item"><span>Lines:</span> <span id="stat-lines">0</span></div>                
-                <div class="status-item"><span>Status:</span> <span id="stat-status" style="color: #38bdf8;">Running</span></div>            
-            </div>
+            </div>                                                    
+            <a href="../index" class="menu-btn" style="margin-bottom: 5px;">Home</a>                                    
             
+            <div class="status-box">                                
+                <div class="status-item"><span>Score:</span> <span id="stat-score" style="color: #ff9e40;">0</span></div>                                
+                <div class="status-item"><span>Lines:</span> <span id="stat-lines">0</span></div>                        
+            </div>                        
+
             <div class="menu-section-title">Controls Info</div>
             <div style="font-size: 0.75rem; color: #aaa; line-height: 1.4; padding: 5px;">
                 • Move: ← / →<br>
                 • Soft Drop: ↓<br>
                 • Hard Drop: Space / Enter<br>
-                • Rotate: Q / W / ↑
-            </div>
+                • Rotate: Q / W / ↑            </div>
 
-            <div class="menu-section-title" style="margin-top: auto;">Game Control</div>            
-            <div class="bottom-btns">                                           
+            <div class="menu-section-title" style="margin-top: auto;">Game Control</div>                        
+            <div class="bottom-btns">                                                           
                 <button class="menu-btn" onclick="resetGame()">Start / Reset</button>
-            </div>                        
+            </div>                                
         </aside>
 
         <!-- 메인 콘텐츠 영역 -->
-        <main class="main-content" id="main-content">                                    
-            <header class="top-section">                                                
-                <h1>AI Model Viewer - Tetris Environment</h1>                
-                <p>Wide screen layout optimized with simulated Reinforcement Learning metrics.</p>
-            </header>                                    
-            
-            <section class="content-card" id="content-card">                                                
-                <div class="card-btn-group">                                        
-                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                                                
+        <main class="main-content" id="main-content">                                                
+            <header class="top-section">                                                                
+                <h1>Classic Tetris Arena</h1>                                
+                <p>Expanded widescreen arcade layout.</p>
+            </header>                                                            
+
+            <section class="content-card" id="content-card">                                                                
+                <div class="card-btn-group">                                                            
+                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                                                                
                 </div>
 
-                <!-- 게임 레이아웃 뷰 (테트리스 + 우측 여백 AI 패널) -->                                
-                <div class="game-layout-view">                                        
-                    <canvas id="tetrisCanvas" width="240" height="400"></canvas>
+                <!-- 대형화된 테트리스 게임 뷰 -->                                                
+                <div class="game-layout-view">                                                            
+                    <canvas id="tetrisCanvas" width="300" height="500"></canvas>
                     
-                    <!-- 가로 여백을 채우는 AI 상태 대시보드 패널 -->
-                    <div class="ai-dashboard">
-                        <h3>🤖 RL Agent Metrics</h3>
-                        <div class="metric-row"><span>Epoch:</span> <span id="metric-epoch">#142</span></div>
-                        <div class="metric-row"><span>Loss Rate:</span> <span id="metric-loss">0.0142</span></div>
-                        <div class="metric-row"><span>Q-Value:</span> <span id="metric-q">84.5%</span></div>
-                        <div class="metric-row"><span>Action:</span> <span id="metric-action" style="color: #ff9e40;">Optimizing</span></div>
-                        
-                        <div class="next-preview-box">
-                            <span style="font-size: 0.75rem; color: #ff9e40; font-weight: bold;">NEXT BLOCK</span>
-                            <canvas id="nextCanvas" width="80" height="80"></canvas>
-                        </div>
+                    <!-- 우측 간결한 넥스트 블록 패널 -->
+                    <div class="side-info-panel">
+                        <h3>NEXT BLOCK</h3>
+                        <canvas id="nextCanvas" width="100" height="100"></canvas>
                     </div>
                 </div>
-            </section>                        
-        </main>    
+            </section>                                
+        </main>        
     </div>
 
     <script>
@@ -273,30 +241,30 @@
         const contentCard = document.getElementById('content-card');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-        window.toggleFullscreen = function() {                                    
-            contentCard.classList.toggle('fullscreen');                        
-            document.body.classList.toggle('is-fullscreen');                        
-            if (contentCard.classList.contains('fullscreen')) {                                                
-                fullscreenBtn.textContent = 'Minimize 🗗';                        
-            } else {                                                
-                fullscreenBtn.textContent = 'Maximize ⛶';                        
-            }            
+        window.toggleFullscreen = function() {                                                
+            contentCard.classList.toggle('fullscreen');                                    
+            document.body.classList.toggle('is-fullscreen');                                    
+            if (contentCard.classList.contains('fullscreen')) {                                                                
+                fullscreenBtn.textContent = 'Minimize 🗗';                                    
+            } else {                                                                
+                fullscreenBtn.textContent = 'Maximize ⛶';                                    
+            }                    
         };
 
-        function toggleSidebar() {                                      
-            const isActive = sidebar.classList.toggle('active');                        
-            if (isActive) backdrop.classList.add('active');                        
-            else backdrop.classList.remove('active');        
+        function toggleSidebar() {                                                  
+            const isActive = sidebar.classList.toggle('active');                                    
+            if (isActive) backdrop.classList.add('active');                                    
+            else backdrop.classList.remove('active');                
         }
 
-        function closeSidebar() {                        
-            sidebar.classList.remove('active');                        
-            backdrop.classList.remove('active');        
+        function closeSidebar() {                                    
+            sidebar.classList.remove('active');                                    
+            backdrop.classList.remove('active');                
         }
 
-        document.getElementById('theme-toggle').addEventListener('click', () => {                                      
-            document.body.classList.toggle('light-mode');                        
-            if (window.innerWidth <= 900) closeSidebar();        
+        document.getElementById('theme-toggle').addEventListener('click', () => {                                                  
+            document.body.classList.toggle('light-mode');                                    
+            if (window.innerWidth <= 900) closeSidebar();                
         });
 
         // --- 테트리스 게임 엔진 ---
@@ -305,8 +273,9 @@
         const nextCanvas = document.getElementById('nextCanvas');
         const nextCtx = nextCanvas.getContext('2d');
 
-        ctx.scale(20, 20);
-        nextCtx.scale(20, 20);
+        // 캔버스 기본 스케일 확장 (블록 크기를 더 큼직하게 렌더링)
+        ctx.scale(25, 25);
+        nextCtx.scale(25, 25);
 
         function createMatrix(w, h) {
             const matrix = [];
@@ -333,8 +302,8 @@
             lines: 0
         };
 
-        const colors = [
-            null, '#ff9e40', '#ffbbd0', '#c8e6c9', '#bbdefb', '#fff9c4', '#e1bee7', '#b2dfdb'
+        const colors = [            
+            null, '#ff9e40', '#ffbbd0', '#c8e6c9', '#bbdefb', '#fff9c4', '#e1bee7', '#b2dfdb'        
         ];
 
         function collide(arena, player) {
@@ -453,8 +422,7 @@
             const deltaTime = time - lastTime;
             lastTime = time;
             dropCounter += deltaTime;
-            if (dropCounter > dropInterval) playerDrop();
-            
+            if (dropCounter > dropInterval) playerDrop();                        
             draw();
             requestAnimationFrame(update);
         }
@@ -472,12 +440,12 @@
 
         function draw() {
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, 12, 20); // 12x20 그리드 기준 채우기
             drawMatrix(arena, {x: 0, y: 0});
             drawMatrix(player.matrix, player.pos);
 
             nextCtx.fillStyle = '#000';
-            nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            nextCtx.fillRect(0, 0, 4, 4);
             if (player.nextMatrix) {
                 let ox = (4 - player.nextMatrix[0].length) / 2;
                 let oy = (4 - player.nextMatrix.length) / 2;
@@ -498,12 +466,6 @@
             playerReset();
             updateScore();
         }
-
-        // 가상의 AI 지표 실시간 변경 효과
-        setInterval(() => {
-            document.getElementById('metric-loss').innerText = (Math.random() * 0.02 + 0.005).toFixed(4);
-            document.getElementById('metric-q').innerText = (Math.floor(Math.random() * 15) + 80) + '%';
-        }, 1500);
 
         document.addEventListener('keydown', event => {
             if (event.key === 'ArrowLeft') playerMove(-1);
