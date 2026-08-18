@@ -1,1 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG 애니메이션 패턴 생성기</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #3b82f6;
+            --border-color: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 380px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        h1 { font-size: 1.25rem; margin-bottom: 20px; color: #60a5fa; }
+        .control-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: #94a3b8;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        input[type="range"] {
+            padding: 0;
+            accent-color: var(--accent-color);
+        }
+        .range-val {
+            float: right;
+            font-size: 0.8rem;
+            color: #60a5fa;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #020617;
+            padding: 20px;
+            position: relative;
+        }
+        .preview-area svg {
+            max-width: 100%;
+            max-height: 100%;
+            background: #000;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .code-area {
+            height: 250px;
+            background: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        textarea {
+            flex: 1;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: #38bdf8;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            font-size: 0.8rem;
+        }
+        button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
 
+    <div class="sidebar">
+        <h1>SVG Pattern Generator</h1>
+        
+        <div class="control-group">
+            <label>패턴 유형</label>
+            <select id="patternType">
+                <option value="grid">격자무늬 그리드 (Grid)</option>
+                <option value="wave">물결 파동 (Wave)</option>
+                <option value="spiral">나선형 (Spiral)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>가로 개수 (Columns) <span id="colsVal" class="range-val">15</span></label>
+            <input type="range" id="cols" min="5" max="40" value="15">
+        </div>
+
+        <div class="control-group">
+            <label>세로 개수 (Rows) <span id="rowsVal" class="range-val">15</span></label>
+            <input type="range" id="rows" min="5" max="40" value="15">
+        </div>
+
+        <div class="control-group">
+            <label>원 크기 (Radius) <span id="radiusVal" class="range-val">6</span></label>
+            <input type="range" id="radius" min="2" max="20" value="6">
+        </div>
+
+        <div class="control-group">
+            <label>간격 (Spacing) <span id="gapVal" class="range-val">30</span></label>
+            <input type="range" id="gap" min="15" max="60" value="30">
+        </div>
+
+        <div class="control-group">
+            <label>애니메이션 속도 (Duration 초) <span id="durVal" class="range-val">2</span></label>
+            <input type="range" id="dur" min="0.5" max="5" step="0.5" value="2">
+        </div>
+
+        <div class="control-group">
+            <label>기본 색상</label>
+            <input type="color" id="baseColor" value="#38bdf8">
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="preview-area" id="previewContainer">
+            <!-- SVG가 실시간으로 렌더링되는 곳 -->
+        </div>
+        <div class="code-area">
+            <div class="code-header">
+                <label style="margin:0;">생성된 SVG 코드</label>
+                <div>
+                    <button id="copyBtn" style="margin-right: 6px;">복사하기</button>
+                    <button id="downloadBtn">다운로드</button>
+                </div>
+            </div>
+            <textarea id="codeOutput" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        const controls = ['patternType', 'cols', 'rows', 'radius', 'gap', 'dur', 'baseColor'];
+        
+        controls.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateGenerator);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const textarea = document.getElementById('codeOutput');
+            textarea.select();
+            navigator.clipboard.writeText(textarea.value);
+            alert('SVG 코드가 클립보드에 복사되었습니다.');
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const code = document.getElementById('codeOutput').value;
+            const blob = new Blob([code], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'animated-pattern.svg';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        function updateGenerator() {
+            const type = document.getElementById('patternType').value;
+            const cols = parseInt(document.getElementById('cols').value);
+            const rows = parseInt(document.getElementById('rows').value);
+            const radius = parseFloat(document.getElementById('radius').value);
+            const gap = parseInt(document.getElementById('gap').value);
+            const dur = parseFloat(document.getElementById('dur').value);
+            const color = document.getElementById('baseColor').value;
+
+            // 라벨 업데이트
+            document.getElementById('colsVal').innerText = cols;
+            document.getElementById('rowsVal').innerText = rows;
+            document.getElementById('radiusVal').innerText = radius;
+            document.getElementById('gapVal').innerText = gap;
+            document.getElementById('durVal').innerText = dur;
+
+            const width = cols * gap + gap;
+            const height = rows * gap + gap;
+
+            let circlesCode = '';
+
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    const cx = (i + 1) * gap;
+                    const cy = (j + 1) * gap;
+                    
+                    let delay = 0;
+                    if (type === 'grid') {
+                        delay = (i + j) * (dur / (cols + rows) * 2);
+                    } else if (type === 'wave') {
+                        delay = Math.sin(i * 0.5) * Math.cos(j * 0.5) * dur;
+                    } else if (type === 'spiral') {
+                        const dx = i - cols / 2;
+                        const dy = j - rows / 2;
+                        delay = Math.sqrt(dx * dx + dy * dy) * (dur / cols);
+                    }
+
+                    circlesCode += `    <circle cx="${cx}" cy="${cy}" r="${radius}" fill="${color}">
+        <animate attributeName="opacity" values="0.2;1;0.2" dur="${dur}s" begin="${delay.toFixed(2)}s" repeatCount="indefinite" />
+        <animate attributeName="r" values="${radius * 0.5};${radius * 1.3};${radius * 0.5}" dur="${dur}s" begin="${delay.toFixed(2)}s" repeatCount="indefinite" />
+    </circle>\n`;
+                }
+            }
+
+            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%">
+    <rect width="100%" height="100%" fill="#020617"/>
+${circlesCode}</svg>`;
+
+            document.getElementById('previewContainer').innerHTML = svgString;
+            document.getElementById('codeOutput').value = svgString;
+        }
+
+        // 초기 실행
+        updateGenerator();
+    </script>
+</body>
+</html>
