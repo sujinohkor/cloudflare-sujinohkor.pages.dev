@@ -3,261 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVG 애니메이션 패턴 생성기</title>
+    <title>채팅 애니메이션 생성기</title>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #3b82f6;
-            --border-color: #334155;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .sidebar {
-            width: 380px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid var(--border-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #242424;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        h1 { font-size: 1.25rem; margin-bottom: 20px; color: #60a5fa; }
-        .control-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            color: #94a3b8;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px 12px;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        input[type="range"] {
-            padding: 0;
-            accent-color: var(--accent-color);
-        }
-        .range-val {
-            float: right;
-            font-size: 0.8rem;
-            color: #60a5fa;
-        }
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .preview-area {
-            flex: 1;
-            display: flex;
             align-items: center;
             justify-content: center;
-            background: #020617;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
             padding: 20px;
-            position: relative;
+            box-sizing: border-box;
         }
-        .preview-area svg {
-            max-width: 100%;
-            max-height: 100%;
-            background: #000;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+
+        .input-box {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
-        .code-area {
-            height: 250px;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-        }
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+
         textarea {
-            flex: 1;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: #38bdf8;
-            font-family: monospace;
+            width: 100%;
+            height: 100px;
             padding: 10px;
-            border-radius: 6px;
-            resize: none;
-            font-size: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-size: 16px;
         }
+
         button {
-            background: var(--accent-color);
+            margin-top: 10px;
+            background-color: #0079ff;
             color: white;
             border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
         }
-        button:hover { background: #2563eb; }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        .preview-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 550px;
+            height: auto;
+        }
+
+        .bubble {
+            fill: #e9e9eb;
+        }
+
+        text {
+            fill: #242424;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #dcdcdc;
+            }
+            .input-box, .preview-container {
+                background: #1e1e1e;
+            }
+            .bubble {
+                fill: #3b3b3d;
+            }
+            text {
+                fill: #dcdcdc;
+            }
+            textarea {
+                background: #2a2a2a;
+                color: #dcdcdc;
+                border-color: #444;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h1>SVG Pattern Generator</h1>
-        
-        <div class="control-group">
-            <label>패턴 유형</label>
-            <select id="patternType">
-                <option value="grid">격자무늬 그리드 (Grid)</option>
-                <option value="wave">물결 파동 (Wave)</option>
-                <option value="spiral">나선형 (Spiral)</option>
-            </select>
+    <div class="container">
+        <div class="input-box">
+            <h3>채팅 문구 입력 (줄바꿈으로 구분)</h3>
+            <textarea id="messageInput" placeholder="출력할 문장을 한 줄씩 입력하세요."></textarea>
+            <br>
+            <button onclick="generateAnimation()">애니메이션 적용</button>
         </div>
 
-        <div class="control-group">
-            <label>가로 개수 (Columns) <span id="colsVal" class="range-val">15</span></label>
-            <input type="range" id="cols" min="5" max="40" value="15">
-        </div>
-
-        <div class="control-group">
-            <label>세로 개수 (Rows) <span id="rowsVal" class="range-val">15</span></label>
-            <input type="range" id="rows" min="5" max="40" value="15">
-        </div>
-
-        <div class="control-group">
-            <label>원 크기 (Radius) <span id="radiusVal" class="range-val">6</span></label>
-            <input type="range" id="radius" min="2" max="20" value="6">
-        </div>
-
-        <div class="control-group">
-            <label>간격 (Spacing) <span id="gapVal" class="range-val">30</span></label>
-            <input type="range" id="gap" min="15" max="60" value="30">
-        </div>
-
-        <div class="control-group">
-            <label>애니메이션 속도 (Duration 초) <span id="durVal" class="range-val">2</span></label>
-            <input type="range" id="dur" min="0.5" max="5" step="0.5" value="2">
-        </div>
-
-        <div class="control-group">
-            <label>기본 색상</label>
-            <input type="color" id="baseColor" value="#38bdf8">
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="preview-area" id="previewContainer">
-            <!-- SVG가 실시간으로 렌더링되는 곳 -->
-        </div>
-        <div class="code-area">
-            <div class="code-header">
-                <label style="margin:0;">생성된 SVG 코드</label>
-                <div>
-                    <button id="copyBtn" style="margin-right: 6px;">복사하기</button>
-                    <button id="downloadBtn">다운로드</button>
-                </div>
-            </div>
-            <textarea id="codeOutput" readonly></textarea>
+        <div class="preview-container">
+            <svg id="chatSvg" viewBox="0 0 550 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="svgContent"></g>
+            </svg>
         </div>
     </div>
 
     <script>
-        const controls = ['patternType', 'cols', 'rows', 'radius', 'gap', 'dur', 'baseColor'];
-        
-        controls.forEach(id => {
-            document.getElementById(id).addEventListener('input', updateGenerator);
-        });
+        function generateAnimation() {
+            const rawText = document.getElementById('messageInput').value;
+            const lines = rawText.split('\n').filter(line => line.trim() !== '');
+            const svgContent = document.getElementById('svgContent');
+            const svgElement = document.getElementById('chatSvg');
 
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            const textarea = document.getElementById('codeOutput');
-            textarea.select();
-            navigator.clipboard.writeText(textarea.value);
-            alert('SVG 코드가 클립보드에 복사되었습니다.');
-        });
+            svgContent.innerHTML = '';
 
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            const code = document.getElementById('codeOutput').value;
-            const blob = new Blob([code], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'animated-pattern.svg';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        function updateGenerator() {
-            const type = document.getElementById('patternType').value;
-            const cols = parseInt(document.getElementById('cols').value);
-            const rows = parseInt(document.getElementById('rows').value);
-            const radius = parseFloat(document.getElementById('radius').value);
-            const gap = parseInt(document.getElementById('gap').value);
-            const dur = parseFloat(document.getElementById('dur').value);
-            const color = document.getElementById('baseColor').value;
-
-            // 라벨 업데이트
-            document.getElementById('colsVal').innerText = cols;
-            document.getElementById('rowsVal').innerText = rows;
-            document.getElementById('radiusVal').innerText = radius;
-            document.getElementById('gapVal').innerText = gap;
-            document.getElementById('durVal').innerText = dur;
-
-            const width = cols * gap + gap;
-            const height = rows * gap + gap;
-
-            let circlesCode = '';
-
-            for (let i = 0; i < cols; i++) {
-                for (let j = 0; j < rows; j++) {
-                    const cx = (i + 1) * gap;
-                    const cy = (j + 1) * gap;
-                    
-                    let delay = 0;
-                    if (type === 'grid') {
-                        delay = (i + j) * (dur / (cols + rows) * 2);
-                    } else if (type === 'wave') {
-                        delay = Math.sin(i * 0.5) * Math.cos(j * 0.5) * dur;
-                    } else if (type === 'spiral') {
-                        const dx = i - cols / 2;
-                        const dy = j - rows / 2;
-                        delay = Math.sqrt(dx * dx + dy * dy) * (dur / cols);
-                    }
-
-                    circlesCode += `    <circle cx="${cx}" cy="${cy}" r="${radius}" fill="${color}">
-        <animate attributeName="opacity" values="0.2;1;0.2" dur="${dur}s" begin="${delay.toFixed(2)}s" repeatCount="indefinite" />
-        <animate attributeName="r" values="${radius * 0.5};${radius * 1.3};${radius * 0.5}" dur="${dur}s" begin="${delay.toFixed(2)}s" repeatCount="indefinite" />
-    </circle>\n`;
-                }
+            if (lines.length === 0) {
+                svgElement.setAttribute('height', 100);
+                return;
             }
 
-            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%">
-    <rect width="100%" height="100%" fill="#020617"/>
-${circlesCode}</svg>`;
+            let currentTime = 0;
+            let totalHeight = 20;
 
-            document.getElementById('previewContainer').innerHTML = svgString;
-            document.getElementById('codeOutput').value = svgString;
+            lines.forEach((text, index) => {
+                const yOffset = totalHeight;
+                const bubbleHeight = 42;
+                const typingDuration = 1.2;
+                const waitTime = currentTime;
+
+                // 타이핑 애니메이션 추가
+                const typingGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                typingGroup.setAttribute("transform", `translate(10, ${yOffset})`);
+                typingGroup.style.opacity = "0";
+                typingGroup.style.animation = `fade-in-out ${typingDuration}s ${waitTime}s forwards`;
+                
+                typingGroup.innerHTML = `
+                    <rect x="8.27246" width="69.7276" height="42" rx="20.9774" class="bubble" />
+                    <circle cx="13.591" cy="33.091" r="7.68185" class="bubble" />
+                    <circle cx="3.54547" cy="41.9547" r="3.54547" class="bubble" />
+                    <circle cx="27.4778" cy="20.9773" r="5.02275" fill="#999999">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="42.8411" cy="20.9773" r="5.02275" fill="#999999">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" begin="0.2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="58.2054" cy="20.9773" r="5.02275" fill="#999999">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" begin="0.4s" repeatCount="indefinite" />
+                    </circle>
+                `;
+                svgContent.appendChild(typingGroup);
+
+                const msgTime = waitTime + typingDuration;
+                
+                // 실제 메시지 그룹 추가
+                const msgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                msgGroup.setAttribute("transform", `translate(10, ${yOffset})`);
+                msgGroup.style.opacity = "0";
+                
+                // 대략적인 텍스트 너비 계산 (폰트 크기 고려)
+                const estimatedWidth = Math.max(120, text.length * 11 + 30);
+
+                msgGroup.style.animation = `msg-appear 0.2s ${msgTime}s forwards`;
+
+                msgGroup.innerHTML = `
+                    <rect width="${estimatedWidth}" height="${bubbleHeight}" rx="18.0355" class="bubble" />
+                    <text x="15" y="27">${text}</text>
+                `;
+                svgContent.appendChild(msgGroup);
+
+                currentTime = msgTime + 0.5;
+                totalHeight += 50;
+            });
+
+            svgElement.setAttribute('height', totalHeight + 10);
+        }
+
+        // 동적 애니메이션 키프레임 주입
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.styleSheet ? styleSheet.styleSheet.cssText = getKeys() : styleSheet.appendChild(document.createTextNode(getKeys()));
+        document.head.appendChild(styleSheet);
+
+        function getKeys() {
+            return `
+                @keyframes fade-in-out {
+                    0%, 100% { opacity: 0; }
+                    25%, 90% { opacity: 1; }
+                }
+                @keyframes msg-appear {
+                    0% { opacity: 0; transform: translate(10px, 5px); }
+                    100% { opacity: 1; transform: translate(10px, 0); }
+                }
+            `;
         }
 
         // 초기 실행
-        updateGenerator();
+        window.onload = () => {
+            document.getElementById('messageInput').value = "Hi, I'm Chansung\nSoftware Engineer and Researcher\nBuilding SDN for Optical Access Network\nHave a great day!";
+            generateAnimation();
+        };
     </script>
 </body>
 </html>
