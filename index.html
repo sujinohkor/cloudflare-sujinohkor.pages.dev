@@ -1899,6 +1899,35 @@
                     ]
                 }</script>
             </a>
+
+            <a href="https://sujinohkor.pages.dev/tools/ml-viewer" class="card" data-category="dev">
+                <div class="icon">🤖</div>
+                <h3>ML Model Viewer</h3>
+                <p>ml-viewer</p>
+                <span class="arrow">Go to ML Model Viewer →</span>
+                <!-- 안 보이는 데이터 블록 -->
+                <script type="application/json" class="app-meta">{
+                    "desc": "A machine learning model viewer module that provides an interactive interface for switching between Netron-based ONNX model viewing and Hugging Face model viewing tools through dynamically loaded iframes, with responsive sidebar navigation, light/dark theme switching, and a custom full-screen viewing mode.",
+                    "deps": [
+                        "Vanilla JavaScript (ES6+) — Pure JavaScript without any external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), innerHTML updates, class manipulation, and DOM event handling",
+                        "HTML5 <iframe> — Dynamically embeds and switches between the Netron ONNX viewer and Hugging Face model viewer pages",
+                        "JavaScript Events API — Handles click events, page load initialization, sidebar controls, theme switching, and responsive interactions",
+                        "Window API — Uses window.onload and window.innerWidth for default application loading and mobile viewport detection",
+                        "Location API — Uses location.href for navigation back to the main index page",
+                        "CSS3 — Uses Flexbox, Media Queries, transitions, backdrop-filter, fixed positioning, responsive layouts, and light/dark theme styling",
+                        "HTML5 ClassList API — Controls active menu states, sidebar visibility, light mode, and custom full-screen mode through CSS class toggling",
+                        "HTML5 DOM Content Injection — Uses innerHTML to dynamically replace the embedded iframe viewer",
+                        "HTML5 Buttons — Provides navigation, viewer selection, theme switching, mobile menu control, and full-screen toggle interactions"
+                    ],
+                    "backends": [
+                        "Static Hosting: Cloudflare Pages",
+                        "Embedded Netron ONNX Viewer: /tools/ml-onnx-netron.html",
+                        "Embedded Hugging Face Model Viewer: /tools/ml-hugging-face.html",
+                        "No Custom Server-Side Backend: The module acts as a client-side container and navigation interface that loads locally hosted machine learning model viewer tools through iframes"
+                    ]
+                }</script>
+            </a>
         </div>
 
         <div class="websites-section">
