@@ -107,6 +107,24 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
+        /* Preview palette: DAY / NIGHT와 독립적으로 동작 */
+        #chatSvg.preview-black .bubble { fill: #3b3b3d; }
+        #chatSvg.preview-black text { fill: #ffffff; }
+
+        #chatSvg.preview-white .bubble { fill: #e9e9eb; }
+        #chatSvg.preview-white text { fill: #242424; }
+
+        .preview-color-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .preview-color-btns .menu-btn.active {
+            background: rgba(255, 158, 64, 0.2);
+            border-color: rgba(255, 158, 64, 0.75);
+        }
+
         .content-left, .content-right {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
@@ -132,8 +150,6 @@
         body.light-mode .content-left, body.light-mode .content-right { background-color: rgba(255, 255, 255, 0.5); border-color: #F38020; }
         body.light-mode .content-left textarea { background: rgba(0, 0, 0, 0.02); color: #202020; border-color: rgba(0, 0, 0, 0.15); }
         body.light-mode .content-left textarea:focus { border-color: #F38020; }
-        body.light-mode .bubble { fill: #e9e9eb; }
-        body.light-mode text { fill: #242424; }
         body.light-mode .menu-toggle-btn { color: #ffffff; }
 
         body.light-mode .content-left, 
@@ -179,6 +195,11 @@
             
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
+            <div class="preview-color-btns">
+                <button class="menu-btn active" id="previewBlackBtn" onclick="setPreviewTheme('black')">Black</button>
+                <button class="menu-btn" id="previewWhiteBtn" onclick="setPreviewTheme('white')">White</button>
+            </div>
+
             <div class="bottom-btns">
                 <button class="menu-btn" onclick="generateAnimation()">Apply Animation</button>
                 <button class="menu-btn" onclick="replayAnimation()">Replay</button>
@@ -205,7 +226,7 @@
                 <section class="content-right">
                     <style id="dynamicKeyframes"></style>
                     <!-- preserveAspectRatio="xMinYMin meet" 추가하여 항상 왼쪽 상단에 밀착되도록 고정 -->
-                    <svg id="chatSvg" viewBox="0 0 350 100" preserveAspectRatio="xMinYMin meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="chatSvg" class="preview-black" viewBox="0 0 350 100" preserveAspectRatio="xMinYMin meet" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="svgContent"></g>
                     </svg>
                 </section>
@@ -220,6 +241,23 @@
         const svgContent = document.getElementById('svgContent');
         const svgElement = document.getElementById('chatSvg');
         const dynamicKeyframes = document.getElementById('dynamicKeyframes');
+        const previewBlackBtn = document.getElementById('previewBlackBtn');
+        const previewWhiteBtn = document.getElementById('previewWhiteBtn');
+
+        let previewTheme = 'black';
+
+        function setPreviewTheme(theme) {
+            previewTheme = theme === 'white' ? 'white' : 'black';
+
+            svgElement.classList.toggle('preview-black', previewTheme === 'black');
+            svgElement.classList.toggle('preview-white', previewTheme === 'white');
+
+            previewBlackBtn.classList.toggle('active', previewTheme === 'black');
+            previewWhiteBtn.classList.toggle('active', previewTheme === 'white');
+
+            // 색상 변경 시 현재 애니메이션도 처음부터 다시 보여줌
+            generateAnimation();
+        }
 
         function toggleSidebar() { 
             sidebar.classList.toggle('active'); 
@@ -446,6 +484,7 @@
 
         function getStandaloneSvgString() {
             const svgClone = svgElement.cloneNode(true);
+            svgClone.classList.remove('preview-black', 'preview-white');
 
             const cleanKeyframes = formatCss(dynamicKeyframes.innerHTML);
 
@@ -454,10 +493,13 @@
                 "style"
             );
 
+            const bubbleFill = previewTheme === 'white' ? '#e9e9eb' : '#3b3b3d';
+            const textFill = previewTheme === 'white' ? '#242424' : '#ffffff';
+
             styleTag.textContent =
                 cleanKeyframes +
-                " .bubble { fill: #3b3b3d; }" +
-                " text { fill: #ffffff; font-size: 18px; letter-spacing: -0.02em; font-family: 'Segoe UI', sans-serif; }";
+                ` .bubble { fill: ${bubbleFill}; }` +
+                ` text { fill: ${textFill}; font-size: 18px; letter-spacing: -0.02em; font-family: 'Segoe UI', sans-serif; }`;
 
             svgClone.insertBefore(styleTag, svgClone.firstChild);
 
@@ -595,6 +637,11 @@
             svgContent.innerHTML = '';
             dynamicKeyframes.innerHTML = '';
             svgElement.setAttribute('viewBox', '0 0 350 100');
+            previewTheme = 'black';
+            svgElement.classList.add('preview-black');
+            svgElement.classList.remove('preview-white');
+            previewBlackBtn.classList.add('active');
+            previewWhiteBtn.classList.remove('active');
         }
 
         let inputRenderTimer = null;
