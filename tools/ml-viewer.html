@@ -148,6 +148,66 @@
             .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; }             
             .content-card { min-height: 0; height: 100%; }             
         }
+
+        /* Fullscreen button style */
+        .fullscreen-btn {             
+            position: absolute;             
+            top: 15px;             
+            right: 15px;             
+            z-index: 2001;             
+            background: #202020;             
+            color: #ff9e40;             
+            border: 1px solid #ff9e40;             
+            padding: 6px 14px;             
+            border-radius: 8px;             
+            cursor: pointer;             
+            font-size: 0.8rem;             
+            font-weight: bold;             
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);             
+            transition: all 0.3s;         
+        }
+        .fullscreen-btn:hover {             
+            background: #ff9e40;             
+            color: #101010;         }
+        
+        /* 풀스크린 활성화 시: 사이드바 숨김 & 메인 콘텐츠 영역 전체 확장 */
+        body.is-fullscreen .sidebar {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.is-fullscreen .main-content {
+            margin-left: 0 !important;
+            width: 100vw !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+        body.is-fullscreen .top-section {
+            display: none !important;
+        }
+        body.is-fullscreen .content-card {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* 라이트 모드(Day mode)에서의 전체화면 버튼 스타일 */
+        body.light-mode .fullscreen-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }
+        body.light-mode .fullscreen-btn:hover { background: #F38020; color: #ffffff; }
+        
+        body.light-mode body.is-fullscreen .content-card {             
+            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png') !important;             
+            background-color: #d2b48c !important;         
+        }
     </style>
 </head>
 <body>
@@ -161,7 +221,7 @@
             <div class="sidebar-title">ML Model Viewer</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                                    
+            </div>
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <div class="bottom-btns">
                 <button class="menu-btn" id="btn-onnx-netron" onclick="switchApp('onnx-netron')">Netron</button>
@@ -173,7 +233,9 @@
                 <h1>ML Model Viewer</h1>
                 <p>ONNX Viewer</p>
             </header>            
-            <section class="content-card" id="content-card">                
+            <section class="content-card" id="content-card">
+                <!-- 전체화면 토글 버튼 -->
+                <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>
                 <div class="board-container" id="board">                    
                     <!-- 동적으로 게임 iframe이 로드되는 영역 -->
                 </div>            
@@ -185,6 +247,19 @@
         const mainContent = document.getElementById('main-content');
         const board = document.getElementById('board');
 
+        const contentCard = document.getElementById('content-card');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        
+        window.toggleFullscreen = function() {            
+            contentCard.classList.toggle('fullscreen');
+            document.body.classList.toggle('is-fullscreen');
+            if (contentCard.classList.contains('fullscreen')) {            
+                fullscreenBtn.textContent = 'Minimize 🗗';            
+            } else {            
+                fullscreenBtn.textContent = 'Maximize ⛶';            
+            }        
+        };
+        
         // 페이지 로드 시 기본값으로 Red 게임 실행
         window.onload = function() {     
             switchApp('onnx-netron');
