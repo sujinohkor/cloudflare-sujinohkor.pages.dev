@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVG Animation Generator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#101010;--panel:rgba(16,16,16,.28);--text:#fff;--muted:#888;--accent:#ff9e40;--field:rgba(255,255,255,.04);--border:rgba(255,158,64,.38)}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",sans-serif;min-height:100vh;overflow:hidden;transition:.25s}
+body.light{--bg:#fff;--panel:rgba(255,255,255,.45);--text:#202020;--muted:#666;--field:rgba(0,0,0,.025)}
+.app{display:flex;min-height:100vh;width:100%}
+.sidebar{width:260px;height:calc(100vh - 40px);position:fixed;left:20px;top:20px;z-index:10;padding:25px 20px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--border);border-radius:24px;background:var(--panel);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 20px 40px rgba(0,0,0,.35);overflow:auto}
+body.light .sidebar{background:rgba(255,255,255,.3);border-color:rgba(243,128,32,.35);box-shadow:0 20px 40px rgba(243,128,32,.15)}
+.sidebar-title{color:#ff9e40;font-size:1.1rem;font-weight:bold;margin-bottom:5px;text-align:center;letter-spacing:1px}
+.theme-toggle-btn,.menu-btn{width:100%;padding:11px 14px;cursor:pointer;text-align:center;background:rgba(255,255,255,.03);color:#ff9e40;border:1px solid rgba(255,158,64,.4);border-radius:50px;font-weight:bold;transition:.3s;font-size:.85rem}
+.theme-toggle-btn:hover,.menu-btn:hover{background:rgba(255,158,64,.2);border-color:rgba(255,158,64,.65)}
+body.light .theme-toggle-btn,body.light .menu-btn{background:rgba(0,0,0,.02);color:#F38020;border-color:rgba(243,128,32,.5)}
+.selector-label{font-size:11px;color:var(--muted);padding-left:4px}
+select,.control input{width:100%;padding:9px 10px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:var(--field);color:var(--text);outline:none;font-family:inherit}
+select option{background:#202020;color:#fff}
+body.light select,body.light .control input{border-color:rgba(0,0,0,.14);background:#fff;color:#202020}
+body.light select option{background:#fff;color:#202020}
+.palette-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.palette-btns .menu-btn.active{background:rgba(255,158,64,.2);border-color:rgba(255,158,64,.75)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0}
+.control{display:flex;flex-direction:column;gap:5px}
+.control label{font-size:11px;color:var(--muted);padding-left:4px}
+.main{margin-left:300px;padding:40px;flex:1;height:100vh;width:calc(100% - 300px);display:flex;flex-direction:column;gap:20px;overflow:hidden}
+header h1{font-size:1.8rem;margin-bottom:5px} header p{font-size:.95rem;color:var(--muted)}
+.workspace{display:flex;gap:20px;flex:1;min-height:0}
+.panel{border:2px solid var(--accent);border-radius:16px;background:rgba(0,0,0,.12);box-shadow:0 10px 20px rgba(0,0,0,.28);padding:20px;min-height:0}
+body.light .panel{background:rgba(255,255,255,.5);border-color:#F38020;box-shadow:0 10px 20px rgba(243,128,32,.15)}
+.left{flex:1;display:flex;flex-direction:column;gap:12px}.left label{color:var(--accent);font-weight:700}
+textarea{width:100%;flex:1;resize:none;border-radius:12px;padding:15px;border:1px solid rgba(255,255,255,.15);background:var(--field);color:var(--text);font-size:16px;font-family:inherit;line-height:1.5;outline:none}
+body.light textarea{background:rgba(0,0,0,.02);color:#202020;border-color:rgba(0,0,0,.15)}
+textarea:focus{border-color:var(--accent)}.hint{font-size:12px;color:var(--muted);line-height:1.5}
+.right{flex:1.2;overflow:auto;display:flex;align-items:flex-start;justify-content:flex-start}
+.preview-wrap{min-width:680px;flex:0 0 auto}.preview-wrap svg{width:680px;min-width:680px;height:auto;display:block}
+.menu-toggle{display:none;position:fixed;left:20px;bottom:20px;z-index:20;padding:10px 15px;background:var(--accent);color:#fff;border:none;border-radius:50px;font-weight:bold}
+@media(max-width:900px){body{overflow:auto}.menu-toggle{display:block}.sidebar{transform:translateX(-320px);transition:.25s;background:var(--bg)}.sidebar.active{transform:translateX(0)}.main{margin-left:0;padding:20px;width:100vw;height:auto;min-height:100svh}.workspace{flex-direction:column}.left{min-height:330px}.right{min-height:300px}}
+</style>
+</head>
+<body>
+<button class="menu-toggle" id="menuToggle">MENU</button>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-title">SVG Animator</div>
+  <button class="theme-toggle-btn" id="themeBtn">DAY / NIGHT</button>
+  <button class="menu-btn" id="homeBtn">Home</button>
+
+  <label class="selector-label" for="generatorType">Generator</label>
+  <select id="generatorType">
+    <option value="typewriter">Typewriter</option>
+    <option value="code">Code Typing</option>
+    <option value="terminal">Terminal</option>
+    <option value="timeline">Timeline</option>
+    <option value="progress">Progress Steps</option>
+    <option value="notification">Notification</option>
+    <option value="search">Search Bar</option>
+    <option value="skill">Skill Badge</option>
+    <option value="counter">Counter</option>
+    <option value="flowchart">Flowchart</option>
+    <option value="architecture">Architecture Diagram</option>
+    <option value="beforeAfter">Before / After</option>
+  </select>
+
+  <div class="palette-btns">
+    <button class="menu-btn active" id="blackBtn">Black</button>
+    <button class="menu-btn" id="whiteBtn">White</button>
+  </div>
+
+  <div class="controls" id="controls"></div>
+
+  <button class="menu-btn" id="applyBtn">Apply Animation</button>
+  <button class="menu-btn" id="replayBtn">Replay</button>
+  <button class="menu-btn" id="copyBtn">Copy SVG Code</button>
+  <button class="menu-btn" id="downloadBtn">Download SVG</button>
+  <button class="menu-btn" id="resetBtn">Reset</button>
+</aside>
+
+<main class="main" id="main">
+<header>
+  <h1 id="pageTitle">Typewriter SVG Generator</h1>
+  <p id="pageDesc"></p>
+</header>
+<div class="workspace">
+  <section class="panel left">
+    <label id="inputLabel" for="mainInput">Text</label>
+    <textarea id="mainInput" spellcheck="false"></textarea>
+    <div class="hint" id="hint"></div>
+  </section>
+  <section class="panel right"><div class="preview-wrap" id="previewWrap"></div></section>
+</div>
+</main>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const mainInput=document.getElementById("mainInput"), previewWrap=document.getElementById("previewWrap");
+const generatorType=document.getElementById("generatorType"), controls=document.getElementById("controls");
+const blackBtn=document.getElementById("blackBtn"), whiteBtn=document.getElementById("whiteBtn");
+let svgTheme="black", renderTimer=null;
+
+const configs = {
+    typewriter: {
+        title: "Typewriter SVG Generator",
+        desc: "Generate a character-by-character typewriter animation.",
+        label: "Text",
+        hint: "Line breaks are preserved. Each line is typed one character at a time.",
+        text: `Hello, I am Sujin Oh.
+Welcome to my coding playground.
+I build small things that I want to try.`,
+        controls: [
+            ["Typing Speed", "a", .07, .01],
+            ["Line Delay", "b", .35, .1],
+            ["Font Size", "c", 22, 1],
+            ["Width", "d", 760, 10]
+        ]
+    },
+
+    code: {
+        title: "Code Typing SVG Generator",
+        desc: "Generate line-by-line source-code typing animation.",
+        label: "Source Code",
+        hint: "Indentation and spaces are preserved.",
+        text: `function greet(name) {
+    const message = "Hello, " + name + "!";
+    console.log(message);
+    return message;
+}
+
+greet("Sujin");`,
+        controls: [
+            ["Typing Speed", "a", .045, .01],
+            ["Line Delay", "b", .3, .1],
+            ["Font Size", "c", 17, 1],
+            ["Width", "d", 760, 10]
+        ]
+    },
+
+    terminal: {
+        title: "Terminal SVG Animation Generator",
+        desc: "Type commands character by character and reveal output lines sequentially.",
+        label: "Terminal Script",
+        hint: "Lines starting with $, > or # are treated as commands.",
+        text: `$ git clone project
+Cloning into 'project'...
+$ cd project
+$ npm install
+added 128 packages
+$ npm run deploy
+✓ Deployment complete`,
+        controls: [
+            ["Typing Speed", "a", .055, .01],
+            ["Line Delay", "b", .4, .1],
+            ["Font Size", "c", 18, 1],
+            ["Width", "d", 720, 10]
+        ]
+    },
+
+    timeline: {
+        title: "Timeline SVG Generator",
+        desc: "Generate an animated vertical timeline from dates and events.",
+        label: "Timeline Data",
+        hint: "One item per line: Date | Event",
+        text: `2019 | Started learning web development
+2022 | Began experimenting with SVG animations
+2024 | Created browser-based generators
+2026 | Expanded the collection`,
+        controls: [
+            ["Item Delay", "a", .55, .1],
+            ["Fade Duration", "b", .35, .05],
+            ["Font Size", "c", 17, 1],
+            ["Width", "d", 760, 10]
+        ]
+    },
+
+    progress: {
+        title: "Progress Steps SVG Generator",
+        desc: "Activate progress steps and connecting lines sequentially.",
+        label: "Steps",
+        hint: "One step per line, or separate with →.",
+        text: `Planning
+Coding
+Testing
+Deploy`,
+        controls: [
+            ["Step Delay", "a", .7, .1],
+            ["Fade Duration", "b", .35, .05],
+            ["Font Size", "c", 17, 1],
+            ["Width", "d", 820, 10]
+        ]
+    },
+
+    notification: {
+        title: "Notification SVG Generator",
+        desc: "Stack notification cards one by one.",
+        label: "Notifications",
+        hint: "One notification per line: Title | Message",
+        text: `Build Complete | Your project was built successfully.
+New Message | You have a new message from Alex.
+Deployment | Production deployment finished.
+Reminder | Team meeting starts in 10 minutes.`,
+        controls: [
+            ["Card Delay", "a", .6, .1],
+            ["Fade Duration", "b", .35, .05],
+            ["Font Size", "c", 16, 1],
+            ["Card Width", "d", 480, 10]
+        ]
+    },
+
+    search: {
+        title: "Search Bar SVG Generator",
+        desc: "Type a query and reveal search result cards sequentially.",
+        label: "Search Data",
+        hint: "First line = query. Remaining lines = Title | Description.",
+        text: `SVG animation generator
+Chat SVG Generator | Create animated chat bubbles.
+Token SVG Generator | Generate sequential word-box animations.
+Timeline SVG Generator | Build animated timelines.`,
+        controls: [
+            ["Typing Speed", "a", .07, .01],
+            ["Result Delay", "b", .45, .1],
+            ["Font Size", "c", 16, 1],
+            ["Width", "d", 720, 10]
+        ]
+    },
+
+    skill: {
+        title: "Skill Badge SVG Generator",
+        desc: "Generate badges that appear sequentially and gently float.",
+        label: "Skills",
+        hint: "One skill per line, or separate with commas.",
+        text: `Linux
+Python
+Cloud
+Docker
+Kubernetes
+Git
+JavaScript
+SQL`,
+        controls: [
+            ["Badge Delay", "a", .35, .1],
+            ["Float Duration", "b", 2.4, .1],
+            ["Font Size", "c", 16, 1],
+            ["Width", "d", 820, 10]
+        ]
+    },
+
+    counter: {
+        title: "Counter SVG Generator",
+        desc: "Count up from zero to target values.",
+        label: "Counters",
+        hint: "Label | Value | Suffix",
+        text: `Progress | 100 | %
+GitHub Stars | 1542 | ★
+Downloads | 24860 |
+Projects | 52 |`,
+        controls: [
+            ["Count Duration", "a", 1.8, .1],
+            ["Item Delay", "b", .35, .1],
+            ["Font Size", "c", 18, 1],
+            ["Width", "d", 760, 10]
+        ]
+    },
+
+    flowchart: {
+        title: "Flowchart SVG Generator",
+        desc: "Automatically place flowchart boxes and arrows.",
+        label: "Flowchart Steps",
+        hint: "One step per line, or separate with →.",
+        text: `Start
+Input Data
+Process
+Validate
+Complete`,
+        controls: [
+            ["Step Delay", "a", .6, .1],
+            ["Fade Duration", "b", .35, .05],
+            ["Font Size", "c", 17, 1],
+            ["Width", "d", 720, 10]
+        ]
+    },
+
+    architecture: {
+        title: "Architecture Diagram Generator",
+        desc: "Generate a simple system architecture diagram.",
+        label: "Architecture",
+        hint: "Separate components with → or put one component per line.",
+        text: `Client → API Gateway → Application Server → Database`,
+        controls: [
+            ["Node Delay", "a", .65, .1],
+            ["Fade Duration", "b", .35, .05],
+            ["Font Size", "c", 17, 1],
+            ["Width", "d", 900, 10]
+        ]
+    },
+
+    beforeAfter: {
+        title: "Before / After SVG Generator",
+        desc: "Alternate smoothly between two states.",
+        label: "Before / After",
+        hint: "Use two lines: Before | Text and After | Text",
+        text: `Before | Manual repetitive work with several separate steps.
+After | One automated workflow that produces the result instantly.`,
+        controls: [
+            ["Hold Duration", "a", 2, .1],
+            ["Fade Duration", "b", .5, .1],
+            ["Font Size", "c", 18, 1],
+            ["Width", "d", 760, 10]
+        ]
+    }
+};
+function esc(s){return String(s).replace(/[<>&'"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","'":"&apos;",'"':"&quot;"}[c]))}
+function n(id,f){const v=Number(document.getElementById(id)?.value);return Number.isFinite(v)?v:f}
+function pal(){
+ if(svgTheme==="white")return{bg:"#f3f3f3",border:"#cfcfcf",card:"#e5e5e5",card2:"#fff",text:"#202020",muted:"#626262",line:"#9a9a9a",active:"#333",activeText:"#fff"};
+ return{bg:"#181818",border:"#333",card:"#252525",card2:"#242424",text:"#fff",muted:"#b8b8b8",line:"#555",active:"#fff",activeText:"#181818"};
+}
+function wrap(t,m){if(!t)return[""];const w=t.split(/\s+/).filter(Boolean),o=[];let c="";w.forEach(x=>{let q=c?c+" "+x:x;if(q.length>m&&c){o.push(c);c=x}else c=q});if(c)o.push(c);return o.length?o:[""]}
+function measure(t,fs,mono=false){const c=measure.c||(measure.c=document.createElement("canvas")),x=c.getContext("2d");x.font=`600 ${fs}px ${mono?"Consolas":"Segoe UI"}`;return x.measureText(t).width}
+function rootSvg(width,height,inside){const p=pal();return `<?xml version="1.0" encoding="UTF-8"?>\n<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="${NS}">\n<rect width="${width}" height="${height}" rx="16" fill="${p.bg}" stroke="${p.border}" stroke-width="2"/>\n${inside}\n</svg>`}
+
+function buildTypewriter(mono=false){
+ const s=mainInput.value.replace(/\r/g,"").split("\n"),sp=Math.max(.01,n("a",.07)),gap=Math.max(0,n("b",.35)),fs=Math.max(10,n("c",22)),w=Math.max(420,n("d",760)),p=pal();
+ const lh=Math.round(fs*1.55),px=32,py=34,h=Math.max(150,py*2+Math.max(1,s.length)*lh);let t=0,o=[];
+ s.forEach((line,i)=>{const y=py+fs+i*lh,ch=[...line];ch.forEach((_,j)=>{const b=t+j*sp,v=ch.slice(0,j+1).join("");o.push(`<text x="${px}" y="${y}" fill="${p.text}" font-size="${fs}" font-family="${mono?"Consolas, 'Courier New', monospace":"'Segoe UI', sans-serif"}" xml:space="preserve" opacity="0">${esc(v)}<animate attributeName="opacity" from="0" to="1" begin="${b.toFixed(3)}s" dur=".01s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" begin="${(b+sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`)});
+ if(ch.length)o.push(`<text x="${px}" y="${y}" fill="${p.text}" font-size="${fs}" font-family="${mono?"Consolas, 'Courier New', monospace":"'Segoe UI', sans-serif"}" xml:space="preserve" opacity="0">${esc(line)}<animate attributeName="opacity" from="0" to="1" begin="${(t+(ch.length-1)*sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`);
+ t+=ch.length*sp+gap});
+ return rootSvg(w,h,o.join("\n"));
+}
+function buildCode(){
+ const lines=mainInput.value.replace(/\r/g,"").split("\n"),sp=Math.max(.01,n("a",.045)),gap=Math.max(0,n("b",.3)),fs=Math.max(10,n("c",17)),w=Math.max(420,n("d",760)),p=pal(),lh=Math.round(fs*1.55),top=42,pad=20,noW=54,x=noW+18,h=Math.max(150,top+pad+lines.length*lh+28);let t=0,o=[`<line x1="${noW}" y1="${top}" x2="${noW}" y2="${h-12}" stroke="${p.border}"/>`];
+ lines.forEach((line,i)=>{const y=top+pad+i*lh+fs,ch=[...line];o.push(`<text x="${noW-12}" y="${y}" fill="${p.muted}" font-size="${fs}" font-family="Consolas, monospace" text-anchor="end" opacity="0">${i+1}<animate attributeName="opacity" from="0" to="1" begin="${t.toFixed(3)}s" dur=".12s" fill="freeze"/></text>`);ch.forEach((_,j)=>{const b=t+j*sp;o.push(`<text x="${x}" y="${y}" fill="${p.text}" font-size="${fs}" font-family="Consolas, monospace" xml:space="preserve" opacity="0">${esc(ch.slice(0,j+1).join(""))}<animate attributeName="opacity" from="0" to="1" begin="${b.toFixed(3)}s" dur=".01s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" begin="${(b+sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`)});if(ch.length)o.push(`<text x="${x}" y="${y}" fill="${p.text}" font-size="${fs}" font-family="Consolas, monospace" xml:space="preserve" opacity="0">${esc(line)}<animate attributeName="opacity" from="0" to="1" begin="${(t+(ch.length-1)*sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`);t+=ch.length*sp+gap});
+ return rootSvg(w,h,o.join("\n"));
+}
+function buildTerminal(){
+ const lines=mainInput.value.replace(/\r/g,"").split("\n"),sp=Math.max(.01,n("a",.055)),gap=Math.max(0,n("b",.4)),fs=Math.max(10,n("c",18)),w=Math.max(420,n("d",720)),p=pal(),lh=Math.round(fs*1.55),top=40,pad=22,h=Math.max(140,top+pad+lines.length*lh+28);let t=0,o=[`<rect width="${w}" height="40" rx="16" fill="${p.card}"/><circle cx="20" cy="20" r="6" fill="#ff5f57"/><circle cx="40" cy="20" r="6" fill="#febc2e"/><circle cx="60" cy="20" r="6" fill="#28c840"/>`];
+ lines.forEach((line,i)=>{const y=top+pad+i*lh+fs,cmd=/^\s*[$>#]/.test(line),ch=[...line];if(cmd){ch.forEach((_,j)=>{const b=t+j*sp;o.push(`<text x="24" y="${y}" fill="${p.text}" font-size="${fs}" font-family="Consolas, monospace" xml:space="preserve" opacity="0">${esc(ch.slice(0,j+1).join(""))}<animate attributeName="opacity" from="0" to="1" begin="${b.toFixed(3)}s" dur=".01s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" begin="${(b+sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`)});if(ch.length)o.push(`<text x="24" y="${y}" fill="${p.text}" font-size="${fs}" font-family="Consolas, monospace" xml:space="preserve" opacity="0">${esc(line)}<animate attributeName="opacity" from="0" to="1" begin="${(t+(ch.length-1)*sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`);t+=ch.length*sp+gap}else{o.push(`<text x="24" y="${y}" fill="${p.muted}" font-size="${fs}" font-family="Consolas, monospace" xml:space="preserve" opacity="0">${esc(line)}<animate attributeName="opacity" from="0" to="1" begin="${t.toFixed(3)}s" dur=".18s" fill="freeze"/></text>`);t+=gap}});
+ return rootSvg(w,h,o.join("\n"));
+}
+function buildTimeline(){
+ const items=mainInput.value.split("\n").map(x=>x.trim()).filter(Boolean).map(x=>{let i=x.indexOf("|");return i<0?["",x]:[x.slice(0,i).trim(),x.slice(i+1).trim()]}),del=Math.max(0,n("a",.55)),dur=Math.max(.05,n("b",.35)),fs=Math.max(10,n("c",17)),w=Math.max(480,n("d",760)),p=pal(),axis=170,cardX=206,cardW=w-cardX-28,lh=Math.round(fs*1.45);let y=34,o=[];
+ items.forEach((it,k)=>{let lines=wrap(it[1],Math.max(16,Math.floor((cardW-32)/(fs*.55)))),ch=Math.max(48,28+lines.length*lh),cy=y+ch/2,b=(k*del).toFixed(3);o.push(`<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur="${dur}s" fill="freeze"/><text x="${axis-20}" y="${cy+fs*.35}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" text-anchor="end" font-weight="600">${esc(it[0])}</text><circle cx="${axis}" cy="${cy}" r="7" fill="${p.active}"/><rect x="${cardX}" y="${y}" width="${cardW}" height="${ch}" rx="14" fill="${p.card}" stroke="${p.border}"/>${lines.map((z,i)=>`<text x="${cardX+16}" y="${y+18+fs+i*lh}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI">${esc(z)}</text>`).join("")}</g>`);y+=ch+22});
+ const h=Math.max(150,y+20);o.unshift(`<line x1="${axis}" y1="50" x2="${axis}" y2="${h-42}" stroke="${p.line}" stroke-width="3" stroke-linecap="round"/>`);return rootSvg(w,h,o.join("\n"));
+}
+function buildProgress(){
+ const s=mainInput.value.split(/\n|→/).map(x=>x.trim()).filter(Boolean),del=Math.max(0,n("a",.7)),dur=Math.max(.05,n("b",.35)),fs=Math.max(10,n("c",17)),w=Math.max(520,n("d",820)),p=pal(),h=230,pad=70,cy=94,r=24,space=s.length<=1?0:(w-pad*2)/(s.length-1);let o=[];
+ for(let i=0;i<s.length-1;i++){let x1=pad+i*space+r,x2=pad+(i+1)*space-r,b=((i+1)*del).toFixed(3);o.push(`<line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="${p.line}" stroke-width="8" stroke-linecap="round"/><line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="${p.active}" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"><animate attributeName="stroke-dashoffset" from="1" to="0" begin="${b}s" dur="${dur}s" fill="freeze"/></line>`)}
+ s.forEach((z,i)=>{let x=pad+i*space,b=(i*del).toFixed(3);o.push(`<circle cx="${x}" cy="${cy}" r="${r}" fill="${p.card}" stroke="${p.border}"/><circle cx="${x}" cy="${cy}" r="${r}" fill="${p.active}" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur="${dur}s" fill="freeze"/></circle><text x="${x}" y="${cy+fs*.35}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" text-anchor="middle">${i+1}</text><text x="${x}" y="${cy+62}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" text-anchor="middle">${esc(z)}</text>`)});return rootSvg(w,h,o.join("\n"));
+}
+function buildNotification(){
+ const items=mainInput.value.split("\n").map(x=>x.trim()).filter(Boolean).map(x=>{let i=x.indexOf("|");return i<0?["Notification",x]:[x.slice(0,i).trim()||"Notification",x.slice(i+1).trim()]}),del=Math.max(0,n("a",.6)),dur=Math.max(.05,n("b",.35)),fs=Math.max(10,n("c",16)),cw=Math.max(320,n("d",480)),p=pal(),pad=24,gap=14,lh=Math.round(fs*1.35);let y=pad,o=[];
+ items.forEach((it,k)=>{let lines=wrap(it[1],Math.max(18,Math.floor((cw-86)/(fs*.52)))),h=Math.max(76,28+fs+8+lines.length*lh),b=(k*del).toFixed(3);o.push(`<g opacity="0" transform="translate(0,-18)"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur="${dur}s" fill="freeze"/><animateTransform attributeName="transform" type="translate" from="0 -18" to="0 0" begin="${b}s" dur="${dur}s" fill="freeze"/><rect x="${pad}" y="${y}" width="${cw}" height="${h}" rx="16" fill="${p.card}" stroke="${p.border}"/><circle cx="${pad+35}" cy="${y+h/2}" r="17" fill="${p.active}" opacity=".12"/><circle cx="${pad+35}" cy="${y+h/2}" r="5" fill="${p.active}"/><text x="${pad+66}" y="${y+28}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" font-weight="700">${esc(it[0])}</text>${lines.map((z,i)=>`<text x="${pad+66}" y="${y+52+i*lh}" fill="${p.muted}" font-size="${fs}" font-family="Segoe UI">${esc(z)}</text>`).join("")}</g>`);y+=h+gap});return rootSvg(cw+pad*2,Math.max(140,y+pad-gap),o.join("\n"));
+}
+function buildSearch(){
+ const lines=mainInput.value.replace(/\r/g,"").split("\n"),q=(lines.shift()||"").trim(),res=lines.map(x=>x.trim()).filter(Boolean).map(x=>{let i=x.indexOf("|");return i<0?[x,""]:[x.slice(0,i).trim(),x.slice(i+1).trim()]}),sp=Math.max(.01,n("a",.07)),del=Math.max(0,n("b",.45)),fs=Math.max(10,n("c",16)),w=Math.max(420,n("d",720)),p=pal(),pad=28,sy=28,sh=54,sw=w-pad*2,tx=pad+48;let o=[`<rect x="${pad}" y="${sy}" width="${sw}" height="${sh}" rx="27" fill="${p.card}" stroke="${p.border}"/><circle cx="${pad+24}" cy="${sy+25}" r="8" fill="none" stroke="${p.text}" stroke-width="2"/><line x1="${pad+30}" y1="${sy+31}" x2="${pad+36}" y2="${sy+37}" stroke="${p.text}" stroke-width="2"/>`],ch=[...q];
+ ch.forEach((_,j)=>{let b=j*sp;o.push(`<text x="${tx}" y="${sy+34}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" opacity="0">${esc(ch.slice(0,j+1).join(""))}<animate attributeName="opacity" from="0" to="1" begin="${b.toFixed(3)}s" dur=".01s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" begin="${(b+sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`)});if(ch.length)o.push(`<text x="${tx}" y="${sy+34}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" opacity="0">${esc(q)}<animate attributeName="opacity" from="0" to="1" begin="${((ch.length-1)*sp).toFixed(3)}s" dur=".01s" fill="freeze"/></text>`);
+ let y=sy+sh+22,lh=Math.round(fs*1.35),td=ch.length*sp+.3;res.forEach((it,k)=>{let desc=wrap(it[1],Math.max(20,Math.floor((sw-32)/(fs*.52)))),h=Math.max(68,28+fs+8+desc.length*lh),b=td+k*del;o.push(`<g opacity="0" transform="translate(0,10)"><animate attributeName="opacity" from="0" to="1" begin="${b.toFixed(3)}s" dur=".3s" fill="freeze"/><animateTransform attributeName="transform" type="translate" from="0 10" to="0 0" begin="${b.toFixed(3)}s" dur=".3s" fill="freeze"/><rect x="${pad}" y="${y}" width="${sw}" height="${h}" rx="14" fill="${p.card}" stroke="${p.border}"/><text x="${pad+16}" y="${y+28}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" font-weight="700">${esc(it[0])}</text>${desc.map((z,i)=>`<text x="${pad+16}" y="${y+52+i*lh}" fill="${p.muted}" font-size="${fs}" font-family="Segoe UI">${esc(z)}</text>`).join("")}</g>`);y+=h+12});return rootSvg(w,Math.max(150,y+pad-12),o.join("\n"));
+}
+function buildSkill(){
+ const s=mainInput.value.split(/\n|,/).map(x=>x.trim()).filter(Boolean),del=Math.max(0,n("a",.35)),flo=Math.max(.5,n("b",2.4)),fs=Math.max(10,n("c",16)),w=Math.max(420,n("d",820)),p=pal(),px=28,py=30,gx=14,gy=16,bh=42;let x=px,y=py,max=y+bh,o=[];
+ s.forEach((z,i)=>{let bw=Math.max(76,Math.ceil(measure(z,fs)+36));if(x>px&&x+bw>w-px){x=px;y+=bh+gy}let b=(i*del).toFixed(3),f=(i*del+.2).toFixed(3),a=5+i%3*2;o.push(`<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur=".3s" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 0;0 -${a};0 0" begin="${f}s" dur="${flo}s" repeatCount="indefinite"/><rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="21" fill="${p.card}" stroke="${p.border}"/><text x="${x+bw/2}" y="${y+bh/2+fs*.35}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" font-weight="600" text-anchor="middle">${esc(z)}</text></g>`);x+=bw+gx;max=Math.max(max,y+bh)});return rootSvg(w,Math.max(140,max+py),o.join("\n"));
+}
+function buildCounter(){
+ const it=mainInput.value.split("\n").map(x=>x.trim()).filter(Boolean).map(x=>{let p=x.split("|").map(y=>y.trim()),v=Number((p[1]||"0").replace(/,/g,""));return[p[0]||"Counter",Number.isFinite(v)?Math.max(0,v):0,p[2]||""]}),dur=Math.max(.2,n("a",1.8)),del=Math.max(0,n("b",.35)),fs=Math.max(10,n("c",18)),w=Math.max(420,n("d",760)),p=pal(),pad=28,gap=14,ch=108,cw=w-pad*2,vs=Math.round(fs*2.15),ls=Math.max(11,Math.round(fs*.78));let y=pad,o=[];
+ it.forEach((z,k)=>{let b=k*del,steps=Math.max(18,Math.min(55,Math.round(dur*24))),sd=dur/steps;o.push(`<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${b.toFixed(3)}s" dur=".25s" fill="freeze"/><rect x="${pad}" y="${y}" width="${cw}" height="${ch}" rx="16" fill="${p.card}" stroke="${p.border}"/><text x="${pad+20}" y="${y+30}" fill="${p.muted}" font-size="${ls}" font-family="Segoe UI" font-weight="600">${esc(z[0])}</text>`);for(let s=0;s<steps;s++){let t=(s+1)/steps,e=1-Math.pow(1-t,3),val=Math.round(z[1]*e).toLocaleString("en-US")+z[2],fb=b+s*sd;o.push(`<text x="${pad+20}" y="${y+78}" fill="${p.text}" font-size="${vs}" font-family="Segoe UI" font-weight="700" opacity="0">${esc(val)}<animate attributeName="opacity" from="0" to="1" begin="${fb.toFixed(3)}s" dur=".001s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" begin="${(fb+sd).toFixed(3)}s" dur=".001s" fill="freeze"/></text>`)}o.push(`<text x="${pad+20}" y="${y+78}" fill="${p.text}" font-size="${vs}" font-family="Segoe UI" font-weight="700" opacity="0">${esc(Math.round(z[1]).toLocaleString("en-US")+z[2])}<animate attributeName="opacity" from="0" to="1" begin="${(b+dur).toFixed(3)}s" dur=".001s" fill="freeze"/></text><rect x="${pad+20}" y="${y+92}" width="${cw-40}" height="4" rx="2" fill="${p.border}"/><rect x="${pad+20}" y="${y+92}" width="0" height="4" rx="2" fill="${p.active}"><animate attributeName="width" from="0" to="${cw-40}" begin="${b.toFixed(3)}s" dur="${dur}s" fill="freeze"/></rect></g>`);y+=ch+gap});return rootSvg(w,Math.max(150,y+pad-gap),o.join("\n"));
+}
+function buildFlowchart(){
+ const s=mainInput.value.split(/\n|→/).map(x=>x.trim()).filter(Boolean),del=Math.max(0,n("a",.6)),dur=Math.max(.05,n("b",.35)),fs=Math.max(10,n("c",17)),w=Math.max(420,n("d",720)),p=pal(),px=34,py=30,bh=58,ag=46,vg=28;let y=py,o=[];
+ s.forEach((z,i)=>{let bw=Math.min(w-px*2,Math.max(150,Math.ceil(measure(z,fs)+48))),x=(w-bw)/2,b=(i*del).toFixed(3);if(i>0){let ax=w/2,y1=y-ag,y2=y-10,ab=Math.max(0,i*del-dur*.5).toFixed(3);o.push(`<line x1="${ax}" y1="${y1}" x2="${ax}" y2="${y2}" stroke="${p.line}" stroke-width="3"/><line x1="${ax}" y1="${y1}" x2="${ax}" y2="${y2}" stroke="${p.active}" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"><animate attributeName="stroke-dashoffset" from="1" to="0" begin="${ab}s" dur="${dur}s" fill="freeze"/></line><polygon points="${ax},${y2+8} ${ax-7},${y2-2} ${ax+7},${y2-2}" fill="${p.active}" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur="${dur}s" fill="freeze"/></polygon>`)}o.push(`<g opacity="0" transform="translate(0,8)"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur="${dur}s" fill="freeze"/><animateTransform attributeName="transform" type="translate" from="0 8" to="0 0" begin="${b}s" dur="${dur}s" fill="freeze"/><rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="${i===0||i===s.length-1?29:12}" fill="${p.card}" stroke="${p.border}"/><text x="${w/2}" y="${y+bh/2+fs*.35}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" font-weight="600" text-anchor="middle">${esc(z)}</text></g>`);y+=bh+vg+ag});return rootSvg(w,Math.max(150,y-vg-ag+py),o.join("\n"));
+}
+function buildArchitecture(){
+ const s=mainInput.value.split(/\n|→/).map(x=>x.trim()).filter(Boolean),del=Math.max(0,n("a",.65)),dur=Math.max(.05,n("b",.35)),fs=Math.max(10,n("c",17)),req=Math.max(520,n("d",900)),p=pal(),pad=36,gap=72,bh=64,ws=s.map(z=>Math.min(220,Math.max(120,Math.ceil(measure(z,fs)+42)))),content=ws.reduce((a,b)=>a+b,0)+Math.max(0,s.length-1)*gap,w=Math.max(req,content+pad*2),y=60;let x=pad,nodes=[],o=[];
+ s.forEach((z,i)=>{let bw=ws[i],b=(i*del).toFixed(3);nodes.push([x,x+bw]);o.push(`<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${b}s" dur="${dur}s" fill="freeze"/><rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="14" fill="${p.card}" stroke="${p.border}" stroke-width="2"/><text x="${x+bw/2}" y="${y+bh/2+fs*.35}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI" font-weight="600" text-anchor="middle">${esc(z)}</text></g>`);x+=bw+gap});
+ nodes.forEach((q,i)=>{if(i>=nodes.length-1)return;let x1=q[1]+12,x2=nodes[i+1][0]-18,cy=y+bh/2,b=Math.max(0,(i+1)*del-dur*.25).toFixed(3);o.push(`<line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="${p.line}" stroke-width="3"/><line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="${p.active}" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"><animate attributeName="stroke-dashoffset" from="1" to="0" begin="${b}s" dur="${dur}s" fill="freeze"/></line><polygon points="${x2},${cy} ${x2-10},${cy-6} ${x2-10},${cy+6}" fill="${p.active}" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${((i+1)*del).toFixed(3)}s" dur="${dur}s" fill="freeze"/></polygon>`)});return rootSvg(w,190,o.join("\n"));
+}
+function buildBeforeAfter(){
+ let lines=mainInput.value.split("\n").filter(x=>x.trim()),bef="",aft="";lines.forEach(x=>{let i=x.indexOf("|"),lab=i>=0?x.slice(0,i).trim().toLowerCase():"",v=i>=0?x.slice(i+1).trim():x.trim();if(lab==="before")bef=v;else if(lab==="after")aft=v;else if(!bef)bef=v;else if(!aft)aft=v});
+ const hold=Math.max(.5,n("a",2)),fade=Math.max(.1,n("b",.5)),fs=Math.max(10,n("c",18)),w=Math.max(420,n("d",760)),p=pal(),pad=30,cw=w-pad*2,lh=Math.round(fs*1.42),maxc=Math.max(18,Math.floor((cw-56)/(fs*.54))),bl=wrap(bef,maxc),al=wrap(aft,maxc),ch=Math.max(170,106+Math.max(bl.length,al.length)*lh),h=ch+pad*2,cycle=hold*2+fade*2,t1=hold/cycle,t2=(hold+fade)/cycle,t3=(hold*2+fade)/cycle,key=`0;${t1.toFixed(4)};${t2.toFixed(4)};${t3.toFixed(4)};1`;
+ function grp(label,arr,vals){return `<g><animate attributeName="opacity" values="${vals}" keyTimes="${key}" dur="${cycle}s" repeatCount="indefinite"/><rect x="${pad}" y="${pad}" width="${cw}" height="${ch}" rx="18" fill="${p.card}" stroke="${p.border}"/><circle cx="${pad+27}" cy="${pad+27}" r="5" fill="${p.active}"/><text x="${pad+44}" y="${pad+33}" fill="${p.text}" font-size="${Math.round(fs*.82)}" font-family="Segoe UI" font-weight="700">${label}</text><line x1="${pad+22}" y1="${pad+52}" x2="${pad+cw-22}" y2="${pad+52}" stroke="${p.border}"/>${arr.map((z,i)=>`<text x="${pad+28}" y="${pad+78+i*lh}" fill="${p.text}" font-size="${fs}" font-family="Segoe UI">${esc(z)}</text>`).join("")}</g>`}
+ return rootSvg(w,h,grp("BEFORE",bl,"1;1;0;0;1")+grp("AFTER",al,"0;0;1;1;0"));
+}
+
+const builders={typewriter:()=>buildTypewriter(false),code:buildCode,terminal:buildTerminal,timeline:buildTimeline,progress:buildProgress,notification:buildNotification,search:buildSearch,skill:buildSkill,counter:buildCounter,flowchart:buildFlowchart,architecture:buildArchitecture,beforeAfter:buildBeforeAfter};
+
+function loadGenerator(resetText=true){
+ const c=configs[generatorType.value];
+ document.getElementById("pageTitle").textContent=c.title;
+ document.getElementById("pageDesc").textContent=c.desc;
+ document.getElementById("inputLabel").textContent=c.label;
+ document.getElementById("hint").innerHTML=c.hint;
+ controls.innerHTML=c.controls.map(([lab,id,val,step])=>`<div class="control"><label for="${id}">${lab}</label><input id="${id}" type="number" step="${step}" value="${val}"></div>`).join("");
+ if(resetText) mainInput.value=c.text;
+ controls.querySelectorAll("input").forEach(el=>el.addEventListener("input",autoRender));
+ replay();
+}
+function buildSvg(){return builders[generatorType.value]()}
+function render(){previewWrap.innerHTML=buildSvg().replace(/^<\?xml[^>]*>\s*/i,"")}
+function replay(){const s=buildSvg();previewWrap.innerHTML="";requestAnimationFrame(()=>previewWrap.innerHTML=s.replace(/^<\?xml[^>]*>\s*/i,""))}
+function autoRender(){clearTimeout(renderTimer);renderTimer=setTimeout(replay,120)}
+async function copySvg(){try{await navigator.clipboard.writeText(buildSvg())}catch(e){}}
+function downloadSvg(){const blob=new Blob([buildSvg()],{type:"image/svg+xml;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${generatorType.value}-animation.svg`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+function setSvgTheme(v){svgTheme=v;blackBtn.classList.toggle("active",v==="black");whiteBtn.classList.toggle("active",v==="white");replay()}
+function resetAll(){loadGenerator(true);setSvgTheme("black")}
+
+generatorType.addEventListener("change",()=>loadGenerator(true));
+mainInput.addEventListener("input",autoRender);
+document.getElementById("applyBtn").addEventListener("click",replay);
+document.getElementById("replayBtn").addEventListener("click",replay);
+document.getElementById("copyBtn").addEventListener("click",copySvg);
+document.getElementById("downloadBtn").addEventListener("click",downloadSvg);
+document.getElementById("resetBtn").addEventListener("click",resetAll);
+document.getElementById("themeBtn").addEventListener("click",()=>document.body.classList.toggle("light"));
+document.getElementById("homeBtn").addEventListener("click",()=>location.href="../index");
+document.getElementById("menuToggle").addEventListener("click",()=>document.getElementById("sidebar").classList.toggle("active"));
+document.getElementById("main").addEventListener("click",()=>document.getElementById("sidebar").classList.remove("active"));
+blackBtn.addEventListener("click",()=>setSvgTheme("black"));
+whiteBtn.addEventListener("click",()=>setSvgTheme("white"));
+window.addEventListener("load",()=>loadGenerator(true));
+</script>
+</body>
+</html>
