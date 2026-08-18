@@ -135,42 +135,69 @@
             border-radius: 6px;
         }
 
-        /* 온스크린 키패드 카드 */
+        /* 온스크린 키패드 카드 - 아케이드 컨트롤러 콘셉트 */
         .keypad-card {
             flex: 0.6;
-            border: 2px solid #ff9e40;
+            border: 2px solid rgba(255, 158, 64, 0.4);
             border-radius: 16px;
-            background: rgba(16, 16, 16, 0.6);
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(10, 10, 10, 0.95));
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            gap: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 15px rgba(255, 158, 64, 0.08), 0 10px 20px rgba(0, 0, 0, 0.5);
+            gap: 14px;
         }
+
         .keypad-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             justify-content: center;
+            max-width: 260px;
         }
+
+        /* 액션 버튼 (회전, 드롭) 그룹 강조 */
+        .keypad-row:first-child .key-btn {
+            background: linear-gradient(145deg, rgba(255, 158, 64, 0.15), rgba(255, 158, 64, 0.05));
+            border-color: rgba(255, 158, 64, 0.6);
+            color: #ffb067;
+        }
+
         .key-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             color: #ff9e40;
-            border: 1px solid rgba(255, 158, 64, 0.5);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-weight: bold;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            padding: 12px 10px;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
             font-size: 0.9rem;
             flex: 1;
-            max-width: 70px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
         }
-        .key-btn:active { background: #ff9e40; color: #101010; }
+
+        .key-btn:hover {
+            background: rgba(255, 158, 64, 0.15);
+            border-color: rgba(255, 158, 64, 0.8);
+            box-shadow: 0 0 12px rgba(255, 158, 64, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .key-btn:active {
+            background: #ff9e40;
+            color: #101010;
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.4);
+            transform: translateY(1px);
+        }
 
         /* 테트리스 캔버스 */
         #tetrisCanvas {
