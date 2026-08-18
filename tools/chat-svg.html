@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -255,6 +256,11 @@
             let currentHeight = 20;
             let keyframeStyles = '';
 
+            const MAX_BUBBLE_WIDTH = 420;
+            const LINE_HEIGHT = 24;
+            const BUBBLE_PADDING_X = 30;
+            const BUBBLE_PADDING_Y = 18;
+
             lines.forEach((text, index) => {
                 const yOffset = currentHeight;
                 const bubbleHeight = 42;
@@ -292,20 +298,108 @@
                 const msgClassName = `msg-${index}`;
                 msgGroup.setAttribute("class", msgClassName);
 
-                const tempText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                tempText.setAttribute("x", "15");
-                tempText.setAttribute("y", "27");
-                tempText.textContent = text;
+                // 텍스트를 최대 폭에 맞춰 단어 단위로 줄바꿈
+                const tempText = document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text"
+                );
+
+                tempText.setAttribute("x", "0");
+                tempText.setAttribute("y", "0");
+                tempText.setAttribute("font-size", "18");
+                tempText.setAttribute("font-family", "'Segoe UI', sans-serif");
+                tempText.setAttribute("letter-spacing", "-0.02em");
+                tempText.setAttribute("visibility", "hidden");
+                
                 svgContent.appendChild(tempText);
-                const textLength = tempText.getComputedTextLength();
+                
+                const words = text.split(/\s+/);
+                const wrappedLines = [];
+                let currentLine = '';
+                
+                words.forEach(word => {
+                    const testLine = currentLine
+                        ? `${currentLine} ${word}`
+                        : word;
+                
+                    tempText.textContent = testLine;
+                
+                    if (
+                        tempText.getComputedTextLength() >
+                            MAX_BUBBLE_WIDTH - BUBBLE_PADDING_X &&
+                        currentLine
+                    ) {
+                        wrappedLines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                
+                if (currentLine) {
+                    wrappedLines.push(currentLine);
+                }
+                
                 svgContent.removeChild(tempText);
-
-                const preciseWidth = Math.max(40, textLength + 30);
-
+                
+                // 한 줄씩 실제 SVG <tspan> 생성
+                const lineCount = wrappedLines.length;
+                
+                const preciseWidth = Math.min(
+                    MAX_BUBBLE_WIDTH,
+                    Math.max(
+                        40,
+                        Math.max(
+                            ...wrappedLines.map(line => {
+                                const measure = document.createElementNS(
+                                    "http://www.w3.org/2000/svg",
+                                    "text"
+                                );
+                
+                                measure.setAttribute("font-size", "18");
+                                measure.setAttribute(
+                                    "font-family",
+                                    "'Segoe UI', sans-serif"
+                                );
+                                measure.setAttribute(
+                                    "letter-spacing",
+                                    "-0.02em"
+                                );
+                
+                                measure.textContent = line;
+                                svgContent.appendChild(measure);
+                
+                                const width = measure.getComputedTextLength();
+                
+                                svgContent.removeChild(measure);
+                
+                                return width;
+                            })
+                        ) + BUBBLE_PADDING_X
+                    )
+                );
+                
+                const actualBubbleHeight =
+                    42 + (lineCount - 1) * LINE_HEIGHT;
+                
+                const textLines = wrappedLines.map((line, lineIndex) => {
+                    const y = 27 + lineIndex * LINE_HEIGHT;
+                
+                    return `
+                        <tspan x="15" y="${y}">${line}</tspan>
+                    `;
+                }).join('');
+                
                 msgGroup.innerHTML = `
-                    <rect width="${preciseWidth}" height="${bubbleHeight}" rx="18.0355" class="bubble" />
-                    <text x="15" y="27">${text}</text>
+                    <rect
+                        width="${preciseWidth}"
+                        height="${actualBubbleHeight}"
+                        rx="18.0355"
+                        class="bubble"
+                    />
+                    <text x="15" y="27">${textLines}</text>
                 `;
+
                 svgContent.appendChild(msgGroup);
 
                 keyframeStyles += `
@@ -331,141 +425,140 @@
                 `;
 
                 currentTime = msgTime + 0.3;
-                currentHeight += 55;
+                currentHeight += actualBubbleHeight + 13;
             });
 
             dynamicKeyframes.innerHTML = keyframeStyles;
             
             // 캔버스 가로 폭을 350으로 고정하여 여백을 제거하고 세로만 동적 연장
             const totalSvgHeight = currentHeight + 20;
-            svgElement.setAttribute('viewBox', `0 0 350 ${totalSvgHeight}`);
+            svgElement.setAttribute('viewBox', `0 0 450 ${totalSvgHeight}`);
         }
 
-function copySvgCode() {
-    const svgClone = svgElement.cloneNode(true);
-
-    const cleanKeyframes = formatCss(dynamicKeyframes.innerHTML);
-
-    const styleTag = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "style"
-    );
-
-    styleTag.textContent =
-        cleanKeyframes +
-        " .bubble { fill: #3b3b3d; }" +
-        " text { fill: #ffffff; font-size: 18px; letter-spacing: -0.02em; font-family: 'Segoe UI', sans-serif; }";
-
-    svgClone.insertBefore(styleTag, svgClone.firstChild);
-
-    const serializer = new XMLSerializer();
-    let svgString = serializer.serializeToString(svgClone);
-
-    // SVG 태그별 줄바꿈 및 인덴트 적용
-    svgString = formatSvg(svgString);
-
-    navigator.clipboard.writeText(svgString).then(() => {
-        alert("SVG code copied to clipboard!");
-    }).catch(err => {
-        alert("Failed to copy SVG code.");
-        console.error(err);
-    });
-}
-
-
-function formatSvg(svgString) {
-    let formatted = '';
-    let indent = 0;
-
-    const nodes = svgString
-        .replace(/>\s*</g, '>\n<')
-        .split('\n');
-
-    nodes.forEach(node => {
-        const line = node.trim();
-
-        if (!line) return;
-
-        if (/^<\//.test(line)) {
-            indent = Math.max(0, indent - 1);
+        function copySvgCode() {
+            const svgClone = svgElement.cloneNode(true);
+        
+            const cleanKeyframes = formatCss(dynamicKeyframes.innerHTML);
+        
+            const styleTag = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "style"
+            );
+        
+            styleTag.textContent =
+                cleanKeyframes +
+                " .bubble { fill: #3b3b3d; }" +
+                " text { fill: #ffffff; font-size: 18px; letter-spacing: -0.02em; font-family: 'Segoe UI', sans-serif; }";
+        
+            svgClone.insertBefore(styleTag, svgClone.firstChild);
+        
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgClone);
+        
+            // SVG 태그별 줄바꿈 및 인덴트 적용
+            svgString = formatSvg(svgString);
+        
+            navigator.clipboard.writeText(svgString).then(() => {
+                alert("SVG code copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy SVG code.");
+                console.error(err);
+            });
         }
 
-        formatted += '    '.repeat(indent) + line + '\n';
+        function formatSvg(svgString) {
+            let formatted = '';
+            let indent = 0;
+        
+            const nodes = svgString
+                .replace(/>\s*</g, '>\n<')
+                .split('\n');
+        
+            nodes.forEach(node => {
+                const line = node.trim();
+        
+                if (!line) return;
+        
+                if (/^<\//.test(line)) {
+                    indent = Math.max(0, indent - 1);
+                }
+        
+                formatted += '    '.repeat(indent) + line + '\n';
+        
+                const isSelfClosing = /\/>$/.test(line);
+        
+                const isCompleteTag =
+                    /^<([^\s/>]+)(?:\s[^>]*)?>.*<\/\1>$/.test(line);
+        
+                const isOpeningTag =
+                    /^<[^/!?][^>]*>$/.test(line);
+        
+                if (
+                    isOpeningTag &&
+                    !isSelfClosing &&
+                    !isCompleteTag
+                ) {
+                    indent++;
+                }
+            });
 
-        const isSelfClosing = /\/>$/.test(line);
-
-        const isCompleteTag =
-            /^<([^\s/>]+)(?:\s[^>]*)?>.*<\/\1>$/.test(line);
-
-        const isOpeningTag =
-            /^<[^/!?][^>]*>$/.test(line);
-
-        if (
-            isOpeningTag &&
-            !isSelfClosing &&
-            !isCompleteTag
-        ) {
-            indent++;
-        }
-    });
-
-// <style> 내부 CSS 들여쓰기 및 줄바꿈 정리
-formatted = formatted.replace(
-    /([ \t]*)<style>\n?([\s\S]*?)<\/style>/,
-    (match, baseIndent, css) => {
-        const cssLines = css
-            .trim()
-            .split('\n')
-            .map(line => line.trim())
-            .filter(line => line);
-
-        const styleIndent = baseIndent;
-        const cssIndent = baseIndent + '    ';
-
-        return (
-            `${styleIndent}<style>\n` +
-            cssLines
-                .map(line => `${cssIndent}${line}`)
-                .join('\n') +
-            `\n${styleIndent}</style>`
-        );
-    }
-);
-
-return formatted.trim();
-}
-
-function formatCss(css) {
-    css = css
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    let result = '';
-    let depth = 0;
-
-    for (let i = 0; i < css.length; i++) {
-        const char = css[i];
-
-        if (char === '{') {
-            depth++;
-            result += char;
-        }
-        else if (char === '}') {
-            depth = Math.max(0, depth - 1);
-            result += char;
-
-            // 가장 바깥 CSS 규칙이 완전히 끝났을 때만 줄바꿈
-            if (depth === 0) {
-                result += '\n';
+        // <style> 내부 CSS 들여쓰기 및 줄바꿈 정리
+        formatted = formatted.replace(
+            /([ \t]*)<style>\n?([\s\S]*?)<\/style>/,
+            (match, baseIndent, css) => {
+                const cssLines = css
+                    .trim()
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line);
+        
+                const styleIndent = baseIndent;
+                const cssIndent = baseIndent + '    ';
+        
+                return (
+                    `${styleIndent}<style>\n` +
+                    cssLines
+                        .map(line => `${cssIndent}${line}`)
+                        .join('\n') +
+                    `\n${styleIndent}</style>`
+                );
             }
+        );
+        
+        return formatted.trim();
         }
-        else {
-            result += char;
+        
+        function formatCss(css) {
+            css = css
+                .replace(/\s+/g, ' ')
+                .trim();
+        
+            let result = '';
+            let depth = 0;
+        
+            for (let i = 0; i < css.length; i++) {
+                const char = css[i];
+        
+                if (char === '{') {
+                    depth++;
+                    result += char;
+                }
+                else if (char === '}') {
+                    depth = Math.max(0, depth - 1);
+                    result += char;
+        
+                    // 가장 바깥 CSS 규칙이 완전히 끝났을 때만 줄바꿈
+                    if (depth === 0) {
+                        result += '\n';
+                    }
+                }
+                else {
+                    result += char;
+                }
+            }
+        
+            return result.trim();
         }
-    }
-
-    return result.trim();
-}
 
         function resetAll() {
             messageInput.value = '';
