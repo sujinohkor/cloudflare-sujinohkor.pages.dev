@@ -1966,6 +1966,36 @@
                     ]
                 }</script>
             </a>
+
+            <a href="https://sujinohkor.pages.dev/tools/token-svg" class="card" data-category="design">
+                <div class="icon">💬</div>
+                <h3>Token SVG</h3>
+                <p>token-svg</p>
+                <span class="arrow">Go to Token SVG →</span>
+                <!-- 안 보이는 데이터 블록 -->
+                <script type="application/json" class="app-meta">{
+                    "desc": "A browser-based token SVG animation generator that converts multiline text into sequentially animated word boxes. It automatically measures the rendered width of each word, calculates individual box sizes and line wrapping, dynamically determines the SVG dimensions, and provides a real-time SVG preview. Users can customize the word interval, fade-in duration, maximum line width, and font size, replay the animation, copy the generated standalone SVG source code, download the SVG file, reset the generator, and switch between light and dark themes. The interface also supports responsive desktop and mobile layouts with a collapsible sidebar.",
+                    "deps": [
+                        "Vanilla JavaScript (ES6+) — Handles text tokenization, word measurement, SVG source generation, animation timing, automatic line wrapping, dynamic SVG sizing, real-time preview updates, replay functionality, SVG downloading, clipboard copying, reset behavior, theme switching, sidebar interactions, and user input events without external frameworks or libraries",
+                        "HTML5 Canvas Text Measurement API — Uses CanvasRenderingContext2D.measureText() to measure the rendered width of each word and automatically calculate the width of individual SVG token boxes",
+                        "SVG (Scalable Vector Graphics) — Generates animated word boxes using <svg>, <g>, <rect>, <text>, and <animate> elements with dynamically calculated positions, dimensions, and animation timing",
+                        "SVG SMIL Animation — Uses <animate> elements to sequentially change each token group's opacity from 0 to 1 based on configurable word intervals and fade-in durations",
+                        "Clipboard API (navigator.clipboard.writeText) — Copies the generated standalone SVG source code directly to the system clipboard",
+                        "Blob and Object URL APIs — Uses Blob, URL.createObjectURL(), and URL.revokeObjectURL() to generate and download the standalone SVG file directly in the browser",
+                        "CSS3 — Uses CSS custom properties, Flexbox, Grid, responsive media queries, transitions, backdrop-filter, box shadows, rounded borders, transparent backgrounds, and light/dark theme styling",
+                        "HTML5 Form Controls — Uses <textarea> for multiline text input, numeric <input> controls for word interval, fade-in duration, maximum line width, and font size, and <button> elements for animation generation, replay, SVG copying, SVG downloading, navigation, theme switching, and reset operations",
+                        "JavaScript DOM API — Uses document.getElementById(), querySelectorAll(), innerHTML, classList, createElement(), appendChild(), and remove() for interface control, SVG preview rendering, temporary download elements, and dynamic DOM updates",
+                        "JavaScript Events API — Handles button clicks, text and numeric input changes, page initialization, theme switching, mobile sidebar interactions, animation replay, and automatic preview regeneration",
+                        "Responsive Web Design — Provides separate desktop and mobile layouts with a fixed desktop sidebar, collapsible mobile sidebar, responsive workspace arrangement, and mobile-specific viewport handling",
+                        "Web APIs (window / location / requestAnimationFrame) — Uses browser APIs for page initialization, navigation, delayed preview regeneration, animation replay, and general runtime behavior"
+                    ],
+                    "backends": [
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side SVG Generation: All text processing, tokenization, word-width measurement, box sizing, line wrapping, SVG construction, animation timing, preview rendering, source generation, clipboard copying, and SVG downloading are performed directly in the browser",
+                        "No Traditional Server-Side Application Backend: The application does not require server-side processing, a database, or an external API; generated SVG animations and downloadable SVG files are produced entirely on the client"
+                    ]
+                }</script>
+            </a>
             
             <a href="https://sujinohkor.pages.dev/tools/app-inspector" class="card guest-book-card" data-category="fun">
                 <div class="icon">📁</div>
