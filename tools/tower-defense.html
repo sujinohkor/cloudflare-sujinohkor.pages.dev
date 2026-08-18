@@ -340,6 +340,19 @@
             }
         }
 
+        // 기존 스크립트 내 적당한 위치에 추가
+        function selectTool(toolName, btnElement) {
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                if (btn.id.startsWith('btn-')) btn.classList.remove('active-tool');
+            });
+            if (btnElement) btnElement.classList.add('active-tool');
+        
+            // 모바일 환경(폭 900px 이하)인 경우 사이드바 자동 닫기
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        }
+        
         function startWave() {
             if (isWaveRunning) return;
             
@@ -360,6 +373,11 @@
                     clearInterval(spawnInterval);
                 }
             }, 900);
+
+            // ★ 이 부분을 추가합니다 (모바일 화면에서 웨이브 시작 시 사이드바 닫기)
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
         }
 
         canvas.addEventListener('click', (e) => {
