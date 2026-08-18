@@ -1,0 +1,1656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1102" height="500" viewBox="0 0 1102 500" xmlns="http://www.w3.org/2000/svg">
+
+  <style>
+    @font-face {
+      font-family: 'Plus Jakarta Sans';
+      font-style: normal;
+      font-weight: 200 800;
+      font-display: swap;
+      src: url(./font.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+    }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="white" />
+    </marker>
+  </defs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<g id="token0" opacity="0">
+  <rect x="441" y="50" width="77" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="479.5" y="76.0" fill="#0d1117" text-anchor="middle">Hello,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="0.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token1" opacity="0">
+  <rect x="528" y="50" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="552.0" y="76.0" fill="#0d1117" text-anchor="middle">I'm</text>
+  <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token2" opacity="0">
+  <rect x="586" y="50" width="87" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="629.5" y="76.0" fill="#0d1117" text-anchor="middle">Sungmin</text>
+  <animate attributeName="opacity" from="0" to="1" begin="1.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token3" opacity="0">
+  <rect x="683" y="50" width="58" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="712.0" y="76.0" fill="#0d1117" text-anchor="middle">Han.</text>
+  <animate attributeName="opacity" from="0" to="1" begin="1.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token4" opacity="0">
+  <rect x="441" y="110" width="39" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="460.5" y="136.0" fill="#0d1117" text-anchor="middle">An</text>
+  <animate attributeName="opacity" from="0" to="1" begin="2.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token5" opacity="0">
+  <rect x="490" y="110" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="514.0" y="136.0" fill="#0d1117" text-anchor="middle">AI,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="2.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token6" opacity="0">
+  <rect x="548" y="110" width="77" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="586.5" y="136.0" fill="#0d1117" text-anchor="middle">Cloud,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="3.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token7" opacity="0">
+  <rect x="635" y="110" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="659.0" y="136.0" fill="#0d1117" text-anchor="middle">and</text>
+  <animate attributeName="opacity" from="0" to="1" begin="3.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token8" opacity="0">
+  <rect x="693" y="110" width="39" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="712.5" y="136.0" fill="#0d1117" text-anchor="middle">Go</text>
+  <animate attributeName="opacity" from="0" to="1" begin="4.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token9" opacity="0">
+  <rect x="742" y="110" width="58" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="771.0" y="136.0" fill="#0d1117" text-anchor="middle">GDE,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="4.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token10" opacity="0">
+  <rect x="441" y="170" width="39" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="460.5" y="196.0" fill="#0d1117" text-anchor="middle">as</text>
+  <animate attributeName="opacity" from="0" to="1" begin="5.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token11" opacity="0">
+  <rect x="490" y="170" width="58" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="519.0" y="196.0" fill="#0d1117" text-anchor="middle">well</text>
+  <animate attributeName="opacity" from="0" to="1" begin="5.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token12" opacity="0">
+  <rect x="558" y="170" width="39" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="577.5" y="196.0" fill="#0d1117" text-anchor="middle">as</text>
+  <animate attributeName="opacity" from="0" to="1" begin="6.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token13" opacity="0">
+  <rect x="607" y="170" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="631.0" y="196.0" fill="#0d1117" text-anchor="middle">the</text>
+  <animate attributeName="opacity" from="0" to="1" begin="6.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token14" opacity="0">
+  <rect x="665" y="170" width="106" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="718.0" y="196.0" fill="#0d1117" text-anchor="middle">organizer</text>
+  <animate attributeName="opacity" from="0" to="1" begin="7.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token15" opacity="0">
+  <rect x="781" y="170" width="39" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="800.5" y="196.0" fill="#0d1117" text-anchor="middle">of</text>
+  <animate attributeName="opacity" from="0" to="1" begin="7.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token16" opacity="0">
+  <rect x="830" y="170" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="854.0" y="196.0" fill="#0d1117" text-anchor="middle">GDG</text>
+  <animate attributeName="opacity" from="0" to="1" begin="8.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token17" opacity="0">
+  <rect x="888" y="170" width="77" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="926.5" y="196.0" fill="#0d1117" text-anchor="middle">Golang</text>
+  <animate attributeName="opacity" from="0" to="1" begin="8.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token18" opacity="0">
+  <rect x="975" y="170" width="77" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="1013.5" y="196.0" fill="#0d1117" text-anchor="middle">Korea.</text>
+  <animate attributeName="opacity" from="0" to="1" begin="9.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token19" opacity="0">
+  <rect x="441" y="230" width="58" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="470.0" y="256.0" fill="#0d1117" text-anchor="middle">Also</text>
+  <animate attributeName="opacity" from="0" to="1" begin="9.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token20" opacity="0">
+  <rect x="509" y="230" width="39" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="528.5" y="256.0" fill="#0d1117" text-anchor="middle">an</text>
+  <animate attributeName="opacity" from="0" to="1" begin="10.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token21" opacity="0">
+  <rect x="558" y="230" width="68" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="592.0" y="256.0" fill="#0d1117" text-anchor="middle">MLOps</text>
+  <animate attributeName="opacity" from="0" to="1" begin="10.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token22" opacity="0">
+  <rect x="636" y="230" width="58" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="665.0" y="256.0" fill="#0d1117" text-anchor="middle">tech</text>
+  <animate attributeName="opacity" from="0" to="1" begin="11.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token23" opacity="0">
+  <rect x="704" y="230" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="728.0" y="256.0" fill="#0d1117" text-anchor="middle">guy</text>
+  <animate attributeName="opacity" from="0" to="1" begin="11.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token24" opacity="0">
+  <rect x="441" y="290" width="29" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="455.5" y="316.0" fill="#0d1117" text-anchor="middle">A</text>
+  <animate attributeName="opacity" from="0" to="1" begin="12.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token25" opacity="0">
+  <rect x="480" y="290" width="116" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="538.0" y="316.0" fill="#0d1117" text-anchor="middle">passionate</text>
+  <animate attributeName="opacity" from="0" to="1" begin="12.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token26" opacity="0">
+  <rect x="606" y="290" width="58" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="635.0" y="316.0" fill="#0d1117" text-anchor="middle">core</text>
+  <animate attributeName="opacity" from="0" to="1" begin="13.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token27" opacity="0">
+  <rect x="674" y="290" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="698.0" y="316.0" fill="#0d1117" text-anchor="middle">dev</text>
+  <animate attributeName="opacity" from="0" to="1" begin="13.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token28" opacity="0">
+  <rect x="732" y="290" width="68" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="766.0" y="316.0" fill="#0d1117" text-anchor="middle">nerd.</text>
+  <animate attributeName="opacity" from="0" to="1" begin="14.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token29" opacity="0">
+  <rect x="441" y="350" width="68" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="475.0" y="376.0" fill="#0d1117" text-anchor="middle">Loved</text>
+  <animate attributeName="opacity" from="0" to="1" begin="14.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token30" opacity="0">
+  <rect x="519" y="350" width="135" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="586.5" y="376.0" fill="#0d1117" text-anchor="middle">cutting-edge</text>
+  <animate attributeName="opacity" from="0" to="1" begin="15.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token31" opacity="0">
+  <rect x="664" y="350" width="125" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="726.5" y="376.0" fill="#0d1117" text-anchor="middle">technology,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="15.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token32" opacity="0">
+  <rect x="799" y="350" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="823.0" y="376.0" fill="#0d1117" text-anchor="middle">AI,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="16.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token33" opacity="0">
+  <rect x="857" y="350" width="68" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="891.0" y="376.0" fill="#0d1117" text-anchor="middle">FPGA,</text>
+  <animate attributeName="opacity" from="0" to="1" begin="16.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token34" opacity="0">
+  <rect x="441" y="410" width="48" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="465.0" y="436.0" fill="#0d1117" text-anchor="middle">and</text>
+  <animate attributeName="opacity" from="0" to="1" begin="17.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token35" opacity="0">
+  <rect x="499" y="410" width="154" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="576.0" y="436.0" fill="#0d1117" text-anchor="middle">unconventional</text>
+  <animate attributeName="opacity" from="0" to="1" begin="17.5s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token36" opacity="0">
+  <rect x="663" y="410" width="125" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="725.5" y="436.0" fill="#0d1117" text-anchor="middle">engineering</text>
+  <animate attributeName="opacity" from="0" to="1" begin="18.0s" dur="0.4s" fill="freeze" />
+</g>
+<g id="token37" opacity="0">
+  <rect x="798" y="410" width="125" height="40" rx="10" ry="10" fill="white" stroke="#0d1117" stroke-width="2" />
+  <text x="860.5" y="436.0" fill="#0d1117" text-anchor="middle">challenges.</text>
+  <animate attributeName="opacity" from="0" to="1" begin="18.5s" dur="0.4s" fill="freeze" />
+</g>
+</svg>
