@@ -3,279 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris Game Viewer</title>
-    <!-- Favicon settings -->
+    <title>Arcade Tetris Dashboard</title>
+    <!-- 파비콘 설정 -->
     <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }                                   
-        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }                        
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
 
-        /* 모바일 백드롭 오버레이 */
-        .sidebar-backdrop {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-                
-        /* 플로팅 사이드바 */
-        .sidebar {                                     
-            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px;                                     
-            background: rgba(16, 16, 16, 0.25);                                     
-            backdrop-filter: blur(16px);                                     
-            -webkit-backdrop-filter: blur(16px);                                    
-            padding: 25px 20px; z-index: 1000;                                     
-            display: flex; flex-direction: column; gap: 12px;                                     
-            border: 1px solid rgba(255, 158, 64, 0.35);                                     
-            border-radius: 24px;                                    
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);                                    
-            transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s, border 0.3s;                        
-            overflow-y: auto;                         
+        /* 완전 투명한 플로팅 사이드바 */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
         }
         .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
         .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
         .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
-        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }                
-        
-        .main-content {                                     
-            margin-left: 300px; padding: 40px; flex: 1;                                     
-            display: flex; flex-direction: column; height: 100vh;                                     
-            gap: 20px; overflow: hidden; transition: all 0.3s ease;                                     
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
             width: calc(100% - 300px);
-        }                
+        }
 
-        .menu-section-title { font-size: 0.8rem; color: #ff9e40; font-weight: bold; margin-top: 5px; padding-left: 5px; letter-spacing: 0.5px; }
-        .menu-btn {                                     
-            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;                                    
-            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35);                                     
-            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;                                    
-            display: flex; align-items: center; justify-content: center; line-height: 1;               
-        }                        
-        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); border-color: rgba(255, 158, 64, 0.6); }                        
-        
-        .status-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 158, 64, 0.35); border-radius: 12px; padding: 12px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 6px; }                
-        .status-item { display: flex; justify-content: space-between; font-weight: bold; }                
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
         .bottom-btns { display: flex; flex-direction: column; gap: 10px; }
+        .bottom-btns > .menu-btn { margin-bottom: 0; }
 
-        /* 도트무늬 배경 적용 카드 */                
-        .content-card {                                                 
-            border: 2px solid #ff9e40;                                                 
-            border-radius: 16px;                                                 
-            flex: 1;                                                 
-            display: flex;                                                 
-            overflow: hidden;                                                 
-            background: radial-gradient(circle, #222 1px, transparent 1px) #101010;                        
-            background-size: 20px 20px;                        
-            position: relative;                                     
-            transition: all 0.3s ease;               
-        }                
-        
-        .card-btn-group {            
-            position: absolute;            
-            top: 15px;            
-            right: 15px;            
-            z-index: 2001;            
-            display: flex;            
-            gap: 8px;        }
-        .action-btn {                                     
-            background: #202020;                                     
-            color: #ff9e40;                                     
-            border: 1px solid #ff9e40;                                     
-            padding: 6px 14px;                                     
-            border-radius: 8px;                                     
-            cursor: pointer;                                     
-            font-size: 0.8rem;                                     
-            font-weight: bold;                                     
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);                                     
-            transition: all 0.3s;               
-        }                
-        .action-btn:hover { background: #ff9e40; color: #101010; }
+        /* 3분할 컨테이너 스타일 */
+        .editors-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
+        }
 
-        /* 풀스크린 스타일 */        
-        body.is-fullscreen .sidebar { transform: translateX(-120%); opacity: 0; pointer-events: none; }
-        body.is-fullscreen .main-content { margin-left: 0 !important; width: 100vw !important; padding: 0 !important; height: 100vh !important; }
-        body.is-fullscreen .top-section { display: none !important; }
-        body.is-fullscreen .content-card { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 9999 !important; border-radius: 0 !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+        .content-card { 
+            border: 2px solid #ff9e40; 
+            border-radius: 16px; 
+            flex: 1; 
+            display: flex; 
+            overflow: hidden; 
+            background: rgba(0,0,0,0.6);
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
 
-        /* 대형 테트리스 뷰 레이아웃 */        
-        .game-layout-view {            
-            display: flex;            
-            width: 100%;            
-            height: 100%;            
-            position: absolute;            
-            top: 0; left: 0;            
-            justify-content: center;            
-            align-items: center;            
-            gap: 35px;            
-            padding: 20px;        }
+        /* 1번 div: 통계 대시보드 스타일 */
+        .stats-panel {
+            flex: 1;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: rgba(16, 16, 16, 0.6);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            gap: 12px;
+            overflow-y: auto;
+        }
+        .stats-title {
+            color: #ff9e40;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 158, 64, 0.3);
+            padding-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 158, 64, 0.15);
+        }
+        .stat-label { font-weight: bold; }
+        .stat-val { color: #38bdf8; font-family: 'Consolas', monospace; }
 
-        /* 확대된 테트리스 캔버스 (세로 20칸 기준 블록 크기 대폭 확장) */
-        #tetrisCanvas {            
-            background: #000;            
-            border: 3px solid #ff9e40;            
-            border-radius: 10px;            
-            box-shadow: 0 15px 40px rgba(0,0,0,0.7);            
-            display: block;            
-            height: 85vh; /* 화면 높이에 맞게 대형화 */            
-            max-height: 650px;            
-            width: auto;        }
+        /* 3번 div: 수직 분할 컨테이너 (위: Next 블록, 아래: 키패드) */
+        .right-vertical-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .next-block-card {
+            flex: 0.4;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            background: rgba(16, 16, 16, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            gap: 5px;
+        }
+        .next-block-card span { font-size: 0.8rem; color: #ff9e40; font-weight: bold; }
+        #nextCanvas {
+            background: #000;
+            border: 1px solid rgba(255, 158, 64, 0.4);
+            border-radius: 6px;
+        }
 
-        /* 우측 미니 패널 (NEXT 블록 확인용) */
-        .side-info-panel {            
-            width: 160px;            
-            height: 220px;            
-            background: rgba(16, 16, 16, 0.6);            
-            backdrop-filter: blur(10px);            
-            border: 1px solid rgba(255, 158, 64, 0.3);            
-            border-radius: 12px;            
-            padding: 15px;            
-            display: flex;            
-            flex-direction: column;            
-            align-items: center;            
-            gap: 12px;            
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);        }
-        
-        .side-info-panel h3 {            
-            color: #ff9e40;            
-            font-size: 0.9rem;            
-            letter-spacing: 0.5px;        }
+        /* 온스크린 키패드 카드 */
+        .keypad-card {
+            flex: 0.6;
+            border: 2px solid #ff9e40;
+            border-radius: 16px;
+            background: rgba(16, 16, 16, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            gap: 10px;
+        }
+        .keypad-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+        .key-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ff9e40;
+            border: 1px solid rgba(255, 158, 64, 0.5);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex: 1;
+            max-width: 70px;
+            text-align: center;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .key-btn:active { background: #ff9e40; color: #101010; }
 
-        #nextCanvas {            
-            background: #000;            
-            border: 1px solid rgba(255, 158, 64, 0.4);            
-            border-radius: 6px;        }
+        /* 테트리스 캔버스 */
+        #tetrisCanvas {
+            background: #000;
+            border: 2px solid #ff9e40;
+            border-radius: 8px;
+            display: block;
+            height: 90%;
+            width: auto;
+        }
 
-        /* Light Mode */        
-        body.light-mode { background-color: #fff; color: #202020; }                                
-        body.light-mode .sidebar { background: rgba(255, 255, 255, 0.4); border-color: rgba(243, 128, 32, 0.35); box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); }                                         
-        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { background: rgba(0, 0, 0, 0.02); color: #F38020; border-color: rgba(243, 128, 32, 0.5); }                        
-        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { background: rgba(243, 128, 32, 0.15); border-color: rgba(243, 128, 32, 0.4); }                                         
-        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }                        
-        body.light-mode .action-btn { background: #FDF5E6; color: #F38020; border-color: #F38020; }                        
-        body.light-mode .action-btn:hover { background: #F38020; color: #ffffff; }                        
-        body.light-mode .content-card { background: radial-gradient(circle, #ddd 1px, transparent 1px) #fff; background-size: 20px 20px; border-color: #F38020; }         
-        body.light-mode .side-info-panel { background: rgba(255, 255, 255, 0.7); border-color: rgba(243, 128, 32, 0.4); }
+        /* Light Mode */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }                        
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .stats-panel, body.light-mode .next-block-card, body.light-mode .keypad-card, body.light-mode .content-card { 
+            background: rgba(255, 255, 255, 0.8); 
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .stat-row { background: rgba(0,0,0,0.02); border-color: rgba(243, 128, 32, 0.2); }
+        body.light-mode .key-btn { background: rgba(0,0,0,0.03); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
+        body.light-mode .key-btn:active { background: #F38020; color: #fff; }
 
-        .menu-toggle-btn { display: none; position: fixed; bottom: 20px; left: 20px; z-index: 4000; padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #ffffff; }                                         
-        
-        @media (max-width: 900px) {                                                 
-            .menu-toggle-btn { display: block; }                                                 
-            .sidebar { transform: translateX(-320px); background: #101010 !important; backdrop-filter: none !important; box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; z-index: 3000; }                                                 
-            body.light-mode .sidebar { background: #ffffff !important; box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; }                                    
-            .sidebar.active { transform: translateX(0); }                                                 
-            .sidebar-backdrop.active { display: block; opacity: 1; }                                    
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100vh; }                                                 
-            .game-layout-view { flex-direction: column; gap: 15px; }            
-            #tetrisCanvas { height: 60vh; max-height: none; }
-            .side-info-panel { width: 100%; height: auto; flex-direction: row; justify-content: space-around; align-items: center; padding: 10px; }
+        /* Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }                        
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
+            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; } 
+            .editors-container { flex-direction: column; height: auto; }
+            .content-card, .stats-panel, .right-vertical-panel { min-height: 350px; }
         }
     </style>
 </head>
 <body>
     <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
-    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
-
     <div class="app-container">
-        <!-- 사이드바 -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">Tetris Arcade</div>
+            <div class="sidebar-title">Arcade Tetris</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                                    
-            <a href="../index" class="menu-btn" style="margin-bottom: 5px;">Home</a>                                    
-            
-            <div class="status-box">                                
-                <div class="status-item"><span>Score:</span> <span id="stat-score" style="color: #ff9e40;">0</span></div>                                
-                <div class="status-item"><span>Lines:</span> <span id="stat-lines">0</span></div>                        
-            </div>                        
-
-            <div class="menu-section-title">Controls Info</div>
-            <div style="font-size: 0.75rem; color: #aaa; line-height: 1.4; padding: 5px;">
-                • Move: ← / →<br>
-                • Soft Drop: ↓<br>
-                • Hard Drop: Space / Enter<br>
-                • Rotate: Q / W / ↑            </div>
-
-            <div class="menu-section-title" style="margin-top: auto;">Game Control</div>                        
-            <div class="bottom-btns">                                                           
+            </div>                                    
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
+            <div class="bottom-btns">                
                 <button class="menu-btn" onclick="resetGame()">Start / Reset</button>
-            </div>                                
+            </div>
         </aside>
+        
+        <main class="main-content">
+            <header class="top-section">
+                <h1>Arcade Tetris Dashboard</h1>
+                <p>Live block statistics, central gameplay arena, and touch-friendly controls.</p>
+            </header>                                        
+            
+            <!-- 3분할 컨테이너 -->
+            <div class="editors-container">
+                <!-- 1번 div: 블록 사용 누적 통계 패널 -->
+                <section class="stats-panel">
+                    <div class="stats-title">📊 Block Statistics</div>
+                    <div class="stat-row"><span class="stat-label">Score:</span><span class="stat-val" id="stat-score">0</span></div>
+                    <div class="stat-row"><span class="stat-label">Lines:</span><span class="stat-val" id="stat-lines">0</span></div>
+                    <div class="stat-row"><span class="stat-label">I Block:</span><span class="stat-val" id="stat-I">0</span></div>
+                    <div class="stat-row"><span class="stat-label">T Block:</span><span class="stat-val" id="stat-T">0</span></div>
+                    <div class="stat-row"><span class="stat-label">O Block:</span><span class="stat-val" id="stat-O">0</span></div>
+                    <div class="stat-row"><span class="stat-label">L Block:</span><span class="stat-val" id="stat-L">0</span></div>
+                    <div class="stat-row"><span class="stat-label">J Block:</span><span class="stat-val" id="stat-J">0</span></div>
+                    <div class="stat-row"><span class="stat-label">S Block:</span><span class="stat-val" id="stat-S">0</span></div>
+                    <div class="stat-row"><span class="stat-label">Z Block:</span><span class="stat-val" id="stat-Z">0</span></div>
+                </section>
 
-        <!-- 메인 콘텐츠 영역 -->
-        <main class="main-content" id="main-content">                                                
-            <header class="top-section">                                                                
-                <h1>Classic Tetris Arena</h1>                                
-                <p>Expanded widescreen arcade layout.</p>
-            </header>                                                            
+                <!-- 2번 div: 테트리스 게임 판 -->
+                <section class="content-card">
+                    <canvas id="tetrisCanvas" width="240" height="400"></canvas>
+                </section>
 
-            <section class="content-card" id="content-card">                                                                
-                <div class="card-btn-group">                                                            
-                    <button class="action-btn" id="fullscreen-btn" onclick="toggleFullscreen()">Maximize ⛶</button>                                                                
-                </div>
-
-                <!-- 대형화된 테트리스 게임 뷰 -->                                                
-                <div class="game-layout-view">                                                            
-                    <canvas id="tetrisCanvas" width="300" height="500"></canvas>
-                    
-                    <!-- 우측 간결한 넥스트 블록 패널 -->
-                    <div class="side-info-panel">
-                        <h3>NEXT BLOCK</h3>
-                        <canvas id="nextCanvas" width="100" height="100"></canvas>
+                <!-- 3번 div: 수직 분할 영역 (위: Next 블록 / 아래: 온스크린 키패드) -->
+                <div class="right-vertical-panel">
+                    <!-- 위: Next 블록 영역 -->
+                    <div class="next-block-card">
+                        <span>NEXT BLOCK</span>
+                        <canvas id="nextCanvas" width="80" height="80"></canvas>
+                    </div>
+                    <!-- 아래: 대형 온스크린 키패드 영역 -->
+                    <div class="keypad-card">
+                        <div class="keypad-row">
+                            <button class="key-btn" onclick="playerRotate(1)">↻ 회전</button>
+                            <button class="key-btn" onclick="playerHardDrop()">⚡ 드롭</button>
+                        </div>
+                        <div class="keypad-row">
+                            <button class="key-btn" onclick="playerMove(-1)">←</button>
+                            <button class="key-btn" onclick="playerDrop()">↓</button>
+                            <button class="key-btn" onclick="playerMove(1)">→</button>
+                        </div>
                     </div>
                 </div>
-            </section>                                
-        </main>        
+            </div>
+        </main>
     </div>
 
     <script>
         const sidebar = document.getElementById('sidebar');
-        const backdrop = document.getElementById('sidebar-backdrop');
-        const mainContent = document.getElementById('main-content');
-        const contentCard = document.getElementById('content-card');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-        window.toggleFullscreen = function() {                                                
-            contentCard.classList.toggle('fullscreen');                                    
-            document.body.classList.toggle('is-fullscreen');                                    
-            if (contentCard.classList.contains('fullscreen')) {                                                                
-                fullscreenBtn.textContent = 'Minimize 🗗';                                    
-            } else {                                                                
-                fullscreenBtn.textContent = 'Maximize ⛶';                                    
-            }                    
-        };
-
-        function toggleSidebar() {                                                  
-            const isActive = sidebar.classList.toggle('active');                                    
-            if (isActive) backdrop.classList.add('active');                                    
-            else backdrop.classList.remove('active');                
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
         }
 
-        function closeSidebar() {                                    
-            sidebar.classList.remove('active');                                    
-            backdrop.classList.remove('active');                
-        }
-
-        document.getElementById('theme-toggle').addEventListener('click', () => {                                                  
-            document.body.classList.toggle('light-mode');                                    
-            if (window.innerWidth <= 900) closeSidebar();                
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
         });
 
-        // --- 테트리스 게임 엔진 ---
+        document.querySelector('.main-content').addEventListener('click', (e) => { 
+            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
+
+        // --- 테트리스 게임 엔진 및 통계 로직 ---
         const canvas = document.getElementById('tetrisCanvas');
         const ctx = canvas.getContext('2d');
         const nextCanvas = document.getElementById('nextCanvas');
         const nextCtx = nextCanvas.getContext('2d');
 
-        // 캔버스 기본 스케일 확장 (블록 크기를 더 큼직하게 렌더링)
-        ctx.scale(25, 25);
-        nextCtx.scale(25, 25);
+        ctx.scale(20, 20);
+        nextCtx.scale(20, 20);
+
+        const blockCounts = { I: 0, T: 0, O: 0, L: 0, J: 0, S: 0, Z: 0 };
 
         function createMatrix(w, h) {
             const matrix = [];
@@ -284,6 +333,9 @@
         }
 
         function createPiece(type) {
+            blockCounts[type]++;
+            updateStatsUI();
+
             if (type === 'T') return [[0,1,0],[1,1,1],[0,0,0]];
             else if (type === 'O') return [[2,2],[2,2]];
             else if (type === 'L') return [[0,0,3],[3,3,3],[0,0,0]];
@@ -299,12 +351,19 @@
             matrix: null,
             nextMatrix: null,
             score: 0,
-            lines: 0
+            lines: 0,
+            nextType: null
         };
 
-        const colors = [            
-            null, '#ff9e40', '#ffbbd0', '#c8e6c9', '#bbdefb', '#fff9c4', '#e1bee7', '#b2dfdb'        
+        const colors = [
+            null, '#ff9e40', '#ffbbd0', '#c8e6c9', '#bbdefb', '#fff9c4', '#e1bee7', '#b2dfdb'
         ];
+
+        const pieceTypes = ['I', 'T', 'O', 'L', 'J', 'S', 'Z'];
+
+        function getRandomPieceType() {
+            return pieceTypes[Math.floor(Math.random() * pieceTypes.length)];
+        }
 
         function collide(arena, player) {
             const m = player.matrix;
@@ -339,7 +398,7 @@
             if (rowCount > 0) {
                 player.lines += rowCount;
                 player.score += rowCount * 100 * rowCount;
-                updateScore();
+                updateStatsUI();
             }
         }
 
@@ -372,20 +431,24 @@
 
         function playerReset() {
             if (player.nextMatrix === null) {
-                const pieces = 'TJLOSZI';
-                player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
-            } else {
-                player.matrix = player.nextMatrix;
+                player.nextType = getRandomPieceType();
+                player.nextMatrix = createPiece(player.nextType);
             }
-            const pieces = 'TJLOSZI';
-            player.nextMatrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+            
+            let currentType = player.nextType;
+            player.matrix = player.nextMatrix;
+            
+            player.nextType = getRandomPieceType();
+            player.nextMatrix = createPiece(player.nextType);
+
             player.pos.y = 0;
             player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+            
             if (collide(arena, player)) {
                 arena.forEach(row => row.fill(0));
                 player.score = 0;
                 player.lines = 0;
-                updateScore();
+                updateStatsUI();
             }
         }
 
@@ -422,7 +485,8 @@
             const deltaTime = time - lastTime;
             lastTime = time;
             dropCounter += deltaTime;
-            if (dropCounter > dropInterval) playerDrop();                        
+            if (dropCounter > dropInterval) playerDrop();
+            
             draw();
             requestAnimationFrame(update);
         }
@@ -440,12 +504,12 @@
 
         function draw() {
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, 12, 20); // 12x20 그리드 기준 채우기
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             drawMatrix(arena, {x: 0, y: 0});
             drawMatrix(player.matrix, player.pos);
 
             nextCtx.fillStyle = '#000';
-            nextCtx.fillRect(0, 0, 4, 4);
+            nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             if (player.nextMatrix) {
                 let ox = (4 - player.nextMatrix[0].length) / 2;
                 let oy = (4 - player.nextMatrix.length) / 2;
@@ -453,18 +517,22 @@
             }
         }
 
-        function updateScore() {
+        function updateStatsUI() {
             document.getElementById('stat-score').innerText = player.score;
             document.getElementById('stat-lines').innerText = player.lines;
+            for (let key in blockCounts) {
+                document.getElementById('stat-' + key).innerText = blockCounts[key];
+            }
         }
 
         function resetGame() {
             arena.forEach(row => row.fill(0));
             player.score = 0;
             player.lines = 0;
+            for (let key in blockCounts) blockCounts[key] = 0;
             player.nextMatrix = null;
             playerReset();
-            updateScore();
+            updateStatsUI();
         }
 
         document.addEventListener('keydown', event => {
