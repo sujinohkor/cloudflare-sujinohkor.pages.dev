@@ -354,7 +354,11 @@ body.light .control input[type="color"]{
 
     <button class="menu-btn" id="clearBtn">Clear Text</button>
     <button class="menu-btn" id="printBtn">인쇄 / PDF 저장</button>
-    <button class="menu-btn" id="jsonBtn">JSON으로 저장</button>
+    <div class="mode-buttons">
+      <button class="menu-btn" id="jsonSaveBtn">JSON 저장</button>
+      <button class="menu-btn" id="jsonLoadBtn">JSON 읽기</button>
+    </div>
+    <input type="file" id="jsonFileInput" accept="application/json,.json" hidden>
 </aside>
 
   <main class="main">
@@ -578,7 +582,7 @@ function applyPageSettings(){
   document.getElementById(id).addEventListener('change',applyPageSettings);
 });
 
-document.getElementById('jsonBtn').addEventListener('click', ()=>{
+document.getElementById('jsonSaveBtn').addEventListener('click', ()=>{
   const activeAlignBtn = document.querySelector('[data-align].active');
   const sheets = labelGroups.map(labels =>
     [...labels.querySelectorAll('.label')].map(input => input.value)
@@ -618,6 +622,92 @@ document.getElementById('jsonBtn').addEventListener('click', ()=>{
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+});
+
+document.getElementById('jsonLoadBtn').addEventListener('click', ()=>{
+  document.getElementById('jsonFileInput').click();
+});
+
+document.getElementById('jsonFileInput').addEventListener('change', async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+
+  try{
+    const data = JSON.parse(await file.text());
+
+    if(data.pageSettings){
+      if(data.pageSettings.paperSize != null)
+        document.getElementById('paperSize').value = data.pageSettings.paperSize;
+
+      if(data.pageSettings.pageMargin != null)
+        document.getElementById('pageMargin').value = data.pageSettings.pageMargin;
+
+      if(data.pageSettings.sheetGap != null)
+        document.getElementById('sheetGap').value = data.pageSettings.sheetGap;
+    }
+
+    if(data.textSettings){
+      if(data.textSettings.fontSize != null){
+        document.getElementById('fontSize').value = data.textSettings.fontSize;
+        document.querySelectorAll('.label,.mirror-text')
+          .forEach(el=>el.style.fontSize = data.textSettings.fontSize + 'px');
+      }
+
+      if(data.textSettings.fontColor){
+        document.getElementById('fontColor').value = data.textSettings.fontColor;
+        document.querySelectorAll('.label,.mirror-text')
+          .forEach(el=>el.style.color = data.textSettings.fontColor);
+      }
+
+      if(data.textSettings.fontFamily){
+        document.getElementById('fontFamily').value = data.textSettings.fontFamily;
+        document.querySelectorAll('.label,.mirror-text')
+          .forEach(el=>el.style.fontFamily = data.textSettings.fontFamily);
+      }
+
+      if(data.textSettings.borderWidth != null){
+        document.getElementById('borderWidth').value = data.textSettings.borderWidth;
+        document.querySelectorAll('.label')
+          .forEach(el=>el.style.borderWidth = data.textSettings.borderWidth + 'px');
+      }
+
+      const align = data.textSettings.align || 'center';
+      document.querySelectorAll('[data-align]').forEach(btn=>{
+        btn.classList.toggle('active', btn.dataset.align === align);
+      });
+
+      document.querySelectorAll('.label').forEach(el=>el.style.textAlign = align);
+      document.querySelectorAll('.mirror-text').forEach(el=>{
+        el.style.textAlign = align;
+        el.style.justifyContent =
+          align === 'left' ? 'flex-start' :
+          align === 'right' ? 'flex-end' : 'center';
+      });
+    }
+
+    if(Array.isArray(data.sheets)){
+      labelGroups.forEach((labels, sheetIndex)=>{
+        const values = Array.isArray(data.sheets[sheetIndex])
+          ? data.sheets[sheetIndex]
+          : [];
+
+        [...labels.querySelectorAll('.label')].forEach((input, i)=>{
+          input.value = values[i] ?? '';
+          const mirrorText = input.parentElement.querySelector('.mirror-text');
+          if(mirrorText) mirrorText.textContent = input.value;
+        });
+      });
+    }
+
+    setMirrorMode(Boolean(data.mode && data.mode.mirrorMode));
+    applyPageSettings();
+
+  }catch(err){
+    alert('JSON 파일을 읽을 수 없습니다.');
+    console.error(err);
+  }finally{
+    e.target.value = '';
+  }
 });
 
 // 시작 상태는 Button 2
