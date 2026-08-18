@@ -1937,6 +1937,36 @@
                 }</script>
             </a>
 
+            <a href="https://sujinohkor.pages.dev/tools/chat-svg" class="card" data-category="design">
+                <div class="icon">💬</div>
+                <h3>Chat SVG</h3>
+                <p>chat-svg</p>
+                <span class="arrow">Go to Chat SVG →</span>
+                <!-- 안 보이는 데이터 블록 -->
+                <script type="application/json" class="app-meta">{
+                    "desc": "A browser-based chat animation SVG generator that converts multiline chat messages into sequential animated speech bubbles with typing indicators and message appearance effects. It provides a real-time SVG preview, automatically calculates bubble widths from rendered text, dynamically adjusts the SVG height, supports light/dark themes and responsive layouts, and allows users to copy the generated standalone SVG source code with formatted CSS, SVG elements, and animation keyframes.",
+                    "deps": [
+                        "Vanilla JavaScript (ES6+) — Handles chat message processing, SVG generation, animation timing, dynamic sizing, source code generation, theme switching, sidebar controls, reset functionality, and user interactions without external frameworks or libraries",
+                        "HTML5 DOM API — Used for document.getElementById(), querySelectorAll(), createElementNS(), appendChild(), removeChild(), class manipulation, attribute management, and dynamic DOM updates",
+                        "SVG (Scalable Vector Graphics) — Generates animated speech bubbles using <svg>, <g>, <rect>, <circle>, <text>, and <animate> elements with dynamically generated SVG content",
+                        "SVG Text Measurement API — Uses getComputedTextLength() to measure rendered message text and automatically calculate the required width of each speech bubble",
+                        "SVG CSS Animations — Uses dynamically generated CSS classes and @keyframes rules to control typing indicators, message delays, fade effects, and upward message appearance animations",
+                        "XMLSerializer API — Converts the generated SVG DOM structure into a standalone SVG source string for copying",
+                        "Clipboard API (navigator.clipboard.writeText) — Copies the formatted standalone SVG source code to the system clipboard",
+                        "CSS3 — Uses Flexbox, responsive media queries, transitions, backdrop-filter, box shadows, rounded borders, transparent backgrounds, and light/dark theme styling",
+                        "HTML5 Form Controls — Uses <textarea> for multiline chat message input and <button> elements for animation generation, SVG source copying, navigation, theme switching, and reset operations",
+                        "JavaScript Events API — Handles button clicks, theme changes, sidebar interactions, page initialization, and generated animation updates",
+                        "Responsive Web Design — Provides separate desktop and mobile layouts with a collapsible sidebar, responsive workspace arrangement, and mobile-specific viewport handling",
+                        "Web APIs (window / location / alert) — Uses browser APIs for page initialization, navigation, user notifications, and general runtime behavior"
+                    ],
+                    "backends": [
+                        "Static Hosting: Cloudflare Pages",
+                        "Client-Side SVG Generation: All chat animation rendering, SVG construction, text measurement, animation keyframe generation, and source formatting are performed directly in the browser",
+                        "No Traditional Server-Side Application Backend: The application does not require a server-side processing service or external API; generated SVG animations and copied SVG source code are produced entirely on the client"
+                    ]
+                }</script>
+            </a>
+            
             <a href="https://sujinohkor.pages.dev/tools/app-inspector" class="card guest-book-card" data-category="fun">
                 <div class="icon">📁</div>
                 <h3>App Inspector</h3>
