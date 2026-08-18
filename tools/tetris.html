@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -279,7 +280,7 @@
                     <!-- 위: Next 블록 영역 -->
                     <div class="next-block-card">
                         <span>NEXT BLOCK</span>
-                        <canvas id="nextCanvas" width="160" height="160"></canvas>
+                        <canvas id="nextCanvas" width="200" height="200"></canvas>
                     </div>
                     <!-- 아래: 대형 온스크린 키패드 영역 -->
                     <div class="keypad-card">
@@ -511,8 +512,8 @@
             nextCtx.fillStyle = '#000';
             nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             if (player.nextMatrix) {
-                let ox = (4 - player.nextMatrix[0].length) / 2;
-                let oy = (4 - player.nextMatrix.length) / 2;
+                let ox = (5 - player.nextMatrix[0].length) / 2;
+                let oy = (5 - player.nextMatrix.length) / 2;
                 drawMatrix(player.nextMatrix, {x: ox, y: oy}, nextCtx);
             }
         }
