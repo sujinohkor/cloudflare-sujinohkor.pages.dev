@@ -511,8 +511,8 @@
             nextCtx.fillStyle = '#000';
             nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             if (player.nextMatrix) {
-                let ox = (4 - player.nextMatrix[0].length) / 2;
-                let oy = (4 - player.nextMatrix.length) / 2;
+                let ox = (5 - player.nextMatrix[0].length) / 2;
+                let oy = (5 - player.nextMatrix.length) / 2;
                 drawMatrix(player.nextMatrix, {x: ox, y: oy}, nextCtx);
             }
         }
