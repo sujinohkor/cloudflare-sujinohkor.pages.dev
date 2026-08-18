@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅 애니메이션 생성기</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #242424;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            gap: 20px;
+            box-sizing: border-box;
+        }
+
+        .input-box {
+            flex: 0.8;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-container {
+            flex: 1.2;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            max-height: 80vh;
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 250px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        button {
+            margin-top: 15px;
+            background-color: #0079ff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+        }
+
+        .bubble {
+            fill: #e9e9eb;
+        }
+
+        text {
+            fill: #242424;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            textarea {
+                min-height: 120px;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #dcdcdc;
+            }
+            .input-box, .preview-container {
+                background: #1e1e1e;
+            }
+            .bubble {
+                fill: #3b3b3d;
+            }
+            text {
+                fill: #dcdcdc;
+            }
+            textarea {
+                background: #2a2a2a;
+                color: #dcdcdc;
+                border-color: #444;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 왼쪽: 입력 영역 -->
+        <div class="input-box">
+            <h3>채팅 문구 입력 (줄바꿈으로 구분)</h3>
+            <textarea id="messageInput" placeholder="출력할 문장을 한 줄씩 입력하세요."></textarea>
+            <button onclick="generateAnimation()">애니메이션 적용</button>
+        </div>
+
+        <!-- 오른쪽: 미리보기 영역 -->
+        <div class="preview-container">
+            <style id="dynamicKeyframes"></style>
+            <svg id="chatSvg" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="svgContent"></g>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        function generateAnimation() {
+            const rawText = document.getElementById('messageInput').value;
+            const lines = rawText.split('\n').filter(line => line.trim() !== '');
+            const svgContent = document.getElementById('svgContent');
+            const svgElement = document.getElementById('chatSvg');
+            const dynamicKeyframes = document.getElementById('dynamicKeyframes');
+
+            svgContent.innerHTML = '';
+
+            if (lines.length === 0) {
+                svgElement.setAttribute('viewBox', '0 0 600 100');
+                dynamicKeyframes.innerHTML = '';
+                return;
+            }
+
+            let currentTime = 0;
+            let currentHeight = 20;
+            let keyframeStyles = '';
+
+            lines.forEach((text, index) => {
+                const yOffset = currentHeight;
+                const bubbleHeight = 42;
+                const typingDuration = 1.0;
+                const waitTime = currentTime;
+                const msgTime = waitTime + typingDuration;
+
+                // 1. 타이핑 점 3개 표시 (고정 크기)
+                const typingGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                typingGroup.setAttribute("transform", `translate(10, ${yOffset})`);
+                
+                const typingClassName = `typing-${index}`;
+                typingGroup.setAttribute("class", typingClassName);
+                
+                typingGroup.innerHTML = `
+                    <rect x="8.27246" width="69.7276" height="42" rx="20.9774" class="bubble" />
+                    <circle cx="13.591" cy="33.091" r="7.68185" class="bubble" />
+                    <circle cx="3.54547" cy="41.9547" r="3.54547" class="bubble" />
+                    <circle cx="27.4778" cy="20.9773" r="5.02275" fill="#999999">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="42.8411" cy="20.9773" r="5.02275" fill="#999999">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" begin="0.2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="58.2054" cy="20.9773" r="5.02275" fill="#999999">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" begin="0.4s" repeatCount="indefinite" />
+                    </circle>
+                `;
+                svgContent.appendChild(typingGroup);
+
+                // 2. 실제 말풍선 생성
+                const msgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                msgGroup.setAttribute("transform", `translate(10, ${yOffset})`);
+                
+                const msgClassName = `msg-${index}`;
+                msgGroup.setAttribute("class", msgClassName);
+
+                // 텍스트 길이 측정
+                const tempText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                tempText.setAttribute("x", "15");
+                tempText.setAttribute("y", "27");
+                tempText.textContent = text;
+                svgContent.appendChild(tempText);
+                const textLength = tempText.getComputedTextLength();
+                svgContent.removeChild(tempText);
+
+                // 최소 너비를 낮추고(40) 여백을 타이트하게 조절
+                const preciseWidth = Math.max(40, textLength + 30);
+
+                msgGroup.innerHTML = `
+                    <rect width="${preciseWidth}" height="${bubbleHeight}" rx="18.0355" class="bubble" />
+                    <text x="15" y="27">${text}</text>
+                `;
+                svgContent.appendChild(msgGroup);
+
+                keyframeStyles += `
+                    .${typingClassName} {
+                        opacity: 0;
+                        animation: wait-${index} ${waitTime}s, fade-in-out-${index} ${typingDuration}s ${waitTime}s;
+                    }
+                    .${msgClassName} {
+                        opacity: 0;
+                        animation: wait-${index} ${msgTime}s, msg-appear-${index} 0.2s ${msgTime}s forwards;
+                    }
+                    @keyframes wait-${index} {
+                        0%, 100% { opacity: 0; }
+                    }
+                    @keyframes fade-in-out-${index} {
+                        0%, 100% { opacity: 0; }
+                        25%, 90% { opacity: 1; }
+                    }
+                    @keyframes msg-appear-${index} {
+                        0% { opacity: 0; transform: translate(10px, ${yOffset + 5}px); }
+                        100% { opacity: 1; transform: translate(10px, ${yOffset}px); }
+                    }
+                `;
+
+                currentTime = msgTime + 0.3;
+                currentHeight += 55;
+            });
+
+            dynamicKeyframes.innerHTML = keyframeStyles;
+            
+            const totalSvgHeight = currentHeight + 20;
+            svgElement.setAttribute('viewBox', `0 0 600 ${totalSvgHeight}`);
+        }
+
+        window.onload = () => {
+            document.getElementById('messageInput').value = 
+`Hi, I'm Sujin Oh
+Civil Servant
+HCI
+Hello
+Have a great day!`;
+            generateAnimation();
+        };
+    </script>
+</body>
+</html>
