@@ -3,167 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>채팅 애니메이션 생성기</title>
+    <title>Chat Animation Generator</title>
+    <!-- Favicon settings -->
+    <link rel="icon" type="image/png" href="/assets/LOGO-orange.png">
+
     <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #242424;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+        /* 1. Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; display: block; }
+
+        .app-container { display: flex; min-height: 100vh; width: 100%; }
+
+        /* 완전 투명한 플로팅 사이드바 (데스크톱 전용) */
+        .sidebar { 
+            width: 260px; height: calc(100vh - 40px); position: fixed; left: 20px; top: 20px; 
+            background: rgba(16, 16, 16, 0.25); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 25px 20px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, background 0.3s, border 0.3s; 
+        }
+        .sidebar-title { color: #ff9e40; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px; }
+
+        .sidebar-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .theme-toggle-btn { width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.5); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .theme-toggle-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .main-content { 
+            margin-left: 300px; padding: 40px; flex: 1; 
+            display: flex; flex-direction: column; height: 100vh; 
+            gap: 20px; overflow: hidden; transition: 0.3s; 
+            width: calc(100% - 300px);
         }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
+        .top-section h1 { font-size: 1.8rem; margin-bottom: 5px; color: #fff; }
+        .top-section p { color: #888; font-size: 0.95rem; }
+
+        .workspace-container {
             display: flex;
+            flex-direction: row;
+            flex: 1;
             gap: 20px;
-            box-sizing: border-box;
+            min-height: 0;
         }
 
-        .input-box {
-            flex: 0.8;
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .menu-btn { 
+            width: 100%; padding: 11px 14px; cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.03); color: #ff9e40; border: 1px solid rgba(255, 158, 64, 0.35); 
+            border-radius: 50px; font-weight: bold; transition: all 0.3s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .menu-btn:hover { background: rgba(255, 158, 64, 0.2); color: #ff9e40; border-color: rgba(255, 158, 64, 0.6); }
+
+        .bottom-btns {
             display: flex;
             flex-direction: column;
+            gap: 10px;
         }
 
-        .preview-container {
-            flex: 1.2;
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-            max-height: 80vh;
+        /* 왼쪽: 채팅 문구 입력 영역 */
+        .content-left { 
+            flex: 1; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            padding: 20px; background: rgba(0, 0, 0, 0.2); gap: 15px;
+        }
+        .content-left label { font-weight: bold; color: #ff9e40; font-size: 0.95rem; }
+        .content-left textarea {
+            width: 100%; flex: 1; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px; padding: 15px; color: #fff; font-size: 1rem; resize: none; outline: none; font-family: inherit;
+            line-height: 1.5;
+        }
+        .content-left textarea:focus { border-color: #ff9e40; }
+
+        /* 오른쪽: SVG 미리보기 영역 */
+        .content-right { 
+            flex: 1.2; border: 2px solid #ff9e40; border-radius: 16px; display: flex; flex-direction: column; 
+            overflow: auto; padding: 20px; background: rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
-        h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        textarea {
-            width: 100%;
-            flex-grow: 1;
-            min-height: 250px;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            resize: vertical;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: inherit;
-        }
-
-        button {
-            margin-top: 15px;
-            background-color: #0079ff;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background-color: #005bb5;
-        }
-
+        /* SVG가 컨테이너 폭에 맞추되 왼쪽 정렬되도록 수정 */
         svg {
             width: 100%;
-            max-width: 600px;
             height: auto;
             display: block;
         }
 
         .bubble {
-            fill: #e9e9eb;
+            fill: #3b3b3d;
         }
 
         text {
-            fill: #242424;
+            fill: #ffffff;
             font-size: 18px;
             letter-spacing: -0.02em;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            textarea {
-                min-height: 120px;
-            }
+        .content-left, .content-right {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #121212;
-                color: #dcdcdc;
+        /* 4. Theme (Light Mode) */
+        body.light-mode { background-color: #fff; color: #202020; }
+        body.light-mode .sidebar { 
+            background: rgba(255, 255, 255, 0.3); 
+            border-color: rgba(243, 128, 32, 0.35); 
+            box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
+        }
+        body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
+            background: rgba(0, 0, 0, 0.02); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.5); 
+        }
+        body.light-mode .menu-btn:hover, body.light-mode .theme-toggle-btn:hover { 
+            background: rgba(243, 128, 32, 0.15); 
+            color: #F38020; 
+            border-color: rgba(243, 128, 32, 0.4); 
+        }
+        body.light-mode .top-section h1, body.light-mode .top-section p { color: #202020; }
+        body.light-mode .content-left, body.light-mode .content-right { background-color: rgba(255, 255, 255, 0.5); border-color: #F38020; }
+        body.light-mode .content-left textarea { background: rgba(0, 0, 0, 0.02); color: #202020; border-color: rgba(0, 0, 0, 0.15); }
+        body.light-mode .content-left textarea:focus { border-color: #F38020; }
+        body.light-mode .bubble { fill: #e9e9eb; }
+        body.light-mode text { fill: #242424; }
+        body.light-mode .menu-toggle-btn { color: #ffffff; }
+
+        body.light-mode .content-left, 
+        body.light-mode .content-right {
+            box-shadow: 0 10px 20px rgba(243, 128, 32, 0.15);
+        }
+
+        /* 5. Mobile Responsive */
+        .menu-toggle-btn { 
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
+            padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; color: #ffffff; 
+        }
+
+        @media (max-width: 900px) { 
+            .menu-toggle-btn { display: block; } 
+            .sidebar { 
+                transform: translateX(-320px); 
+                background: #101010 !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important; 
+            } 
+            body.light-mode .sidebar { 
+                background: #ffffff !important; 
+                box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .input-box, .preview-container {
-                background: #1e1e1e;
-            }
-            .bubble {
-                fill: #3b3b3d;
-            }
-            text {
-                fill: #dcdcdc;
-            }
-            textarea {
-                background: #2a2a2a;
-                color: #dcdcdc;
-                border-color: #444;
-            }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: 100svh; overflow: hidden; display: flex; flex-direction: column; } 
+            .workspace-container { flex-direction: column; overflow: hidden; gap: 15px; }
         }
     </style>
 </head>
 <body>
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">MENU</button>
 
-    <div class="container">
-        <!-- 왼쪽: 입력 영역 -->
-        <div class="input-box">
-            <h3>채팅 문구 입력 (줄바꿈으로 구분)</h3>
-            <textarea id="messageInput" placeholder="출력할 문장을 한 줄씩 입력하세요."></textarea>
-            <button onclick="generateAnimation()">애니메이션 적용</button>
-        </div>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Chat Animator</div>
+            <div class="sidebar-top">
+                <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
+            </div>
+            
+            <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
-        <!-- 오른쪽: 미리보기 영역 -->
-        <div class="preview-container">
-            <style id="dynamicKeyframes"></style>
-            <svg id="chatSvg" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g id="svgContent"></g>
-            </svg>
-        </div>
+            <div class="bottom-btns">
+                <button class="menu-btn" onclick="generateAnimation()">Apply Animation</button>
+                <button class="menu-btn" onclick="copySvgCode()">Copy SVG Code</button>
+                <button class="menu-btn" onclick="resetAll()">Reset</button>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <header class="top-section">
+                <h1>Chat Animation Generator</h1>
+                <p>Enter chat lines below to generate sequential speech bubble animations.</p>
+            </header>
+
+            <div class="workspace-container">
+                <!-- 왼쪽: 채팅 문구 입력 영역 -->
+                <section class="content-left">
+                    <label for="messageInput">Chat Messages (One per line)</label>
+                    <textarea id="messageInput" placeholder="Type lines here..."></textarea>
+                </section>
+
+                <!-- 오른쪽: SVG 미리보기 영역 -->
+                <section class="content-right">
+                    <style id="dynamicKeyframes"></style>
+                    <!-- preserveAspectRatio="xMinYMin meet" 추가하여 항상 왼쪽 상단에 밀착되도록 고정 -->
+                    <svg id="chatSvg" viewBox="0 0 350 100" preserveAspectRatio="xMinYMin meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="svgContent"></g>
+                    </svg>
+                </section>
+            </div>
+        </main>
     </div>
 
     <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const messageInput = document.getElementById('messageInput');
+        const svgContent = document.getElementById('svgContent');
+        const svgElement = document.getElementById('chatSvg');
+        const dynamicKeyframes = document.getElementById('dynamicKeyframes');
+
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            document.body.classList.toggle('light-mode'); 
+        });
+
+        mainContent.addEventListener('click', (e) => { 
+            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar')) { 
+                sidebar.classList.remove('active'); 
+            } 
+        });
+
+        // 사이드바 내부의 버튼을 누르면 모바일에서 사이드바가 닫히도록 설정
+        document.querySelectorAll('.sidebar button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
         function generateAnimation() {
-            const rawText = document.getElementById('messageInput').value;
+            const rawText = messageInput.value;
             const lines = rawText.split('\n').filter(line => line.trim() !== '');
-            const svgContent = document.getElementById('svgContent');
-            const svgElement = document.getElementById('chatSvg');
-            const dynamicKeyframes = document.getElementById('dynamicKeyframes');
 
             svgContent.innerHTML = '';
 
             if (lines.length === 0) {
-                svgElement.setAttribute('viewBox', '0 0 600 100');
+                svgElement.setAttribute('viewBox', '0 0 350 100');
                 dynamicKeyframes.innerHTML = '';
                 return;
             }
@@ -179,37 +262,36 @@
                 const waitTime = currentTime;
                 const msgTime = waitTime + typingDuration;
 
-                // 1. 타이핑 점 3개 표시 (고정 크기)
+                // 1. 타이핑 점 3개 표시
                 const typingGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                typingGroup.setAttribute("transform", `translate(10, ${yOffset})`);
+                typingGroup.setAttribute("transform", `translate(0, ${yOffset})`);
                 
                 const typingClassName = `typing-${index}`;
                 typingGroup.setAttribute("class", typingClassName);
                 
                 typingGroup.innerHTML = `
-                    <rect x="8.27246" width="69.7276" height="42" rx="20.9774" class="bubble" />
+                    <rect x="0" width="69.7276" height="42" rx="20.9774" class="bubble" />
                     <circle cx="13.591" cy="33.091" r="7.68185" class="bubble" />
                     <circle cx="3.54547" cy="41.9547" r="3.54547" class="bubble" />
-                    <circle cx="27.4778" cy="20.9773" r="5.02275" fill="#999999">
+                    <circle cx="19.2054" cy="20.9773" r="5.02275" fill="#999999">
                         <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" />
                     </circle>
-                    <circle cx="42.8411" cy="20.9773" r="5.02275" fill="#999999">
+                    <circle cx="34.5687" cy="20.9773" r="5.02275" fill="#999999">
                         <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" begin="0.2s" repeatCount="indefinite" />
                     </circle>
-                    <circle cx="58.2054" cy="20.9773" r="5.02275" fill="#999999">
+                    <circle cx="49.933" cy="20.9773" r="5.02275" fill="#999999">
                         <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" begin="0.4s" repeatCount="indefinite" />
                     </circle>
                 `;
                 svgContent.appendChild(typingGroup);
 
-                // 2. 실제 말풍선 생성
+                // 2. 실제 문구 말풍선 생성
                 const msgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                msgGroup.setAttribute("transform", `translate(10, ${yOffset})`);
+                msgGroup.setAttribute("transform", `translate(0, ${yOffset})`);
                 
                 const msgClassName = `msg-${index}`;
                 msgGroup.setAttribute("class", msgClassName);
 
-                // 텍스트 길이 측정
                 const tempText = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 tempText.setAttribute("x", "15");
                 tempText.setAttribute("y", "27");
@@ -218,7 +300,6 @@
                 const textLength = tempText.getComputedTextLength();
                 svgContent.removeChild(tempText);
 
-                // 최소 너비를 낮추고(40) 여백을 타이트하게 조절
                 const preciseWidth = Math.max(40, textLength + 30);
 
                 msgGroup.innerHTML = `
@@ -244,8 +325,8 @@
                         25%, 90% { opacity: 1; }
                     }
                     @keyframes msg-appear-${index} {
-                        0% { opacity: 0; transform: translate(10px, ${yOffset + 5}px); }
-                        100% { opacity: 1; transform: translate(10px, ${yOffset}px); }
+                        0% { opacity: 0; transform: translate(0px, ${yOffset + 5}px); }
+                        100% { opacity: 1; transform: translate(0px, ${yOffset}px); }
                     }
                 `;
 
@@ -255,17 +336,150 @@
 
             dynamicKeyframes.innerHTML = keyframeStyles;
             
+            // 캔버스 가로 폭을 350으로 고정하여 여백을 제거하고 세로만 동적 연장
             const totalSvgHeight = currentHeight + 20;
-            svgElement.setAttribute('viewBox', `0 0 600 ${totalSvgHeight}`);
+            svgElement.setAttribute('viewBox', `0 0 350 ${totalSvgHeight}`);
+        }
+
+function copySvgCode() {
+    const svgClone = svgElement.cloneNode(true);
+
+    const cleanKeyframes = formatCss(dynamicKeyframes.innerHTML);
+
+    const styleTag = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "style"
+    );
+
+    styleTag.textContent =
+        cleanKeyframes +
+        " .bubble { fill: #3b3b3d; }" +
+        " text { fill: #ffffff; font-size: 18px; letter-spacing: -0.02em; font-family: 'Segoe UI', sans-serif; }";
+
+    svgClone.insertBefore(styleTag, svgClone.firstChild);
+
+    const serializer = new XMLSerializer();
+    let svgString = serializer.serializeToString(svgClone);
+
+    // SVG 태그별 줄바꿈 및 인덴트 적용
+    svgString = formatSvg(svgString);
+
+    navigator.clipboard.writeText(svgString).then(() => {
+        alert("SVG code copied to clipboard!");
+    }).catch(err => {
+        alert("Failed to copy SVG code.");
+        console.error(err);
+    });
+}
+
+
+function formatSvg(svgString) {
+    let formatted = '';
+    let indent = 0;
+
+    const nodes = svgString
+        .replace(/>\s*</g, '>\n<')
+        .split('\n');
+
+    nodes.forEach(node => {
+        const line = node.trim();
+
+        if (!line) return;
+
+        if (/^<\//.test(line)) {
+            indent = Math.max(0, indent - 1);
+        }
+
+        formatted += '    '.repeat(indent) + line + '\n';
+
+        const isSelfClosing = /\/>$/.test(line);
+
+        const isCompleteTag =
+            /^<([^\s/>]+)(?:\s[^>]*)?>.*<\/\1>$/.test(line);
+
+        const isOpeningTag =
+            /^<[^/!?][^>]*>$/.test(line);
+
+        if (
+            isOpeningTag &&
+            !isSelfClosing &&
+            !isCompleteTag
+        ) {
+            indent++;
+        }
+    });
+
+// <style> 내부 CSS 들여쓰기 및 줄바꿈 정리
+formatted = formatted.replace(
+    /([ \t]*)<style>\n?([\s\S]*?)<\/style>/,
+    (match, baseIndent, css) => {
+        const cssLines = css
+            .trim()
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line);
+
+        const styleIndent = baseIndent;
+        const cssIndent = baseIndent + '    ';
+
+        return (
+            `${styleIndent}<style>\n` +
+            cssLines
+                .map(line => `${cssIndent}${line}`)
+                .join('\n') +
+            `\n${styleIndent}</style>`
+        );
+    }
+);
+
+return formatted.trim();
+}
+
+function formatCss(css) {
+    css = css
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    let result = '';
+    let depth = 0;
+
+    for (let i = 0; i < css.length; i++) {
+        const char = css[i];
+
+        if (char === '{') {
+            depth++;
+            result += char;
+        }
+        else if (char === '}') {
+            depth = Math.max(0, depth - 1);
+            result += char;
+
+            // 가장 바깥 CSS 규칙이 완전히 끝났을 때만 줄바꿈
+            if (depth === 0) {
+                result += '\n';
+            }
+        }
+        else {
+            result += char;
+        }
+    }
+
+    return result.trim();
+}
+
+        function resetAll() {
+            messageInput.value = '';
+            svgContent.innerHTML = '';
+            dynamicKeyframes.innerHTML = '';
+            svgElement.setAttribute('viewBox', '0 0 350 100');
         }
 
         window.onload = () => {
-            document.getElementById('messageInput').value = 
-`Hi, I'm Sujin Oh
-Civil Servant
-HCI
-Hello
-Have a great day!`;
+            messageInput.value = 
+`Hi, I am Sujin Oh
+Thank you for visiting here.
+This is my FUN site for coding practice.
+I hope you enjoy it as much as I do.`;
             generateAnimation();
         };
     </script>
