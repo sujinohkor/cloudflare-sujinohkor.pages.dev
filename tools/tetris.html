@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -11,7 +10,8 @@
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }                        
+        a { text-decoration: none; color: inherit; display: block; }                    
+        
         .app-container { display: flex; min-height: 100vh; width: 100%; }
 
         /* 완전 투명한 플로팅 사이드바 */
@@ -129,10 +129,12 @@
             gap: 5px;
         }
         .next-block-card span { font-size: 0.8rem; color: #ff9e40; font-weight: bold; }
+        
         #nextCanvas {
             background: #000;
             border: 1px solid rgba(255, 158, 64, 0.4);
             border-radius: 6px;
+            transition: background 0.3s;
         }
 
         /* 온스크린 키패드 카드 - 아케이드 컨트롤러 콘셉트 */
@@ -207,6 +209,7 @@
             display: block;
             height: 90%;
             width: auto;
+            transition: background 0.3s;
         }
 
         /* Light Mode */
@@ -215,7 +218,7 @@
             background: rgba(255, 255, 255, 0.3); 
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
-        }                        
+        }                    
         body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
@@ -235,12 +238,19 @@
         body.light-mode .key-btn { background: rgba(0,0,0,0.03); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .key-btn:active { background: #F38020; color: #fff; }
 
+        /* 라이트모드일 때 캔버스 배경을 하얗게 변경 */
+        body.light-mode #tetrisCanvas, 
+        body.light-mode #nextCanvas {
+            background: #ffffff;
+            border-color: rgba(243, 128, 32, 0.4);
+        }
+
         /* Mobile Responsive */
         .menu-toggle-btn { 
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
             font-weight: bold; cursor: pointer; color: #ffffff; 
-        }                        
+        }                    
         @media (max-width: 900px) { 
             .menu-toggle-btn { display: block; } 
             .sidebar { 
@@ -268,9 +278,9 @@
             <div class="sidebar-title">Arcade Tetris</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>                                    
+            </div>                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <div class="bottom-btns">                
+            <div class="bottom-btns">                    
                 <button class="menu-btn" onclick="resetGame()">Start / Reset</button>
             </div>
         </aside>
@@ -279,7 +289,7 @@
             <header class="top-section">
                 <h1>Arcade Tetris Dashboard</h1>
                 <p>Live block statistics, central gameplay arena, and touch-friendly controls.</p>
-            </header>                                        
+            </header>                    
             
             <!-- 3분할 컨테이너 -->
             <div class="editors-container">
@@ -531,12 +541,16 @@
         }
 
         function draw() {
-            ctx.fillStyle = '#000';
+            // 라이트 모드일 때 캔버스 클리어 색상을 하얗게(#fff), 다크 모드일 때 검은색(#000)으로 설정
+            const isLightMode = document.body.classList.contains('light-mode');
+            const canvasBg = isLightMode ? '#ffffff' : '#000000';
+
+            ctx.fillStyle = canvasBg;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             drawMatrix(arena, {x: 0, y: 0});
             drawMatrix(player.matrix, player.pos);
 
-            nextCtx.fillStyle = '#000';
+            nextCtx.fillStyle = canvasBg;
             nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             if (player.nextMatrix) {
                 let ox = (5 - player.nextMatrix[0].length) / 2;
