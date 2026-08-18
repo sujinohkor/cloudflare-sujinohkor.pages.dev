@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Badge SVG Animation Generator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:#101010; --panel:rgba(16,16,16,.28); --text:#fff; --muted:#888;
+  --accent:#ff9e40; --field:rgba(255,255,255,.04); --border:rgba(255,158,64,.38);
+}
+body {
+  background:var(--bg); color:var(--text); font-family:"Segoe UI",sans-serif;
+  min-height:100vh; overflow:hidden; transition:.25s;
+}
+body.light {
+  --bg:#fff; --panel:rgba(255,255,255,.45); --text:#202020;
+  --muted:#666; --field:rgba(0,0,0,.025);
+}
+.app { display:flex; min-height:100vh; width:100%; }
+
+.sidebar {
+  width:260px; height:calc(100vh - 40px); position:fixed; left:20px; top:20px; z-index:10;
+  padding:25px 20px; display:flex; flex-direction:column; gap:12px;
+  border:1px solid var(--border); border-radius:24px; background:var(--panel);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+body.light .sidebar {
+  background:rgba(255,255,255,.3);
+  border-color:rgba(243,128,32,.35);
+  box-shadow:0 20px 40px rgba(243,128,32,.15);
+}
+.sidebar-title {
+  color:#ff9e40; font-size:1.1rem; font-weight:bold; margin-bottom:5px;
+  text-align:center; letter-spacing:1px;
+}
+.sidebar-top { display:flex; flex-direction:column; gap:10px; margin-bottom:5px; }
+
+.theme-toggle-btn {
+  width:100%; padding:11px; background:rgba(255,255,255,.03); color:#ff9e40;
+  border:1px solid rgba(255,158,64,.5); border-radius:50px; font-weight:bold;
+  cursor:pointer; transition:.3s; text-align:center;
+}
+.theme-toggle-btn:hover { background:rgba(255,158,64,.2); border-color:rgba(255,158,64,.6); }
+
+.menu-btn {
+  width:100%; padding:11px 14px; cursor:pointer; text-align:center;
+  background:rgba(255,255,255,.03); color:#ff9e40; border:1px solid rgba(255,158,64,.35);
+  border-radius:50px; font-weight:bold; transition:all .3s; font-size:.85rem;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.menu-btn:hover { background:rgba(255,158,64,.2); border-color:rgba(255,158,64,.6); }
+
+body.light .menu-btn,
+body.light .theme-toggle-btn {
+  background:rgba(0,0,0,.02); color:#F38020; border-color:rgba(243,128,32,.5);
+}
+body.light .menu-btn:hover,
+body.light .theme-toggle-btn:hover {
+  background:rgba(243,128,32,.15); border-color:rgba(243,128,32,.4);
+}
+
+.palette-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.palette-btns .menu-btn.active {
+  background:rgba(255,158,64,.2); border-color:rgba(255,158,64,.75);
+}
+
+.controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:4px 0; }
+.control { display:flex; flex-direction:column; gap:5px; }
+.control label { font-size:11px; color:var(--muted); padding-left:4px; }
+.control input {
+  width:100%; padding:9px 10px; border:1px solid rgba(255,255,255,.13);
+  border-radius:10px; background:var(--field); color:var(--text); outline:none;
+}
+body.light .control input { border-color:rgba(0,0,0,.14); }
+
+.main {
+  margin-left:300px; padding:40px; flex:1; height:100vh; width:calc(100% - 300px);
+  display:flex; flex-direction:column; gap:20px; overflow:hidden;
+}
+header h1 { font-size:1.8rem; margin-bottom:5px; }
+header p { font-size:.95rem; color:var(--muted); }
+
+.workspace { display:flex; gap:20px; flex:1; min-height:0; }
+
+.panel {
+  border:2px solid var(--accent); border-radius:16px; background:rgba(0,0,0,.12);
+  box-shadow:0 10px 20px rgba(0,0,0,.28); padding:20px; min-height:0;
+}
+body.light .panel {
+  background:rgba(255,255,255,.5); border-color:#F38020;
+  box-shadow:0 10px 20px rgba(243,128,32,.15);
+}
+
+.left { flex:1; display:flex; flex-direction:column; gap:12px; }
+.left label { color:var(--accent); font-weight:700; }
+
+textarea {
+  width:100%; flex:1; resize:none; border-radius:12px; padding:15px;
+  border:1px solid rgba(255,255,255,.15); background:var(--field); color:var(--text);
+  font-size:16px; font-family:inherit; line-height:1.5; outline:none;
+}
+body.light textarea {
+  background:rgba(0,0,0,.02); color:#202020; border-color:rgba(0,0,0,.15);
+}
+textarea:focus { border-color:var(--accent); }
+
+.hint { font-size:12px; color:var(--muted); line-height:1.5; }
+
+.right {
+  flex:1.2; overflow:auto; display:flex; align-items:flex-start; justify-content:flex-start;
+}
+.preview-wrap { min-width:720px; flex:0 0 auto; }
+.preview-wrap svg { width:720px; min-width:720px; height:auto; display:block; }
+
+.menu-toggle {
+  display:none; position:fixed; left:20px; bottom:20px; z-index:20; width:auto;
+  padding:10px 15px; background:var(--accent); color:#fff; border:none;
+  border-radius:50px; font-weight:bold;
+}
+
+@media(max-width:900px) {
+  body { overflow:auto; }
+  .menu-toggle { display:block; }
+  .sidebar {
+    transform:translateX(-320px); transition:.25s; background:var(--bg);
+  }
+  .sidebar.active { transform:translateX(0); }
+  .main {
+    margin-left:0; padding:20px; width:100vw; height:auto; min-height:100svh;
+  }
+  .workspace { flex-direction:column; }
+  .left { min-height:330px; }
+  .right { min-height:300px; }
+}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">MENU</button>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Skill Badge SVG Animator</div>
+
+    <div class="sidebar-top">
+      <button class="theme-toggle-btn" id="themeBtn">DAY / NIGHT</button>
+    </div>
+
+    <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+    <div class="palette-btns">
+      <button class="menu-btn active" id="blackBtn">Black</button>
+      <button class="menu-btn" id="whiteBtn">White</button>
+    </div>
+
+    <div class="controls">
+      <div class="control">
+        <label for="badgeDelay">Badge Delay</label>
+        <input id="badgeDelay" type="number" min="0" step="0.1" value="0.35">
+      </div>
+      <div class="control">
+        <label for="floatDuration">Float Duration</label>
+        <input id="floatDuration" type="number" min="0.5" step="0.1" value="2.4">
+      </div>
+      <div class="control">
+        <label for="fontSize">Font Size</label>
+        <input id="fontSize" type="number" min="10" step="1" value="16">
+      </div>
+      <div class="control">
+        <label for="canvasWidth">Width</label>
+        <input id="canvasWidth" type="number" min="420" step="10" value="820">
+      </div>
+    </div>
+
+    <button class="menu-btn" id="applyBtn">Apply Animation</button>
+    <button class="menu-btn" id="replayBtn">Replay</button>
+    <button class="menu-btn" id="copyBtn">Copy SVG Code</button>
+    <button class="menu-btn" id="downloadBtn">Download SVG</button>
+    <button class="menu-btn" id="resetBtn">Reset</button>
+  </aside>
+
+  <main class="main" id="main">
+    <header>
+      <h1>Skill Badge SVG Generator</h1>
+      <p>Enter skills to generate animated badges that appear sequentially and gently float in place.</p>
+    </header>
+
+    <div class="workspace">
+      <section class="panel left">
+        <label for="skillsInput">Skills</label>
+        <textarea id="skillsInput" spellcheck="false"></textarea>
+        <div class="hint">
+          Use one skill per line, or separate items with commas. Example:
+          <strong>Linux, Python, Cloud, Docker, Kubernetes</strong>.
+        </div>
+      </section>
+
+      <section class="panel right">
+        <div class="preview-wrap" id="previewWrap"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const skillsInput = document.getElementById("skillsInput");
+const previewWrap = document.getElementById("previewWrap");
+const blackBtn = document.getElementById("blackBtn");
+const whiteBtn = document.getElementById("whiteBtn");
+
+let badgeTheme = "black";
+
+const defaults = {
+  text: `Linux
+Python
+Cloud
+Docker
+Kubernetes
+Git
+JavaScript
+SQL`,
+  badgeDelay: 0.35,
+  floatDuration: 2.4,
+  fontSize: 16,
+  canvasWidth: 820
+};
+
+function escapeXml(value) {
+  return value.replace(/[<>&'"]/g, ch => ({
+    "<":"&lt;", ">":"&gt;", "&":"&amp;", "'":"&apos;", '"':"&quot;"
+  }[ch]));
+}
+
+function num(id, fallback) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function palette() {
+  if (badgeTheme === "white") {
+    return {
+      bg:"#f3f3f3",
+      border:"#cfcfcf",
+      badge:"#e2e2e2",
+      badgeStroke:"#bfbfbf",
+      text:"#202020",
+      shadow:"#000000"
+    };
+  }
+
+  return {
+    bg:"#181818",
+    border:"#333333",
+    badge:"#262626",
+    badgeStroke:"#494949",
+    text:"#ffffff",
+    shadow:"#000000"
+  };
+}
+
+function parseSkills() {
+  return skillsInput.value
+    .replace(/\r/g, "")
+    .split(/\n|,/g)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function measureText(text, fontSize) {
+  const canvas = measureText.canvas || (measureText.canvas = document.createElement("canvas"));
+  const ctx = canvas.getContext("2d");
+  ctx.font = `600 ${fontSize}px "Segoe UI", sans-serif`;
+  return ctx.measureText(text).width;
+}
+
+function buildSvg() {
+  const skills = parseSkills();
+  const badgeDelay = Math.max(0, num("badgeDelay", defaults.badgeDelay));
+  const floatDuration = Math.max(0.5, num("floatDuration", defaults.floatDuration));
+  const fontSize = Math.max(10, num("fontSize", defaults.fontSize));
+  const width = Math.max(420, num("canvasWidth", defaults.canvasWidth));
+  const p = palette();
+
+  const padX = 28;
+  const padY = 30;
+  const gapX = 14;
+  const gapY = 16;
+  const badgeH = 42;
+  const badgePadX = 18;
+
+  let x = padX;
+  let y = padY;
+  let maxY = y + badgeH;
+  const parts = [];
+
+  skills.forEach((skill, index) => {
+    const badgeW = Math.max(76, Math.ceil(measureText(skill, fontSize) + badgePadX * 2));
+
+    if (x > padX && x + badgeW > width - padX) {
+      x = padX;
+      y += badgeH + gapY;
+    }
+
+    const begin = (index * badgeDelay).toFixed(3);
+    const floatBegin = (index * badgeDelay + 0.2).toFixed(3);
+    const floatAmount = 5 + (index % 3) * 2;
+
+    parts.push(`
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" begin="${begin}s" dur="0.3s" fill="freeze"/>
+  <animateTransform attributeName="transform" type="translate"
+                    values="0 0; 0 -${floatAmount}; 0 0"
+                    begin="${floatBegin}s" dur="${floatDuration}s"
+                    repeatCount="indefinite"/>
+  <rect x="${x + 2}" y="${y + 3}" width="${badgeW}" height="${badgeH}" rx="21"
+        fill="${p.shadow}" opacity="0.10"/>
+  <rect x="${x}" y="${y}" width="${badgeW}" height="${badgeH}" rx="21"
+        fill="${p.badge}" stroke="${p.badgeStroke}" stroke-width="1.5"/>
+  <text x="${x + badgeW/2}" y="${y + badgeH/2 + fontSize*.35}"
+        fill="${p.text}" font-size="${fontSize}" font-family="'Segoe UI', sans-serif"
+        font-weight="600" text-anchor="middle">${escapeXml(skill)}</text>
+</g>`);
+
+    x += badgeW + gapX;
+    maxY = Math.max(maxY, y + badgeH);
+  });
+
+  const height = Math.max(140, maxY + padY);
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="${NS}">
+  <rect width="${width}" height="${height}" rx="16" fill="${p.bg}" stroke="${p.border}" stroke-width="2"/>
+  ${parts.join("\n")}
+</svg>`;
+}
+
+function render() {
+  const svg = buildSvg();
+  previewWrap.innerHTML = svg.replace(/^<\?xml[^>]*>\s*/i, "");
+  return svg;
+}
+
+function replay() {
+  const svg = buildSvg();
+  previewWrap.innerHTML = "";
+  requestAnimationFrame(() => {
+    previewWrap.innerHTML = svg.replace(/^<\?xml[^>]*>\s*/i, "");
+  });
+}
+
+async function copySvg() {
+  try {
+    await navigator.clipboard.writeText(buildSvg());
+  } catch {}
+}
+
+function downloadSvg() {
+  const blob = new Blob([buildSvg()], { type:"image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "skill-badges-animation.svg";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function setBadgeTheme(theme) {
+  badgeTheme = theme === "white" ? "white" : "black";
+
+  blackBtn.classList.toggle("active", badgeTheme === "black");
+  whiteBtn.classList.toggle("active", badgeTheme === "white");
+
+  replay();
+}
+
+function resetAll() {
+  skillsInput.value = defaults.text;
+  document.getElementById("badgeDelay").value = defaults.badgeDelay;
+  document.getElementById("floatDuration").value = defaults.floatDuration;
+  document.getElementById("fontSize").value = defaults.fontSize;
+  document.getElementById("canvasWidth").value = defaults.canvasWidth;
+
+  badgeTheme = "black";
+  blackBtn.classList.add("active");
+  whiteBtn.classList.remove("active");
+
+  render();
+}
+
+document.getElementById("applyBtn").addEventListener("click", replay);
+document.getElementById("replayBtn").addEventListener("click", replay);
+document.getElementById("copyBtn").addEventListener("click", copySvg);
+document.getElementById("downloadBtn").addEventListener("click", downloadSvg);
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+});
+
+document.getElementById("menuToggle").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("active");
+});
+
+document.getElementById("main").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.remove("active");
+});
+
+blackBtn.addEventListener("click", () => setBadgeTheme("black"));
+whiteBtn.addEventListener("click", () => setBadgeTheme("white"));
+
+let renderTimer = null;
+[skillsInput, ...document.querySelectorAll(".control input")].forEach(el => {
+  el.addEventListener("input", () => {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(replay, 120);
+  });
+});
+
+window.addEventListener("load", resetAll);
+</script>
+</body>
+</html>

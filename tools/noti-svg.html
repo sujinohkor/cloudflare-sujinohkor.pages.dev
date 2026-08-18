@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notification SVG Animation Generator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:#101010; --panel:rgba(16,16,16,.28); --text:#fff; --muted:#888;
+  --accent:#ff9e40; --field:rgba(255,255,255,.04); --border:rgba(255,158,64,.38);
+}
+body {
+  background:var(--bg); color:var(--text); font-family:"Segoe UI",sans-serif;
+  min-height:100vh; overflow:hidden; transition:.25s;
+}
+body.light {
+  --bg:#fff; --panel:rgba(255,255,255,.45); --text:#202020;
+  --muted:#666; --field:rgba(0,0,0,.025);
+}
+.app { display:flex; min-height:100vh; width:100%; }
+
+.sidebar {
+  width:260px; height:calc(100vh - 40px); position:fixed; left:20px; top:20px; z-index:10;
+  padding:25px 20px; display:flex; flex-direction:column; gap:12px;
+  border:1px solid var(--border); border-radius:24px; background:var(--panel);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+body.light .sidebar {
+  background:rgba(255,255,255,.3);
+  border-color:rgba(243,128,32,.35);
+  box-shadow:0 20px 40px rgba(243,128,32,.15);
+}
+.sidebar-title {
+  color:#ff9e40; font-size:1.1rem; font-weight:bold; margin-bottom:5px;
+  text-align:center; letter-spacing:1px;
+}
+.sidebar-top { display:flex; flex-direction:column; gap:10px; margin-bottom:5px; }
+
+.theme-toggle-btn {
+  width:100%; padding:11px; background:rgba(255,255,255,.03); color:#ff9e40;
+  border:1px solid rgba(255,158,64,.5); border-radius:50px; font-weight:bold;
+  cursor:pointer; transition:.3s; text-align:center;
+}
+.theme-toggle-btn:hover { background:rgba(255,158,64,.2); border-color:rgba(255,158,64,.6); }
+
+.menu-btn {
+  width:100%; padding:11px 14px; cursor:pointer; text-align:center;
+  background:rgba(255,255,255,.03); color:#ff9e40; border:1px solid rgba(255,158,64,.35);
+  border-radius:50px; font-weight:bold; transition:all .3s; font-size:.85rem;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.menu-btn:hover { background:rgba(255,158,64,.2); border-color:rgba(255,158,64,.6); }
+
+body.light .menu-btn,
+body.light .theme-toggle-btn {
+  background:rgba(0,0,0,.02); color:#F38020; border-color:rgba(243,128,32,.5);
+}
+body.light .menu-btn:hover,
+body.light .theme-toggle-btn:hover {
+  background:rgba(243,128,32,.15); border-color:rgba(243,128,32,.4);
+}
+
+.palette-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.palette-btns .menu-btn.active {
+  background:rgba(255,158,64,.2); border-color:rgba(255,158,64,.75);
+}
+
+.controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:4px 0; }
+.control { display:flex; flex-direction:column; gap:5px; }
+.control label { font-size:11px; color:var(--muted); padding-left:4px; }
+.control input {
+  width:100%; padding:9px 10px; border:1px solid rgba(255,255,255,.13);
+  border-radius:10px; background:var(--field); color:var(--text); outline:none;
+}
+body.light .control input { border-color:rgba(0,0,0,.14); }
+
+.main {
+  margin-left:300px; padding:40px; flex:1; height:100vh; width:calc(100% - 300px);
+  display:flex; flex-direction:column; gap:20px; overflow:hidden;
+}
+header h1 { font-size:1.8rem; margin-bottom:5px; }
+header p { font-size:.95rem; color:var(--muted); }
+
+.workspace { display:flex; gap:20px; flex:1; min-height:0; }
+
+.panel {
+  border:2px solid var(--accent); border-radius:16px; background:rgba(0,0,0,.12);
+  box-shadow:0 10px 20px rgba(0,0,0,.28); padding:20px; min-height:0;
+}
+body.light .panel {
+  background:rgba(255,255,255,.5); border-color:#F38020;
+  box-shadow:0 10px 20px rgba(243,128,32,.15);
+}
+
+.left { flex:1; display:flex; flex-direction:column; gap:12px; }
+.left label { color:var(--accent); font-weight:700; }
+
+textarea {
+  width:100%; flex:1; resize:none; border-radius:12px; padding:15px;
+  border:1px solid rgba(255,255,255,.15); background:var(--field); color:var(--text);
+  font-size:16px; font-family:inherit; line-height:1.5; outline:none;
+}
+body.light textarea {
+  background:rgba(0,0,0,.02); color:#202020; border-color:rgba(0,0,0,.15);
+}
+textarea:focus { border-color:var(--accent); }
+
+.hint { font-size:12px; color:var(--muted); line-height:1.5; }
+
+.right {
+  flex:1.2; overflow:auto; display:flex; align-items:flex-start; justify-content:flex-start;
+}
+.preview-wrap { min-width:560px; flex:0 0 auto; }
+.preview-wrap svg { width:560px; min-width:560px; height:auto; display:block; }
+
+.menu-toggle {
+  display:none; position:fixed; left:20px; bottom:20px; z-index:20; width:auto;
+  padding:10px 15px; background:var(--accent); color:#fff; border:none;
+  border-radius:50px; font-weight:bold;
+}
+
+@media(max-width:900px) {
+  body { overflow:auto; }
+  .menu-toggle { display:block; }
+  .sidebar {
+    transform:translateX(-320px); transition:.25s; background:var(--bg);
+  }
+  .sidebar.active { transform:translateX(0); }
+  .main {
+    margin-left:0; padding:20px; width:100vw; height:auto; min-height:100svh;
+  }
+  .workspace { flex-direction:column; }
+  .left { min-height:330px; }
+  .right { min-height:300px; }
+}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">MENU</button>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Notification SVG Animator</div>
+
+    <div class="sidebar-top">
+      <button class="theme-toggle-btn" id="themeBtn">DAY / NIGHT</button>
+    </div>
+
+    <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+    <div class="palette-btns">
+      <button class="menu-btn active" id="blackBtn">Black</button>
+      <button class="menu-btn" id="whiteBtn">White</button>
+    </div>
+
+    <div class="controls">
+      <div class="control">
+        <label for="cardDelay">Card Delay</label>
+        <input id="cardDelay" type="number" min="0" step="0.1" value="0.6">
+      </div>
+      <div class="control">
+        <label for="duration">Fade Duration</label>
+        <input id="duration" type="number" min="0.05" step="0.05" value="0.35">
+      </div>
+      <div class="control">
+        <label for="fontSize">Font Size</label>
+        <input id="fontSize" type="number" min="10" step="1" value="16">
+      </div>
+      <div class="control">
+        <label for="cardWidth">Card Width</label>
+        <input id="cardWidth" type="number" min="320" step="10" value="480">
+      </div>
+    </div>
+
+    <button class="menu-btn" id="applyBtn">Apply Animation</button>
+    <button class="menu-btn" id="replayBtn">Replay</button>
+    <button class="menu-btn" id="copyBtn">Copy SVG Code</button>
+    <button class="menu-btn" id="downloadBtn">Download SVG</button>
+    <button class="menu-btn" id="resetBtn">Reset</button>
+  </aside>
+
+  <main class="main" id="main">
+    <header>
+      <h1>Notification SVG Generator</h1>
+      <p>Enter notification titles and messages to generate stacked animated notification cards.</p>
+    </header>
+
+    <div class="workspace">
+      <section class="panel left">
+        <label for="notificationInput">Notifications</label>
+        <textarea id="notificationInput" spellcheck="false"></textarea>
+        <div class="hint">
+          Use one notification per line in the format <strong>Title | Message</strong>.
+          If no title is provided, the whole line is used as the message.
+        </div>
+      </section>
+
+      <section class="panel right">
+        <div class="preview-wrap" id="previewWrap"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const notificationInput = document.getElementById("notificationInput");
+const previewWrap = document.getElementById("previewWrap");
+const blackBtn = document.getElementById("blackBtn");
+const whiteBtn = document.getElementById("whiteBtn");
+
+let notificationTheme = "black";
+
+const defaults = {
+  text:
+`Build Complete | Your project was built successfully.
+New Message | You have a new message from Alex.
+Deployment | Production deployment finished.
+Reminder | Team meeting starts in 10 minutes.`,
+  cardDelay: 0.6,
+  duration: 0.35,
+  fontSize: 16,
+  cardWidth: 480
+};
+
+function escapeXml(value) {
+  return value.replace(/[<>&'"]/g, ch => ({
+    "<":"&lt;", ">":"&gt;", "&":"&amp;", "'":"&apos;", '"':"&quot;"
+  }[ch]));
+}
+
+function num(id, fallback) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function palette() {
+  if (notificationTheme === "white") {
+    return {
+      bg:"#f2f2f2",
+      border:"#d0d0d0",
+      card:"#e4e4e4",
+      title:"#202020",
+      message:"#4f4f4f",
+      icon:"#6a6a6a"
+    };
+  }
+
+  return {
+    bg:"#181818",
+    border:"#333333",
+    card:"#242424",
+    title:"#ffffff",
+    message:"#c6c6c6",
+    icon:"#ffffff"
+  };
+}
+
+function parseItems() {
+  return notificationInput.value
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => {
+      const i = line.indexOf("|");
+
+      if (i === -1) {
+        return { title:"Notification", message:line };
+      }
+
+      return {
+        title:line.slice(0, i).trim() || "Notification",
+        message:line.slice(i + 1).trim()
+      };
+    });
+}
+
+function wrapText(text, maxChars) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = "";
+
+  words.forEach(word => {
+    const test = current ? `${current} ${word}` : word;
+
+    if (test.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  });
+
+  if (current) lines.push(current);
+  return lines.length ? lines : [""];
+}
+
+function buildSvg() {
+  const items = parseItems();
+  const cardDelay = Math.max(0, num("cardDelay", defaults.cardDelay));
+  const duration = Math.max(0.05, num("duration", defaults.duration));
+  const fontSize = Math.max(10, num("fontSize", defaults.fontSize));
+  const cardWidth = Math.max(320, num("cardWidth", defaults.cardWidth));
+
+  const p = palette();
+  const outerPad = 24;
+  const gap = 14;
+  const iconSize = 34;
+  const cardPadX = 18;
+  const cardPadY = 14;
+  const lineHeight = Math.round(fontSize * 1.35);
+  const titleSize = Math.round(fontSize * 1.02);
+
+  let y = outerPad;
+  const parts = [];
+
+  items.forEach((item, index) => {
+    const textX = outerPad + cardPadX + iconSize + 14;
+    const usableTextWidth = cardWidth - cardPadX * 2 - iconSize - 14;
+    const maxChars = Math.max(18, Math.floor(usableTextWidth / (fontSize * .52)));
+    const messageLines = wrapText(item.message, maxChars);
+    const cardHeight = Math.max(
+      76,
+      cardPadY * 2 + titleSize + 8 + messageLines.length * lineHeight
+    );
+
+    const begin = (index * cardDelay).toFixed(3);
+    const startY = y - 18;
+
+    const tspans = messageLines.map((line, i) =>
+      `<tspan x="${textX}" y="${y + cardPadY + titleSize + 18 + i * lineHeight}">${escapeXml(line)}</tspan>`
+    ).join("");
+
+    parts.push(`
+<g opacity="0" transform="translate(0,-18)">
+  <animate attributeName="opacity" from="0" to="1" begin="${begin}s" dur="${duration}s" fill="freeze"/>
+  <animateTransform attributeName="transform" type="translate" from="0 -18" to="0 0"
+                    begin="${begin}s" dur="${duration}s" fill="freeze"/>
+  <rect x="${outerPad}" y="${y}" width="${cardWidth}" height="${cardHeight}"
+        rx="16" fill="${p.card}" stroke="${p.border}" stroke-width="1.5"/>
+  <circle cx="${outerPad + cardPadX + iconSize / 2}" cy="${y + cardHeight / 2}"
+          r="${iconSize / 2}" fill="${p.icon}" opacity="0.12"/>
+  <circle cx="${outerPad + cardPadX + iconSize / 2}" cy="${y + cardHeight / 2}"
+          r="5" fill="${p.icon}"/>
+  <text x="${textX}" y="${y + cardPadY + titleSize}"
+        fill="${p.title}" font-size="${titleSize}" font-family="'Segoe UI', sans-serif"
+        font-weight="700">${escapeXml(item.title)}</text>
+  <text fill="${p.message}" font-size="${fontSize}" font-family="'Segoe UI', sans-serif">
+    ${tspans}
+  </text>
+</g>`);
+
+    y += cardHeight + gap;
+  });
+
+  const width = cardWidth + outerPad * 2;
+  const height = Math.max(140, y + outerPad - gap);
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="${NS}">
+  <rect width="${width}" height="${height}" rx="16" fill="${p.bg}" stroke="${p.border}" stroke-width="2"/>
+  ${parts.join("\n")}
+</svg>`;
+}
+
+function render() {
+  const svg = buildSvg();
+  previewWrap.innerHTML = svg.replace(/^<\?xml[^>]*>\s*/i, "");
+  return svg;
+}
+
+function replay() {
+  const svg = buildSvg();
+  previewWrap.innerHTML = "";
+  requestAnimationFrame(() => {
+    previewWrap.innerHTML = svg.replace(/^<\?xml[^>]*>\s*/i, "");
+  });
+}
+
+async function copySvg() {
+  try {
+    await navigator.clipboard.writeText(buildSvg());
+  } catch {}
+}
+
+function downloadSvg() {
+  const blob = new Blob([buildSvg()], { type:"image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "notification-animation.svg";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+function setNotificationTheme(theme) {
+  notificationTheme = theme === "white" ? "white" : "black";
+
+  blackBtn.classList.toggle("active", notificationTheme === "black");
+  whiteBtn.classList.toggle("active", notificationTheme === "white");
+
+  replay();
+}
+
+function resetAll() {
+  notificationInput.value = defaults.text;
+  document.getElementById("cardDelay").value = defaults.cardDelay;
+  document.getElementById("duration").value = defaults.duration;
+  document.getElementById("fontSize").value = defaults.fontSize;
+  document.getElementById("cardWidth").value = defaults.cardWidth;
+
+  notificationTheme = "black";
+  blackBtn.classList.add("active");
+  whiteBtn.classList.remove("active");
+
+  render();
+}
+
+document.getElementById("applyBtn").addEventListener("click", replay);
+document.getElementById("replayBtn").addEventListener("click", replay);
+document.getElementById("copyBtn").addEventListener("click", copySvg);
+document.getElementById("downloadBtn").addEventListener("click", downloadSvg);
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+});
+
+document.getElementById("menuToggle").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("active");
+});
+
+document.getElementById("main").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.remove("active");
+});
+
+blackBtn.addEventListener("click", () => setNotificationTheme("black"));
+whiteBtn.addEventListener("click", () => setNotificationTheme("white"));
+
+let renderTimer = null;
+[notificationInput, ...document.querySelectorAll(".control input")].forEach(el => {
+  el.addEventListener("input", () => {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(replay, 120);
+  });
+});
+
+window.addEventListener("load", resetAll);
+</script>
+</body>
+</html>
