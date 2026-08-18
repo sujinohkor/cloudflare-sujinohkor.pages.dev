@@ -10,7 +10,7 @@
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
-        a { text-decoration: none; color: inherit; display: block; }
+        a { text-decoration: none; color: inherit; display: block; }                    
         
         .app-container { display: flex; min-height: 100vh; width: 100%; }
 
@@ -129,48 +129,77 @@
             gap: 5px;
         }
         .next-block-card span { font-size: 0.8rem; color: #ff9e40; font-weight: bold; }
+        
         #nextCanvas {
             background: #000;
             border: 1px solid rgba(255, 158, 64, 0.4);
             border-radius: 6px;
+            transition: background 0.3s;
         }
 
-        /* 온스크린 키패드 카드 */
+        /* 온스크린 키패드 카드 - 아케이드 컨트롤러 콘셉트 */
         .keypad-card {
             flex: 0.6;
-            border: 2px solid #ff9e40;
+            border: 2px solid rgba(255, 158, 64, 0.4);
             border-radius: 16px;
-            background: rgba(16, 16, 16, 0.6);
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(10, 10, 10, 0.95));
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            gap: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 15px rgba(255, 158, 64, 0.08), 0 10px 20px rgba(0, 0, 0, 0.5);
+            gap: 14px;
         }
+
         .keypad-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             justify-content: center;
+            max-width: 260px;
         }
+
+        /* 액션 버튼 (회전, 드롭) 그룹 강조 */
+        .keypad-row:first-child .key-btn {
+            background: linear-gradient(145deg, rgba(255, 158, 64, 0.15), rgba(255, 158, 64, 0.05));
+            border-color: rgba(255, 158, 64, 0.6);
+            color: #ffb067;
+        }
+
         .key-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             color: #ff9e40;
-            border: 1px solid rgba(255, 158, 64, 0.5);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-weight: bold;
+            border: 1px solid rgba(255, 158, 64, 0.35);
+            padding: 12px 10px;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
             font-size: 0.9rem;
             flex: 1;
-            max-width: 70px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
         }
-        .key-btn:active { background: #ff9e40; color: #101010; }
+
+        .key-btn:hover {
+            background: rgba(255, 158, 64, 0.15);
+            border-color: rgba(255, 158, 64, 0.8);
+            box-shadow: 0 0 12px rgba(255, 158, 64, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .key-btn:active {
+            background: #ff9e40;
+            color: #101010;
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.4);
+            transform: translateY(1px);
+        }
 
         /* 테트리스 캔버스 */
         #tetrisCanvas {
@@ -180,6 +209,7 @@
             display: block;
             height: 90%;
             width: auto;
+            transition: background 0.3s;
         }
 
         /* Light Mode */
@@ -188,7 +218,7 @@
             background: rgba(255, 255, 255, 0.3); 
             border-color: rgba(243, 128, 32, 0.35); 
             box-shadow: 0 20px 40px rgba(243, 128, 32, 0.15); 
-        }
+        }                    
         body.light-mode .menu-btn, body.light-mode .theme-toggle-btn { 
             background: rgba(0, 0, 0, 0.02); 
             color: #F38020; 
@@ -208,15 +238,21 @@
         body.light-mode .key-btn { background: rgba(0,0,0,0.03); color: #F38020; border-color: rgba(243, 128, 32, 0.4); }
         body.light-mode .key-btn:active { background: #F38020; color: #fff; }
 
+        /* 라이트모드일 때 캔버스 배경을 하얗게 변경 */
+        body.light-mode #tetrisCanvas, 
+        body.light-mode #nextCanvas {
+            background: #ffffff;
+            border-color: rgba(243, 128, 32, 0.4);
+        }
+
         /* Mobile Responsive */
         .menu-toggle-btn { 
             display: none; position: fixed; bottom: 20px; left: 20px; z-index: 2000; 
             padding: 10px 15px; background: #ff9e40; border: none; border-radius: 50px; 
             font-weight: bold; cursor: pointer; color: #ffffff; 
-        }
-
+        }                    
         @media (max-width: 900px) { 
-            .menu-toggle-btn { display: block; }
+            .menu-toggle-btn { display: block; } 
             .sidebar { 
                 transform: translateX(-320px); 
                 background: #101010 !important; 
@@ -228,16 +264,10 @@
                 background: #ffffff !important; 
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; }
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; } 
             .editors-container { flex-direction: column; height: auto; }
             .content-card, .stats-panel, .right-vertical-panel { min-height: 350px; }
-            
-            /* 모바일에서 Block Statistics와 Next Block 숨기기 */
-            .stats-panel, 
-            .next-block-card { 
-                display: none !important; 
-            }
         }
     </style>
 </head>
@@ -248,9 +278,9 @@
             <div class="sidebar-title">Arcade Tetris</div>
             <div class="sidebar-top">
                 <button class="theme-toggle-btn" id="theme-toggle">DAY / NIGHT</button>
-            </div>
+            </div>                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
-            <div class="bottom-btns">
+            <div class="bottom-btns">                    
                 <button class="menu-btn" onclick="resetGame()">Start / Reset</button>
             </div>
         </aside>
@@ -259,7 +289,7 @@
             <header class="top-section">
                 <h1>Arcade Tetris Dashboard</h1>
                 <p>Live block statistics, central gameplay arena, and touch-friendly controls.</p>
-            </header>
+            </header>                    
             
             <!-- 3분할 컨테이너 -->
             <div class="editors-container">
@@ -287,7 +317,7 @@
                     <!-- 위: Next 블록 영역 -->
                     <div class="next-block-card">
                         <span>NEXT BLOCK</span>
-                        <canvas id="nextCanvas" width="80" height="80"></canvas>
+                        <canvas id="nextCanvas" width="200" height="200"></canvas>
                     </div>
                     <!-- 아래: 대형 온스크린 키패드 영역 -->
                     <div class="keypad-card">
@@ -330,7 +360,7 @@
         const nextCtx = nextCanvas.getContext('2d');
 
         ctx.scale(20, 20);
-        nextCtx.scale(20, 20);
+        nextCtx.scale(40, 40);
 
         const blockCounts = { I: 0, T: 0, O: 0, L: 0, J: 0, S: 0, Z: 0 };
 
@@ -511,16 +541,20 @@
         }
 
         function draw() {
-            ctx.fillStyle = '#000';
+            // 라이트 모드일 때 캔버스 클리어 색상을 하얗게(#fff), 다크 모드일 때 검은색(#000)으로 설정
+            const isLightMode = document.body.classList.contains('light-mode');
+            const canvasBg = isLightMode ? '#ffffff' : '#000000';
+
+            ctx.fillStyle = canvasBg;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             drawMatrix(arena, {x: 0, y: 0});
             drawMatrix(player.matrix, player.pos);
 
-            nextCtx.fillStyle = '#000';
+            nextCtx.fillStyle = canvasBg;
             nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             if (player.nextMatrix) {
-                let ox = (4 - player.nextMatrix[0].length) / 2;
-                let oy = (4 - player.nextMatrix.length) / 2;
+                let ox = (5 - player.nextMatrix[0].length) / 2;
+                let oy = (5 - player.nextMatrix.length) / 2;
                 drawMatrix(player.nextMatrix, {x: ox, y: oy}, nextCtx);
             }
         }
