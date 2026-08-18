@@ -12,7 +12,7 @@
         body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
         a { text-decoration: none; color: inherit; display: block; }                    
         
-        .app-container { display: flex; min-height: 100vh; width: 100%; }
+        .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
 
         /* 완전 투명한 플로팅 사이드바 */
         .sidebar { 
@@ -347,10 +347,26 @@
             document.body.classList.toggle('light-mode'); 
         });
 
-        document.querySelector('.main-content').addEventListener('click', (e) => { 
-            if (sidebar.classList.contains('active') && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle-btn')) { 
-                sidebar.classList.remove('active'); 
-            } 
+        // 모바일 화면 등에서 사이드바 내부의 버튼(메인 메뉴 링크, Start/Reset 버튼 등)을 누르면 사이드바 닫기
+        sidebar.querySelectorAll('button, a').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // 화면 전체(document)를 기준으로 사이드바 외부 영역을 클릭/터치했을 때 닫히도록 처리
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('active')) {
+                const isClickInsideSidebar = sidebar.contains(e.target);
+                const isClickMenuToggle = e.target.closest('.menu-toggle-btn');
+
+                // 사이드바 내부나 메뉴 토글 버튼이 아닐 경우에만 사이드바 닫기
+                if (!isClickInsideSidebar && !isClickMenuToggle) {
+                    sidebar.classList.remove('active');
+                }
+            }
         });
 
         // --- 테트리스 게임 엔진 및 통계 로직 ---
@@ -541,7 +557,6 @@
         }
 
         function draw() {
-            // 라이트 모드일 때 캔버스 클리어 색상을 하얗게(#fff), 다크 모드일 때 검은색(#000)으로 설정
             const isLightMode = document.body.classList.contains('light-mode');
             const canvasBg = isLightMode ? '#ffffff' : '#000000';
 
