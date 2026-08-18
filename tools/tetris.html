@@ -279,7 +279,7 @@
                     <!-- 위: Next 블록 영역 -->
                     <div class="next-block-card">
                         <span>NEXT BLOCK</span>
-                        <canvas id="nextCanvas" width="80" height="80"></canvas>
+                        <canvas id="nextCanvas" width="200" height="200"></canvas>
                     </div>
                     <!-- 아래: 대형 온스크린 키패드 영역 -->
                     <div class="keypad-card">
@@ -322,7 +322,7 @@
         const nextCtx = nextCanvas.getContext('2d');
 
         ctx.scale(20, 20);
-        nextCtx.scale(20, 20);
+        nextCtx.scale(40, 40);
 
         const blockCounts = { I: 0, T: 0, O: 0, L: 0, J: 0, S: 0, Z: 0 };
 
