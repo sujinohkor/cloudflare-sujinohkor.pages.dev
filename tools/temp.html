@@ -9,7 +9,7 @@
     <style>
         /* 1. Reset & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow: hidden; }
+        body { background: #101010; color: #fff; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; min-height: 100vh; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; display: block; }                    
         
         .app-container { display: flex; min-height: 100vh; width: 100%; position: relative; }
@@ -36,8 +36,8 @@
         /* 메인 콘텐츠 영역 */
         .main-content { 
             margin-left: 300px; padding: 40px; flex: 1; 
-            display: flex; flex-direction: column; height: 100vh; 
-            gap: 20px; overflow: hidden; transition: 0.3s; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+            gap: 20px; transition: 0.3s; 
             width: calc(100% - 300px);
         }
 
@@ -57,7 +57,6 @@
             display: flex;
             gap: 20px;
             flex: 1;
-            overflow: hidden;
         }
 
         .content-card { 
@@ -71,6 +70,7 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
+            min-height: 400px;
         }
 
         /* 1번 div: 통계 대시보드 스타일 */
@@ -265,9 +265,13 @@
                 box-shadow: 10px 0 30px rgba(243, 128, 32, 0.35) !important; 
             }
             .sidebar.active { transform: translateX(0); } 
-            .main-content { margin-left: 0; padding: 20px; width: 100vw; height: auto; overflow-y: auto; } 
+            .main-content { margin-left: 0; padding: 20px; width: 100vw; min-height: 100vh; overflow-y: auto; } 
             .editors-container { flex-direction: column; height: auto; }
-            .content-card, .stats-panel, .right-vertical-panel { min-height: 350px; }
+            
+            /* 모바일에서 통계 패널 숨김 처리 */
+            .stats-panel { display: none; }
+            
+            .content-card, .right-vertical-panel { min-height: 350px; width: 100%; }
         }
     </style>
 </head>
@@ -293,7 +297,7 @@
             
             <!-- 3분할 컨테이너 -->
             <div class="editors-container">
-                <!-- 1번 div: 블록 사용 누적 통계 패널 -->
+                <!-- 1번 div: 블록 사용 누적 통계 패널 (모바일에서 숨김) -->
                 <section class="stats-panel">
                     <div class="stats-title">📊 Block Statistics</div>
                     <div class="stat-row"><span class="stat-label">Score:</span><span class="stat-val" id="stat-score">0</span></div>
@@ -347,7 +351,6 @@
             document.body.classList.toggle('light-mode'); 
         });
 
-        // 모바일 화면 등에서 사이드바 내부의 버튼(메인 메뉴 링크, Start/Reset 버튼 등)을 누르면 사이드바 닫기
         sidebar.querySelectorAll('button, a').forEach(item => {
             item.addEventListener('click', () => {
                 if (window.innerWidth <= 900) {
@@ -356,13 +359,11 @@
             });
         });
 
-        // 화면 전체(document)를 기준으로 사이드바 외부 영역을 클릭/터치했을 때 닫히도록 처리
         document.addEventListener('click', (e) => {
             if (sidebar.classList.contains('active')) {
                 const isClickInsideSidebar = sidebar.contains(e.target);
                 const isClickMenuToggle = e.target.closest('.menu-toggle-btn');
 
-                // 사이드바 내부나 메뉴 토글 버튼이 아닐 경우에만 사이드바 닫기
                 if (!isClickInsideSidebar && !isClickMenuToggle) {
                     sidebar.classList.remove('active');
                 }
