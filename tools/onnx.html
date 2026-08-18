@@ -164,7 +164,7 @@
             </div>                                                    
             <button class="menu-btn" onclick="location.href='../index'">Home</button>
             <div class="bottom-btns">
-                <button class="menu-btn" id="btn-team-rocket" onclick="switchApp('onnx-netron')">Netron</button>
+                <button class="menu-btn" id="btn-onnx-netron" onclick="switchApp('onnx-netron')">Netron</button>
             </div>        
         </aside>
         <main class="main-content" id="main-content">            
@@ -197,7 +197,7 @@
             let iframeHTML = '';
             
             if (appType === 'onnx-netron') {
-                document.getElementById('btn-red').classList.add('active');
+                document.getElementById('btn-onnx-netron').classList.add('active');
                 iframeHTML = `<iframe width="100%" height="100%" allowfullscreen="allowfullscreen" scrolling="no" allow="autoplay" id="flash" frameborder="0" src="/tools/onnx-netron.html"></iframe>`;
             }
 
