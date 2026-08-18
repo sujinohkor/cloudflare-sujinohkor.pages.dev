@@ -354,7 +354,7 @@ body.light .control input[type="color"]{
 
     <button class="menu-btn" id="clearBtn">Clear Text</button>
     <button class="menu-btn" id="printBtn">인쇄 / PDF 저장</button>
-    <button class="menu-btn" id="pngBtn">이미지로 저장 (PNG)</button>
+    <button class="menu-btn" id="jsonBtn">JSON으로 저장</button>
 </aside>
 
   <main class="main">
@@ -374,7 +374,6 @@ body.light .control input[type="color"]{
   </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 const labelGroups = [...document.querySelectorAll('.labels')];
 const mirrorModeBtn = document.getElementById('mirrorModeBtn');
@@ -579,21 +578,46 @@ function applyPageSettings(){
   document.getElementById(id).addEventListener('change',applyPageSettings);
 });
 
-document.getElementById('pngBtn').addEventListener('click', async ()=>{
-  if(typeof html2canvas === 'undefined'){
-    alert('PNG 저장 라이브러리를 불러오지 못했습니다. 인터넷 연결 후 다시 시도해 주세요.');
-    return;
-  }
+document.getElementById('jsonBtn').addEventListener('click', ()=>{
+  const activeAlignBtn = document.querySelector('[data-align].active');
+  const sheets = labelGroups.map(labels =>
+    [...labels.querySelectorAll('.label')].map(input => input.value)
+  );
 
-  const canvas = await html2canvas(stage,{
-    backgroundColor:'#ffffff',
-    scale:2,
-    useCORS:true
-  });
+  const data = {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    pageSettings: {
+      paperSize: document.getElementById('paperSize').value,
+      pageMargin: Number(document.getElementById('pageMargin').value),
+      sheetGap: Number(document.getElementById('sheetGap').value)
+    },
+    textSettings: {
+      fontSize: Number(document.getElementById('fontSize').value),
+      fontColor: document.getElementById('fontColor').value,
+      fontFamily: document.getElementById('fontFamily').value,
+      align: activeAlignBtn ? activeAlignBtn.dataset.align : 'center',
+      borderWidth: Number(document.getElementById('borderWidth').value)
+    },
+    mode: {
+      mirrorMode
+    },
+    sheets
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    {type:'application/json;charset=utf-8'}
+  );
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = 'label-sheet.png';
-  link.href = canvas.toDataURL('image/png');
+  link.href = url;
+  link.download = 'label-sheet.json';
+  document.body.appendChild(link);
   link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 });
 
 // 시작 상태는 Button 2
