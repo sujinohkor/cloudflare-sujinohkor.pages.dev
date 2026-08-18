@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Label Sheet Generator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#101010;--panel:rgba(16,16,16,.28);--text:#fff;--muted:#888;
+  --accent:#ff9e40;--field:rgba(255,255,255,.04);--border:rgba(255,158,64,.38);
+}
+body{
+  background:var(--bg);color:var(--text);font-family:"Segoe UI",sans-serif;
+  min-height:100vh;overflow:hidden;transition:.25s
+}
+body.light{
+  --bg:#fff;--panel:rgba(255,255,255,.45);--text:#202020;--muted:#666;
+  --field:rgba(0,0,0,.025)
+}
+.app{display:flex;min-height:100vh;width:100%}
+.sidebar{
+  width:260px;height:calc(100vh - 40px);position:fixed;left:20px;top:20px;z-index:10;
+  padding:25px 20px;display:flex;flex-direction:column;gap:12px;
+  border:1px solid var(--border);border-radius:24px;background:var(--panel);
+  backdrop-filter:blur(16px);box-shadow:0 20px 40px rgba(0,0,0,.35)
+}
+body.light .sidebar{
+  background:rgba(255,255,255,.3);border-color:rgba(243,128,32,.35);
+  box-shadow:0 20px 40px rgba(243,128,32,.15)
+}
+.sidebar-title{
+  color:#ff9e40;font-size:1.1rem;font-weight:bold;margin-bottom:5px;
+  text-align:center;letter-spacing:1px
+}
+button{
+  width:100%;padding:11px 14px;border-radius:999px;border:1px solid var(--border);
+  background:var(--field);color:var(--accent);font-weight:700;cursor:pointer;transition:.2s
+}
+button:hover{background:rgba(255,158,64,.16)}
+.sidebar-top{display:flex;flex-direction:column;gap:10px;margin-bottom:5px}
+.theme-toggle-btn,.menu-btn{
+  width:100%;padding:11px 14px;background:rgba(255,255,255,.03);color:#ff9e40;
+  border:1px solid rgba(255,158,64,.35);border-radius:50px;font-weight:bold;
+  cursor:pointer;transition:.3s;text-align:center;font-size:.85rem
+}
+.theme-toggle-btn:hover,.menu-btn:hover{background:rgba(255,158,64,.2)}
+body.light .theme-toggle-btn,body.light .menu-btn{
+  background:rgba(0,0,0,.02);color:#F38020;border-color:rgba(243,128,32,.35)
+}
+.menu-btn.active{
+  background:#ff9e40;color:#111;border-color:#ff9e40;
+}
+body.light .menu-btn.active{
+  background:#F38020;color:#fff;border-color:#F38020;
+}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0}
+.control{display:flex;flex-direction:column;gap:5px}
+.control label{font-size:11px;color:var(--muted);padding-left:4px}
+.control input{
+  width:100%;padding:9px 10px;border:1px solid rgba(255,255,255,.13);
+  border-radius:10px;background:var(--field);color:var(--text);outline:none
+}
+body.light .control input{border-color:rgba(0,0,0,.14)}
+.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:auto}
+
+.main{
+  margin-left:300px;width:calc(100vw - 300px);height:100vh;padding:30px;
+  display:flex;flex-direction:column;overflow:auto
+}
+header{margin-bottom:18px}
+header h1{font-size:24px;margin-bottom:6px}
+header p{font-size:13px;color:var(--muted)}
+
+.preview-area{
+  flex:1;min-height:560px;border:1px solid var(--border);border-radius:24px;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  background:var(--panel);overflow:auto
+}
+
+/* 원본 이미지의 500 x 500 구성을 그대로 재현 */
+.reference-stage{
+  width:500px;height:500px;min-width:500px;min-height:500px;background:#fff;
+  position:relative;
+}
+.sheet{
+  position:absolute;
+  left:129px;top:65px;
+  width:262px;height:401px;
+  border:1px solid #222;
+  background:#fff;
+}
+.labels{
+  position:absolute;
+  left:9px;top:13px;
+  width:241px;
+  display:grid;
+  grid-template-columns:repeat(4,56px);
+  column-gap:6px;
+}
+.label-cell{
+  position:relative;
+  width:56px;height:25px;
+  margin-bottom:3px;
+}
+.label{
+  width:56px;height:25px;
+  border:2px solid #ff3d3d;
+  background:#fff;
+  border-radius:0 0 7px 7px;
+  outline:none;
+  font:12px/1.1 "Segoe UI",sans-serif;
+  color:#222;text-align:center;
+  padding:3px 3px 2px;
+}
+.label-cell:nth-child(8n+1) .label,
+.label-cell:nth-child(8n+2) .label,
+.label-cell:nth-child(8n+3) .label,
+.label-cell:nth-child(8n+4) .label{
+  border-radius:0 0 7px 7px;
+}
+.label-cell:nth-child(8n+5) .label,
+.label-cell:nth-child(8n+6) .label,
+.label-cell:nth-child(8n+7) .label,
+.label-cell:nth-child(8n+8) .label{
+  border-radius:7px 7px 0 0;
+}
+.label-cell:nth-child(8n+5),
+.label-cell:nth-child(8n+6),
+.label-cell:nth-child(8n+7),
+.label-cell:nth-child(8n+8){
+  margin-bottom:12px;
+}
+.mirror-text{
+  display:none;
+  position:absolute;
+  inset:2px;
+  align-items:center;
+  justify-content:center;
+  padding:1px 3px;
+  color:#222;
+  font:12px/1.1 "Segoe UI",sans-serif;
+  text-align:center;
+  pointer-events:none;
+  overflow:hidden;
+  white-space:nowrap;
+  transform:rotate(180deg);
+}
+.label.upper{
+  color:transparent;
+  caret-color:#222;
+}
+.label.upper + .mirror-text{
+  display:flex;
+}
+body.mirror-mode .label.upper{
+  caret-color:transparent;
+}
+
+.menu-toggle{
+  display:none;position:fixed;left:20px;bottom:20px;z-index:20;width:auto;
+  padding:10px 15px;background:var(--accent);color:#fff
+}
+
+@media(max-width:900px){
+  body{overflow:auto}
+  .menu-toggle{display:block}
+  .sidebar{
+    transform:translateX(-320px);transition:.25s;background:var(--bg)
+  }
+  .sidebar.active{transform:translateX(0)}
+  .main{margin-left:0;padding:20px;width:100vw;height:auto;min-height:100svh}
+}
+
+@media print{
+  body{background:#fff}
+  .sidebar,.menu-toggle,header{display:none!important}
+  .main{margin:0;padding:0;width:auto;height:auto;overflow:visible}
+  .preview-area{border:0;padding:0;background:#fff;display:block}
+  .reference-stage{margin:0}
+}
+</style>
+</head>
+<body>
+<button class="menu-toggle" id="menuToggle">MENU</button>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Label Sheet</div>
+    <div class="sidebar-top">
+      <button class="theme-toggle-btn" id="themeBtn">DAY / NIGHT</button>
+    </div>
+
+    <button class="menu-btn" onclick="location.href='../index'">Home</button>
+
+    <div class="controls">
+      <div class="control">
+        <label for="fontSize">글자 크기</label>
+        <input id="fontSize" type="number" min="6" max="18" step="1" value="12">
+      </div>
+      <div class="control">
+        <label for="borderWidth">선 두께</label>
+        <input id="borderWidth" type="number" min="1" max="4" step="0.5" value="2">
+      </div>
+    </div>
+
+    <button class="menu-btn" id="mirrorModeBtn">Button 1 · 아래칸 → 윗칸 반전복사</button>
+    <button class="menu-btn active" id="freeModeBtn">Button 2 · 윗칸도 직접 입력</button>
+
+    <button class="menu-btn" id="clearBtn">Clear Text</button>
+    <button class="menu-btn" id="printBtn">Print</button>
+
+    <div class="hint">
+      Button 1에서는 각 쌍의 아랫칸만 입력할 수 있으며, 같은 내용이 180° 뒤집힌 상태로 윗칸에 자동 복사됩니다.
+      Button 2에서는 모든 칸을 각각 직접 입력할 수 있으며, 윗칸에 직접 입력한 내용도 180° 뒤집힌 상태로 표시됩니다.
+    </div>
+  </aside>
+
+  <main class="main">
+    <header>
+      <h1>Label Sheet Generator</h1>
+      <p>4열 × 12행 견출지 레이아웃</p>
+    </header>
+
+    <section class="preview-area">
+      <div class="reference-stage">
+        <div class="sheet">
+          <div class="labels" id="labels"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const labels = document.getElementById('labels');
+const mirrorModeBtn = document.getElementById('mirrorModeBtn');
+const freeModeBtn = document.getElementById('freeModeBtn');
+let mirrorMode = false;
+
+for(let i=0;i<48;i++){
+  const cell = document.createElement('div');
+  cell.className = 'label-cell';
+
+  const input = document.createElement('input');
+  input.className = 'label';
+  input.type = 'text';
+  input.maxLength = 12;
+  input.setAttribute('aria-label', `견출지 ${i+1}`);
+
+  // 8개 단위: 앞 4개가 윗칸, 뒤 4개가 아랫칸
+  const pos = i % 8;
+  if(pos < 4) input.classList.add('upper');
+  else input.classList.add('lower');
+
+  const mirrorText = document.createElement('span');
+  mirrorText.className = 'mirror-text';
+
+  cell.appendChild(input);
+  cell.appendChild(mirrorText);
+  labels.appendChild(cell);
+}
+
+function getInputs(){
+  return [...document.querySelectorAll('.label')];
+}
+
+function syncPairFromLower(lowerInput){
+  const inputs = getInputs();
+  const lowerIndex = inputs.indexOf(lowerInput);
+  if(lowerIndex < 0) return;
+
+  const pos = lowerIndex % 8;
+  if(pos < 4) return;
+
+  const upperIndex = lowerIndex - 4;
+  const upper = inputs[upperIndex];
+  const mirrorText = upper.parentElement.querySelector('.mirror-text');
+
+  upper.value = lowerInput.value;
+  mirrorText.textContent = lowerInput.value;
+}
+
+function syncAllPairs(){
+  const inputs = getInputs();
+  for(let group=0; group<6; group++){
+    for(let col=0; col<4; col++){
+      const upperIndex = group*8 + col;
+      const lowerIndex = upperIndex + 4;
+      const upper = inputs[upperIndex];
+      const lower = inputs[lowerIndex];
+      upper.value = lower.value;
+      upper.parentElement.querySelector('.mirror-text').textContent = lower.value;
+    }
+  }
+}
+
+function setMirrorMode(enabled){
+  mirrorMode = enabled;
+  document.body.classList.toggle('mirror-mode', enabled);
+
+  const inputs = getInputs();
+  inputs.forEach(input=>{
+    if(input.classList.contains('upper')){
+      input.disabled = enabled;
+    }
+  });
+
+  if(enabled) syncAllPairs();
+
+  mirrorModeBtn.classList.toggle('active', enabled);
+  freeModeBtn.classList.toggle('active', !enabled);
+}
+
+labels.addEventListener('input', e=>{
+  if(e.target.classList.contains('upper')){
+    const mirrorText = e.target.parentElement.querySelector('.mirror-text');
+    mirrorText.textContent = e.target.value;
+    return;
+  }
+
+  if(mirrorMode && e.target.classList.contains('lower')){
+    syncPairFromLower(e.target);
+  }
+});
+
+mirrorModeBtn.addEventListener('click',()=>setMirrorMode(true));
+freeModeBtn.addEventListener('click',()=>setMirrorMode(false));
+
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  document.body.classList.toggle('light');
+});
+
+document.getElementById('menuToggle').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('active');
+});
+
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  document.querySelectorAll('.label').forEach(el=>el.value='');
+  document.querySelectorAll('.mirror-text').forEach(el=>el.textContent='');
+});
+
+document.getElementById('printBtn').addEventListener('click',()=>window.print());
+
+document.getElementById('fontSize').addEventListener('input',e=>{
+  document.querySelectorAll('.label').forEach(el=>el.style.fontSize=e.target.value+'px');
+  document.querySelectorAll('.mirror-text').forEach(el=>el.style.fontSize=e.target.value+'px');
+});
+
+document.getElementById('borderWidth').addEventListener('input',e=>{
+  document.querySelectorAll('.label').forEach(el=>el.style.borderWidth=e.target.value+'px');
+});
+
+// 시작 상태는 Button 2
+setMirrorMode(false);
+</script>
+</body>
+</html>
