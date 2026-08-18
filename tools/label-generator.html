@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -74,37 +75,51 @@ header p{font-size:13px;color:var(--muted)}
 
 .preview-area{
   flex:1;min-height:560px;border:1px solid var(--border);border-radius:24px;
-  display:flex;align-items:center;justify-content:center;padding:24px;
+  display:flex;align-items:flex-start;justify-content:center;padding:24px;
   background:var(--panel);overflow:auto
 }
 
-/* 원본 이미지의 500 x 500 구성을 그대로 재현 */
+/* 기본 프레임은 유지하고, 프리뷰 안에 견출지 4장을 2 x 2로 배치 */
 .reference-stage{
-  width:500px;height:500px;min-width:500px;min-height:500px;background:#fff;
+  width:760px;
+  height:1040px;
+  min-width:760px;
+  min-height:1040px;
+  background:#fff;
   position:relative;
+  display:grid;
+  grid-template-columns:repeat(2,300px);
+  grid-template-rows:repeat(2,438px);
+  column-gap:34px;
+  row-gap:38px;
+  justify-content:center;
+  align-content:center;
 }
 .sheet{
-  position:absolute;
-  left:129px;top:65px;
-  width:262px;height:401px;
+  position:relative;
+  width:300px;height:438px;
   border:1px solid #222;
   background:#fff;
+  overflow:hidden;
+}
+.sheet .labels{
+  transform-origin:top left;
 }
 .labels{
   position:absolute;
   left:9px;top:13px;
-  width:241px;
+  width:280px;
   display:grid;
-  grid-template-columns:repeat(4,56px);
-  column-gap:6px;
+  grid-template-columns:repeat(4,66px);
+  column-gap:5px;
 }
 .label-cell{
   position:relative;
-  width:56px;height:25px;
+  width:66px;height:27px;
   margin-bottom:3px;
 }
 .label{
-  width:56px;height:25px;
+  width:66px;height:27px;
   border:2px solid #ff3d3d;
   background:#fff;
   border-radius:0 0 7px 7px;
@@ -129,7 +144,7 @@ header p{font-size:13px;color:var(--muted)}
 .label-cell:nth-child(8n+6),
 .label-cell:nth-child(8n+7),
 .label-cell:nth-child(8n+8){
-  margin-bottom:12px;
+  margin-bottom:13px;
 }
 .mirror-text{
   display:none;
@@ -177,8 +192,88 @@ body.mirror-mode .label.upper{
   .sidebar,.menu-toggle,header{display:none!important}
   .main{margin:0;padding:0;width:auto;height:auto;overflow:visible}
   .preview-area{border:0;padding:0;background:#fff;display:block}
-  .reference-stage{margin:0}
+  .reference-stage{
+    margin:0 auto;
+    width:190mm;
+    height:277mm;
+    min-width:190mm;
+    min-height:277mm;
+    grid-template-columns:repeat(2,62mm);
+    grid-template-rows:repeat(2,95mm);
+    column-gap:16mm;
+    row-gap:18mm;
+  }
+  .sheet{
+    width:62mm;
+    height:95mm;
+    transform-origin:top left;
+  }
 }
+
+/* 추가 설정 UI - 기존 사이드바 프레임/버튼 디자인 유지 */
+.mode-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.mode-buttons .menu-btn{
+  margin:0;
+  padding:11px 6px;
+  font-size:12px;
+}
+.sidebar{
+  overflow:auto;
+}
+.settings-section{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:4px 0;
+}
+.settings-title{
+  font-size:12px;
+  font-weight:800;
+  color:var(--muted);
+  letter-spacing:.4px;
+  padding-left:4px;
+  margin-top:2px;
+}
+.control.full{grid-column:1 / -1}
+.control select,
+.control input[type="color"]{
+  width:100%;
+  padding:9px 10px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:10px;
+  background:var(--field);
+  color:var(--text);
+  outline:none;
+}
+body.light .control select,
+body.light .control input[type="color"]{
+  border-color:rgba(0,0,0,.14);
+}
+.control input[type="color"]{
+  height:38px;
+  padding:4px 7px;
+}
+.align-buttons{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+}
+.align-buttons button{
+  padding:8px 6px;
+  border-radius:10px;
+  font-size:12px;
+}
+.small-note{
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.45;
+  padding:0 4px;
+}
+
 </style>
 </head>
 <body>
@@ -193,28 +288,71 @@ body.mirror-mode .label.upper{
 
     <button class="menu-btn" onclick="location.href='../index'">Home</button>
 
-    <div class="controls">
-      <div class="control">
-        <label for="fontSize">글자 크기</label>
-        <input id="fontSize" type="number" min="6" max="18" step="1" value="12">
-      </div>
-      <div class="control">
-        <label for="borderWidth">선 두께</label>
-        <input id="borderWidth" type="number" min="1" max="4" step="0.5" value="2">
+    <div class="settings-section">
+      <div class="settings-title">PAGE SETTINGS</div>
+      <div class="controls">
+        <div class="control full">
+          <label for="paperSize">용지 크기</label>
+          <select id="paperSize">
+            <option value="a4" selected>A4 (210 × 297 mm)</option>
+            <option value="a3">A3 (297 × 420 mm)</option>
+            <option value="letter">Letter (8.5 × 11 in)</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="pageMargin">여백 (mm)</label>
+          <input id="pageMargin" type="number" min="0" max="40" step="1" value="10">
+        </div>
+        <div class="control">
+          <label for="sheetGap">간격 (mm)</label>
+          <input id="sheetGap" type="number" min="0" max="40" step="1" value="10">
+        </div>
       </div>
     </div>
 
-    <button class="menu-btn" id="mirrorModeBtn">Button 1 · 아래칸 → 윗칸 반전복사</button>
-    <button class="menu-btn active" id="freeModeBtn">Button 2 · 윗칸도 직접 입력</button>
+    <div class="settings-section">
+      <div class="settings-title">TEXT SETTINGS</div>
+      <div class="controls">
+        <div class="control">
+          <label for="fontSize">글자 크기</label>
+          <input id="fontSize" type="number" min="6" max="24" step="1" value="12">
+        </div>
+        <div class="control">
+          <label for="fontColor">글자 색상</label>
+          <input id="fontColor" type="color" value="#222222">
+        </div>
+        <div class="control full">
+          <label for="fontFamily">글꼴</label>
+          <select id="fontFamily">
+            <option value='"Segoe UI","Noto Sans KR",sans-serif'>맑은 고딕</option>
+            <option value='Arial,sans-serif'>Arial</option>
+            <option value='"Times New Roman",serif'>Times New Roman</option>
+          </select>
+        </div>
+        <div class="control full">
+          <label>정렬</label>
+          <div class="align-buttons">
+            <button class="menu-btn" data-align="left">왼쪽</button>
+            <button class="menu-btn active" data-align="center">가운데</button>
+            <button class="menu-btn" data-align="right">오른쪽</button>
+          </div>
+        </div>
+        <div class="control">
+          <label for="borderWidth">선 두께</label>
+          <input id="borderWidth" type="number" min="1" max="4" step="0.5" value="2">
+        </div>
+      </div>
+    </div>
+
+    <div class="mode-buttons">
+      <button class="menu-btn" id="mirrorModeBtn">윗칸 반전복사</button>
+      <button class="menu-btn active" id="freeModeBtn">윗칸 직접입력</button>
+    </div>
 
     <button class="menu-btn" id="clearBtn">Clear Text</button>
-    <button class="menu-btn" id="printBtn">Print</button>
-
-    <div class="hint">
-      Button 1에서는 각 쌍의 아랫칸만 입력할 수 있으며, 같은 내용이 180° 뒤집힌 상태로 윗칸에 자동 복사됩니다.
-      Button 2에서는 모든 칸을 각각 직접 입력할 수 있으며, 윗칸에 직접 입력한 내용도 180° 뒤집힌 상태로 표시됩니다.
-    </div>
-  </aside>
+    <button class="menu-btn" id="printBtn">인쇄 / PDF 저장</button>
+    <button class="menu-btn" id="pngBtn">이미지로 저장 (PNG)</button>
+</aside>
 
   <main class="main">
     <header>
@@ -223,50 +361,55 @@ body.mirror-mode .label.upper{
     </header>
 
     <section class="preview-area">
-      <div class="reference-stage">
-        <div class="sheet">
-          <div class="labels" id="labels"></div>
-        </div>
+      <div class="reference-stage" id="referenceStage">
+        <div class="sheet"><div class="labels"></div></div>
+        <div class="sheet"><div class="labels"></div></div>
+        <div class="sheet"><div class="labels"></div></div>
+        <div class="sheet"><div class="labels"></div></div>
       </div>
     </section>
   </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-const labels = document.getElementById('labels');
+const labelGroups = [...document.querySelectorAll('.labels')];
 const mirrorModeBtn = document.getElementById('mirrorModeBtn');
 const freeModeBtn = document.getElementById('freeModeBtn');
+const stage = document.getElementById('referenceStage');
 let mirrorMode = false;
 
-for(let i=0;i<48;i++){
-  const cell = document.createElement('div');
-  cell.className = 'label-cell';
+labelGroups.forEach((labels, sheetIndex)=>{
+  for(let i=0;i<48;i++){
+    const cell = document.createElement('div');
+    cell.className = 'label-cell';
 
-  const input = document.createElement('input');
-  input.className = 'label';
-  input.type = 'text';
-  input.maxLength = 12;
-  input.setAttribute('aria-label', `견출지 ${i+1}`);
+    const input = document.createElement('input');
+    input.className = 'label';
+    input.type = 'text';
+    input.maxLength = 12;
+    input.setAttribute('aria-label', `견출지 ${sheetIndex+1}-${i+1}`);
 
-  // 8개 단위: 앞 4개가 윗칸, 뒤 4개가 아랫칸
-  const pos = i % 8;
-  if(pos < 4) input.classList.add('upper');
-  else input.classList.add('lower');
+    const pos = i % 8;
+    if(pos < 4) input.classList.add('upper');
+    else input.classList.add('lower');
 
-  const mirrorText = document.createElement('span');
-  mirrorText.className = 'mirror-text';
+    const mirrorText = document.createElement('span');
+    mirrorText.className = 'mirror-text';
 
-  cell.appendChild(input);
-  cell.appendChild(mirrorText);
-  labels.appendChild(cell);
-}
+    cell.appendChild(input);
+    cell.appendChild(mirrorText);
+    labels.appendChild(cell);
+  }
+});
 
 function getInputs(){
   return [...document.querySelectorAll('.label')];
 }
 
 function syncPairFromLower(lowerInput){
-  const inputs = getInputs();
+  const labels = lowerInput.closest('.labels');
+  const inputs = [...labels.querySelectorAll('.label')];
   const lowerIndex = inputs.indexOf(lowerInput);
   if(lowerIndex < 0) return;
 
@@ -282,25 +425,26 @@ function syncPairFromLower(lowerInput){
 }
 
 function syncAllPairs(){
-  const inputs = getInputs();
-  for(let group=0; group<6; group++){
-    for(let col=0; col<4; col++){
-      const upperIndex = group*8 + col;
-      const lowerIndex = upperIndex + 4;
-      const upper = inputs[upperIndex];
-      const lower = inputs[lowerIndex];
-      upper.value = lower.value;
-      upper.parentElement.querySelector('.mirror-text').textContent = lower.value;
+  labelGroups.forEach(labels=>{
+    const inputs = [...labels.querySelectorAll('.label')];
+    for(let group=0; group<6; group++){
+      for(let col=0; col<4; col++){
+        const upperIndex = group*8 + col;
+        const lowerIndex = upperIndex + 4;
+        const upper = inputs[upperIndex];
+        const lower = inputs[lowerIndex];
+        upper.value = lower.value;
+        upper.parentElement.querySelector('.mirror-text').textContent = lower.value;
+      }
     }
-  }
+  });
 }
 
 function setMirrorMode(enabled){
   mirrorMode = enabled;
   document.body.classList.toggle('mirror-mode', enabled);
 
-  const inputs = getInputs();
-  inputs.forEach(input=>{
+  getInputs().forEach(input=>{
     if(input.classList.contains('upper')){
       input.disabled = enabled;
     }
@@ -312,16 +456,18 @@ function setMirrorMode(enabled){
   freeModeBtn.classList.toggle('active', !enabled);
 }
 
-labels.addEventListener('input', e=>{
-  if(e.target.classList.contains('upper')){
-    const mirrorText = e.target.parentElement.querySelector('.mirror-text');
-    mirrorText.textContent = e.target.value;
-    return;
-  }
+labelGroups.forEach(labels=>{
+  labels.addEventListener('input', e=>{
+    if(e.target.classList.contains('upper')){
+      const mirrorText = e.target.parentElement.querySelector('.mirror-text');
+      mirrorText.textContent = e.target.value;
+      return;
+    }
 
-  if(mirrorMode && e.target.classList.contains('lower')){
-    syncPairFromLower(e.target);
-  }
+    if(mirrorMode && e.target.classList.contains('lower')){
+      syncPairFromLower(e.target);
+    }
+  });
 });
 
 mirrorModeBtn.addEventListener('click',()=>setMirrorMode(true));
@@ -343,16 +489,113 @@ document.getElementById('clearBtn').addEventListener('click',()=>{
 document.getElementById('printBtn').addEventListener('click',()=>window.print());
 
 document.getElementById('fontSize').addEventListener('input',e=>{
-  document.querySelectorAll('.label').forEach(el=>el.style.fontSize=e.target.value+'px');
-  document.querySelectorAll('.mirror-text').forEach(el=>el.style.fontSize=e.target.value+'px');
+  document.querySelectorAll('.label,.mirror-text').forEach(el=>el.style.fontSize=e.target.value+'px');
+});
+
+document.getElementById('fontColor').addEventListener('input',e=>{
+  document.querySelectorAll('.label,.mirror-text').forEach(el=>el.style.color=e.target.value);
+});
+
+document.getElementById('fontFamily').addEventListener('change',e=>{
+  document.querySelectorAll('.label,.mirror-text').forEach(el=>el.style.fontFamily=e.target.value);
 });
 
 document.getElementById('borderWidth').addEventListener('input',e=>{
   document.querySelectorAll('.label').forEach(el=>el.style.borderWidth=e.target.value+'px');
 });
 
+document.querySelectorAll('[data-align]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('[data-align]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const align = btn.dataset.align;
+
+    document.querySelectorAll('.label').forEach(el=>el.style.textAlign=align);
+    document.querySelectorAll('.mirror-text').forEach(el=>{
+      el.style.textAlign=align;
+      el.style.justifyContent = align==='left' ? 'flex-start' : align==='right' ? 'flex-end' : 'center';
+    });
+  });
+});
+
+function applyPageSettings(){
+  const paper = document.getElementById('paperSize').value;
+  const marginMm = Math.max(0, Number(document.getElementById('pageMargin').value || 0));
+  const gapMm = Math.max(0, Number(document.getElementById('sheetGap').value || 0));
+
+  const sizes = {
+    a4:[210,297],
+    a3:[297,420],
+    letter:[215.9,279.4]
+  };
+  const [paperWmm,paperHmm] = sizes[paper];
+
+  // 화면 미리보기 비율
+  const pxPerMm = 3.55;
+
+  const pageW = paperWmm * pxPerMm;
+  const pageH = paperHmm * pxPerMm;
+  const margin = marginMm * pxPerMm;
+  const gap = gapMm * pxPerMm;
+
+  // 핵심:
+  // 페이지 전체 크기에서 좌우/상하여백과 가운데 간격을 뺀 나머지를
+  // 정확히 2등분하여 각 견출지 크기로 사용합니다.
+  const sheetW = Math.max(80, (pageW - margin * 2 - gap) / 2);
+  const sheetH = Math.max(120, (pageH - margin * 2 - gap) / 2);
+
+  stage.style.width = pageW + 'px';
+  stage.style.height = pageH + 'px';
+  stage.style.minWidth = pageW + 'px';
+  stage.style.minHeight = pageH + 'px';
+  stage.style.padding = margin + 'px';
+  stage.style.columnGap = gap + 'px';
+  stage.style.rowGap = gap + 'px';
+  stage.style.gridTemplateColumns = `repeat(2, ${sheetW}px)`;
+  stage.style.gridTemplateRows = `repeat(2, ${sheetH}px)`;
+  stage.style.justifyContent = 'start';
+  stage.style.alignContent = 'start';
+
+  // 기본 견출지 디자인(300×438)을 기준으로 내부 라벨까지 함께 확대/축소합니다.
+  const baseW = 300;
+  const baseH = 438;
+  const scaleX = sheetW / baseW;
+  const scaleY = sheetH / baseH;
+
+  document.querySelectorAll('.sheet').forEach(sheet=>{
+    sheet.style.width = sheetW + 'px';
+    sheet.style.height = sheetH + 'px';
+
+    const labels = sheet.querySelector('.labels');
+    labels.style.transform = `scale(${scaleX}, ${scaleY})`;
+  });
+}
+
+['paperSize','pageMargin','sheetGap'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',applyPageSettings);
+  document.getElementById(id).addEventListener('change',applyPageSettings);
+});
+
+document.getElementById('pngBtn').addEventListener('click', async ()=>{
+  if(typeof html2canvas === 'undefined'){
+    alert('PNG 저장 라이브러리를 불러오지 못했습니다. 인터넷 연결 후 다시 시도해 주세요.');
+    return;
+  }
+
+  const canvas = await html2canvas(stage,{
+    backgroundColor:'#ffffff',
+    scale:2,
+    useCORS:true
+  });
+  const link = document.createElement('a');
+  link.download = 'label-sheet.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
 // 시작 상태는 Button 2
 setMirrorMode(false);
+applyPageSettings();
 </script>
 </body>
 </html>
