@@ -629,7 +629,11 @@ document.getElementById('jsonSaveBtn').addEventListener('click', ()=>{
       fontColor: document.getElementById('fontColor').value,
       fontFamily: document.getElementById('fontFamily').value,
       align: activeAlignBtn ? activeAlignBtn.dataset.align : 'center',
-      borderWidth: Number(document.getElementById('borderWidth').value)
+      borderWidth: Number(document.getElementById('borderWidth').value),
+
+      bold: document.querySelector('[data-style="bold"]').classList.contains('active'),
+      italic: document.querySelector('[data-style="italic"]').classList.contains('active'),
+      underline: document.querySelector('[data-style="underline"]').classList.contains('active')
     },
     mode: {
       mirrorMode
@@ -711,6 +715,26 @@ document.getElementById('jsonFileInput').addEventListener('change', async (e)=>{
           align === 'left' ? 'flex-start' :
           align === 'right' ? 'flex-end' : 'center';
       });
+
+      /* 여기부터 추가 */
+      const bold = Boolean(data.textSettings.bold);
+      const italic = Boolean(data.textSettings.italic);
+      const underline = Boolean(data.textSettings.underline);
+      
+      const boldBtn = document.querySelector('[data-style="bold"]');
+      const italicBtn = document.querySelector('[data-style="italic"]');
+      const underlineBtn = document.querySelector('[data-style="underline"]');
+      
+      boldBtn.classList.toggle('active', bold);
+      italicBtn.classList.toggle('active', italic);
+      underlineBtn.classList.toggle('active', underline);
+      
+      document.querySelectorAll('.label,.mirror-text').forEach(el=>{
+        el.style.fontWeight = bold ? '700' : '400';
+        el.style.fontStyle = italic ? 'italic' : 'normal';
+        el.style.textDecoration = underline ? 'underline' : 'none';
+      });
+      /* 여기까지 추가 */
     }
 
     if(Array.isArray(data.sheets)){
