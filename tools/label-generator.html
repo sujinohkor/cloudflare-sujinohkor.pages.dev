@@ -349,6 +349,10 @@ body.light .control input[type="color"]{
           <label for="borderWidth">선 두께</label>
           <input id="borderWidth" type="number" min="1" max="4" step="0.5" value="2">
         </div>
+        <div class="control">
+          <label for="borderColor">선 색상</label>
+          <input id="borderColor" type="color" value="#ff3d3d">
+        </div>
       </div>
     </div>
 
@@ -518,6 +522,12 @@ document.getElementById('borderWidth').addEventListener('input',e=>{
   document.querySelectorAll('.label').forEach(el=>el.style.borderWidth=e.target.value+'px');
 });
 
+document.getElementById('borderColor').addEventListener('input',e=>{
+  document.querySelectorAll('.label').forEach(el=>{
+    el.style.borderColor = e.target.value;
+  });
+});
+
 document.querySelectorAll('[data-align]').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('[data-align]').forEach(b=>b.classList.remove('active'));
@@ -630,7 +640,7 @@ document.getElementById('jsonSaveBtn').addEventListener('click', ()=>{
       fontFamily: document.getElementById('fontFamily').value,
       align: activeAlignBtn ? activeAlignBtn.dataset.align : 'center',
       borderWidth: Number(document.getElementById('borderWidth').value),
-
+      borderColor: document.getElementById('borderColor').value,
       bold: document.querySelector('[data-style="bold"]').classList.contains('active'),
       italic: document.querySelector('[data-style="italic"]').classList.contains('active'),
       underline: document.querySelector('[data-style="underline"]').classList.contains('active')
@@ -701,6 +711,12 @@ document.getElementById('jsonFileInput').addEventListener('change', async (e)=>{
         document.getElementById('borderWidth').value = data.textSettings.borderWidth;
         document.querySelectorAll('.label')
           .forEach(el=>el.style.borderWidth = data.textSettings.borderWidth + 'px');
+      }
+
+      if(data.textSettings.borderColor){
+        document.getElementById('borderColor').value = data.textSettings.borderColor;
+        document.querySelectorAll('.label')
+          .forEach(el=>el.style.borderColor = data.textSettings.borderColor);
       }
 
       const align = data.textSettings.align || 'center';
