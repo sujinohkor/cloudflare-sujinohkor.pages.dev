@@ -297,8 +297,8 @@ body.light .control input[type="color"]{
     </div>
     
     <div class="settings-section">
-      <!--div class="settings-title">PAGE SETTINGS</div-->
       <div class="controls">
+        <!-- 용지 크기 -->
         <div class="control full">
           <label for="paperSize">용지 크기</label>
           <select id="paperSize">
@@ -307,6 +307,8 @@ body.light .control input[type="color"]{
             <option value="letter">Letter (8.5 × 11 in)</option>
           </select>
         </div>
+    
+        <!-- 여백 / 간격 -->
         <div class="control">
           <label for="pageMargin">여백 (mm)</label>
           <input id="pageMargin" type="number" min="0" max="40" step="1" value="10">
@@ -315,12 +317,8 @@ body.light .control input[type="color"]{
           <label for="sheetGap">간격 (mm)</label>
           <input id="sheetGap" type="number" min="0" max="40" step="1" value="10">
         </div>
-      </div>
-    <!--/div-->
-
-    <!--div class="settings-section"-->
-      <!--div class="settings-title">TEXT SETTINGS</div-->
-      <div class="controls">
+    
+        <!-- 글자 크기 / 색상 -->
         <div class="control">
           <label for="fontSize">글자 크기</label>
           <input id="fontSize" type="number" min="6" max="24" step="1" value="12">
@@ -329,6 +327,8 @@ body.light .control input[type="color"]{
           <label for="fontColor">글자 색상</label>
           <input id="fontColor" type="color" value="#222222">
         </div>
+    
+        <!-- 글꼴 -->
         <div class="control full">
           <label for="fontFamily">글꼴</label>
           <select id="fontFamily">
@@ -342,6 +342,8 @@ body.light .control input[type="color"]{
             <button class="menu-btn" data-style="underline">밑줄</button>
           </div>
         </div>
+    
+        <!-- 정렬 -->
         <div class="control full">
           <label>정렬</label>
           <div class="align-buttons">
@@ -350,6 +352,8 @@ body.light .control input[type="color"]{
             <button class="menu-btn" data-align="right">오른쪽</button>
           </div>
         </div>
+    
+        <!-- 선 -->
         <div class="control">
           <label for="borderWidth">선 두께</label>
           <input id="borderWidth" type="number" min="1" max="4" step="0.5" value="2">
