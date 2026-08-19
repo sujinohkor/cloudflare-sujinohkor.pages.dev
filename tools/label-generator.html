@@ -277,6 +277,50 @@ body.light .control input[type="color"]{
   padding:0 4px;
 }
 
+/* 세로 견출지 전용 레이아웃
+   - 기존 가로 견출지를 90도 돌린 것과 같은 짝 모양을 직접 재현
+   - 한 쌍: 왼쪽(lower, 직접입력) + 오른쪽(upper, 복사/직접입력)
+   - 쌍 내부 간격 3px, 쌍 사이 간격 13px
+   - 글자는 위→아래 세로쓰기 */
+body.vertical-label-mode .labels{
+  width:407px;
+  height:279px;
+  display:block;
+  position:absolute;
+}
+
+body.vertical-label-mode .label-cell{
+  position:absolute;
+  width:27px;
+  height:66px;
+  margin:0 !important;
+}
+
+body.vertical-label-mode .label{
+  width:27px;
+  height:66px;
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  text-align:center;
+  padding:3px 2px;
+}
+
+/* 왼쪽 견출지: 마주보는 오른쪽 모서리를 둥글게 */
+body.vertical-label-mode .label-cell.lower-cell .label{
+  border-radius:0 7px 7px 0;
+}
+
+/* 오른쪽 견출지: 마주보는 왼쪽 모서리를 둥글게 */
+body.vertical-label-mode .label-cell.upper-cell .label{
+  border-radius:7px 0 0 7px;
+}
+
+body.vertical-label-mode .mirror-text{
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  transform:none;
+}
+
 </style>
 </head>
 <body>
@@ -421,8 +465,13 @@ labelGroups.forEach((labels, sheetIndex)=>{
     input.setAttribute('aria-label', `견출지 ${sheetIndex+1}-${i+1}`);
 
     const pos = i % 8;
-    if(pos < 4) input.classList.add('upper');
-    else input.classList.add('lower');
+    if(pos < 4){
+      input.classList.add('upper');
+      cell.classList.add('upper-cell');
+    }else{
+      input.classList.add('lower');
+      cell.classList.add('lower-cell');
+    }
 
     const mirrorText = document.createElement('span');
     mirrorText.className = 'mirror-text';
@@ -500,6 +549,45 @@ labelGroups.forEach(labels=>{
   });
 });
 
+function applyCellOrder(){
+  labelGroups.forEach(labels=>{
+    const cells = [...labels.querySelectorAll('.label-cell')];
+
+    cells.forEach((cell, i)=>{
+      if(labelOrientation === 'vertical'){
+        /*
+          기존 8개 단위 pair
+          upper: 0~3 / lower: 4~7
+
+          세로 모드에서는 각 pair를 좌우로 배치합니다.
+          lower = 왼쪽, upper = 오른쪽
+
+          27px + 3px + 27px = 한 쌍 57px
+          다음 쌍까지 13px 간격 -> pair pitch 70px
+          세로 방향은 66px + 5px -> row pitch 71px
+        */
+        const group = Math.floor(i / 8); // 0~5
+        const pos = i % 8;
+        const row = pos % 4;             // 0~3
+        const isUpper = pos < 4;
+
+        const pairX = group * 70;
+        const x = pairX + (isUpper ? 30 : 0);
+        const y = row * 71;
+
+        cell.style.left = x + 'px';
+        cell.style.top = y + 'px';
+        cell.style.order = '';
+      }else{
+        // 가로 견출지로 돌아오면 세로 모드에서 준 절대좌표를 제거합니다.
+        cell.style.left = '';
+        cell.style.top = '';
+        cell.style.order = '';
+      }
+    });
+  });
+}
+
 function setLabelOrientation(mode){
   labelOrientation = mode;
 
@@ -518,6 +606,7 @@ function setLabelOrientation(mode){
     freeModeBtn.textContent = '윗칸 직접입력';
   }
 
+  applyCellOrder();
   applyPageSettings();
 }
 
@@ -658,13 +747,11 @@ function applyPageSettings(){
     const labels = sheet.querySelector('.labels');
 
     if(isVertical){
-      // 회전된 라벨 묶음(기준 약 420×280)을 438×300 판의 중앙에 배치합니다.
-      // 위치 이동도 transform 안에 넣어 scale과 같은 좌표계에서 계산되게 하여
-      // 왼쪽으로 밀리거나 overflow:hidden에 잘리는 현상을 방지합니다.
-      labels.style.left = '0';
-      labels.style.top = '0';
+      // 407×279 내부 배열을 438×300 기준 판의 정중앙에 배치합니다.
+      labels.style.left = '15.5px';
+      labels.style.top = '10.5px';
       labels.style.transformOrigin = 'top left';
-      labels.style.transform = `scale(${scaleX}, ${scaleY}) translate(420px, 10px) rotate(90deg)`;
+      labels.style.transform = `scale(${scaleX}, ${scaleY})`;
     }else{
       labels.style.left = '9px';
       labels.style.top = '13px';
