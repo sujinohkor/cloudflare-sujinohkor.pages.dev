@@ -503,9 +503,20 @@ labelGroups.forEach(labels=>{
 function setLabelOrientation(mode){
   labelOrientation = mode;
 
-  horizontalModeBtn.classList.toggle('active', mode === 'horizontal');
-  verticalModeBtn.classList.toggle('active', mode === 'vertical');
-  document.body.classList.toggle('vertical-label-mode', mode === 'vertical');
+  const isVertical = mode === 'vertical';
+
+  horizontalModeBtn.classList.toggle('active', !isVertical);
+  verticalModeBtn.classList.toggle('active', isVertical);
+  document.body.classList.toggle('vertical-label-mode', isVertical);
+
+  // 방향에 따라 복사 모드 버튼 문구 변경
+  if(isVertical){
+    mirrorModeBtn.textContent = '우측 복사';
+    freeModeBtn.textContent = '우측 직접입력';
+  }else{
+    mirrorModeBtn.textContent = '윗칸 반전복사';
+    freeModeBtn.textContent = '윗칸 직접입력';
+  }
 
   applyPageSettings();
 }
