@@ -1996,6 +1996,39 @@
                     ]
                 }</script>
             </a>
+
+            <a href="https://sujinohkor.pages.dev/tools/label-generator" class="card" data-category="utility">
+                <div class="icon">🗂️</div>
+                <h3>Label Generator</h3>
+                <p>label-generator</p>
+                <span class="arrow">Go to Label Generator →</span>
+                <!-- 안 보이는 데이터 블록 -->
+                <script type="application/json" class="app-meta">{
+                    "desc": "A browser-based label sheet generator for creating, editing, previewing, and printing customizable index label sheets. It provides four label sheets arranged in a 2 × 2 page layout, with 48 editable labels per sheet. Users can switch between horizontal and vertical label orientations, with the page layout automatically changing between portrait and landscape modes. The vertical label mode rearranges paired labels horizontally and supports vertical Korean text. The generator provides direct-entry and paired-copy modes, including 180-degree mirrored text for upper labels in horizontal mode and right-side copying in vertical mode. Users can customize paper size, page margins, spacing between sheets, font size, font color, font family, bold, italic, underline, text alignment, border thickness, and border color. The page preview automatically recalculates sheet dimensions and scaling based on the selected paper size, margins, spacing, and label orientation. Users can clear all label text, print or export the layout as PDF through the browser print system, save the complete label content and configuration as a JSON file, reload previously saved JSON data, switch between light and dark themes, and use a responsive desktop or mobile interface with a collapsible sidebar.",
+                    "deps": [
+                      "Vanilla JavaScript (ES6+) — Handles dynamic creation of 192 editable labels across four sheets, horizontal and vertical label orientation switching, paired-label synchronization, copy/direct-entry modes, text formatting, page layout calculations, scaling, JSON serialization and restoration, theme switching, mobile sidebar interactions, clearing label content, printing, and user input events without external frameworks or libraries",
+                      "CSS3 — Implements the label sheet layout, 2 × 2 page arrangement, horizontal and vertical label designs, paired label shapes, vertical Korean text using writing-mode and text-orientation, responsive layouts, light/dark themes, CSS custom properties, Grid, Flexbox, absolute positioning, scaling transforms, rounded borders, transitions, backdrop-filter, and print-specific styling",
+                      "HTML5 Form Controls — Uses text <input> elements for individual label editing, numeric <input> controls for margins, spacing, font size, and border width, color inputs for text and border colors, <select> elements for paper size and font family, a hidden file input for JSON loading, and buttons for orientation, formatting, copy modes, printing, JSON operations, navigation, theme switching, and mobile menu control",
+                      "CSS Writing Modes — Uses writing-mode: vertical-rl and text-orientation: upright to display Korean text vertically from top to bottom when vertical label orientation is selected",
+                      "JavaScript DOM API — Uses document.getElementById(), querySelectorAll(), createElement(), appendChild(), closest(), classList, style properties, textContent, and dynamically generated DOM elements to construct and control the label sheets and interface",
+                      "JavaScript Events API — Handles input, change, and click events for label editing, paired-label synchronization, page settings, text formatting, orientation switching, copy modes, JSON operations, theme switching, printing, and responsive sidebar controls",
+                      "JSON API — Uses JSON.stringify() and JSON.parse() to serialize and restore label contents, page settings, text formatting settings, copy mode, and label orientation",
+                      "Blob and Object URL APIs — Uses Blob, URL.createObjectURL(), and URL.revokeObjectURL() to generate and download label-sheet configuration data as a JSON file directly in the browser",
+                      "File API — Uses the browser File interface and File.text() to read previously saved JSON configuration files and restore label contents and settings",
+                      "Browser Print API (window.print) — Opens the browser print interface for physical printing or PDF export of the generated label sheets",
+                      "Responsive Web Design — Provides a fixed desktop sidebar and a collapsible mobile sidebar, with responsive page layout behavior for smaller screens",
+                      "CSS Print Media Queries — Provides print-specific page styling that hides the application controls and reformats the label sheet preview for physical printing or browser-based PDF generation",
+                      "Web APIs (window / location) — Uses browser APIs for navigation, printing, page interaction, and client-side runtime behavior"
+                    ],
+                    "backends": [
+                      "Static Hosting: Cloudflare Pages",
+                      "Client-Side Label Sheet Generation: All label creation, text editing, paired-label synchronization, orientation switching, vertical text rendering, page sizing, scaling, formatting, preview rendering, JSON serialization, JSON restoration, and print preparation are performed directly in the browser",
+                      "Client-Side File Generation and Loading: Label contents and configuration settings are exported as JSON using Blob and Object URL APIs and restored locally using the browser File API",
+                      "Browser-Based Printing and PDF Export: Physical printing and PDF generation are handled through the browser's native print system using window.print() and print-specific CSS",
+                      "No Traditional Server-Side Application Backend: The application does not require server-side processing, a database, authentication, or an external API; all label generation, editing, configuration storage, and output preparation are performed entirely on the client"
+                    ]
+                }</script>
+            </a>
             
             <a href="https://sujinohkor.pages.dev/tools/app-inspector" class="card guest-book-card" data-category="fun">
                 <div class="icon">📁</div>
