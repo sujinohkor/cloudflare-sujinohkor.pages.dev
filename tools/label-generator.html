@@ -401,10 +401,13 @@ body.light .control input[type="color"]{
 
 <script>
 const labelGroups = [...document.querySelectorAll('.labels')];
+const horizontalModeBtn = document.getElementById('horizontalModeBtn');
+const verticalModeBtn = document.getElementById('verticalModeBtn');
 const mirrorModeBtn = document.getElementById('mirrorModeBtn');
 const freeModeBtn = document.getElementById('freeModeBtn');
 const stage = document.getElementById('referenceStage');
 let mirrorMode = false;
+let labelOrientation = 'horizontal';
 
 labelGroups.forEach((labels, sheetIndex)=>{
   for(let i=0;i<48;i++){
@@ -497,6 +500,19 @@ labelGroups.forEach(labels=>{
   });
 });
 
+function setLabelOrientation(mode){
+  labelOrientation = mode;
+
+  horizontalModeBtn.classList.toggle('active', mode === 'horizontal');
+  verticalModeBtn.classList.toggle('active', mode === 'vertical');
+  document.body.classList.toggle('vertical-label-mode', mode === 'vertical');
+
+  applyPageSettings();
+}
+
+horizontalModeBtn.addEventListener('click',()=>setLabelOrientation('horizontal'));
+verticalModeBtn.addEventListener('click',()=>setLabelOrientation('vertical'));
+
 mirrorModeBtn.addEventListener('click',()=>setMirrorMode(true));
 freeModeBtn.addEventListener('click',()=>setMirrorMode(false));
 
@@ -583,7 +599,12 @@ function applyPageSettings(){
     a3:[297,420],
     letter:[215.9,279.4]
   };
-  const [paperWmm,paperHmm] = sizes[paper];
+  let [paperWmm,paperHmm] = sizes[paper];
+
+  // 세로 견출지 모드에서는 용지를 가로 방향(landscape)으로 전환합니다.
+  if(labelOrientation === 'vertical'){
+    [paperWmm,paperHmm] = [paperHmm,paperWmm];
+  }
 
   // 화면 미리보기 비율
   const pxPerMm = 3.55;
@@ -611,9 +632,11 @@ function applyPageSettings(){
   stage.style.justifyContent = 'start';
   stage.style.alignContent = 'start';
 
-  // 기본 견출지 디자인(300×438)을 기준으로 내부 라벨까지 함께 확대/축소합니다.
-  const baseW = 300;
-  const baseH = 438;
+  // 가로 견출지: 기본 300×438.
+  // 세로 견출지: 큰 견출지 판을 438×300으로 눕히고, 내부 빨간 견출지 전체를 90도 회전합니다.
+  const isVertical = labelOrientation === 'vertical';
+  const baseW = isVertical ? 438 : 300;
+  const baseH = isVertical ? 300 : 438;
   const scaleX = sheetW / baseW;
   const scaleY = sheetH / baseH;
 
@@ -622,7 +645,21 @@ function applyPageSettings(){
     sheet.style.height = sheetH + 'px';
 
     const labels = sheet.querySelector('.labels');
-    labels.style.transform = `scale(${scaleX}, ${scaleY})`;
+
+    if(isVertical){
+      // 회전된 라벨 묶음(기준 약 420×280)을 438×300 판의 중앙에 배치합니다.
+      // 위치 이동도 transform 안에 넣어 scale과 같은 좌표계에서 계산되게 하여
+      // 왼쪽으로 밀리거나 overflow:hidden에 잘리는 현상을 방지합니다.
+      labels.style.left = '0';
+      labels.style.top = '0';
+      labels.style.transformOrigin = 'top left';
+      labels.style.transform = `scale(${scaleX}, ${scaleY}) translate(420px, 10px) rotate(90deg)`;
+    }else{
+      labels.style.left = '9px';
+      labels.style.top = '13px';
+      labels.style.transformOrigin = 'top left';
+      labels.style.transform = `scale(${scaleX}, ${scaleY})`;
+    }
   });
 }
 
@@ -657,7 +694,8 @@ document.getElementById('jsonSaveBtn').addEventListener('click', ()=>{
       underline: document.querySelector('[data-style="underline"]').classList.contains('active')
     },
     mode: {
-      mirrorMode
+      mirrorMode,
+      labelOrientation
     },
     sheets
   };
@@ -783,7 +821,7 @@ document.getElementById('jsonFileInput').addEventListener('change', async (e)=>{
     }
 
     setMirrorMode(Boolean(data.mode && data.mode.mirrorMode));
-    applyPageSettings();
+    setLabelOrientation(data.mode && data.mode.labelOrientation === 'vertical' ? 'vertical' : 'horizontal');
 
   }catch(err){
     alert('JSON 파일을 읽을 수 없습니다.');
@@ -793,9 +831,9 @@ document.getElementById('jsonFileInput').addEventListener('change', async (e)=>{
   }
 });
 
-// 시작 상태는 Button 2
+// 시작 상태: 가로 견출지 + 윗칸 직접입력
 setMirrorMode(false);
-applyPageSettings();
+setLabelOrientation('horizontal');
 </script>
 </body>
 </html>
