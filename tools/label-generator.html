@@ -161,7 +161,7 @@ header p{font-size:13px;color:var(--muted)}
   transform:rotate(180deg);
 }
 .label.upper{
-  color:transparent;
+  color:transparent !important;
   caret-color:#222;
 }
 .label.upper + .mirror-text{
@@ -511,7 +511,9 @@ document.getElementById('fontSize').addEventListener('input',e=>{
 });
 
 document.getElementById('fontColor').addEventListener('input',e=>{
-  document.querySelectorAll('.label,.mirror-text').forEach(el=>el.style.color=e.target.value);
+  document.querySelectorAll('.label:not(.upper),.mirror-text').forEach(el=>{
+    el.style.color = e.target.value;
+  });
 });
 
 document.getElementById('fontFamily').addEventListener('change',e=>{
@@ -697,8 +699,12 @@ document.getElementById('jsonFileInput').addEventListener('change', async (e)=>{
 
       if(data.textSettings.fontColor){
         document.getElementById('fontColor').value = data.textSettings.fontColor;
-        document.querySelectorAll('.label,.mirror-text')
+
+        document.querySelectorAll('.label:not(.upper),.mirror-text')
           .forEach(el=>el.style.color = data.textSettings.fontColor);
+      
+        document.querySelectorAll('.label.upper')
+          .forEach(el=>el.style.color = 'transparent');
       }
 
       if(data.textSettings.fontFamily){
