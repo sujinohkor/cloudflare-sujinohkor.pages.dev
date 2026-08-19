@@ -331,6 +331,11 @@ body.light .control input[type="color"]{
             <option value='Arial,sans-serif'>Arial</option>
             <option value='"Times New Roman",serif'>Times New Roman</option>
           </select>
+          <div class="align-buttons">
+            <button class="menu-btn" data-style="bold">굵게</button>
+            <button class="menu-btn" data-style="italic">기울임</button>
+            <button class="menu-btn" data-style="underline">밑줄</button>
+          </div>
         </div>
         <div class="control full">
           <label>정렬</label>
@@ -354,7 +359,7 @@ body.light .control input[type="color"]{
 
     <div class="mode-buttons">
       <button class="menu-btn" id="clearBtn">Clear Text</button>
-      <button class="menu-btn" id="printBtn">인쇄 / PDF 저장</button>
+      <button class="menu-btn" id="printBtn">인쇄/PDF</button>
     </div>
     
     <div class="mode-buttons">
@@ -523,6 +528,26 @@ document.querySelectorAll('[data-align]').forEach(btn=>{
     document.querySelectorAll('.mirror-text').forEach(el=>{
       el.style.textAlign=align;
       el.style.justifyContent = align==='left' ? 'flex-start' : align==='right' ? 'flex-end' : 'center';
+    });
+  });
+});
+
+document.querySelectorAll('[data-style]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    btn.classList.toggle('active');
+
+    const boldBtn = document.querySelector('[data-style="bold"]');
+    const italicBtn = document.querySelector('[data-style="italic"]');
+    const underlineBtn = document.querySelector('[data-style="underline"]');
+
+    const isBold = boldBtn.classList.contains('active');
+    const isItalic = italicBtn.classList.contains('active');
+    const isUnderline = underlineBtn.classList.contains('active');
+
+    document.querySelectorAll('.label,.mirror-text').forEach(el=>{
+      el.style.fontWeight = isBold ? '700' : '400';
+      el.style.fontStyle = isItalic ? 'italic' : 'normal';
+      el.style.textDecoration = isUnderline ? 'underline' : 'none';
     });
   });
 });
