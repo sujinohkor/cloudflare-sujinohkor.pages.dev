@@ -187,25 +187,47 @@ body.mirror-mode .label.upper{
 }
 
 @media print{
-  body{background:#fff}
-  .sidebar,.menu-toggle,header{display:none!important}
-  .main{margin:0;padding:0;width:auto;height:auto;overflow:visible}
-  .preview-area{border:0;padding:0;background:#fff;display:block}
-  .reference-stage{
-    margin:0 auto;
-    width:190mm;
-    height:277mm;
-    min-width:190mm;
-    min-height:277mm;
-    grid-template-columns:repeat(2,62mm);
-    grid-template-rows:repeat(2,95mm);
-    column-gap:16mm;
-    row-gap:18mm;
+  html,body{
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+    overflow:hidden!important;
   }
-  .sheet{
-    width:62mm;
-    height:95mm;
-    transform-origin:top left;
+  .sidebar,.menu-toggle,header{display:none!important}
+  .app{
+    margin:0!important;
+    padding:0!important;
+    width:100%!important;
+    height:100%!important;
+    display:block!important;
+  }
+  .main{
+    margin:0!important;
+    padding:0!important;
+    width:100%!important;
+    height:100%!important;
+    overflow:visible!important;
+    display:block!important;
+  }
+  .preview-area{
+    position:fixed!important;
+    inset:0!important;
+    margin:0!important;
+    padding:0!important;
+    width:100%!important;
+    height:100%!important;
+    border:0!important;
+    border-radius:0!important;
+    background:#fff!important;
+    overflow:hidden!important;
+  }
+  .reference-stage{
+    position:absolute!important;
+    left:50%!important;
+    top:50%!important;
+    margin:0!important;
+    transform:translate(-50%,-50%)!important;
+    background:#fff!important;
   }
 }
 
@@ -737,7 +759,7 @@ function applyPageSettings(){
   }
 
   // 화면 미리보기 비율
-  const pxPerMm = 3.55;
+  const pxPerMm = 96 / 25.4;
 
   const pageW = paperWmm * pxPerMm;
   const pageH = paperHmm * pxPerMm;
@@ -759,8 +781,8 @@ function applyPageSettings(){
   stage.style.rowGap = gap + 'px';
   stage.style.gridTemplateColumns = `repeat(2, ${sheetW}px)`;
   stage.style.gridTemplateRows = `repeat(2, ${sheetH}px)`;
-  stage.style.justifyContent = 'start';
-  stage.style.alignContent = 'start';
+  stage.style.justifyContent = 'center';
+  stage.style.alignContent = 'center';
 
   // 가로 견출지: 기본 300×438.
   // 세로 견출지: 큰 견출지 판을 438×300으로 눕히고, 내부 빨간 견출지 전체를 90도 회전합니다.
