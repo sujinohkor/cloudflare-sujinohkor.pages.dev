@@ -177,13 +177,45 @@ body.mirror-mode .label.upper{
 }
 
 @media(max-width:900px){
-  body{overflow:auto}
-  .menu-toggle{display:block}
-  .sidebar{
-    transform:translateX(-320px);transition:.25s;background:var(--bg)
+  body{
+    overflow:auto;
   }
-  .sidebar.active{transform:translateX(0)}
-  .main{margin-left:0;padding:20px;width:100vw;height:auto;min-height:100svh}
+
+  .menu-toggle{
+    display:block;
+  }
+
+  .sidebar{
+    transform:translateX(-320px);
+    transition:.25s;
+    background:var(--bg);
+  }
+
+  .sidebar.active{
+    transform:translateX(0);
+  }
+
+  .main{
+    margin-left:0;
+    padding:20px;
+    width:100%;
+    height:auto;
+    min-height:100svh;
+  }
+
+  .preview-area{
+    justify-content:flex-start;
+    align-items:flex-start;
+    overflow:auto;
+
+    /* 스크롤 시작점에서 내용이 잘리지 않도록 */
+    padding:20px;
+  }
+
+  .reference-stage{
+    flex:none;
+    margin:0;
+  }
 }
 
 @media print{
