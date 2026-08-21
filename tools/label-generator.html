@@ -674,8 +674,50 @@ document.getElementById('themeBtn').addEventListener('click',()=>{
   document.body.classList.toggle('light');
 });
 
-document.getElementById('menuToggle').addEventListener('click',()=>{
-  document.getElementById('sidebar').classList.toggle('active');
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.getElementById('sidebar');
+
+function isMobile(){
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+function closeSidebar(){
+  if(isMobile()){
+    sidebar.classList.remove('active');
+  }
+}
+
+/* MENU 버튼: 열기/닫기 */
+menuToggle.addEventListener('click', (e)=>{
+  e.stopPropagation();
+
+  if(isMobile()){
+    sidebar.classList.toggle('active');
+  }
+});
+
+/* 사이드바 내부의 "버튼"을 누르면 닫기 */
+sidebar.addEventListener('click', (e)=>{
+  if(!isMobile()) return;
+
+  const button = e.target.closest('button');
+
+  if(button){
+    closeSidebar();
+  }
+});
+
+/* 사이드바 바깥을 누르면 닫기 */
+document.addEventListener('click', (e)=>{
+  if(!isMobile()) return;
+
+  if(
+    sidebar.classList.contains('active') &&
+    !sidebar.contains(e.target) &&
+    !menuToggle.contains(e.target)
+  ){
+    closeSidebar();
+  }
 });
 
 document.getElementById('clearBtn').addEventListener('click',()=>{
