@@ -629,7 +629,37 @@ document.getElementById('clearBtn').addEventListener('click',()=>{
   document.querySelectorAll('.mirror-text').forEach(el=>el.textContent='');
 });
 
-document.getElementById('printBtn').addEventListener('click',()=>window.print());
+document.getElementById('printBtn').addEventListener('click', () => {
+  let printStyle = document.getElementById('dynamicPrintPage');
+
+  if(!printStyle){
+    printStyle = document.createElement('style');
+    printStyle.id = 'dynamicPrintPage';
+    document.head.appendChild(printStyle);
+  }
+
+  const paper = document.getElementById('paperSize').value;
+
+  const paperNames = {
+    a4: 'A4',
+    a3: 'A3',
+    letter: 'letter'
+  };
+
+  const orientation =
+    labelOrientation === 'vertical'
+      ? 'landscape'
+      : 'portrait';
+
+  printStyle.textContent = `
+    @page {
+      size: ${paperNames[paper]} ${orientation};
+      margin: 0;
+    }
+  `;
+
+  window.print();
+});
 
 document.getElementById('fontSize').addEventListener('input',e=>{
   document.querySelectorAll('.label,.mirror-text').forEach(el=>el.style.fontSize=e.target.value+'px');
