@@ -3,20 +3,139 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CloudTeX · LaTeX.js Live Editor</title>
+<title>CloudTeX · LaTeX.js Paginated Editor</title>
 
-<script type="module">
-import { LaTeXJSComponent } from "https://cdn.jsdelivr.net/npm/latex.js/dist/latex.mjs";
+<script src="https://cdn.jsdelivr.net/npm/latex.js/dist/latex.js"></script>
 
-if (!customElements.get("latex-js")) {
-  customElements.define("latex-js", LaTeXJSComponent);
+<style>
+:root{
+  --bg:#f3f5f9;--panel:#fff;--panel-soft:#f8f9fc;--editor:#fbfcff;
+  --text:#172033;--muted:#758197;--line:#e2e6ee;--accent:#2f7d32;
+  --shadow:0 15px 40px rgba(20,35,60,.10)
 }
+[data-theme="dark"]{
+  --bg:#10141d;--panel:#171c26;--panel-soft:#1c2330;--editor:#121722;
+  --text:#edf2ff;--muted:#9ba7bc;--line:#2d3545;--accent:#59b962;
+  --shadow:0 15px 40px rgba(0,0,0,.32)
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit}
+button,select{color:inherit}
+.app{height:100%;display:grid;grid-template-rows:50px 1fr}
+.topbar{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel);border-bottom:1px solid var(--line);z-index:10}
+.brand{display:flex;align-items:center;gap:8px;font-weight:750;margin-right:8px}
+.logo{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--accent);color:#fff;font-family:Georgia,serif;font-weight:800}
+.btn{border:1px solid var(--line);background:var(--panel);height:34px;border-radius:9px;padding:0 11px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.btn:hover{background:var(--panel-soft)} .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.icon{width:34px;padding:0;justify-content:center}.spacer{flex:1}.status{font-size:12px;color:var(--muted)}
+.workspace{display:grid;grid-template-columns:48% 6px 1fr;min-width:0;min-height:0}
+.editor-pane{min-width:0;min-height:0;display:grid;grid-template-rows:38px 1fr 30px;background:var(--panel);border-right:1px solid var(--line)}
+.pane-title{display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--panel-soft);border-bottom:1px solid var(--line);font-size:12px;font-weight:650}
+.file-tab{height:28px;padding:0 10px;border-radius:7px;background:var(--panel);display:flex;align-items:center;gap:6px;border:1px solid var(--line)}
+.editor-wrap{position:relative;min-height:0;background:var(--editor)}
+#lineNums{position:absolute;left:0;top:0;bottom:0;width:48px;padding:14px 8px;text-align:right;white-space:pre;overflow:hidden;user-select:none;color:#a0a9b8;border-right:1px solid var(--line);background:var(--panel-soft);font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+#editor{position:absolute;inset:0 0 0 48px;width:calc(100% - 48px);height:100%;border:0;outline:0;resize:none;padding:14px 16px;background:var(--editor);color:var(--text);white-space:pre;tab-size:2;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.editor-footer{display:flex;align-items:center;gap:14px;padding:0 10px;border-top:1px solid var(--line);background:var(--panel-soft);color:var(--muted);font-size:11px}
+.divider{background:var(--line);cursor:col-resize;touch-action:none}
+.preview-pane{min-width:0;min-height:0;display:grid;grid-template-rows:38px 1fr;background:#dfe3ea}
+.preview-toolbar{display:flex;align-items:center;gap:8px;padding:0 10px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12px}
+.preview-shell{min-height:0;overflow:auto;padding:28px;background:#dfe3ea}
+#measureRoot{position:absolute;left:-100000px;top:0;background:#fff;color:#111;visibility:visible;pointer-events:none}
+#pages{display:flex;flex-direction:column;align-items:center;gap:24px;min-width:max-content}
+.paper-page{position:relative;flex:none;background:#fff;color:#111;box-shadow:0 8px 28px rgba(0,0,0,.17);overflow:hidden}
+.paper-content{position:absolute;overflow:hidden;background:#fff}
+.page-stage{position:absolute;left:0;top:0;transform-origin:top left}
+.page-number{position:absolute;left:0;right:0;bottom:5mm;text-align:center;font:10px/1.2 Inter,system-ui,sans-serif;color:#999;user-select:none}
+.error-panel{position:fixed;left:18px;right:18px;bottom:18px;z-index:100;display:none;background:#251314;color:#ffd8d8;border:1px solid #6a2e31;border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.error-panel.open{display:block}.error-head{height:36px;display:flex;align-items:center;padding:0 10px;border-bottom:1px solid #633033;font-size:12px;font-weight:700}.error-head span{flex:1}
+#errorText{margin:0;padding:12px;max-height:180px;overflow:auto;white-space:pre-wrap;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.toast{position:fixed;right:16px;top:62px;padding:10px 13px;border-radius:10px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:.18s;z-index:120}
+.toast.show{opacity:1;transform:none}#fileInput{display:none}
+@media print{
+  @page{size:var(--print-page-size,A4);margin:0}
+  html,body{width:auto!important;height:auto!important;overflow:visible!important;background:#fff!important}
+  .topbar,.editor-pane,.divider,.preview-toolbar,.error-panel,.toast,#measureRoot{display:none!important}
+  .app,.workspace,.preview-pane,.preview-shell,#pages{display:block!important;width:auto!important;height:auto!important;overflow:visible!important;margin:0!important;padding:0!important;background:#fff!important}
+  .paper-page{margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always}
+  .paper-page:last-child{break-after:auto;page-break-after:auto}
+  .page-number{display:none!important}
+}
+@media(max-width:760px){
+  .workspace{grid-template-columns:1fr!important;grid-template-rows:50% 6px 1fr}
+  .divider{cursor:row-resize}.brand span{display:none}.top-status{display:none}.preview-shell{padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">TₑX</div><span>CloudTeX</span></div>
+    <button class="btn primary" id="renderBtn">▶ Render</button>
+    <button class="btn" id="saveBtn">💾 Save</button>
+    <button class="btn" id="importBtn">📂 Import</button>
+    <button class="btn" id="downloadBtn">↓ .tex</button>
 
-const DEFAULT_SOURCE = String.raw`\documentclass{article}
+    <select class="btn" id="paperSize">
+      <option>A4</option><option>A5</option><option>B5</option><option>Letter</option><option>Legal</option>
+    </select>
+    <select class="btn" id="orientation">
+      <option value="portrait">Portrait</option><option value="landscape">Landscape</option>
+    </select>
 
-\usepackage{amsmath}
+    <button class="btn" id="pdfBtn">↓ PDF</button>
+    <button class="btn" id="resetBtn">↺ Reset</button>
+    <div class="spacer"></div>
+    <span class="status top-status" id="status">Loading…</span>
+    <button class="btn icon" id="themeBtn">◐</button>
+    <input type="file" id="fileInput" accept=".tex,.txt">
+  </header>
 
-\title{CloudTeX with LaTeX.js}
+  <main class="workspace" id="workspace">
+    <section class="editor-pane">
+      <div class="pane-title">
+        <div class="file-tab">📄 main.tex</div>
+        <span class="status" id="savedState">Saved</span>
+      </div>
+      <div class="editor-wrap">
+        <div id="lineNums">1</div>
+        <textarea id="editor" spellcheck="false"></textarea>
+      </div>
+      <div class="editor-footer">
+        <span id="cursorPos">Ln 1, Col 1</span><span>LaTeX</span><span>UTF-8</span><span>Live render · 400ms</span>
+      </div>
+    </section>
+
+    <div class="divider" id="divider"></div>
+
+    <section class="preview-pane">
+      <div class="preview-toolbar"><strong>Live Preview</strong><span class="status">HTML5 · LaTeX.js low-level API</span></div>
+      <div class="preview-shell">
+        <div id="measureRoot"></div>
+        <div id="pages"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="error-panel" id="errorPanel">
+  <div class="error-head"><span>LaTeX.js render error</span><button class="btn icon" id="closeError">×</button></div>
+  <pre id="errorText"></pre>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const STORAGE_KEY="cloudtex-lowlevel-source-v1";
+const THEME_KEY="cloudtex-lowlevel-theme-v1";
+const PAPER_KEY="cloudtex-lowlevel-paper-v1";
+const ORIENT_KEY="cloudtex-lowlevel-orient-v1";
+const BASE_URL="https://cdn.jsdelivr.net/npm/latex.js/dist/";
+
+const DEFAULT_SOURCE=String.raw`\documentclass{article}
+
+\title{CloudTeX Sample}
 \author{Your Name}
 \date{\today}
 
@@ -26,839 +145,166 @@ const DEFAULT_SOURCE = String.raw`\documentclass{article}
 
 \begin{abstract}
 This document is rendered directly in the browser with LaTeX.js.
-No TeX server or WebAssembly engine is required.
+The preview is divided into visible paper pages by CloudTeX.
 \end{abstract}
 
 \section{Introduction}
 
-Edit the LaTeX source on the left.
-The preview on the right updates automatically.
+This is a sample document. Add more paragraphs to test pagination.
+
+This paragraph exists to make the document longer. This paragraph exists to make the document longer.
+This paragraph exists to make the document longer. This paragraph exists to make the document longer.
 
 \section{Equation}
 
-The famous mass--energy relation is
-
 \[
-E = mc^2.
+E = mc^2
 \]
 
 \section{List}
 
 \begin{itemize}
   \item Live browser preview
-  \item IndexedDB/local browser storage
-  \item Import and export of \texttt{.tex} files
+  \item Selectable paper size
+  \item Browser PDF printing
 \end{itemize}
 
 \end{document}`;
 
-const STORAGE_KEY = "cloudtex-latexjs-source-v1";
-const THEME_KEY = "cloudtex-latexjs-theme-v1";
+const editor=$("editor"),lineNums=$("lineNums"),measureRoot=$("measureRoot"),pages=$("pages");
+let lastRendered="",timer=null,stylesInstalled=false;
 
-const $ = id => document.getElementById(id);
-const editor = $("editor");
-const previewSource = $("previewSource");
-const paginatedPages = $("paginatedPages");
-const status = $("status");
-const lineNums = $("lineNums");
-const cursorPos = $("cursorPos");
-const errorPanel = $("errorPanel");
-const errorText = $("errorText");
-
-let renderTimer = null;
-let lastRendered = "";
-
-function toast(message) {
-  const el = $("toast");
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.classList.remove("show"), 1800);
+function toast(s){const t=$("toast");t.textContent=s;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),1800)}
+function showError(e){$("errorText").textContent=e?.stack||e?.message||String(e);$("errorPanel").classList.add("open");$("status").textContent="Render error"}
+function clearError(){$("errorPanel").classList.remove("open")}
+function updateLines(){const n=editor.value.split("\n").length;lineNums.textContent=Array.from({length:n},(_,i)=>i+1).join("\n");lineNums.scrollTop=editor.scrollTop}
+function updateCursor(){const a=editor.value.slice(0,editor.selectionStart).split("\n");$("cursorPos").textContent=`Ln ${a.length}, Col ${a.at(-1).length+1}`}
+function mmToPx(mm){return mm*(96/25.4)}
+function paperDims(){
+  const map={A4:[210,297],A5:[148,210],B5:[176,250],Letter:[215.9,279.4],Legal:[215.9,355.6]};
+  let [w,h]=map[$("paperSize").value]||map.A4;
+  if($("orientation").value==="landscape")[w,h]=[h,w];
+  return{w,h}
 }
-
-function updateLines() {
-  const count = editor.value.split("\n").length;
-  lineNums.textContent = Array.from({ length: count }, (_, i) => i + 1).join("\n");
-  lineNums.scrollTop = editor.scrollTop;
+function makeGenerator(source){
+  if(!window.latexjs)throw new Error("LaTeX.js library failed to load.");
+  const generator=new latexjs.HtmlGenerator({hyphenate:false});
+  return latexjs.parse(source,{generator});
 }
-
-function updateCursor() {
-  const before = editor.value.slice(0, editor.selectionStart);
-  const rows = before.split("\n");
-  cursorPos.textContent = `Ln ${rows.length}, Col ${rows[rows.length - 1].length + 1}`;
+function installLatexAssets(generator){
+  if(stylesInstalled)return;
+  const assets=generator.stylesAndScripts(BASE_URL);
+  document.head.appendChild(assets);
+  stylesInstalled=true;
 }
-
-function showError(error) {
-  errorText.textContent = error?.message || String(error);
-  errorPanel.classList.add("open");
-  status.textContent = "Render error";
-}
-
-function clearError() {
-  errorPanel.classList.remove("open");
-}
-
-async function renderLatex(force = false) {
-  const source = editor.value;
-
-  if (!force && source === lastRendered) return;
-
-  status.textContent = "Rendering…";
-  clearError();
-
-  try {
-    await paginatePreview();
-
-    lastRendered = source;
-    localStorage.setItem(STORAGE_KEY, source);
-    $("savedState").textContent = "Saved";
-  } catch (error) {
-    showError(error);
+async function waitLayout(el){
+  let prev=-1,stable=0;
+  for(let i=0;i<30;i++){
+    await new Promise(r=>setTimeout(r,50));
+    const h=Math.max(el.scrollHeight,el.getBoundingClientRect().height);
+    if(h>10&&Math.abs(h-prev)<1){stable++;if(stable>=3)return h}else stable=0;
+    prev=h;
   }
+  return Math.max(el.scrollHeight,el.getBoundingClientRect().height)
 }
+async function renderLatex(force=false){
+  const src=editor.value;
+  if(!force&&src===lastRendered)return;
+  $("status").textContent="Rendering…";clearError();
+  try{
+    const dims=paperDims(),top=18,side=17,bottom=20;
+    const contentW=dims.w-side*2,contentH=dims.h-top-bottom;
 
+    // The official low-level API gives us a normal DOM fragment.
+    const measuredGen=makeGenerator(src);
+    installLatexAssets(measuredGen);
 
+    measureRoot.innerHTML="";
+    measureRoot.style.width=`${contentW}mm`;
+    const fragment=measuredGen.domFragment();
+    measureRoot.appendChild(fragment);
 
-function getPaperDimensionsMm() {
-  const PAPER_SIZES = {
-    A4:     { w: 210,   h: 297 },
-    A5:     { w: 148,   h: 210 },
-    B5:     { w: 176,   h: 250 },
-    Letter: { w: 215.9, h: 279.4 },
-    Legal:  { w: 215.9, h: 355.6 }
-  };
+    const fullHeight=await waitLayout(measureRoot);
+    if(fullHeight<10)throw new Error("LaTeX.js generated an empty DOM fragment.");
 
-  const selected = PAPER_SIZES[$("paperSize").value] || PAPER_SIZES.A4;
-  const landscape = $("orientation").value === "landscape";
+    const pageHpx=mmToPx(contentH);
+    const pageCount=Math.max(1,Math.ceil(fullHeight/pageHpx));
+    pages.innerHTML="";
 
-  return landscape
-    ? { w: selected.h, h: selected.w }
-    : { w: selected.w, h: selected.h };
-}
+    // Render each paper independently from the same source, then translate+clip it.
+    for(let i=0;i<pageCount;i++){
+      const page=document.createElement("section");
+      page.className="paper-page";
+      page.style.width=`${dims.w}mm`;
+      page.style.height=`${dims.h}mm`;
 
-function mmToPx(mm) {
-  return mm * (96 / 25.4);
-}
+      const content=document.createElement("div");
+      content.className="paper-content";
+      content.style.left=`${side}mm`;
+      content.style.right=`${side}mm`;
+      content.style.top=`${top}mm`;
+      content.style.bottom=`${bottom}mm`;
 
-async function waitForLatexLayout(component) {
-  function measure() {
-    const hostRect = component.getBoundingClientRect();
+      const stage=document.createElement("div");
+      stage.className="page-stage";
+      stage.style.width=`${contentW}mm`;
+      stage.style.transform=`translateY(-${i*pageHpx}px)`;
 
-    // Normal host measurement first.
-    let height = Math.max(
-      component.scrollHeight || 0,
-      hostRect.height || 0
-    );
+      const gen=makeGenerator(src);
+      stage.appendChild(gen.domFragment());
+      content.appendChild(stage);
 
-    // LaTeX.js commonly renders its output inside Shadow DOM.
-    // In that case the host itself can report height 0, so measure
-    // the union of the actual rendered elements inside the shadow root.
-    const root = component.shadowRoot;
-    if (root) {
-      const elements = [...root.querySelectorAll("*")];
-
-      if (elements.length) {
-        let top = Infinity;
-        let bottom = -Infinity;
-
-        for (const el of elements) {
-          const style = getComputedStyle(el);
-
-          if (
-            style.display === "none" ||
-            style.position === "fixed"
-          ) {
-            continue;
-          }
-
-          const r = el.getBoundingClientRect();
-
-          if (r.width === 0 && r.height === 0) continue;
-
-          top = Math.min(top, r.top);
-          bottom = Math.max(bottom, r.bottom);
-        }
-
-        if (Number.isFinite(top) && Number.isFinite(bottom)) {
-          height = Math.max(height, bottom - top);
-        }
-
-        // Also try likely document/body wrappers if present.
-        const wrappers = [
-          root.querySelector(".body"),
-          root.querySelector(".document"),
-          root.querySelector("main"),
-          root.querySelector("article"),
-          root.firstElementChild
-        ].filter(Boolean);
-
-        for (const el of wrappers) {
-          const r = el.getBoundingClientRect();
-          height = Math.max(
-            height,
-            el.scrollHeight || 0,
-            r.height || 0
-          );
-        }
-      }
+      const num=document.createElement("div");
+      num.className="page-number";num.textContent=`Page ${i+1}`;
+      page.append(content,num);
+      pages.appendChild(page);
     }
 
-    return height;
-  }
-
-  let previous = -1;
-  let stableCount = 0;
-
-  // Give LaTeX.js enough time to parse, attach styles, and render.
-  for (let i = 0; i < 50; i++) {
-    await new Promise(resolve => setTimeout(resolve, 80));
-
-    const h = measure();
-
-    if (h > 20 && Math.abs(h - previous) < 1) {
-      stableCount += 1;
-
-      if (stableCount >= 3) {
-        return h;
-      }
-    } else {
-      stableCount = 0;
-    }
-
-    previous = h;
-  }
-
-  return measure();
+    lastRendered=src;
+    localStorage.setItem(STORAGE_KEY,src);
+    $("savedState").textContent="Saved";
+    $("status").textContent=`${pageCount} page${pageCount===1?"":"s"} · LaTeX.js`;
+  }catch(e){showError(e)}
+}
+function schedule(){clearTimeout(timer);$("savedState").textContent="Editing…";timer=setTimeout(()=>renderLatex(),400)}
+function download(name,text){const b=new Blob([text],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function applyPrintSize(){
+  const p=$("paperSize").value.toLowerCase(),o=$("orientation").value;
+  const css=p==="b5"?"176mm 250mm":p;
+  document.documentElement.style.setProperty("--print-page-size",`${css} ${o}`);
 }
 
-function makePreviewComponent(source) {
-  const component = document.createElement("latex-js");
-  component.setAttribute(
-    "baseURL",
-    "https://cdn.jsdelivr.net/npm/latex.js/dist/"
-  );
-  component.setAttribute("hyphenate", "false");
-  component.textContent = source;
-  component.className = "latex-page-document";
-  return component;
-}
+editor.value=localStorage.getItem(STORAGE_KEY)||DEFAULT_SOURCE;
+$("paperSize").value=localStorage.getItem(PAPER_KEY)||"A4";
+$("orientation").value=localStorage.getItem(ORIENT_KEY)||"portrait";
+document.documentElement.dataset.theme=localStorage.getItem(THEME_KEY)||"light";
+applyPrintSize();updateLines();updateCursor();
 
-async function paginatePreview() {
-  const source = editor.value;
-  const dims = getPaperDimensionsMm();
-
-  // These are the same margins used for PDF printing.
-  const topMm = 18;
-  const sideMm = 17;
-  const bottomMm = 20;
-
-  const contentWidthMm = Math.max(20, dims.w - sideMm * 2);
-  const contentHeightMm = Math.max(20, dims.h - topMm - bottomMm);
-
-  const contentWidthPx = mmToPx(contentWidthMm);
-  const contentHeightPx = mmToPx(contentHeightMm);
-
-  // 1) Render ONE complete LaTeX.js document off-screen.
-  previewSource.innerHTML = "";
-  previewSource.style.width = `${contentWidthMm}mm`;
-
-  const measureComponent = makePreviewComponent(source);
-  previewSource.appendChild(measureComponent);
-
-  await customElements.whenDefined("latex-js");
-  const documentHeightPx = await waitForLatexLayout(measureComponent);
-
-  if (!documentHeightPx || documentHeightPx < 1) {
-    throw new Error(
-      "LaTeX.js 렌더링 결과를 측정하지 못했습니다. " +
-      "렌더러는 로드됐지만 실제 문서 DOM이 생성되지 않았습니다."
-    );
-  }
-
-  const pageCount = Math.max(1, Math.ceil(documentHeightPx / contentHeightPx));
-
-  // 2) Each visible page contains the same rendered document,
-  // translated upward and clipped to the content rectangle.
-  paginatedPages.innerHTML = "";
-
-  for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-    const page = document.createElement("section");
-    page.className = "paper-page";
-    page.style.width = `${dims.w}mm`;
-    page.style.height = `${dims.h}mm`;
-
-    const content = document.createElement("div");
-    content.className = "paper-content";
-    content.style.left = `${sideMm}mm`;
-    content.style.right = `${sideMm}mm`;
-    content.style.top = `${topMm}mm`;
-    content.style.bottom = `${bottomMm}mm`;
-
-    const stage = document.createElement("div");
-    stage.className = "fragment-stage";
-    stage.style.width = `${contentWidthMm}mm`;
-    stage.style.transform = `translateY(-${pageIndex * contentHeightPx}px)`;
-
-    const pageComponent = makePreviewComponent(source);
-    stage.appendChild(pageComponent);
-    content.appendChild(stage);
-
-    const number = document.createElement("div");
-    number.className = "page-number";
-    number.textContent = `Page ${pageIndex + 1}`;
-
-    page.append(content, number);
-    paginatedPages.appendChild(page);
-  }
-
-  status.textContent = `${pageCount} page${pageCount === 1 ? "" : "s"} · LaTeX.js`;
-}
-function scheduleRender() {
-  clearTimeout(renderTimer);
-  $("savedState").textContent = "Editing…";
-  renderTimer = setTimeout(() => renderLatex(), 350);
-}
-
-function downloadText(name, text, type = "text/plain;charset=utf-8") {
-  const blob = new Blob([text], { type });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1200);
-}
-
-function setTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem(THEME_KEY, theme);
-}
-
-window.addEventListener("DOMContentLoaded", async () => {
-  setTheme(localStorage.getItem(THEME_KEY) || "light");
-
-  editor.value = localStorage.getItem(STORAGE_KEY) || DEFAULT_SOURCE;
-  updateLines();
-  updateCursor();
-
-  editor.addEventListener("input", () => {
-    updateLines();
-    updateCursor();
-    scheduleRender();
-  });
-
-  editor.addEventListener("scroll", () => {
-    lineNums.scrollTop = editor.scrollTop;
-  });
-
-  editor.addEventListener("click", updateCursor);
-  editor.addEventListener("keyup", updateCursor);
-
-  editor.addEventListener("keydown", event => {
-    if (event.key === "Tab") {
-      event.preventDefault();
-      const start = editor.selectionStart;
-      const end = editor.selectionEnd;
-      editor.setRangeText("  ", start, end, "end");
-      editor.dispatchEvent(new Event("input"));
-    }
-
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
-      event.preventDefault();
-      localStorage.setItem(STORAGE_KEY, editor.value);
-      $("savedState").textContent = "Saved";
-      toast("저장했습니다.");
-    }
-  });
-
-  $("renderBtn").addEventListener("click", () => renderLatex(true));
-
-  $("saveBtn").addEventListener("click", () => {
-    localStorage.setItem(STORAGE_KEY, editor.value);
-    $("savedState").textContent = "Saved";
-    toast("브라우저에 저장했습니다.");
-  });
-
-  $("downloadBtn").addEventListener("click", () => {
-    downloadText("main.tex", editor.value);
-  });
-
-  const PAPER_SIZES = {
-    A4:     { css: "A4",          w: 210,   h: 297 },
-    A5:     { css: "A5",          w: 148,   h: 210 },
-    B5:     { css: "176mm 250mm", w: 176,   h: 250 },
-    Letter: { css: "letter",      w: 215.9, h: 279.4 },
-    Legal:  { css: "legal",       w: 215.9, h: 355.6 }
-  };
-
-  function applyPaperSettings() {
-    const name = $("paperSize").value;
-    const orientation = $("orientation").value;
-    const p = PAPER_SIZES[name];
-
-    const w = orientation === "landscape" ? p.h : p.w;
-    const h = orientation === "landscape" ? p.w : p.h;
-
-    // CSS pixels at 96dpi approximation for the on-screen paper preview.
-    const pxPerMm = 96 / 25.4;
-    document.documentElement.style.setProperty("--preview-width", `${Math.round(w * pxPerMm)}px`);
-    document.documentElement.style.setProperty("--preview-height", `${Math.round(h * pxPerMm)}px`);
-
-    const pageSize = orientation === "landscape"
-      ? `${p.css} landscape`
-      : `${p.css} portrait`;
-
-    document.documentElement.style.setProperty("--print-page-size", pageSize);
-    localStorage.setItem("cloudtex-paper-size", name);
-    localStorage.setItem("cloudtex-paper-orientation", orientation);
-  }
-
-  $("paperSize").value = localStorage.getItem("cloudtex-paper-size") || "A4";
-  $("orientation").value = localStorage.getItem("cloudtex-paper-orientation") || "portrait";
-  $("paperSize").addEventListener("change", async () => { applyPaperSettings(); await renderLatex(true); });
-  $("orientation").addEventListener("change", async () => { applyPaperSettings(); await renderLatex(true); });
-  applyPaperSettings();
-
-  $("pdfBtn").addEventListener("click", async () => {
-    applyPaperSettings();
-    await renderLatex(true);
-    document.body.classList.add("printing-preview");
-    setTimeout(() => window.print(), 80);
-  });
-
-  window.addEventListener("afterprint", () => {
-    document.body.classList.remove("printing-preview");
-  });
-
-  $("importBtn").addEventListener("click", () => $("fileInput").click());
-
-  $("fileInput").addEventListener("change", async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    editor.value = await file.text();
-    updateLines();
-    updateCursor();
-    localStorage.setItem(STORAGE_KEY, editor.value);
-    await renderLatex(true);
-    event.target.value = "";
-    toast(`${file.name} 불러오기 완료`);
-  });
-
-  $("resetBtn").addEventListener("click", async () => {
-    if (!confirm("기본 예제로 되돌릴까요? 현재 편집 내용은 덮어씌워집니다.")) return;
-    editor.value = DEFAULT_SOURCE;
-    localStorage.setItem(STORAGE_KEY, editor.value);
-    updateLines();
-    updateCursor();
-    await renderLatex(true);
-  });
-
-  $("themeBtn").addEventListener("click", () => {
-    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    setTheme(next);
-  });
-
-  $("closeError").addEventListener("click", clearError);
-
-  // resizable split view
-  const workspace = $("workspace");
-  const divider = $("divider");
-  let dragging = false;
-
-  divider.addEventListener("pointerdown", event => {
-    dragging = true;
-    divider.setPointerCapture(event.pointerId);
-  });
-
-  divider.addEventListener("pointermove", event => {
-    if (!dragging || window.innerWidth < 760) return;
-    const pct = Math.max(25, Math.min(75, (event.clientX / window.innerWidth) * 100));
-    workspace.style.gridTemplateColumns = `${pct}% 6px 1fr`;
-  });
-
-  divider.addEventListener("pointerup", () => dragging = false);
-  divider.addEventListener("pointercancel", () => dragging = false);
-
-  // Wait for the custom element to be registered before first render.
-  await customElements.whenDefined("latex-js");
-  await renderLatex(true);
+editor.addEventListener("input",()=>{updateLines();updateCursor();schedule()});
+editor.addEventListener("scroll",()=>lineNums.scrollTop=editor.scrollTop);
+editor.addEventListener("click",updateCursor);editor.addEventListener("keyup",updateCursor);
+editor.addEventListener("keydown",e=>{
+  if(e.key==="Tab"){e.preventDefault();const s=editor.selectionStart,en=editor.selectionEnd;editor.setRangeText("  ",s,en,"end");editor.dispatchEvent(new Event("input"))}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){e.preventDefault();localStorage.setItem(STORAGE_KEY,editor.value);$("savedState").textContent="Saved";toast("저장했습니다.")}
 });
+$("renderBtn").onclick=()=>renderLatex(true);
+$("saveBtn").onclick=()=>{localStorage.setItem(STORAGE_KEY,editor.value);$("savedState").textContent="Saved";toast("브라우저에 저장했습니다.")};
+$("downloadBtn").onclick=()=>download("main.tex",editor.value);
+$("importBtn").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;editor.value=await f.text();updateLines();updateCursor();await renderLatex(true);e.target.value=""};
+$("resetBtn").onclick=async()=>{if(!confirm("기본 문서로 되돌릴까요?"))return;editor.value=DEFAULT_SOURCE;updateLines();updateCursor();await renderLatex(true)};
+$("paperSize").onchange=async()=>{localStorage.setItem(PAPER_KEY,$("paperSize").value);applyPrintSize();lastRendered="";await renderLatex(true)};
+$("orientation").onchange=async()=>{localStorage.setItem(ORIENT_KEY,$("orientation").value);applyPrintSize();lastRendered="";await renderLatex(true)};
+$("pdfBtn").onclick=async()=>{await renderLatex(true);setTimeout(()=>window.print(),80)};
+$("themeBtn").onclick=()=>{const n=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=n;localStorage.setItem(THEME_KEY,n)};
+$("closeError").onclick=clearError;
+
+const workspace=$("workspace"),divider=$("divider");let dragging=false;
+divider.onpointerdown=e=>{dragging=true;divider.setPointerCapture(e.pointerId)};
+divider.onpointermove=e=>{if(!dragging||innerWidth<760)return;const p=Math.max(25,Math.min(75,e.clientX/innerWidth*100));workspace.style.gridTemplateColumns=`${p}% 6px 1fr`};
+divider.onpointerup=()=>dragging=false;
+
+window.addEventListener("load",()=>renderLatex(true));
 </script>
-
-<style>
-:root{
-  --bg:#f3f5f9;
-  --panel:#fff;
-  --panel-soft:#f8f9fc;
-  --editor:#fbfcff;
-  --text:#172033;
-  --muted:#758197;
-  --line:#e2e6ee;
-  --accent:#2f7d32;
-  --accent-soft:#edf7ee;
-  --danger:#c64545;
-  --shadow:0 15px 40px rgba(20,35,60,.10);
-}
-[data-theme="dark"]{
-  --bg:#10141d;
-  --panel:#171c26;
-  --panel-soft:#1c2330;
-  --editor:#121722;
-  --text:#edf2ff;
-  --muted:#9ba7bc;
-  --line:#2d3545;
-  --accent:#59b962;
-  --accent-soft:#19351d;
-  --danger:#ff7777;
-  --shadow:0 15px 40px rgba(0,0,0,.32);
-}
-*{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden}
-body{
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);color:var(--text)
-}
-button,input,textarea{font:inherit}
-button{color:inherit}
-.app{height:100%;display:grid;grid-template-rows:50px 1fr}
-.topbar{
-  display:flex;align-items:center;gap:8px;padding:7px 10px;
-  background:var(--panel);border-bottom:1px solid var(--line);z-index:10
-}
-.brand{display:flex;align-items:center;gap:8px;font-weight:750;margin-right:8px}
-.logo{
-  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
-  background:var(--accent);color:#fff;font-family:Georgia,serif;font-weight:800
-}
-.btn{
-  border:1px solid var(--line);background:var(--panel);height:34px;border-radius:9px;
-  padding:0 11px;display:inline-flex;align-items:center;gap:6px;cursor:pointer
-}
-.btn:hover{background:var(--panel-soft)}
-.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.btn.icon{width:34px;padding:0;justify-content:center}
-.spacer{flex:1}
-.status{font-size:12px;color:var(--muted)}
-.workspace{display:grid;grid-template-columns:48% 6px 1fr;min-width:0;min-height:0}
-.editor-pane{
-  min-width:0;min-height:0;display:grid;grid-template-rows:38px 1fr 30px;
-  background:var(--panel);border-right:1px solid var(--line)
-}
-.pane-title{
-  display:flex;align-items:center;gap:8px;padding:0 12px;
-  background:var(--panel-soft);border-bottom:1px solid var(--line);
-  font-size:12px;font-weight:650
-}
-.file-tab{
-  height:28px;padding:0 10px;border-radius:7px;background:var(--panel);
-  display:flex;align-items:center;gap:6px;border:1px solid var(--line)
-}
-.editor-wrap{position:relative;min-height:0;background:var(--editor)}
-#lineNums{
-  position:absolute;left:0;top:0;bottom:0;width:48px;padding:14px 8px;
-  text-align:right;white-space:pre;overflow:hidden;user-select:none;color:#a0a9b8;
-  border-right:1px solid var(--line);background:var(--panel-soft);
-  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace
-}
-#editor{
-  position:absolute;inset:0 0 0 48px;width:calc(100% - 48px);height:100%;
-  border:0;outline:0;resize:none;padding:14px 16px;background:var(--editor);color:var(--text);
-  white-space:pre;tab-size:2;
-  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace
-}
-.editor-footer{
-  display:flex;align-items:center;gap:14px;padding:0 10px;
-  border-top:1px solid var(--line);background:var(--panel-soft);
-  color:var(--muted);font-size:11px
-}
-.divider{background:var(--line);cursor:col-resize;touch-action:none}
-.preview-pane{
-  min-width:0;min-height:0;display:grid;grid-template-rows:38px 1fr;
-  background:#dfe3ea
-}
-.preview-toolbar{
-  display:flex;align-items:center;gap:8px;padding:0 10px;background:var(--panel);
-  border-bottom:1px solid var(--line);font-size:12px
-}
-.preview-shell{
-  min-height:0;overflow:auto;padding:28px;background:#dfe3ea
-}
-#previewSource{
-  position:absolute;
-  left:0;
-  top:0;
-  z-index:-1000;
-  opacity:0;
-  visibility:visible;
-  pointer-events:none;
-  background:#fff;
-  color:#111;
-  overflow:visible;
-}
-#previewSource latex-js,
-.latex-page-document{
-  display:block;
-  width:100%;
-  background:#fff;
-  color:#111;
-}
-#paginatedPages{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:24px;
-  min-width:max-content;
-}
-.paper-page{
-  position:relative;
-  flex:none;
-  background:#fff;
-  color:#111;
-  box-shadow:0 8px 28px rgba(0,0,0,.17);
-  overflow:hidden;
-}
-.paper-content{
-  position:absolute;
-  overflow:hidden;
-  background:#fff;
-}
-.fragment-stage{
-  position:absolute;
-  left:0;
-  top:0;
-  transform-origin:top left;
-  will-change:transform;
-}
-.page-number{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:5mm;
-  text-align:center;
-  font:10px/1.2 Inter,system-ui,sans-serif;
-  color:#999;
-  user-select:none;
-}
-.error-panel{
-  position:fixed;left:18px;right:18px;bottom:18px;z-index:100;
-  display:none;background:#251314;color:#ffd8d8;border:1px solid #6a2e31;
-  border-radius:12px;box-shadow:var(--shadow);overflow:hidden
-}
-.error-panel.open{display:block}
-.error-head{
-  height:36px;display:flex;align-items:center;padding:0 10px;
-  border-bottom:1px solid #633033;font-size:12px;font-weight:700
-}
-.error-head span{flex:1}
-#errorText{
-  margin:0;padding:12px;max-height:180px;overflow:auto;white-space:pre-wrap;
-  font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace
-}
-.toast{
-  position:fixed;right:16px;top:62px;padding:10px 13px;border-radius:10px;
-  background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);
-  font-size:12px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:.18s;z-index:120
-}
-.toast.show{opacity:1;transform:none}
-#fileInput{display:none}
-
-
-@media print {
-  @page {
-    size: var(--print-page-size, A4);
-    margin: 18mm 17mm 20mm 17mm;
-  }
-
-  html, body {
-    width: auto !important;
-    height: auto !important;
-    overflow: visible !important;
-    background: #fff !important;
-  }
-
-  body {
-    margin: 0 !important;
-  }
-
-  .topbar,
-  .editor-pane,
-  .divider,
-  .preview-toolbar,
-  .error-panel,
-  .toast {
-    display: none !important;
-  }
-
-  .app,
-  .workspace,
-  .preview-pane,
-  .preview-shell,
-  #paginatedPages {
-    display:block !important;
-    width:auto !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-    position:static !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:#fff !important;
-    box-shadow:none !important;
-    border:0 !important;
-  }
-
-  #previewSource {
-    display:none !important;
-  }
-
-  #paginatedPages {
-    display:block !important;
-  }
-
-  .paper-page {
-    position:relative !important;
-    margin:0 !important;
-    box-shadow:none !important;
-    overflow:hidden !important;
-    break-after:page;
-    page-break-after:always;
-    background:#fff !important;
-    color:#000 !important;
-  }
-
-  .paper-page:last-child {
-    break-after:auto;
-    page-break-after:auto;
-  }
-
-  .paper-content {
-    position:absolute !important;
-    overflow:hidden !important;
-    background:#fff !important;
-  }
-
-  .fragment-stage {
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-  }
-
-  .latex-page-document {
-    color:#000 !important;
-    background:#fff !important;
-  }
-
-  .page-number {
-    display:none !important;
-  }
-
-  /* Avoid awkward breaks where browsers can honor them. */
-  h1, h2, h3, h4, h5, h6 {
-    break-after: avoid-page;
-    page-break-after: avoid;
-  }
-
-  p, li {
-    orphans: 3;
-    widows: 3;
-  }
-
-  table, figure, img, pre, blockquote,
-  .table, .figure, .equation {
-    break-inside: avoid-page;
-    page-break-inside: avoid;
-  }
-
-  a {
-    color: #000 !important;
-    text-decoration: none !important;
-  }
-}
-
-@media(max-width:760px){
-  .workspace{grid-template-columns:1fr!important;grid-template-rows:50% 6px 1fr}
-  .divider{cursor:row-resize}
-  .brand span{display:none}
-  .status.top-status{display:none}
-  .preview-shell{padding:10px}
-  #paginatedPages{transform-origin:top center}
-}
-</style>
-</head>
-<body>
-<div class="app">
-  <header class="topbar">
-    <div class="brand"><div class="logo">TₑX</div><span>CloudTeX</span></div>
-
-    <button class="btn primary" id="renderBtn">▶ Render</button>
-    <button class="btn" id="saveBtn">💾 Save</button>
-    <button class="btn" id="importBtn">📂 Import</button>
-    <button class="btn" id="downloadBtn">↓ .tex</button>
-    <select class="btn" id="paperSize" title="용지 크기">
-      <option value="A4">A4</option>
-      <option value="A5">A5</option>
-      <option value="B5">B5</option>
-      <option value="Letter">Letter</option>
-      <option value="Legal">Legal</option>
-    </select>
-    <select class="btn" id="orientation" title="방향">
-      <option value="portrait">Portrait</option>
-      <option value="landscape">Landscape</option>
-    </select>
-    <button class="btn" id="pdfBtn">↓ PDF</button>
-    <button class="btn" id="resetBtn">↺ Reset</button>
-
-    <div class="spacer"></div>
-    <span class="status top-status" id="status">Loading LaTeX.js…</span>
-    <button class="btn icon" id="themeBtn" title="테마">◐</button>
-
-    <input type="file" id="fileInput" accept=".tex,.txt">
-  </header>
-
-  <main class="workspace" id="workspace">
-    <section class="editor-pane">
-      <div class="pane-title">
-        <div class="file-tab">📄 <span>main.tex</span></div>
-        <span class="status" id="savedState">Saved</span>
-      </div>
-
-      <div class="editor-wrap">
-        <div id="lineNums">1</div>
-        <textarea id="editor" spellcheck="false" aria-label="LaTeX editor"></textarea>
-      </div>
-
-      <div class="editor-footer">
-        <span id="cursorPos">Ln 1, Col 1</span>
-        <span>LaTeX</span>
-        <span>UTF-8</span>
-        <span>Live render · 350ms</span>
-      </div>
-    </section>
-
-    <div class="divider" id="divider"></div>
-
-    <section class="preview-pane">
-      <div class="preview-toolbar">
-        <strong>Live Preview</strong>
-        <span class="status">HTML5 · LaTeX.js</span>
-      </div>
-
-      <div class="preview-shell">
-        <div id="previewSource" aria-hidden="true"></div>
-        <div id="paginatedPages"></div>
-      </div>
-    </section>
-  </main>
-</div>
-
-<div class="error-panel" id="errorPanel">
-  <div class="error-head">
-    <span>LaTeX.js render error</span>
-    <button class="btn icon" id="closeError">×</button>
-  </div>
-  <pre id="errorText"></pre>
-</div>
-
-<div class="toast" id="toast"></div>
 </body>
 </html>
