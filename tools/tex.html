@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CloudTeX</title>
+<style>
+:root{
+  --bg:#f5f7fb;
+  --panel:#ffffff;
+  --panel2:#f8f9fc;
+  --text:#172033;
+  --muted:#768198;
+  --line:#e3e7ef;
+  --accent:#2e7d32;
+  --accent2:#eaf5eb;
+  --editor:#fbfcff;
+  --toolbar:48px;
+  --tabs:38px;
+  --shadow:0 14px 38px rgba(25,40,70,.10);
+}
+[data-theme="dark"]{
+  --bg:#10141d;
+  --panel:#171c26;
+  --panel2:#1d2430;
+  --text:#edf2ff;
+  --muted:#98a4bb;
+  --line:#2c3444;
+  --accent:#53b45b;
+  --accent2:#18361d;
+  --editor:#121722;
+  --shadow:0 14px 38px rgba(0,0,0,.30);
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);
+}
+button,input,textarea{font:inherit}
+button{color:inherit}
+.app{height:100%;display:grid;grid-template-rows:var(--toolbar) 1fr}
+.topbar{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;
+  border-bottom:1px solid var(--line);background:var(--panel);z-index:20;
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:750;margin-right:8px}
+.logo{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--accent);color:white;font-family:Georgia,serif;font-weight:800}
+.btn{
+  height:34px;border:1px solid var(--line);background:var(--panel);border-radius:9px;
+  padding:0 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{background:var(--panel2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.icon{width:34px;padding:0;justify-content:center}
+.spacer{flex:1}
+.status{font-size:12px;color:var(--muted);white-space:nowrap}
+.workspace{min-height:0;display:grid;grid-template-columns:minmax(360px,48%) 6px 1fr}
+.pane{min-width:0;min-height:0;background:var(--panel)}
+.divider{cursor:col-resize;background:var(--line);position:relative}
+.divider:after{content:"";position:absolute;top:0;bottom:0;left:-3px;right:-3px}
+.editor-pane{display:grid;grid-template-rows:var(--tabs) 1fr 30px;border-right:1px solid var(--line)}
+.tabs{
+  display:flex;align-items:end;overflow:auto;background:var(--panel2);
+  border-bottom:1px solid var(--line);padding-left:4px;
+}
+.tab{
+  height:34px;min-width:110px;max-width:190px;border:0;border-right:1px solid var(--line);
+  background:transparent;padding:0 10px;display:flex;align-items:center;gap:7px;cursor:pointer;
+  font-size:12px;color:var(--muted);
+}
+.tab.active{background:var(--panel);color:var(--text);box-shadow:inset 0 2px 0 var(--accent)}
+.tab-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);visibility:hidden}
+.tab.dirty .dot{visibility:visible}
+.add-tab{min-width:36px;width:36px;font-size:18px;justify-content:center}
+.editor-wrap{position:relative;min-height:0;background:var(--editor)}
+#lineNums{
+  position:absolute;left:0;top:0;bottom:0;width:48px;padding:14px 8px;
+  overflow:hidden;text-align:right;white-space:pre;user-select:none;
+  color:#a1a9b8;border-right:1px solid var(--line);
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--panel2);
+}
+#editor{
+  position:absolute;inset:0 0 0 48px;width:calc(100% - 48px);height:100%;
+  resize:none;border:0;outline:0;padding:14px 16px;background:var(--editor);color:var(--text);
+  tab-size:2;white-space:pre;overflow:auto;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+.editor-footer{
+  display:flex;align-items:center;gap:12px;padding:0 10px;border-top:1px solid var(--line);
+  background:var(--panel2);font-size:11px;color:var(--muted)
+}
+.pdf-pane{display:grid;grid-template-rows:38px 1fr;min-height:0;background:#d9dde5}
+.pdf-toolbar{
+  display:flex;align-items:center;gap:7px;padding:4px 8px;background:var(--panel);
+  border-bottom:1px solid var(--line);
+}
+.pdf-toolbar .label{font-size:12px;font-weight:650}
+.pdf-viewer{min-height:0;position:relative;background:#dfe3ea}
+#pdfFrame{width:100%;height:100%;border:0;background:#fff}
+.empty-preview{
+  position:absolute;inset:0;display:grid;place-items:center;color:#667085;text-align:center;
+}
+.empty-card{
+  background:rgba(255,255,255,.9);padding:26px 30px;border-radius:16px;box-shadow:var(--shadow);max-width:430px
+}
+.empty-card h2{margin:8px 0 5px;color:#1d2939}
+.empty-card p{margin:0;line-height:1.55;font-size:13px}
+.log-panel{
+  position:fixed;left:16px;right:16px;bottom:16px;height:210px;background:#0e1420;color:#d9e3f6;
+  border:1px solid #28354b;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.35);
+  z-index:100;display:none;grid-template-rows:38px 1fr;overflow:hidden
+}
+.log-panel.open{display:grid}
+.log-head{display:flex;align-items:center;padding:0 12px;border-bottom:1px solid #263247;font-size:12px}
+.log-head b{flex:1}
+#log{margin:0;padding:12px;overflow:auto;white-space:pre-wrap;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.toast{
+  position:fixed;right:16px;top:62px;background:var(--panel);border:1px solid var(--line);
+  box-shadow:var(--shadow);border-radius:10px;padding:10px 13px;font-size:12px;z-index:150;
+  opacity:0;transform:translateY(-6px);pointer-events:none;transition:.18s
+}
+.toast.show{opacity:1;transform:none}
+input[type=file]{display:none}
+@media(max-width:800px){
+  .workspace{grid-template-columns:1fr;grid-template-rows:50% 6px 1fr}
+  .divider{cursor:row-resize}
+  .editor-pane{border-right:0;border-bottom:1px solid var(--line)}
+  .brand span:last-child{display:none}
+  .status{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">TₑX</div><span>CloudTeX</span></div>
+    <button class="btn primary" id="compileBtn">▶ Compile</button>
+    <button class="btn" id="saveBtn">💾 Save</button>
+    <button class="btn" id="importBtn">📂 Import</button>
+    <button class="btn" id="downloadTexBtn">↓ .tex</button>
+    <button class="btn" id="downloadPdfBtn" disabled>↓ PDF</button>
+    <button class="btn" id="logBtn">⌘ Log</button>
+    <div class="spacer"></div>
+    <span class="status" id="status">Local project · IndexedDB</span>
+    <button class="btn icon" id="themeBtn" title="테마">◐</button>
+    <input type="file" id="fileInput" accept=".tex,.bib,.sty,.cls,.txt" multiple>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <section class="pane editor-pane">
+      <div class="tabs" id="tabs"></div>
+      <div class="editor-wrap">
+        <div id="lineNums">1</div>
+        <textarea id="editor" spellcheck="false"></textarea>
+      </div>
+      <div class="editor-footer">
+        <span id="cursorPos">Ln 1, Col 1</span>
+        <span id="fileType">LaTeX</span>
+        <span>UTF-8</span>
+        <span id="engineState">Engine: demo</span>
+      </div>
+    </section>
+
+    <div class="divider" id="divider"></div>
+
+    <section class="pane pdf-pane">
+      <div class="pdf-toolbar">
+        <span class="label">PDF Preview</span>
+        <span class="status" id="previewState">아직 컴파일하지 않았습니다.</span>
+        <div class="spacer"></div>
+        <button class="btn icon" id="refreshPdfBtn" title="새로고침">↻</button>
+      </div>
+      <div class="pdf-viewer">
+        <iframe id="pdfFrame" title="PDF preview"></iframe>
+        <div class="empty-preview" id="emptyPreview">
+          <div class="empty-card">
+            <div style="font-size:48px">📄</div>
+            <h2>PDF Preview</h2>
+            <p>왼쪽에서 LaTeX를 편집한 뒤 <b>Compile</b>을 누르세요.<br>
+            현재 단일 HTML 버전은 데모 PDF를 만들며, SwiftLaTeX WASM 파일을 추가하면 실제 LaTeX 컴파일 모드로 자동 전환됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="log-panel" id="logPanel">
+  <div class="log-head"><b>Compilation Log</b><button class="btn icon" id="closeLog">×</button></div>
+  <pre id="log">CloudTeX ready.</pre>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script>
+const DB_NAME="CloudTeXDB";
+const DB_VERSION=1;
+let db=null;
+let activeFile="main.tex";
+let pdfUrl=null;
+let pdfBlob=null;
+let texEngine=null;
+
+const DEFAULT_FILES={
+"main.tex":String.raw`\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{CloudTeX Sample}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This is a browser-based LaTeX workspace prototype.
+Edit the source on the left and preview the PDF on the right.
+\end{abstract}
+
+\section{Introduction}
+
+CloudTeX is designed as a lightweight web workspace for writing
+\LaTeX{} documents without installing a local editor.
+
+\section{Equation}
+
+A familiar equation is
+\[
+E = mc^2.
+\]
+
+\section{Table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrr}
+\toprule
+Method & Accuracy & Time \\
+\midrule
+Baseline & 82.1 & 10.4 \\
+Proposed & 91.7 & 8.9 \\
+\bottomrule
+\end{tabular}
+\caption{Example result.}
+\end{table}
+
+\input{methodology}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
+`,
+"methodology.tex":String.raw`\section{Methodology}
+
+This section is stored as a separate \texttt{.tex} file.
+
+\subsection{Design}
+
+The editor supports multiple tabs, local persistence, import,
+and PDF preview in a side-by-side layout.
+`,
+"related.tex":String.raw`\section{Related Work}
+
+Write your related-work section here.
+`,
+"references.bib":String.raw`@article{example2026,
+  title   = {A Browser-Based Writing Environment},
+  author  = {Example, Alice},
+  journal = {Journal of Web Tools},
+  year    = {2026}
+}
+`
+};
+
+let files={...DEFAULT_FILES};
+let dirty=new Set();
+
+const editor=document.getElementById("editor");
+const tabs=document.getElementById("tabs");
+const lineNums=document.getElementById("lineNums");
+const logEl=document.getElementById("log");
+const logPanel=document.getElementById("logPanel");
+const pdfFrame=document.getElementById("pdfFrame");
+const emptyPreview=document.getElementById("emptyPreview");
+const previewState=document.getElementById("previewState");
+
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),2200);
+}
+
+function log(msg,clear=false){
+  if(clear)logEl.textContent="";
+  logEl.textContent+=(clear?"":"\n")+msg;
+  logEl.scrollTop=logEl.scrollHeight;
+}
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,DB_VERSION);
+    req.onupgradeneeded=()=>{
+      const d=req.result;
+      if(!d.objectStoreNames.contains("projects"))d.createObjectStore("projects",{keyPath:"id"});
+    };
+    req.onsuccess=()=>{db=req.result;resolve(db)};
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+function idbGet(id){
+  return new Promise((resolve,reject)=>{
+    const req=db.transaction("projects").objectStore("projects").get(id);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function idbPut(value){
+  return new Promise((resolve,reject)=>{
+    const req=db.transaction("projects","readwrite").objectStore("projects").put(value);
+    req.onsuccess=()=>resolve(value);
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+function iconFor(name){
+  if(name.endsWith(".bib"))return"📚";
+  if(name.endsWith(".tex"))return"📄";
+  return"📎";
+}
+
+function renderTabs(){
+  tabs.innerHTML="";
+  Object.keys(files).forEach(name=>{
+    const b=document.createElement("button");
+    b.className="tab"+(name===activeFile?" active":"")+(dirty.has(name)?" dirty":"");
+    b.innerHTML=`<span>${iconFor(name)}</span><span class="tab-name">${escapeHtml(name)}</span><span class="dot"></span>`;
+    b.onclick=()=>switchFile(name);
+    tabs.appendChild(b);
+  });
+  const add=document.createElement("button");
+  add.className="tab add-tab";add.textContent="+";
+  add.onclick=addFile;
+  tabs.appendChild(add);
+}
+
+function switchFile(name){
+  saveEditorToMemory();
+  activeFile=name;
+  editor.value=files[name]??"";
+  renderTabs();updateLines();updateCursor();
+  document.getElementById("fileType").textContent=name.endsWith(".bib")?"BibTeX":"LaTeX";
+}
+
+function saveEditorToMemory(){
+  if(activeFile)files[activeFile]=editor.value;
+}
+
+function addFile(){
+  const name=prompt("새 파일 이름", "section.tex");
+  if(!name)return;
+  if(files[name]!==undefined){toast("이미 있는 파일입니다.");return}
+  files[name]="";
+  activeFile=name;dirty.add(name);
+  switchFile(name);
+}
+
+function updateLines(){
+  const count=editor.value.split("\n").length;
+  lineNums.textContent=Array.from({length:count},(_,i)=>i+1).join("\n");
+  lineNums.scrollTop=editor.scrollTop;
+}
+
+function updateCursor(){
+  const p=editor.selectionStart;
+  const before=editor.value.slice(0,p);
+  const lines=before.split("\n");
+  document.getElementById("cursorPos").textContent=`Ln ${lines.length}, Col ${lines.at(-1).length+1}`;
+}
+
+editor.addEventListener("input",()=>{
+  files[activeFile]=editor.value;dirty.add(activeFile);
+  renderTabs();updateLines();updateCursor();
+  scheduleAutosave();
+});
+editor.addEventListener("scroll",()=>lineNums.scrollTop=editor.scrollTop);
+editor.addEventListener("click",updateCursor);
+editor.addEventListener("keyup",updateCursor);
+editor.addEventListener("keydown",e=>{
+  if(e.key==="Tab"){
+    e.preventDefault();
+    const s=editor.selectionStart,en=editor.selectionEnd;
+    editor.setRangeText("  ",s,en,"end");
+    editor.dispatchEvent(new Event("input"));
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){
+    e.preventDefault();saveProject();
+  }
+});
+
+let autosaveTimer;
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(()=>saveProject(true),700);
+}
+
+async function saveProject(silent=false){
+  saveEditorToMemory();
+  await idbPut({id:"default",files,activeFile,updatedAt:Date.now()});
+  dirty.clear();renderTabs();
+  document.getElementById("status").textContent="Saved locally · IndexedDB";
+  if(!silent)toast("프로젝트를 저장했습니다.");
+}
+
+async function loadProject(){
+  const p=await idbGet("default");
+  if(p?.files){
+    files=p.files;activeFile=p.activeFile&&p.files[p.activeFile]!==undefined?p.activeFile:Object.keys(files)[0];
+  }
+  editor.value=files[activeFile]||"";
+  renderTabs();updateLines();updateCursor();
+}
+
+function download(name,blob){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+
+document.getElementById("downloadTexBtn").onclick=()=>{
+  saveEditorToMemory();
+  download(activeFile,new Blob([files[activeFile]],{type:"text/plain;charset=utf-8"}));
+};
+
+document.getElementById("downloadPdfBtn").onclick=()=>{
+  if(pdfBlob)download("cloudtex-output.pdf",pdfBlob);
+};
+
+document.getElementById("importBtn").onclick=()=>document.getElementById("fileInput").click();
+document.getElementById("fileInput").onchange=async e=>{
+  for(const f of e.target.files){
+    files[f.name]=await f.text();
+    dirty.add(f.name);
+  }
+  if(e.target.files[0])activeFile=e.target.files[0].name;
+  switchFile(activeFile);
+  saveProject(true);
+  e.target.value="";
+  toast("파일을 가져왔습니다.");
+};
+
+document.getElementById("saveBtn").onclick=()=>saveProject();
+document.getElementById("logBtn").onclick=()=>logPanel.classList.toggle("open");
+document.getElementById("closeLog").onclick=()=>logPanel.classList.remove("open");
+document.getElementById("refreshPdfBtn").onclick=()=>{if(pdfUrl)pdfFrame.src=pdfUrl};
+
+function stripLatexForDemo(src){
+  let s=src;
+  s=s.replace(/%.*$/gm,"");
+  s=s.replace(/\\(documentclass|usepackage|bibliographystyle|bibliography)(\[[^\]]*\])?\{[^}]*\}/g,"");
+  s=s.replace(/\\begin\{(document|abstract|table|tabular)\}(\{[^}]*\})?/g,"");
+  s=s.replace(/\\end\{(document|abstract|table|tabular)\}/g,"");
+  s=s.replace(/\\(title|author|date|caption|label)\{([^}]*)\}/g,"$2");
+  s=s.replace(/\\(section|subsection|subsubsection)\{([^}]*)\}/g,"\n$2\n");
+  s=s.replace(/\\maketitle/g,"");
+  s=s.replace(/\\input\{([^}]+)\}/g,(m,n)=>"\n"+(files[n.endsWith(".tex")?n:n+".tex"]||""));
+  s=s.replace(/\\\[(.*?)\\\]/gs,"\n$1\n");
+  s=s.replace(/\$(.*?)\$/g,"$1");
+  s=s.replace(/\\[a-zA-Z]+\*?(\[[^\]]*\])?/g,"");
+  s=s.replace(/[{}]/g,"");
+  s=s.replace(/&/g,"   ");
+  s=s.replace(/\\\\/g,"\n");
+  return s.replace(/\n{3,}/g,"\n\n").trim();
+}
+
+async function demoCompile(){
+  const {jsPDF}=window.jspdf||{};
+  if(!jsPDF)throw new Error("jsPDF CDN을 불러오지 못했습니다.");
+  const doc=new jsPDF({unit:"pt",format:"a4"});
+  const margin=54,maxWidth=487;
+  let y=66;
+  doc.setFont("times","normal");doc.setFontSize(11);
+  const plain=stripLatexForDemo(files["main.tex"]||editor.value);
+  const paras=plain.split(/\n/);
+  for(const para of paras){
+    const text=para.trim();
+    if(!text){y+=8;continue}
+    if(y>785){doc.addPage();y=66}
+    const looksHeading=/^(Introduction|Methodology|Related Work|Equation|Table|Design|CloudTeX Sample)$/i.test(text);
+    if(looksHeading){doc.setFont("times","bold");doc.setFontSize(text==="CloudTeX Sample"?18:14);y+=8}
+    else{doc.setFont("times","normal");doc.setFontSize(11)}
+    const lines=doc.splitTextToSize(text,maxWidth);
+    doc.text(lines,margin,y);
+    y+=lines.length*(looksHeading?18:15);
+  }
+  return doc.output("blob");
+}
+
+async function tryInitSwiftLatex(){
+  // If the user later places SwiftLaTeX's PdfTeXEngine.js and assets beside this file,
+  // it can be loaded by adding <script src="PdfTeXEngine.js"></script> before this script.
+  if(typeof window.PdfTeXEngine!=="function")return false;
+  texEngine=new window.PdfTeXEngine();
+  await texEngine.loadEngine();
+  document.getElementById("engineState").textContent="Engine: pdfTeX WASM";
+  return true;
+}
+
+async function realCompile(){
+  texEngine.flushCache?.();
+  for(const [name,content] of Object.entries(files)){
+    texEngine.writeMemFSFile(name,content);
+  }
+  texEngine.setEngineMainFile("main.tex");
+  const result=await texEngine.compileLaTeX();
+  log(result.log||"Compilation finished.",true);
+  if(result.status!==0 && result.pdf===undefined)throw new Error("LaTeX compilation failed. 로그를 확인하세요.");
+  return new Blob([result.pdf],{type:"application/pdf"});
+}
+
+document.getElementById("compileBtn").onclick=async()=>{
+  saveEditorToMemory();
+  const btn=document.getElementById("compileBtn");
+  btn.disabled=true;btn.textContent="⏳ Compiling...";
+  previewState.textContent="컴파일 중...";
+  log("Compilation started...",true);
+
+  try{
+    if(!texEngine)await tryInitSwiftLatex();
+    if(texEngine){
+      log("Using SwiftLaTeX pdfTeX WebAssembly engine.");
+      pdfBlob=await realCompile();
+      previewState.textContent="실제 LaTeX PDF";
+    }else{
+      log("SwiftLaTeX WASM engine was not found.");
+      log("Running demo PDF renderer instead.");
+      log("실제 LaTeX 조판이 아니라 UI/워크플로 확인용 PDF입니다.");
+      pdfBlob=await demoCompile();
+      previewState.textContent="Demo PDF · WASM 미연결";
+    }
+
+    if(pdfUrl)URL.revokeObjectURL(pdfUrl);
+    pdfUrl=URL.createObjectURL(pdfBlob);
+    pdfFrame.src=pdfUrl;
+    emptyPreview.style.display="none";
+    document.getElementById("downloadPdfBtn").disabled=false;
+    log("PDF generated successfully.");
+    toast("PDF를 생성했습니다.");
+  }catch(err){
+    log("ERROR: "+err.message);
+    previewState.textContent="컴파일 실패";
+    logPanel.classList.add("open");
+    toast("컴파일에 실패했습니다.");
+  }finally{
+    btn.disabled=false;btn.textContent="▶ Compile";
+  }
+};
+
+document.getElementById("themeBtn").onclick=()=>{
+  const next=document.documentElement.dataset.theme==="dark"?"light":"dark";
+  document.documentElement.dataset.theme=next;
+  localStorage.setItem("cloudtex-theme",next);
+};
+document.documentElement.dataset.theme=localStorage.getItem("cloudtex-theme")||"light";
+
+const workspace=document.getElementById("workspace");
+const divider=document.getElementById("divider");
+let resizing=false;
+divider.addEventListener("mousedown",()=>resizing=true);
+window.addEventListener("mouseup",()=>resizing=false);
+window.addEventListener("mousemove",e=>{
+  if(!resizing||innerWidth<=800)return;
+  const pct=Math.max(25,Math.min(75,(e.clientX/innerWidth)*100));
+  workspace.style.gridTemplateColumns=`${pct}% 6px 1fr`;
+});
+
+function escapeHtml(s=""){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+(async()=>{
+  await openDB();
+  await loadProject();
+  tryInitSwiftLatex().catch(()=>{});
+})();
+</script>
+</body>
+</html>
