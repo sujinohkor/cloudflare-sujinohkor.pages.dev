@@ -141,21 +141,86 @@ function mmToPx(mm) {
 }
 
 async function waitForLatexLayout(component) {
-  // LaTeX.js may still be laying out fonts/styles after the element is connected.
+  function measure() {
+    const hostRect = component.getBoundingClientRect();
+
+    // Normal host measurement first.
+    let height = Math.max(
+      component.scrollHeight || 0,
+      hostRect.height || 0
+    );
+
+    // LaTeX.js commonly renders its output inside Shadow DOM.
+    // In that case the host itself can report height 0, so measure
+    // the union of the actual rendered elements inside the shadow root.
+    const root = component.shadowRoot;
+    if (root) {
+      const elements = [...root.querySelectorAll("*")];
+
+      if (elements.length) {
+        let top = Infinity;
+        let bottom = -Infinity;
+
+        for (const el of elements) {
+          const style = getComputedStyle(el);
+
+          if (
+            style.display === "none" ||
+            style.position === "fixed"
+          ) {
+            continue;
+          }
+
+          const r = el.getBoundingClientRect();
+
+          if (r.width === 0 && r.height === 0) continue;
+
+          top = Math.min(top, r.top);
+          bottom = Math.max(bottom, r.bottom);
+        }
+
+        if (Number.isFinite(top) && Number.isFinite(bottom)) {
+          height = Math.max(height, bottom - top);
+        }
+
+        // Also try likely document/body wrappers if present.
+        const wrappers = [
+          root.querySelector(".body"),
+          root.querySelector(".document"),
+          root.querySelector("main"),
+          root.querySelector("article"),
+          root.firstElementChild
+        ].filter(Boolean);
+
+        for (const el of wrappers) {
+          const r = el.getBoundingClientRect();
+          height = Math.max(
+            height,
+            el.scrollHeight || 0,
+            r.height || 0
+          );
+        }
+      }
+    }
+
+    return height;
+  }
+
   let previous = -1;
   let stableCount = 0;
 
-  for (let i = 0; i < 20; i++) {
-    await new Promise(resolve => setTimeout(resolve, 60));
+  // Give LaTeX.js enough time to parse, attach styles, and render.
+  for (let i = 0; i < 50; i++) {
+    await new Promise(resolve => setTimeout(resolve, 80));
 
-    const h = Math.max(
-      component.scrollHeight || 0,
-      component.getBoundingClientRect().height || 0
-    );
+    const h = measure();
 
-    if (Math.abs(h - previous) < 1 && h > 20) {
+    if (h > 20 && Math.abs(h - previous) < 1) {
       stableCount += 1;
-      if (stableCount >= 2) return h;
+
+      if (stableCount >= 3) {
+        return h;
+      }
     } else {
       stableCount = 0;
     }
@@ -163,10 +228,7 @@ async function waitForLatexLayout(component) {
     previous = h;
   }
 
-  return Math.max(
-    component.scrollHeight || 0,
-    component.getBoundingClientRect().height || 0
-  );
+  return measure();
 }
 
 function makePreviewComponent(source) {
@@ -207,7 +269,10 @@ async function paginatePreview() {
   const documentHeightPx = await waitForLatexLayout(measureComponent);
 
   if (!documentHeightPx || documentHeightPx < 1) {
-    throw new Error("LaTeX.js 결과의 높이를 측정하지 못했습니다.");
+    throw new Error(
+      "LaTeX.js 렌더링 결과를 측정하지 못했습니다. " +
+      "렌더러는 로드됐지만 실제 문서 DOM이 생성되지 않았습니다."
+    );
   }
 
   const pageCount = Math.max(1, Math.ceil(documentHeightPx / contentHeightPx));
@@ -518,13 +583,16 @@ button{color:inherit}
   min-height:0;overflow:auto;padding:28px;background:#dfe3ea
 }
 #previewSource{
-  position:fixed;
-  left:-100000px;
+  position:absolute;
+  left:0;
   top:0;
-  visibility:hidden;
+  z-index:-1000;
+  opacity:0;
+  visibility:visible;
   pointer-events:none;
   background:#fff;
   color:#111;
+  overflow:visible;
 }
 #previewSource latex-js,
 .latex-page-document{
