@@ -507,7 +507,7 @@ async function demoCompile(){
 
 async function tryInitSwiftLatex(){
   // If the user later places SwiftLaTeX's PdfTeXEngine.js and assets beside this file,
-  // it can be loaded by adding <script src="PdfTeXEngine.js"></script> before this script.
+  // it can be loaded by adding the PdfTeXEngine.js script before this script.
   if(typeof window.PdfTeXEngine!=="function")return false;
   texEngine=new window.PdfTeXEngine();
   await texEngine.loadEngine();
