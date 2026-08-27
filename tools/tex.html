@@ -196,6 +196,53 @@ window.addEventListener("DOMContentLoaded", async () => {
     downloadText("main.tex", editor.value);
   });
 
+  const PAPER_SIZES = {
+    A4:     { css: "A4",          w: 210,   h: 297 },
+    A5:     { css: "A5",          w: 148,   h: 210 },
+    B5:     { css: "176mm 250mm", w: 176,   h: 250 },
+    Letter: { css: "letter",      w: 215.9, h: 279.4 },
+    Legal:  { css: "legal",       w: 215.9, h: 355.6 }
+  };
+
+  function applyPaperSettings() {
+    const name = $("paperSize").value;
+    const orientation = $("orientation").value;
+    const p = PAPER_SIZES[name];
+
+    const w = orientation === "landscape" ? p.h : p.w;
+    const h = orientation === "landscape" ? p.w : p.h;
+
+    // CSS pixels at 96dpi approximation for the on-screen paper preview.
+    const pxPerMm = 96 / 25.4;
+    document.documentElement.style.setProperty("--preview-width", `${Math.round(w * pxPerMm)}px`);
+    document.documentElement.style.setProperty("--preview-height", `${Math.round(h * pxPerMm)}px`);
+
+    const pageSize = orientation === "landscape"
+      ? `${p.css} landscape`
+      : `${p.css} portrait`;
+
+    document.documentElement.style.setProperty("--print-page-size", pageSize);
+    localStorage.setItem("cloudtex-paper-size", name);
+    localStorage.setItem("cloudtex-paper-orientation", orientation);
+  }
+
+  $("paperSize").value = localStorage.getItem("cloudtex-paper-size") || "A4";
+  $("orientation").value = localStorage.getItem("cloudtex-paper-orientation") || "portrait";
+  $("paperSize").addEventListener("change", applyPaperSettings);
+  $("orientation").addEventListener("change", applyPaperSettings);
+  applyPaperSettings();
+
+  $("pdfBtn").addEventListener("click", async () => {
+    applyPaperSettings();
+    await renderLatex(true);
+    document.body.classList.add("printing-preview");
+    setTimeout(() => window.print(), 80);
+  });
+
+  window.addEventListener("afterprint", () => {
+    document.body.classList.remove("printing-preview");
+  });
+
   $("importBtn").addEventListener("click", () => $("fileInput").click());
 
   $("fileInput").addEventListener("change", async event => {
@@ -379,6 +426,96 @@ button{color:inherit}
 }
 .toast.show{opacity:1;transform:none}
 #fileInput{display:none}
+
+
+/* Selected paper preview */
+.preview-paper{
+  width:min(var(--preview-width, 794px),100%);
+  min-height:var(--preview-height, 1123px);
+  transition:width .18s ease,min-height .18s ease;
+}
+
+@media print {
+  @page {
+    size: var(--print-page-size, A4);
+    margin: 18mm 17mm 20mm 17mm;
+  }
+
+  html, body {
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  body {
+    margin: 0 !important;
+  }
+
+  .topbar,
+  .editor-pane,
+  .divider,
+  .preview-toolbar,
+  .error-panel,
+  .toast {
+    display: none !important;
+  }
+
+  .app,
+  .workspace,
+  .preview-pane,
+  .preview-shell,
+  .preview-paper,
+  #previewHost {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  .preview-paper {
+    color: #000 !important;
+  }
+
+  #previewHost latex-js {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  /* Avoid awkward breaks where browsers can honor them. */
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  table, figure, img, pre, blockquote,
+  .table, .figure, .equation {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+}
+
 @media(max-width:760px){
   .workspace{grid-template-columns:1fr!important;grid-template-rows:50% 6px 1fr}
   .divider{cursor:row-resize}
@@ -398,6 +535,18 @@ button{color:inherit}
     <button class="btn" id="saveBtn">💾 Save</button>
     <button class="btn" id="importBtn">📂 Import</button>
     <button class="btn" id="downloadBtn">↓ .tex</button>
+    <select class="btn" id="paperSize" title="용지 크기">
+      <option value="A4">A4</option>
+      <option value="A5">A5</option>
+      <option value="B5">B5</option>
+      <option value="Letter">Letter</option>
+      <option value="Legal">Legal</option>
+    </select>
+    <select class="btn" id="orientation" title="방향">
+      <option value="portrait">Portrait</option>
+      <option value="landscape">Landscape</option>
+    </select>
+    <button class="btn" id="pdfBtn">↓ PDF</button>
     <button class="btn" id="resetBtn">↺ Reset</button>
 
     <div class="spacer"></div>
