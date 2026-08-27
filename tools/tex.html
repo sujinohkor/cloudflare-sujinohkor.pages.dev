@@ -46,7 +46,7 @@ button,select{color:inherit}
 #pages{display:flex;flex-direction:column;align-items:center;gap:28px;min-width:max-content;padding-bottom:28px}
 .paper-page{position:relative;flex:none;background:#fff;color:#111;box-shadow:0 8px 28px rgba(0,0,0,.17);overflow:hidden;scroll-snap-align:start}
 .paper-content{position:absolute;overflow:hidden;background:#fff}
-.page-stage{position:absolute;left:0;top:0;transform-origin:top left}
+.page-flow{height:100%;overflow:hidden;background:#fff;color:#111}
 .page-number{position:absolute;left:0;right:0;bottom:5mm;text-align:center;font:10px/1.2 Inter,system-ui,sans-serif;color:#999;user-select:none}
 .error-panel{position:fixed;left:18px;right:18px;bottom:18px;z-index:100;display:none;background:#251314;color:#ffd8d8;border:1px solid #6a2e31;border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 .error-panel.open{display:block}.error-head{height:36px;display:flex;align-items:center;padding:0 10px;border-bottom:1px solid #633033;font-size:12px;font-weight:700}.error-head span{flex:1}
@@ -61,6 +61,11 @@ button,select{color:inherit}
   .paper-page{margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always}
   .paper-page:last-child{break-after:auto;page-break-after:auto}
   .page-number{display:none!important}
+
+  .page-flow{
+    height:100% !important;
+    overflow:visible !important;
+  }
 }
 @media(max-width:760px){
   .workspace{grid-template-columns:1fr!important;grid-template-rows:50% 6px 1fr}
@@ -217,29 +222,56 @@ async function waitLayout(el){
 async function renderLatex(force=false){
   const src=editor.value;
   if(!force&&src===lastRendered)return;
-  $("status").textContent="Rendering…";clearError();
-  try{
-    const dims=paperDims(),top=18,side=17,bottom=20;
-    const contentW=dims.w-side*2,contentH=dims.h-top-bottom;
 
-    // The official low-level API gives us a normal DOM fragment.
-    const measuredGen=makeGenerator(src);
-    installLatexAssets(measuredGen);
+  $("status").textContent="Rendering…";
+  clearError();
+
+  try{
+    const dims=paperDims();
+    const top=18,side=17,bottom=20;
+    const contentW=dims.w-side*2;
+    const contentH=dims.h-top-bottom;
+
+    // Render once into a normal DOM fragment using LaTeX.js low-level API.
+    const generator=makeGenerator(src);
+    installLatexAssets(generator);
 
     measureRoot.innerHTML="";
     measureRoot.style.width=`${contentW}mm`;
-    const fragment=measuredGen.domFragment();
+
+    const fragment=generator.domFragment();
     measureRoot.appendChild(fragment);
 
-    const fullHeight=await waitLayout(measureRoot);
-    if(fullHeight<10)throw new Error("LaTeX.js generated an empty DOM fragment.");
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 
-    const pageHpx=mmToPx(contentH);
-    const pageCount=Math.max(1,Math.ceil(fullHeight/pageHpx));
+    const sourceRoot=measureRoot.firstElementChild || measureRoot;
+
+    // Collect real top-level rendered blocks.
+    let blocks=[...sourceRoot.children];
+
+    // Some LaTeX.js builds wrap the whole document in one container.
+    // If so, descend one or two levels until we get meaningful block children.
+    for(let depth=0; depth<3 && blocks.length===1; depth++){
+      const only=blocks[0];
+      const kids=[...only.children];
+      if(kids.length>1){
+        blocks=kids;
+        break;
+      }
+      if(kids.length===1){
+        blocks=kids;
+      }else{
+        break;
+      }
+    }
+
+    if(!blocks.length){
+      throw new Error("LaTeX.js 렌더링 결과에서 페이지에 넣을 블록을 찾지 못했습니다.");
+    }
+
     pages.innerHTML="";
 
-    // Render each paper independently from the same source, then translate+clip it.
-    for(let i=0;i<pageCount;i++){
+    function makePage(pageNo){
       const page=document.createElement("section");
       page.className="paper-page";
       page.style.width=`${dims.w}mm`;
@@ -252,27 +284,120 @@ async function renderLatex(force=false){
       content.style.top=`${top}mm`;
       content.style.bottom=`${bottom}mm`;
 
-      const stage=document.createElement("div");
-      stage.className="page-stage";
-      stage.style.width=`${contentW}mm`;
-      stage.style.transform=`translateY(-${i*pageHpx}px)`;
-
-      const gen=makeGenerator(src);
-      stage.appendChild(gen.domFragment());
-      content.appendChild(stage);
+      const flow=document.createElement("div");
+      flow.className="page-flow";
+      flow.style.width=`${contentW}mm`;
+      content.appendChild(flow);
 
       const num=document.createElement("div");
-      num.className="page-number";num.textContent=`Page ${i+1}`;
+      num.className="page-number";
+      num.textContent=`Page ${pageNo}`;
+
       page.append(content,num);
       pages.appendChild(page);
+
+      return {page,content,flow};
+    }
+
+    let pageNo=1;
+    let current=makePage(pageNo);
+
+    function contentOverflows(flow){
+      return flow.scrollHeight > flow.clientHeight + 1;
+    }
+
+    function splitTextElement(original){
+      // Split a large paragraph/list-like block by child nodes.
+      // Returns an array of smaller clones.
+      const pieces=[];
+      const shell=original.cloneNode(false);
+
+      if(original.childNodes.length<=1){
+        // Fallback: split long text by sentences/words.
+        const text=original.textContent||"";
+        const words=text.split(/(\s+)/);
+        let chunk="";
+        const maxChars=700;
+
+        for(const w of words){
+          if((chunk+w).length>maxChars && chunk.trim()){
+            const clone=original.cloneNode(false);
+            clone.textContent=chunk;
+            pieces.push(clone);
+            chunk=w;
+          }else{
+            chunk+=w;
+          }
+        }
+        if(chunk.trim()){
+          const clone=original.cloneNode(false);
+          clone.textContent=chunk;
+          pieces.push(clone);
+        }
+        return pieces.length?pieces:[original.cloneNode(true)];
+      }
+
+      for(const node of original.childNodes){
+        const clone=shell.cloneNode(false);
+        clone.appendChild(node.cloneNode(true));
+        pieces.push(clone);
+      }
+      return pieces;
+    }
+
+    async function appendBlock(block){
+      let clone=block.cloneNode(true);
+      current.flow.appendChild(clone);
+
+      if(!contentOverflows(current.flow)) return;
+
+      current.flow.removeChild(clone);
+
+      // Try the whole block on a fresh page first.
+      pageNo++;
+      current=makePage(pageNo);
+      current.flow.appendChild(clone);
+
+      if(!contentOverflows(current.flow)) return;
+
+      // Single block is taller than a page: split it into smaller chunks.
+      current.flow.removeChild(clone);
+      const pieces=splitTextElement(block);
+
+      for(const piece of pieces){
+        const part=piece.cloneNode(true);
+        current.flow.appendChild(part);
+
+        if(contentOverflows(current.flow)){
+          current.flow.removeChild(part);
+          pageNo++;
+          current=makePage(pageNo);
+          current.flow.appendChild(part);
+        }
+      }
+    }
+
+    for(const block of blocks){
+      await appendBlock(block);
+    }
+
+    // Remove an accidental trailing empty page.
+    const allPages=[...pages.querySelectorAll(".paper-page")];
+    const last=allPages.at(-1);
+    if(allPages.length>1 && last && !last.querySelector(".page-flow")?.textContent.trim()){
+      last.remove();
+      pageNo--;
     }
 
     lastRendered=src;
     localStorage.setItem(STORAGE_KEY,src);
     $("savedState").textContent="Saved";
-    $("status").textContent=`${pageCount} page${pageCount===1?"":"s"} · LaTeX.js`;
+    $("status").textContent=`${pageNo} page${pageNo===1?"":"s"} · LaTeX.js`;
     updatePageIndicator();
-  }catch(e){showError(e)}
+
+  }catch(e){
+    showError(e);
+  }
 }
 function schedule(){clearTimeout(timer);$("savedState").textContent="Editing…";timer=setTimeout(()=>renderLatex(),400)}
 function download(name,text){const b=new Blob([text],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
