@@ -75,6 +75,7 @@ button,input,textarea{font:inherit;color:inherit}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
+const API_BASE="https://clouddesk-api.sujinhokor.workers.dev";
 const DB_NAME="CloudDeskDB";
 const DB_VERSION=1;
 let db=null;
@@ -268,13 +269,22 @@ function enableDrag(win,handle){
 async function renderFiles(root){
   root.innerHTML=`<div class="split">
     <div class="sidebar">
-      <button class="active" data-folder="">🏠 Home</button>
-      <button data-folder="Documents">📄 Documents</button>
-      <button data-folder="Pictures">🖼 Pictures</button>
-      <button data-folder="Projects">📦 Projects</button>
+      <div class="muted" style="font-size:11px;padding:6px 10px">DRIVES</div>
+      <button class="active" data-drive="local">💻 Local</button>
+      <button data-drive="cloud">☁️ Cloud</button>
+
+      <div class="muted" style="font-size:11px;padding:16px 10px 6px">FOLDERS</div>
+      <button class="folder-nav active" data-folder="">🏠 Home</button>
+      <button class="folder-nav" data-folder="Documents">📄 Documents</button>
+      <button class="folder-nav" data-folder="Pictures">🖼 Pictures</button>
+      <button class="folder-nav" data-folder="Projects">📦 Projects</button>
     </div>
+
     <div class="content">
       <div class="toolbar">
+        <strong id="driveTitle">💻 Local</strong>
+        <span class="muted" id="connectionState"></span>
+        <span style="flex:1"></span>
         <button class="btn primary" id="uploadBtn">⬆ Upload</button>
         <button class="btn" id="folderBtn">＋ Folder</button>
         <button class="btn" id="refreshBtn">↻ Refresh</button>
@@ -285,43 +295,128 @@ async function renderFiles(root){
     </div>
   </div>`;
 
+  let drive="local";
   let folder="";
   const grid=root.querySelector("#fileGrid");
   const status=root.querySelector("#fileStatus");
   const input=root.querySelector("#fileInput");
+  const driveTitle=root.querySelector("#driveTitle");
+  const connectionState=root.querySelector("#connectionState");
+
+  function setDriveUI(){
+    driveTitle.textContent=drive==="local"?"💻 Local":"☁️ Cloud";
+    connectionState.textContent=drive==="local"?"이 브라우저에 저장":"D1 + R2";
+  }
+
+  async function cloudFetch(path,options={}){
+    const res=await fetch(API_BASE+path,options);
+    if(!res.ok){
+      let detail="";
+      try{
+        const data=await res.json();
+        detail=data.error||JSON.stringify(data);
+      }catch{
+        detail=await res.text();
+      }
+      throw new Error(detail||`HTTP ${res.status}`);
+    }
+    const type=res.headers.get("content-type")||"";
+    return type.includes("application/json")?res.json():res;
+  }
+
+  async function getItems(){
+    if(drive==="local"){
+      const all=await idbAll("files");
+      return all.filter(x=>(x.folder||"")===folder);
+    }
+    return await cloudFetch("/api/files?folder="+encodeURIComponent(folder));
+  }
 
   async function load(){
-    const all=await idbAll("files");
-    const items=all.filter(x=>(x.folder||"")===folder);
     grid.innerHTML="";
-    status.textContent=items.length?`${items.length} item(s)`:"비어 있습니다.";
+    status.textContent="Loading...";
+    try{
+      const items=await getItems();
+      items.sort((a,b)=>
+        a.kind===b.kind
+          ? String(a.name).localeCompare(String(b.name))
+          : a.kind==="folder" ? -1 : 1
+      );
 
-    items.sort((a,b)=>(a.kind===b.kind?a.name.localeCompare(b.name):a.kind==="folder"?-1:1));
+      status.textContent=items.length
+        ? `${items.length} item(s) · ${folder||"Home"}`
+        : `${folder||"Home"} · 비어 있습니다.`;
 
-    for(const item of items){
-      const c=document.createElement("div");
-      c.className="file-card";
-      c.innerHTML=`<div class="big">${item.kind==="folder"?"📁":fileIcon(item)}</div><b>${escapeHtml(item.name)}</b><small>${item.kind==="folder"?"Folder":formatBytes(item.size||0)}</small>`;
-      c.ondblclick=()=>{
-        if(item.kind==="folder"){folder=item.name;load();}
-        else openApp("viewer",{title:item.name,file:item});
-      };
-      c.oncontextmenu=async e=>{
-        e.preventDefault();
-        if(confirm(`"${item.name}" 삭제할까요?`)){
-          await idbDelete("files",item.id);
-          load();
-        }
-      };
-      grid.appendChild(c);
+      for(const item of items){
+        const card=document.createElement("div");
+        card.className="file-card";
+        card.innerHTML=`<div class="big">${item.kind==="folder"?"📁":fileIcon(item)}</div>
+          <b>${escapeHtml(item.name)}</b>
+          <small>${item.kind==="folder"?"Folder":formatBytes(item.size||0)}</small>`;
+
+        card.ondblclick=()=>{
+          if(item.kind==="folder"){
+            folder=item.name;
+            syncFolderButtons();
+            load();
+            return;
+          }
+
+          if(drive==="local"){
+            openApp("viewer",{title:item.name,file:item});
+          }else{
+            window.open(API_BASE+"/api/file/"+encodeURIComponent(item.id),"_blank","noopener");
+          }
+        };
+
+        card.oncontextmenu=async e=>{
+          e.preventDefault();
+          if(!confirm(`"${item.name}" 삭제할까요?`))return;
+          try{
+            if(drive==="local"){
+              await idbDelete("files",item.id);
+            }else{
+              await cloudFetch("/api/files/"+encodeURIComponent(item.id),{method:"DELETE"});
+            }
+            toast("삭제했습니다.");
+            load();
+          }catch(err){
+            toast("삭제 실패: "+err.message);
+          }
+        };
+
+        grid.appendChild(card);
+      }
+    }catch(err){
+      status.textContent="불러오기 실패";
+      grid.innerHTML=`<div class="file-card" style="grid-column:1/-1;cursor:default">
+        <div class="big">⚠️</div>
+        <b>${drive==="cloud"?"Cloud Drive 연결 오류":"Local Drive 오류"}</b>
+        <small>${escapeHtml(err.message)}</small>
+      </div>`;
     }
   }
 
-  root.querySelectorAll("[data-folder]").forEach(btn=>{
+  function syncFolderButtons(){
+    root.querySelectorAll(".folder-nav").forEach(btn=>{
+      btn.classList.toggle("active",btn.dataset.folder===folder);
+    });
+  }
+
+  root.querySelectorAll("[data-drive]").forEach(btn=>{
     btn.onclick=()=>{
-      root.querySelectorAll("[data-folder]").forEach(x=>x.classList.remove("active"));
+      drive=btn.dataset.drive;
+      root.querySelectorAll("[data-drive]").forEach(x=>x.classList.remove("active"));
       btn.classList.add("active");
+      setDriveUI();
+      load();
+    };
+  });
+
+  root.querySelectorAll(".folder-nav").forEach(btn=>{
+    btn.onclick=()=>{
       folder=btn.dataset.folder;
+      syncFolderButtons();
       load();
     };
   });
@@ -330,54 +425,159 @@ async function renderFiles(root){
   root.querySelector("#uploadBtn").onclick=()=>input.click();
 
   input.onchange=async()=>{
-    for(const file of input.files){
-      await idbPut("files",{
-        id:crypto.randomUUID(),
-        name:file.name,
-        kind:"file",
-        folder,
-        size:file.size,
-        type:file.type,
-        blob:file,
-        createdAt:Date.now()
-      });
+    if(!input.files.length)return;
+    try{
+      for(const file of input.files){
+        if(drive==="local"){
+          await idbPut("files",{
+            id:crypto.randomUUID(),
+            name:file.name,
+            kind:"file",
+            folder,
+            size:file.size,
+            type:file.type,
+            blob:file,
+            createdAt:Date.now()
+          });
+        }else{
+          const fd=new FormData();
+          fd.append("file",file);
+          fd.append("folder",folder);
+          await cloudFetch("/api/upload",{method:"POST",body:fd});
+        }
+      }
+      toast(drive==="local"?"Local에 저장했습니다.":"Cloud R2에 업로드했습니다.");
+      input.value="";
+      load();
+    }catch(err){
+      toast("업로드 실패: "+err.message);
     }
-    input.value="";
-    toast("파일을 IndexedDB에 저장했습니다.");
-    load();
   };
 
   root.querySelector("#folderBtn").onclick=async()=>{
     const name=prompt("폴더 이름");
     if(!name)return;
-    await idbPut("files",{id:crypto.randomUUID(),name,kind:"folder",folder,size:0,createdAt:Date.now()});
-    load();
+    try{
+      if(drive==="local"){
+        await idbPut("files",{
+          id:crypto.randomUUID(),
+          name,
+          kind:"folder",
+          folder,
+          size:0,
+          createdAt:Date.now()
+        });
+      }else{
+        await cloudFetch("/api/folders",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({name,folder})
+        });
+      }
+      toast("폴더를 만들었습니다.");
+      load();
+    }catch(err){
+      toast("폴더 생성 실패: "+err.message);
+    }
   };
 
+  setDriveUI();
   load();
 }
-
 async function renderNotes(root){
-  root.innerHTML=`<div class="notes-wrap"><div class="notes-toolbar"><span class="muted" id="noteStatus">Loading...</span><button class="btn" id="saveNote">Save</button></div><textarea class="notes" placeholder="메모를 입력하세요. IndexedDB에 저장됩니다."></textarea></div>`;
+  root.innerHTML=`<div class="notes-wrap">
+    <div class="notes-toolbar">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn primary" id="localNoteBtn">💻 Local</button>
+        <button class="btn" id="cloudNoteBtn">☁️ Cloud</button>
+        <span class="muted" id="noteStatus">Loading...</span>
+      </div>
+      <button class="btn" id="saveNote">Save</button>
+    </div>
+    <textarea class="notes" placeholder="메모를 입력하세요."></textarea>
+  </div>`;
+
+  let mode="local";
   const ta=root.querySelector("textarea");
   const st=root.querySelector("#noteStatus");
-  const row=await idbGet("notes","main");
-  ta.value=row?.content||"";
-  st.textContent="IndexedDB";
+  const localBtn=root.querySelector("#localNoteBtn");
+  const cloudBtn=root.querySelector("#cloudNoteBtn");
+
+  async function cloudJson(path,options={}){
+    const res=await fetch(API_BASE+path,options);
+    if(!res.ok){
+      let text="";
+      try{
+        const data=await res.json();
+        text=data.error||JSON.stringify(data);
+      }catch{
+        text=await res.text();
+      }
+      throw new Error(text||`HTTP ${res.status}`);
+    }
+    return res.json();
+  }
+
+  async function load(){
+    st.textContent="Loading...";
+    try{
+      if(mode==="local"){
+        const row=await idbGet("notes","main");
+        ta.value=row?.content||"";
+        st.textContent="IndexedDB";
+      }else{
+        const row=await cloudJson("/api/notes");
+        ta.value=row.content||"";
+        st.textContent="D1";
+      }
+    }catch(err){
+      st.textContent="Error";
+      toast("Notes 불러오기 실패: "+err.message);
+    }
+  }
 
   async function save(){
-    await idbPut("notes",{id:"main",content:ta.value,updatedAt:Date.now()});
-    st.textContent="Saved";
+    try{
+      if(mode==="local"){
+        await idbPut("notes",{id:"main",content:ta.value,updatedAt:Date.now()});
+        st.textContent="Saved locally";
+      }else{
+        await cloudJson("/api/notes",{
+          method:"PUT",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({content:ta.value})
+        });
+        st.textContent="Saved to D1";
+      }
+    }catch(err){
+      st.textContent="Save failed";
+      toast("Notes 저장 실패: "+err.message);
+    }
   }
-  root.querySelector("#saveNote").onclick=async()=>{await save();toast("메모 저장 완료")};
+
+  function syncButtons(){
+    localBtn.classList.toggle("primary",mode==="local");
+    cloudBtn.classList.toggle("primary",mode==="cloud");
+  }
+
+  localBtn.onclick=()=>{mode="local";syncButtons();load();};
+  cloudBtn.onclick=()=>{mode="cloud";syncButtons();load();};
+
+  root.querySelector("#saveNote").onclick=async()=>{
+    await save();
+    toast(mode==="local"?"Local Notes 저장 완료":"Cloud Notes 저장 완료");
+  };
+
   let timer;
   ta.oninput=()=>{
     st.textContent="Unsaved";
     clearTimeout(timer);
-    timer=setTimeout(save,700);
+    timer=setTimeout(save,900);
   };
-}
 
+  syncButtons();
+  load();
+}
 async function renderViewer(root,file){
   root.innerHTML=`<div class="viewer"><div class="muted">Loading...</div></div>`;
   const box=root.querySelector(".viewer");
@@ -411,7 +611,7 @@ async function renderStorage(root){
   root.innerHTML=`<div class="center"><div><div style="font-size:64px">💾</div><h1>IndexedDB Storage</h1><p class="muted" id="usage">Checking...</p><button class="btn" id="refreshUsage">Refresh</button></div></div>`;
 
   async function update(){
-    let text="CloudDeskDB가 이 브라우저 안에 생성되어 있습니다.";
+    let text="Local: CloudDeskDB(IndexedDB) · Cloud: D1 + R2";
     if(navigator.storage?.estimate){
       const e=await navigator.storage.estimate();
       text+=` 현재 사용량 약 ${formatBytes(e.usage||0)} / 브라우저 허용량 약 ${formatBytes(e.quota||0)}`;
@@ -425,7 +625,7 @@ async function renderStorage(root){
 function renderSettings(root){
   root.innerHTML=`<div class="settings"><h2 style="margin-top:0">Settings</h2>
     <div class="setting-row"><div><b>Appearance</b><div class="muted">Light / Dark</div></div><button class="pill" id="themeBtn"></button></div>
-    <div class="setting-row"><div><b>Database</b><div class="muted">CloudDeskDB / IndexedDB</div></div><span>Local</span></div>
+    <div class="setting-row"><div><b>Local Storage</b><div class="muted">CloudDeskDB / IndexedDB</div></div><span>💻</span></div><div class="setting-row"><div><b>Cloud Storage</b><div class="muted">D1 metadata + R2 objects</div></div><span>☁️</span></div>
     <div class="setting-row"><div><b>Reset</b><div class="muted">모든 파일·메모 삭제</div></div><button class="pill" id="resetBtn">Erase data</button></div>
   </div>`;
 
@@ -480,7 +680,7 @@ async function runCommand(cmd){
   if(cmd==="help")return"help, date, ls, storage, clear, echo <text>";
   if(cmd==="date")return new Date().toString();
   if(cmd==="ls"){const files=await idbAll("files");return files.map(f=>f.name).join("  ")||"(empty)"}
-  if(cmd==="storage")return"CloudDeskDB / IndexedDB / local browser storage";
+  if(cmd==="storage")return`Local: CloudDeskDB / IndexedDB\nCloud: ${API_BASE} / D1 + R2`;
   if(cmd.startsWith("echo "))return cmd.slice(5);
   if(cmd==="clear"){setTimeout(()=>document.querySelectorAll(".terminal").forEach(t=>[...t.children].filter(c=>!c.classList.contains("terminal-input-row")).forEach(c=>c.remove())),0);return""}
   return cmd?`command not found: ${cmd}`:"";
