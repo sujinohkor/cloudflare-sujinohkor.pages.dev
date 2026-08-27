@@ -107,29 +107,16 @@ async function renderLatex(force = false) {
   clearError();
 
   try {
-    const component = document.createElement("latex-js");
-    component.setAttribute(
-      "baseURL",
-      "https://cdn.jsdelivr.net/npm/latex.js/dist/"
-    );
-    component.setAttribute("hyphenate", "false");
-    component.textContent = source;
-
-    previewSource.replaceChildren(component);
-
-    // Wait until LaTeX.js has actually rendered the component.
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-    paginatePreview();
+    await paginatePreview();
 
     lastRendered = source;
     localStorage.setItem(STORAGE_KEY, source);
-    status.textContent = "Live preview · LaTeX.js";
     $("savedState").textContent = "Saved";
   } catch (error) {
     showError(error);
   }
 }
+
 
 
 function getPaperDimensionsMm() {
@@ -153,136 +140,114 @@ function mmToPx(mm) {
   return mm * (96 / 25.4);
 }
 
-function createPaperPage(pageWidthPx, pageHeightPx, pageNumber) {
-  const page = document.createElement("section");
-  page.className = "paper-page";
-  page.style.width = `${pageWidthPx}px`;
-  page.style.height = `${pageHeightPx}px`;
+async function waitForLatexLayout(component) {
+  // LaTeX.js may still be laying out fonts/styles after the element is connected.
+  let previous = -1;
+  let stableCount = 0;
 
-  const content = document.createElement("div");
-  content.className = "paper-content";
+  for (let i = 0; i < 20; i++) {
+    await new Promise(resolve => setTimeout(resolve, 60));
 
-  const number = document.createElement("div");
-  number.className = "page-number";
-  number.textContent = `Page ${pageNumber}`;
+    const h = Math.max(
+      component.scrollHeight || 0,
+      component.getBoundingClientRect().height || 0
+    );
 
-  page.append(content, number);
-  return { page, content };
-}
-
-function isBreakFriendlyBlock(el) {
-  const tag = el.tagName?.toLowerCase();
-
-  if (["h1","h2","h3","h4","h5","h6","p","ul","ol","table","figure","blockquote","pre"].includes(tag)) {
-    return true;
-  }
-
-  const cls = typeof el.className === "string" ? el.className.toLowerCase() : "";
-  return /equation|table|figure|display|abstract|section|paragraph|theorem/.test(cls);
-}
-
-function splitLargeTextBlock(block, target, createNewPage, maxHeight) {
-  // For very large paragraph-like blocks, split by text nodes/children instead of
-  // allowing one enormous block to overflow a page.
-  const cloneShell = block.cloneNode(false);
-  target.appendChild(cloneShell);
-
-  const children = [...block.childNodes];
-
-  for (const node of children) {
-    const cloned = node.cloneNode(true);
-    cloneShell.appendChild(cloned);
-
-    if (target.scrollHeight > maxHeight) {
-      cloneShell.removeChild(cloned);
-
-      const next = createNewPage();
-      const nextShell = block.cloneNode(false);
-      next.appendChild(nextShell);
-      nextShell.appendChild(cloned);
-      target = next;
+    if (Math.abs(h - previous) < 1 && h > 20) {
+      stableCount += 1;
+      if (stableCount >= 2) return h;
+    } else {
+      stableCount = 0;
     }
+
+    previous = h;
   }
 
-  return target;
+  return Math.max(
+    component.scrollHeight || 0,
+    component.getBoundingClientRect().height || 0
+  );
 }
 
-function paginatePreview() {
-  const component = previewSource.querySelector("latex-js");
-  if (!component) return;
+function makePreviewComponent(source) {
+  const component = document.createElement("latex-js");
+  component.setAttribute(
+    "baseURL",
+    "https://cdn.jsdelivr.net/npm/latex.js/dist/"
+  );
+  component.setAttribute("hyphenate", "false");
+  component.textContent = source;
+  component.className = "latex-page-document";
+  return component;
+}
 
+async function paginatePreview() {
+  const source = editor.value;
   const dims = getPaperDimensionsMm();
 
-  // Screen representation of physical paper.
-  const pageWidthPx = mmToPx(dims.w);
-  const pageHeightPx = mmToPx(dims.h);
+  // These are the same margins used for PDF printing.
+  const topMm = 18;
+  const sideMm = 17;
+  const bottomMm = 20;
 
-  // 18/17/20/17 mm print margins from existing PDF stylesheet.
-  const topMargin = mmToPx(18);
-  const sideMargin = mmToPx(17);
-  const bottomMargin = mmToPx(20);
-  const contentHeight = pageHeightPx - topMargin - bottomMargin;
+  const contentWidthMm = Math.max(20, dims.w - sideMm * 2);
+  const contentHeightMm = Math.max(20, dims.h - topMm - bottomMm);
 
+  const contentWidthPx = mmToPx(contentWidthMm);
+  const contentHeightPx = mmToPx(contentHeightMm);
+
+  // 1) Render ONE complete LaTeX.js document off-screen.
+  previewSource.innerHTML = "";
+  previewSource.style.width = `${contentWidthMm}mm`;
+
+  const measureComponent = makePreviewComponent(source);
+  previewSource.appendChild(measureComponent);
+
+  await customElements.whenDefined("latex-js");
+  const documentHeightPx = await waitForLatexLayout(measureComponent);
+
+  if (!documentHeightPx || documentHeightPx < 1) {
+    throw new Error("LaTeX.js 결과의 높이를 측정하지 못했습니다.");
+  }
+
+  const pageCount = Math.max(1, Math.ceil(documentHeightPx / contentHeightPx));
+
+  // 2) Each visible page contains the same rendered document,
+  // translated upward and clipped to the content rectangle.
   paginatedPages.innerHTML = "";
-  paginatedPages.style.setProperty("--page-width", `${pageWidthPx}px`);
-  paginatedPages.style.setProperty("--page-height", `${pageHeightPx}px`);
-  paginatedPages.style.setProperty("--page-pad-top", `${topMargin}px`);
-  paginatedPages.style.setProperty("--page-pad-side", `${sideMargin}px`);
-  paginatedPages.style.setProperty("--page-pad-bottom", `${bottomMargin}px`);
 
-  let pageNo = 1;
-  let current = createPaperPage(pageWidthPx, pageHeightPx, pageNo);
-  paginatedPages.appendChild(current.page);
+  for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+    const page = document.createElement("section");
+    page.className = "paper-page";
+    page.style.width = `${dims.w}mm`;
+    page.style.height = `${dims.h}mm`;
 
-  const renderedRoot =
-    component.shadowRoot?.querySelector(".body") ||
-    component.shadowRoot?.querySelector("main") ||
-    component.shadowRoot?.firstElementChild ||
-    component;
+    const content = document.createElement("div");
+    content.className = "paper-content";
+    content.style.left = `${sideMm}mm`;
+    content.style.right = `${sideMm}mm`;
+    content.style.top = `${topMm}mm`;
+    content.style.bottom = `${bottomMm}mm`;
 
-  const sourceNodes = [...renderedRoot.children];
+    const stage = document.createElement("div");
+    stage.className = "fragment-stage";
+    stage.style.width = `${contentWidthMm}mm`;
+    stage.style.transform = `translateY(-${pageIndex * contentHeightPx}px)`;
 
-  const newPageContent = () => {
-    pageNo += 1;
-    current = createPaperPage(pageWidthPx, pageHeightPx, pageNo);
-    paginatedPages.appendChild(current.page);
-    return current.content;
-  };
+    const pageComponent = makePreviewComponent(source);
+    stage.appendChild(pageComponent);
+    content.appendChild(stage);
 
-  for (const original of sourceNodes) {
-    const block = original.cloneNode(true);
+    const number = document.createElement("div");
+    number.className = "page-number";
+    number.textContent = `Page ${pageIndex + 1}`;
 
-    current.content.appendChild(block);
-
-    if (current.content.scrollHeight <= contentHeight) {
-      continue;
-    }
-
-    // Move the overflowing block to the next page.
-    current.content.removeChild(block);
-    let nextContent = newPageContent();
-    nextContent.appendChild(block);
-
-    // If a single block is taller than a page, attempt a child-by-child split.
-    if (nextContent.scrollHeight > contentHeight && isBreakFriendlyBlock(block)) {
-      nextContent.removeChild(block);
-      nextContent = splitLargeTextBlock(
-        block,
-        nextContent,
-        newPageContent,
-        contentHeight
-      );
-    }
+    page.append(content, number);
+    paginatedPages.appendChild(page);
   }
 
-  // Remove a trailing empty page if one was created.
-  const pages = [...paginatedPages.querySelectorAll(".paper-page")];
-  const last = pages.at(-1);
-  if (pages.length > 1 && last && !last.querySelector(".paper-content")?.textContent.trim()) {
-    last.remove();
-  }
+  status.textContent = `${pageCount} page${pageCount === 1 ? "" : "s"} · LaTeX.js`;
 }
-
 function scheduleRender() {
   clearTimeout(renderTimer);
   $("savedState").textContent = "Editing…";
@@ -384,8 +349,8 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("paperSize").value = localStorage.getItem("cloudtex-paper-size") || "A4";
   $("orientation").value = localStorage.getItem("cloudtex-paper-orientation") || "portrait";
-  $("paperSize").addEventListener("change", () => { applyPaperSettings(); paginatePreview(); });
-  $("orientation").addEventListener("change", () => { applyPaperSettings(); paginatePreview(); });
+  $("paperSize").addEventListener("change", async () => { applyPaperSettings(); await renderLatex(true); });
+  $("orientation").addEventListener("change", async () => { applyPaperSettings(); await renderLatex(true); });
   applyPaperSettings();
 
   $("pdfBtn").addEventListener("click", async () => {
@@ -556,9 +521,17 @@ button{color:inherit}
   position:fixed;
   left:-100000px;
   top:0;
-  width:900px;
   visibility:hidden;
   pointer-events:none;
+  background:#fff;
+  color:#111;
+}
+#previewSource latex-js,
+.latex-page-document{
+  display:block;
+  width:100%;
+  background:#fff;
+  color:#111;
 }
 #paginatedPages{
   display:flex;
@@ -577,14 +550,15 @@ button{color:inherit}
 }
 .paper-content{
   position:absolute;
-  left:var(--page-pad-side);
-  right:var(--page-pad-side);
-  top:var(--page-pad-top);
-  bottom:var(--page-pad-bottom);
   overflow:hidden;
+  background:#fff;
 }
-.paper-content > *{
-  max-width:100%;
+.fragment-stage{
+  position:absolute;
+  left:0;
+  top:0;
+  transform-origin:top left;
+  will-change:transform;
 }
 .page-number{
   position:absolute;
@@ -669,15 +643,15 @@ button{color:inherit}
     display:none !important;
   }
 
+  #paginatedPages {
+    display:block !important;
+  }
+
   .paper-page {
-    width:auto !important;
-    height:auto !important;
-    min-height:0 !important;
     position:relative !important;
     margin:0 !important;
-    padding:0 !important;
     box-shadow:none !important;
-    overflow:visible !important;
+    overflow:hidden !important;
     break-after:page;
     page-break-after:always;
     background:#fff !important;
@@ -690,10 +664,20 @@ button{color:inherit}
   }
 
   .paper-content {
-    position:static !important;
-    overflow:visible !important;
-    padding:0 !important;
+    position:absolute !important;
+    overflow:hidden !important;
+    background:#fff !important;
+  }
+
+  .fragment-stage {
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+  }
+
+  .latex-page-document {
     color:#000 !important;
+    background:#fff !important;
   }
 
   .page-number {
