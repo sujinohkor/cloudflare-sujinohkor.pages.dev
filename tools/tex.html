@@ -57,7 +57,8 @@ const THEME_KEY = "cloudtex-latexjs-theme-v1";
 
 const $ = id => document.getElementById(id);
 const editor = $("editor");
-const previewHost = $("previewHost");
+const previewSource = $("previewSource");
+const paginatedPages = $("paginatedPages");
 const status = $("status");
 const lineNums = $("lineNums");
 const cursorPos = $("cursorPos");
@@ -106,8 +107,6 @@ async function renderLatex(force = false) {
   clearError();
 
   try {
-    // Re-create the component because LaTeX.js parses the element content
-    // when the custom element is connected.
     const component = document.createElement("latex-js");
     component.setAttribute(
       "baseURL",
@@ -116,7 +115,12 @@ async function renderLatex(force = false) {
     component.setAttribute("hyphenate", "false");
     component.textContent = source;
 
-    previewHost.replaceChildren(component);
+    previewSource.replaceChildren(component);
+
+    // Wait until LaTeX.js has actually rendered the component.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    paginatePreview();
 
     lastRendered = source;
     localStorage.setItem(STORAGE_KEY, source);
@@ -124,6 +128,158 @@ async function renderLatex(force = false) {
     $("savedState").textContent = "Saved";
   } catch (error) {
     showError(error);
+  }
+}
+
+
+function getPaperDimensionsMm() {
+  const PAPER_SIZES = {
+    A4:     { w: 210,   h: 297 },
+    A5:     { w: 148,   h: 210 },
+    B5:     { w: 176,   h: 250 },
+    Letter: { w: 215.9, h: 279.4 },
+    Legal:  { w: 215.9, h: 355.6 }
+  };
+
+  const selected = PAPER_SIZES[$("paperSize").value] || PAPER_SIZES.A4;
+  const landscape = $("orientation").value === "landscape";
+
+  return landscape
+    ? { w: selected.h, h: selected.w }
+    : { w: selected.w, h: selected.h };
+}
+
+function mmToPx(mm) {
+  return mm * (96 / 25.4);
+}
+
+function createPaperPage(pageWidthPx, pageHeightPx, pageNumber) {
+  const page = document.createElement("section");
+  page.className = "paper-page";
+  page.style.width = `${pageWidthPx}px`;
+  page.style.height = `${pageHeightPx}px`;
+
+  const content = document.createElement("div");
+  content.className = "paper-content";
+
+  const number = document.createElement("div");
+  number.className = "page-number";
+  number.textContent = `Page ${pageNumber}`;
+
+  page.append(content, number);
+  return { page, content };
+}
+
+function isBreakFriendlyBlock(el) {
+  const tag = el.tagName?.toLowerCase();
+
+  if (["h1","h2","h3","h4","h5","h6","p","ul","ol","table","figure","blockquote","pre"].includes(tag)) {
+    return true;
+  }
+
+  const cls = typeof el.className === "string" ? el.className.toLowerCase() : "";
+  return /equation|table|figure|display|abstract|section|paragraph|theorem/.test(cls);
+}
+
+function splitLargeTextBlock(block, target, createNewPage, maxHeight) {
+  // For very large paragraph-like blocks, split by text nodes/children instead of
+  // allowing one enormous block to overflow a page.
+  const cloneShell = block.cloneNode(false);
+  target.appendChild(cloneShell);
+
+  const children = [...block.childNodes];
+
+  for (const node of children) {
+    const cloned = node.cloneNode(true);
+    cloneShell.appendChild(cloned);
+
+    if (target.scrollHeight > maxHeight) {
+      cloneShell.removeChild(cloned);
+
+      const next = createNewPage();
+      const nextShell = block.cloneNode(false);
+      next.appendChild(nextShell);
+      nextShell.appendChild(cloned);
+      target = next;
+    }
+  }
+
+  return target;
+}
+
+function paginatePreview() {
+  const component = previewSource.querySelector("latex-js");
+  if (!component) return;
+
+  const dims = getPaperDimensionsMm();
+
+  // Screen representation of physical paper.
+  const pageWidthPx = mmToPx(dims.w);
+  const pageHeightPx = mmToPx(dims.h);
+
+  // 18/17/20/17 mm print margins from existing PDF stylesheet.
+  const topMargin = mmToPx(18);
+  const sideMargin = mmToPx(17);
+  const bottomMargin = mmToPx(20);
+  const contentHeight = pageHeightPx - topMargin - bottomMargin;
+
+  paginatedPages.innerHTML = "";
+  paginatedPages.style.setProperty("--page-width", `${pageWidthPx}px`);
+  paginatedPages.style.setProperty("--page-height", `${pageHeightPx}px`);
+  paginatedPages.style.setProperty("--page-pad-top", `${topMargin}px`);
+  paginatedPages.style.setProperty("--page-pad-side", `${sideMargin}px`);
+  paginatedPages.style.setProperty("--page-pad-bottom", `${bottomMargin}px`);
+
+  let pageNo = 1;
+  let current = createPaperPage(pageWidthPx, pageHeightPx, pageNo);
+  paginatedPages.appendChild(current.page);
+
+  const renderedRoot =
+    component.shadowRoot?.querySelector(".body") ||
+    component.shadowRoot?.querySelector("main") ||
+    component.shadowRoot?.firstElementChild ||
+    component;
+
+  const sourceNodes = [...renderedRoot.children];
+
+  const newPageContent = () => {
+    pageNo += 1;
+    current = createPaperPage(pageWidthPx, pageHeightPx, pageNo);
+    paginatedPages.appendChild(current.page);
+    return current.content;
+  };
+
+  for (const original of sourceNodes) {
+    const block = original.cloneNode(true);
+
+    current.content.appendChild(block);
+
+    if (current.content.scrollHeight <= contentHeight) {
+      continue;
+    }
+
+    // Move the overflowing block to the next page.
+    current.content.removeChild(block);
+    let nextContent = newPageContent();
+    nextContent.appendChild(block);
+
+    // If a single block is taller than a page, attempt a child-by-child split.
+    if (nextContent.scrollHeight > contentHeight && isBreakFriendlyBlock(block)) {
+      nextContent.removeChild(block);
+      nextContent = splitLargeTextBlock(
+        block,
+        nextContent,
+        newPageContent,
+        contentHeight
+      );
+    }
+  }
+
+  // Remove a trailing empty page if one was created.
+  const pages = [...paginatedPages.querySelectorAll(".paper-page")];
+  const last = pages.at(-1);
+  if (pages.length > 1 && last && !last.querySelector(".paper-content")?.textContent.trim()) {
+    last.remove();
   }
 }
 
@@ -228,8 +384,8 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   $("paperSize").value = localStorage.getItem("cloudtex-paper-size") || "A4";
   $("orientation").value = localStorage.getItem("cloudtex-paper-orientation") || "portrait";
-  $("paperSize").addEventListener("change", applyPaperSettings);
-  $("orientation").addEventListener("change", applyPaperSettings);
+  $("paperSize").addEventListener("change", () => { applyPaperSettings(); paginatePreview(); });
+  $("orientation").addEventListener("change", () => { applyPaperSettings(); paginatePreview(); });
   applyPaperSettings();
 
   $("pdfBtn").addEventListener("click", async () => {
@@ -394,15 +550,51 @@ button{color:inherit}
   border-bottom:1px solid var(--line);font-size:12px
 }
 .preview-shell{
-  min-height:0;overflow:auto;padding:26px;background:#dfe3ea
+  min-height:0;overflow:auto;padding:28px;background:#dfe3ea
 }
-.preview-paper{
-  width:min(794px,100%);min-height:calc(100% - 10px);margin:0 auto;
-  background:#fff;color:#111;box-shadow:0 8px 28px rgba(0,0,0,.16);
-  padding:48px 56px
+#previewSource{
+  position:fixed;
+  left:-100000px;
+  top:0;
+  width:900px;
+  visibility:hidden;
+  pointer-events:none;
 }
-#previewHost latex-js{
-  display:block;width:100%;min-height:500px
+#paginatedPages{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+  min-width:max-content;
+}
+.paper-page{
+  position:relative;
+  flex:none;
+  background:#fff;
+  color:#111;
+  box-shadow:0 8px 28px rgba(0,0,0,.17);
+  overflow:hidden;
+}
+.paper-content{
+  position:absolute;
+  left:var(--page-pad-side);
+  right:var(--page-pad-side);
+  top:var(--page-pad-top);
+  bottom:var(--page-pad-bottom);
+  overflow:hidden;
+}
+.paper-content > *{
+  max-width:100%;
+}
+.page-number{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:5mm;
+  text-align:center;
+  font:10px/1.2 Inter,system-ui,sans-serif;
+  color:#999;
+  user-select:none;
 }
 .error-panel{
   position:fixed;left:18px;right:18px;bottom:18px;z-index:100;
@@ -427,13 +619,6 @@ button{color:inherit}
 .toast.show{opacity:1;transform:none}
 #fileInput{display:none}
 
-
-/* Selected paper preview */
-.preview-paper{
-  width:min(var(--preview-width, 794px),100%);
-  min-height:var(--preview-height, 1123px);
-  transition:width .18s ease,min-height .18s ease;
-}
 
 @media print {
   @page {
@@ -465,32 +650,54 @@ button{color:inherit}
   .workspace,
   .preview-pane,
   .preview-shell,
-  .preview-paper,
-  #previewHost {
-    display: block !important;
-    width: auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-    position: static !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #fff !important;
-    box-shadow: none !important;
-    border: 0 !important;
+  #paginatedPages {
+    display:block !important;
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    position:static !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:#fff !important;
+    box-shadow:none !important;
+    border:0 !important;
   }
 
-  .preview-paper {
-    color: #000 !important;
+  #previewSource {
+    display:none !important;
   }
 
-  #previewHost latex-js {
-    display: block !important;
-    width: 100% !important;
-    min-height: 0 !important;
-    color: #000 !important;
-    background: #fff !important;
+  .paper-page {
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    position:relative !important;
+    margin:0 !important;
+    padding:0 !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+    break-after:page;
+    page-break-after:always;
+    background:#fff !important;
+    color:#000 !important;
+  }
+
+  .paper-page:last-child {
+    break-after:auto;
+    page-break-after:auto;
+  }
+
+  .paper-content {
+    position:static !important;
+    overflow:visible !important;
+    padding:0 !important;
+    color:#000 !important;
+  }
+
+  .page-number {
+    display:none !important;
   }
 
   /* Avoid awkward breaks where browsers can honor them. */
@@ -522,7 +729,7 @@ button{color:inherit}
   .brand span{display:none}
   .status.top-status{display:none}
   .preview-shell{padding:10px}
-  .preview-paper{padding:30px 24px}
+  #paginatedPages{transform-origin:top center}
 }
 </style>
 </head>
@@ -585,9 +792,8 @@ button{color:inherit}
       </div>
 
       <div class="preview-shell">
-        <article class="preview-paper">
-          <div id="previewHost"></div>
-        </article>
+        <div id="previewSource" aria-hidden="true"></div>
+        <div id="paginatedPages"></div>
       </div>
     </section>
   </main>
